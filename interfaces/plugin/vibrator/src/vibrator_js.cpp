@@ -53,7 +53,7 @@ static napi_value Vibrate(napi_env env, napi_callback_info info)
     } else if (IsMatchType(args[0], napi_string, env)) {
         size_t bufLength = 0;
         napi_status status = napi_get_value_string_utf8(env, args[0], nullptr, 0, &bufLength);
-        if (bufLength <= 0) {
+        if (bufLength < 0) {
             HiLog::Error(LABEL, "%{public}s input parameter is invalid", __func__);
             return nullptr;
         }
@@ -105,7 +105,7 @@ static napi_value Stop(napi_env env, napi_callback_info info)
     };
     size_t bufLength = 0;
     napi_status status = napi_get_value_string_utf8(env, args[0], nullptr, 0, &bufLength);
-    if (bufLength <= 0) {
+    if (bufLength < 0) {
         HiLog::Error(LABEL, "%{public}s input parameter is invalid", __func__);
         return nullptr;
     }

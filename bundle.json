@@ -9,8 +9,8 @@
     "syscap": ["SystemCapability.Sensors.MiscDevice"],
     "features": [],
     "adapted_system_type": [ "standard" ],
-    "rom": "230KB",
-    "ram": "~4KB",
+    "rom": "1024KB",
+    "ram": "~4096KB",
     "deps": {
       "components": [
         "libhilog",
