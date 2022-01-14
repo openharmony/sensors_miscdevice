@@ -34,7 +34,6 @@ ohos_shared_library("libmiscdevice_service") {
   deps = [
     "$SUBSYSTEM_DIR/miscdevice/utils:libmiscdevice_utils",
     "//drivers/peripheral/misc/vibrator/hal:hdi_vibrator",
-    "//utils/native/base:utils",
   ]
 
   external_deps = [
@@ -43,6 +42,7 @@ ohos_shared_library("libmiscdevice_service") {
     "permission_standard:libpermissionsdk_standard",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
+    "utils_base:utils",
   ]
 
   part_name = "miscdevice"

@@ -32,12 +32,12 @@ ohos_shared_library("vibrator") {
     "./vibrator/src/vibrator_napi_utils.cpp",
   ]
 
-  deps = [
-    "../native/vibrator:vibrator_interface_native",
-    "//foundation/ace/napi:ace_napi",
-    "//utils/native/base:utils",
+  deps = [ "//base/sensors/miscdevice/interfaces/native/vibrator:vibrator_interface_native" ]
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "napi:ace_napi",
+    "utils_base:utils",
   ]
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
   relative_install_dir = "module"
   part_name = "miscdevice"
   subsystem_name = "sensors"

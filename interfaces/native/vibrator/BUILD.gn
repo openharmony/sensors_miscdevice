@@ -49,11 +49,13 @@ ohos_shared_library("vibrator_interface_native") {
   deps = [
     "$SUBSYSTEM_DIR/frameworks/native/miscdevice:libvibrator_native",
     "$SUBSYSTEM_DIR/interfaces/native/vibrator:libvibrator_ndk",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
-    "//utils/native/base:utils",
   ]
 
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "utils_base:utils",
+  ]
 
   public_configs = [ ":vibrator_config" ]
   part_name = "miscdevice"
