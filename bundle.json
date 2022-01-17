@@ -3,6 +3,9 @@
   "description": "Control vibration vibration",
   "version": "3.1",
   "license": "Apache License 2.0",
+  "segment": {
+    "destPath": "base/sensors/miscdevice"
+  },
   "component": {
     "name": "miscdevice",
     "subsystem": "sensors",
@@ -13,14 +16,14 @@
     "ram": "~4096KB",
     "deps": {
       "components": [
-        "libhilog",
-        "ipc_core",
-        "system_ability_fwk",
-        "samgr_proxy",
+        "hiviewdfx_hilog_native",
+        "ipc",
+        "safwk",
+        "samgr_standard",
         "utils_base",
-        "libeventhandler",
-        "libpermissionsdk_standard",
-        "ace_napi"
+        "permission_standard",
+        "napi",
+        "hisysevent_native"
       ],
       "third_party": []
     },
