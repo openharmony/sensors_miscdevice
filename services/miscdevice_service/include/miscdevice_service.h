@@ -30,9 +30,7 @@
 #include "miscdevice_common.h"
 #include "miscdevice_service_stub.h"
 #include "nocopyable.h"
-#include "vibrator_if.h"
-#include "vibrator_type.h"
-#include "miscdevice_service_impl.h"
+#include "vibrator_hdi_connection.h"
 
 namespace OHOS {
 namespace Sensors {
@@ -70,7 +68,7 @@ public:
 private:
     DISALLOW_COPY_AND_MOVE(MiscdeviceService);
     bool InitInterface();
-    MiscdeviceServiceImpl &vibratorServiceImpl_ = MiscdeviceServiceImpl::GetInstance();
+    VibratorHdiConnection &vibratorHdiConnection_ = VibratorHdiConnection::GetInstance();
     class VibratorThread : public Thread {
     public:
         explicit VibratorThread(const MiscdeviceService &service);

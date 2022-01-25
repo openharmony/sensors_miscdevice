@@ -19,9 +19,6 @@
 #include "sensors_log_domain.h"
 #include "system_ability_definition.h"
 
-#include "miscdevice_service_impl.h"
-
-
 namespace OHOS {
 namespace Sensors {
 using namespace OHOS::HiviewDFX;
@@ -130,7 +127,7 @@ void MiscdeviceService::OnStart()
 
 bool MiscdeviceService::InitInterface()
 {
-    auto ret = vibratorServiceImpl_.InitVibratorServiceImpl();
+    auto ret = vibratorHdiConnection_.ConnectHdi();
     if (ret != ERR_OK) {
         HiLog::Error(LABEL, "%{public}s InitVibratorServiceImpl failed", __func__);
         return false;
@@ -146,6 +143,10 @@ void MiscdeviceService::OnStop()
         return;
     }
     state_ = MiscdeviceServiceState::STATE_STOPPED;
+    int32_t ret = vibratorHdiConnection_.DestroyHdiConnection();
+    if (ret != ERR_OK) {
+        HiLog::Error(LABEL, "%{public}s destroy hdi connection fail", __func__);
+    }
     HiLog::Info(LABEL, "%{public}s end", __func__);
 }
 
@@ -180,13 +181,13 @@ int32_t MiscdeviceService::Vibrate(int32_t vibratorId, uint32_t timeOut)
     auto it = vibratorEffectMap_.find(vibratorId);
     if (it != vibratorEffectMap_.end()) {
         if (it->second == "time") {
-            vibratorServiceImpl_.StopVibratorImpl(VIBRATOR_MODE_ONCE);
+            vibratorHdiConnection_.Stop(IVibratorHdiConnection::VIBRATOR_STOP_MODE_TIME);
         } else {
-            vibratorServiceImpl_.StopVibratorImpl(VIBRATOR_MODE_PRESET);
+            vibratorHdiConnection_.Stop(IVibratorHdiConnection::VIBRATOR_STOP_MODE_PRESET);
         }
     }
     vibratorEffectMap_[vibratorId] = "time";
-    return vibratorServiceImpl_.StartOnceVibrator((timeOut < MIN_VIBRATOR_TIME) ? MIN_VIBRATOR_TIME : timeOut);
+    return vibratorHdiConnection_.StartOnce((timeOut < MIN_VIBRATOR_TIME) ? MIN_VIBRATOR_TIME : timeOut);
 }
 
 int32_t MiscdeviceService::CancelVibrator(int32_t vibratorId)
@@ -208,7 +209,7 @@ int32_t MiscdeviceService::CancelVibrator(int32_t vibratorId)
             vibratorThread_->NotifyExitSync();
         }
     }
-    return vibratorServiceImpl_.StopVibratorImpl(VIBRATOR_MODE_ONCE);
+    return vibratorHdiConnection_.Stop(IVibratorHdiConnection::VIBRATOR_STOP_MODE_TIME);
 }
 
 int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::string &effect, bool isLooping)
@@ -222,15 +223,15 @@ int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::str
                 vibratorThread_->NotifyExit();
                 vibratorThread_->NotifyExitSync();
             }
-            vibratorServiceImpl_.StopVibratorImpl(VIBRATOR_MODE_ONCE);
+            vibratorHdiConnection_.Stop(IVibratorHdiConnection::VIBRATOR_STOP_MODE_TIME);
         } else {
-            vibratorServiceImpl_.StopVibratorImpl(VIBRATOR_MODE_PRESET);
+            vibratorHdiConnection_.Stop(IVibratorHdiConnection::VIBRATOR_STOP_MODE_PRESET);
         }
     }
     if (!isLooping) {
         vibratorEffectMap_[vibratorId] = effect;
         const char *effectType = (char *)effect.data();
-        return vibratorServiceImpl_.StartVibrator(effectType);
+        return vibratorHdiConnection_.Start(effectType);
     }
     if (hapticRingMap_.empty()) {
         HiLog::Error(LABEL, "%{public}s hapticRingMap_ cannot be empty", __func__);
@@ -276,9 +277,9 @@ int32_t MiscdeviceService::PlayCustomVibratorEffect(int32_t vibratorId, const st
     auto it = vibratorEffectMap_.find(vibratorId);
     if (it != vibratorEffectMap_.end()) {
         if (it->second == "time") {
-            vibratorServiceImpl_.StopVibratorImpl(VIBRATOR_MODE_ONCE);
+            vibratorHdiConnection_.Stop(IVibratorHdiConnection::VIBRATOR_STOP_MODE_TIME);
         } else {
-            vibratorServiceImpl_.StopVibratorImpl(VIBRATOR_MODE_PRESET);
+            vibratorHdiConnection_.Stop(IVibratorHdiConnection::VIBRATOR_STOP_MODE_PRESET);
         }
     }
     vibratorEffectMap_[vibratorId] = "time";
@@ -327,7 +328,7 @@ int32_t MiscdeviceService::StopVibratorEffect(int32_t vibratorId, const std::str
             ready_ = false;
         }
     }
-    int32_t ret = vibratorServiceImpl_.StopVibratorImpl(VIBRATOR_MODE_PRESET);
+    int32_t ret = vibratorHdiConnection_.Stop(IVibratorHdiConnection::VIBRATOR_STOP_MODE_PRESET);
     return ret;
 }
 

@@ -17,10 +17,9 @@ SUBSYSTEM_DIR = "//base/sensors"
 ohos_shared_library("libmiscdevice_service") {
   sources = [
     "hdi_connection/adpter/src/compatible_connection.cpp",
-    "hdi_connection/adpter/src/hdi_direct_connection.cpp",
+    "hdi_connection/adpter/src/hdi_connection.cpp",
     "hdi_connection/interface/src/vibrator_hdi_connection.cpp",
     "src/miscdevice_service.cpp",
-    "src/miscdevice_service_impl.cpp",
     "src/miscdevice_service_stub.cpp",
   ]
 
@@ -30,7 +29,6 @@ ohos_shared_library("libmiscdevice_service") {
     "//utils/system/safwk/native/include",
     "$SUBSYSTEM_DIR/miscdevice/frameworks/native/miscdevice/include",
     "$SUBSYSTEM_DIR/miscdevice/utils/include",
-    "//drivers/peripheral/misc/vibrator/interfaces/include",
     "hdi_connection/adpter/include",
     "hdi_connection/interface/include",
   ]
@@ -38,7 +36,7 @@ ohos_shared_library("libmiscdevice_service") {
   cflags = [ "-Wno-error=inconsistent-missing-override" ]
   deps = [
     "$SUBSYSTEM_DIR/miscdevice/utils:libmiscdevice_utils",
-    "//drivers/peripheral/misc/vibrator/hal:hdi_vibrator",
+    "//drivers/interface/vibrator/v1_0:libvibrator_proxy_1.0",
   ]
 
   external_deps = [

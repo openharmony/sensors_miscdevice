@@ -13,19 +13,19 @@
  * limitations under the License.
  */
 
-#ifndef HDI_DIRECT_CONNECTION_H
-#define HDI_DIRECT_CONNECTION_H
+#ifndef HDI_CONNECTION_H
+#define HDI_CONNECTION_H
 
 #include "i_vibrator_hdi_connection.h"
-#include "vibrator_if.h"
-
+#include "vibrator_interface_proxy.h"
+using vibrator::v1_0::IVibratorInterface;
 namespace OHOS {
 namespace Sensors {
-class HdiDirectConnection : public IVibratorHdiConnection {
+class HdiConnection : public IVibratorHdiConnection {
 public:
-    HdiDirectConnection() = default;
+    HdiConnection() = default;
 
-    virtual ~HdiDirectConnection() {};
+    virtual ~HdiConnection() {};
 
     int32_t ConnectHdi() override;
 
@@ -38,9 +38,9 @@ public:
     int32_t DestroyHdiConnection() override;
 
 private:
-    DISALLOW_COPY_AND_MOVE(HdiDirectConnection);
-    const struct VibratorInterface *vibratorInterface = nullptr;
+    DISALLOW_COPY_AND_MOVE(HdiConnection);
+    sptr<IVibratorInterface> vibratorInterface_ = nullptr;
 };
 }  // namespace Sensors
 }  // namespace OHOS
-#endif  // HDI_DIRECT_CONNECTION_H
+#endif  // HDI_CONNECTION_H
