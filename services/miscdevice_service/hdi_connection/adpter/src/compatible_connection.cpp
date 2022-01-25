@@ -45,7 +45,7 @@ int32_t CompatibleConnection::StartOnce(uint32_t duration)
     HiLog::Info(LABEL, "%{public}s in", __func__);
     if (duration > MAX_VIBRATOR_TIME || duration <= MIN_VIBRATOR_TIME) {
         HiLog::Error(LABEL, "%{public}s duration: %{public}d invalid", __func__, duration);
-        return -1;
+        return VIBRATOR_ON_ERR;
     }
     duration_ = duration;
     if (!vibrateThread_.joinable()) {
@@ -62,7 +62,7 @@ int32_t CompatibleConnection::Start(const char *effectType)
     HiLog::Info(LABEL, "%{public}s in", __func__);
     if (std::find(vibratorEffect_.begin(), vibratorEffect_.end(), effectType) == vibratorEffect_.end()) {
         HiLog::Error(LABEL, "%{public}s not support %{public}s type", __func__, effectType);
-        return -1;
+        return VIBRATOR_ON_ERR;
     }
     if (!vibrateThread_.joinable()) {
         std::thread senocdDataThread(CompatibleConnection::VibrateProcess);
@@ -78,11 +78,11 @@ int32_t CompatibleConnection::Stop(VibratorStopMode mode)
     HiLog::Info(LABEL, "%{public}s in", __func__);
     if (mode < 0 || mode >= VIBRATOR_STOP_MODE_INVALID) {
         HiLog::Error(LABEL, "%{public}s mode: %{public}d invalid", __func__, mode);
-        return -1;
+        return VIBRATOR_OFF_ERR;
     }
     if (vibrateMode_ != mode) {
         HiLog::Error(LABEL, "%{public}s should start vibrate first", __func__);
-        return -1;
+        return VIBRATOR_OFF_ERR;
     }
     if (vibrateThread_.joinable()) {
         HiLog::Info(LABEL, "%{public}s stop vibrate thread", __func__);

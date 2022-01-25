@@ -23,7 +23,8 @@
         "utils_base",
         "permission_standard",
         "napi",
-        "hisysevent_native"
+        "hisysevent_native",
+        "vibrator_device_driver"
       ],
       "third_party": []
     },

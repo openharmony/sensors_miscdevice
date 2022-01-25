@@ -15,7 +15,7 @@
 #include "vibrator_hdi_connection.h"
 
 #include "compatible_connection.h"
-#include "hdi_direct_connection.h"
+#include "hdi_connection.h"
 #include "sensors_errors.h"
 #include "sensors_log_domain.h"
 
@@ -29,7 +29,7 @@ constexpr HiLogLabel LABEL = { LOG_CORE, SensorsLogDomain::SENSOR_SERVICE, "Vibr
 
 int32_t VibratorHdiConnection::ConnectHdi()
 {
-    iVibratorHdiConnection_ = std::make_unique<HdiDirectConnection>();
+    iVibratorHdiConnection_ = std::make_unique<HdiConnection>();
     int32_t ret = iVibratorHdiConnection_->ConnectHdi();
     if (ret != 0) {
         HiLog::Error(LABEL, "%{public}s hdi direct failed", __func__);
