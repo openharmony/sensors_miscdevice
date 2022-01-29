@@ -15,7 +15,7 @@
 
 #ifndef HDI_CONNECTION_H
 #define HDI_CONNECTION_H
-
+#include "death_recipient_template.h"
 #include "i_vibrator_hdi_connection.h"
 #include "vibrator_interface_proxy.h"
 using vibrator::v1_0::IVibratorInterface;
@@ -37,9 +37,14 @@ public:
 
     int32_t DestroyHdiConnection() override;
 
+    void ProcessDeathObserver(const wptr<IRemoteObject> &object);
 private:
     DISALLOW_COPY_AND_MOVE(HdiConnection);
     sptr<IVibratorInterface> vibratorInterface_ = nullptr;
+    sptr<IRemoteObject::DeathRecipient> hdiDeathObserver_;
+    void RegisterHdiDeathRecipient();
+    void UnregisterHdiDeathRecipient();
+    void reconnect();
 };
 }  // namespace Sensors
 }  // namespace OHOS
