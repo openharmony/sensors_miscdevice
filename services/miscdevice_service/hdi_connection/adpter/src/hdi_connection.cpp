@@ -103,7 +103,7 @@ void HdiConnection::UnregisterHdiDeathRecipient()
 {
     HiLog::Debug(LABEL, "%{public}s begin", __func__);
     if (vibratorInterface_ == nullptr || hdiDeathObserver_ == nullptr) {
-        HiLog::Error(LABEL, "%{public}s sensorInterface_ or hdiDeathObserver_ is null", __func__);
+        HiLog::Error(LABEL, "%{public}s vibratorInterface_ or hdiDeathObserver_ is null", __func__);
         return;
     }
     vibratorInterface_->AsObject()->RemoveDeathRecipient(hdiDeathObserver_);
@@ -113,8 +113,8 @@ void HdiConnection::ProcessDeathObserver(const wptr<IRemoteObject> &object)
 {
     HiLog::Debug(LABEL, "%{public}s begin", __func__);
     sptr<IRemoteObject> hdiService = object.promote();
-    if (hdiService == nullptr) {
-        HiLog::Error(LABEL, "%{public}s invalid remote object", __func__);
+    if (hdiService == nullptr || hdiDeathObserver_ == nullptr) {
+        HiLog::Error(LABEL, "%{public}s invalid remote object or hdiDeathObserver_ is null", __func__);
         return;
     }
     hdiService->RemoveDeathRecipient(hdiDeathObserver_);
