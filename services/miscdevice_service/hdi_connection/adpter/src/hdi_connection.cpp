@@ -70,7 +70,7 @@ int32_t HdiConnection::Start(const char *effectType)
 
 int32_t HdiConnection::Stop(VibratorStopMode mode)
 {
-    int32_t ret = vibratorInterface_->Stop(static_cast<vibrator::v1_0::HdfVibratorMode>(mode));
+    int32_t ret = vibratorInterface_->Stop(static_cast<OHOS::HDI::Vibrator::V1_0::HdfVibratorMode>(mode));
     if (ret < 0) {
         HiLog::Error(LABEL, "%{public}s failed", __func__);
         return ret;

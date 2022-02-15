@@ -18,7 +18,7 @@
 #include "death_recipient_template.h"
 #include "i_vibrator_hdi_connection.h"
 #include "vibrator_interface_proxy.h"
-using vibrator::v1_0::IVibratorInterface;
+using OHOS::HDI::Vibrator::V1_0::IVibratorInterface;
 namespace OHOS {
 namespace Sensors {
 class HdiConnection : public IVibratorHdiConnection {
