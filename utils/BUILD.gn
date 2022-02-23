@@ -16,6 +16,7 @@ ohos_shared_library("libmiscdevice_utils") {
   sources = [
     "src/dmd_report.cpp",
     "src/miscdevice_common.cpp",
+    "src/permission_util.cpp",
   ]
 
   include_dirs = [
@@ -25,6 +26,7 @@ ohos_shared_library("libmiscdevice_utils") {
   ]
 
   external_deps = [
+    "access_token:libaccesstoken_sdk",
     "hisysevent_native:libhisysevent",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",

@@ -16,12 +16,12 @@
     "ram": "~4096KB",
     "deps": {
       "components": [
+        "access_token",
         "hiviewdfx_hilog_native",
         "ipc",
         "safwk",
         "samgr_standard",
         "utils_base",
-        "permission_standard",
         "napi",
         "hisysevent_native",
         "vibrator_device_driver"
