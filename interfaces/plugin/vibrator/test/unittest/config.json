@@ -23,6 +23,18 @@
         "moduleName": "entry",
         "moduleType": "entry"
       },
+      "reqPermissions": [
+        {
+          "name": "ohos.permission.VIBRATE",
+          "reason": "",
+          "usedScene": {
+            "ability": [
+              ".MainAbility"
+            ],
+            "when": "inuse"
+          }
+        }
+      ],
       "abilities": [
         {
           "visible": true,
