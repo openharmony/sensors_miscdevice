@@ -21,6 +21,7 @@
 #include "ipc_skeleton.h"
 #include "message_parcel.h"
 
+#include "permission_util.h"
 #include "sensors_errors.h"
 #include "sensors_log_domain.h"
 
@@ -76,6 +77,11 @@ int32_t MiscdeviceServiceStub::IsVibratorEffectAvailablePb(MessageParcel &data, 
 
 int32_t MiscdeviceServiceStub::VibratePb(MessageParcel &data, MessageParcel &reply)
 {
+    PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
+    if (!permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION)) {
+        HiLog::Error(LABEL, "%{public}s permission denied", __func__);
+        return ERR_PERMISSION_DENIED;
+    }
     return Vibrate(data.ReadInt32(), data.ReadUint32());
 }
 
@@ -89,12 +95,22 @@ int32_t MiscdeviceServiceStub::GetVibratorIdListPb(MessageParcel &data, MessageP
 
 int32_t MiscdeviceServiceStub::CancelVibratorPb(MessageParcel &data, MessageParcel &reply)
 {
+    PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
+    if (!permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION)) {
+        HiLog::Error(LABEL, "%{public}s permission denied", __func__);
+        return ERR_PERMISSION_DENIED;
+    }
     int32_t vibratorId = data.ReadInt32();
     return CancelVibrator(vibratorId);
 }
 
 int32_t MiscdeviceServiceStub::PlayVibratorEffectPb(MessageParcel &data, MessageParcel &reply)
 {
+    PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
+    if (!permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION)) {
+        HiLog::Error(LABEL, "%{public}s permission denied", __func__);
+        return ERR_PERMISSION_DENIED;
+    }
     int32_t vibratorId = data.ReadInt32();
     std::string effectType = data.ReadString();
     bool isLooping = data.ReadBool();
@@ -103,6 +119,11 @@ int32_t MiscdeviceServiceStub::PlayVibratorEffectPb(MessageParcel &data, Message
 
 int32_t MiscdeviceServiceStub::PlayCustomVibratorEffectPb(MessageParcel &data, MessageParcel &reply)
 {
+    PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
+    if (!permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION)) {
+        HiLog::Error(LABEL, "%{public}s permission denied", __func__);
+        return ERR_PERMISSION_DENIED;
+    }
     int32_t vibratorId = data.ReadInt32();
     std::vector<int32_t> timing;
     data.ReadInt32Vector(&timing);
@@ -114,6 +135,11 @@ int32_t MiscdeviceServiceStub::PlayCustomVibratorEffectPb(MessageParcel &data, M
 
 int32_t MiscdeviceServiceStub::StopVibratorEffectPb(MessageParcel &data, MessageParcel &reply)
 {
+    PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
+    if (!permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION)) {
+        HiLog::Error(LABEL, "%{public}s permission denied", __func__);
+        return ERR_PERMISSION_DENIED;
+    }
     int32_t vibratorId = data.ReadInt32();
     std::string effectType = data.ReadString();
     return StopVibratorEffect(vibratorId, effectType);
@@ -121,6 +147,11 @@ int32_t MiscdeviceServiceStub::StopVibratorEffectPb(MessageParcel &data, Message
 
 int32_t MiscdeviceServiceStub::SetVibratorParameterPb(MessageParcel &data, MessageParcel &reply)
 {
+    PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
+    if (!permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION)) {
+        HiLog::Error(LABEL, "%{public}s permission denied", __func__);
+        return ERR_PERMISSION_DENIED;
+    }
     int32_t vibratorId = data.ReadInt32();
     std::string cmd = data.ReadString();
     return SetVibratorParameter(vibratorId, cmd);
