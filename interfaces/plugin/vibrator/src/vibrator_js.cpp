@@ -135,6 +135,52 @@ static napi_value Stop(napi_env env, napi_callback_info info)
     return nullptr;
 }
 
+static napi_value EnumClassConstructor(const napi_env env, const napi_callback_info info)
+{
+    size_t argc = 0;
+    napi_value args[1] = {0};
+    napi_value res = nullptr;
+    void *data = nullptr;
+    napi_status status = napi_get_cb_info(env, info, &argc, args, &res, &data);
+    if (status != napi_ok) {
+        return nullptr;
+    }
+    return res;
+}
+
+static napi_value CreateEnumStopMode(const napi_env env, napi_value exports)
+{
+    napi_value timeMode = nullptr;
+    napi_value presetMode = nullptr;
+    napi_create_string_utf8(env, "time", NAPI_AUTO_LENGTH, &timeMode);
+    napi_create_string_utf8(env, "preset", NAPI_AUTO_LENGTH, &presetMode);
+
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("VIBRATOR_STOP_MODE_TIME", timeMode),
+        DECLARE_NAPI_STATIC_PROPERTY("VIBRATOR_STOP_MODE_PRESET", presetMode),
+    };
+    napi_value result = nullptr;
+    napi_define_class(env, "VibratorStopMode", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+        sizeof(desc) / sizeof(*desc), desc, &result);
+    napi_set_named_property(env, exports, "VibratorStopMode", result);
+    return exports;
+}
+
+static napi_value CreateEnumEffectId(const napi_env env, const napi_value exports)
+{
+    napi_value clockTime = nullptr;
+    napi_create_string_utf8(env, "haptic.clock.timer", NAPI_AUTO_LENGTH, &clockTime);
+
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("EFFECT_CLOCK_TIMER", clockTime),
+    };
+    napi_value result = nullptr;
+    napi_define_class(env, "EffectId", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+        sizeof(desc) / sizeof(*desc), desc, &result);
+    napi_set_named_property(env, exports, "EffectId", result);
+    return exports;
+}
+
 EXTERN_C_START
 
 static napi_value Init(napi_env env, napi_value exports)
@@ -144,6 +190,8 @@ static napi_value Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("stop", Stop)
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(napi_property_descriptor), desc));
+    CreateEnumStopMode(env, exports);
+    CreateEnumEffectId(env, exports);
     return exports;
 }
 EXTERN_C_END
