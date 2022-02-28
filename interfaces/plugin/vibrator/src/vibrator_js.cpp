@@ -135,7 +135,7 @@ static napi_value Stop(napi_env env, napi_callback_info info)
     return nullptr;
 }
 
-napi_value EnumClassConstructor(const napi_env env, const napi_callback_info info)
+static napi_value EnumClassConstructor(const napi_env env, const napi_callback_info info)
 {
     size_t argc = 0;
     napi_value args[1] = {0};
@@ -148,7 +148,7 @@ napi_value EnumClassConstructor(const napi_env env, const napi_callback_info inf
     return res;
 }
 
-napi_value CreateEnumStopMode(const napi_env env, napi_value exports)
+static napi_value CreateEnumStopMode(const napi_env env, napi_value exports)
 {
     napi_value timeMode = nullptr;
     napi_value presetMode = nullptr;
@@ -166,7 +166,7 @@ napi_value CreateEnumStopMode(const napi_env env, napi_value exports)
     return exports;
 }
 
-napi_value CreateEnumEffectId(const napi_env env, const napi_value exports)
+static napi_value CreateEnumEffectId(const napi_env env, const napi_value exports)
 {
     napi_value clockTime = nullptr;
     napi_create_string_utf8(env, "haptic.clock.timer", NAPI_AUTO_LENGTH, &clockTime);
