@@ -233,10 +233,6 @@ int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::str
         const char *effectType = (char *)effect.data();
         return vibratorHdiConnection_.Start(effectType);
     }
-    if (hapticRingMap_.empty()) {
-        HiLog::Error(LABEL, "%{public}s hapticRingMap_ cannot be empty", __func__);
-        return ERROR;
-    }
     std::unordered_map<std::string, int32_t>::iterator iter = hapticRingMap_.find(effect);
     if (iter == hapticRingMap_.end()) {
         HiLog::Error(LABEL, "%{public}s is not exist", __func__);
