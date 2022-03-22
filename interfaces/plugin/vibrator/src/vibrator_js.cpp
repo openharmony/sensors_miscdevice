@@ -55,11 +55,15 @@ static napi_value Vibrate(napi_env env, napi_callback_info info)
         napi_status status = napi_get_value_string_utf8(env, args[0], nullptr, 0, &bufLength);
         if (status != napi_ok) {
             HiLog::Error(LABEL, "%{public}s input parameter is invalid", __func__);
+            delete asyncCallbackInfo;
+            asyncCallbackInfo = nullptr;
             return nullptr;
         }
         char *vibratorEffect = static_cast<char *>(malloc((bufLength + 1) * sizeof(char)));
         if (vibratorEffect == nullptr) {
             HiLog::Error(LABEL, "%{public}s malloc fail", __func__);
+            delete asyncCallbackInfo;
+            asyncCallbackInfo = nullptr;
             return nullptr;
         }
         status = napi_get_value_string_utf8(env, args[0], vibratorEffect, bufLength + 1, &bufLength);
@@ -111,11 +115,15 @@ static napi_value Stop(napi_env env, napi_callback_info info)
     napi_status status = napi_get_value_string_utf8(env, args[0], nullptr, 0, &bufLength);
     if (status != napi_ok) {
         HiLog::Error(LABEL, "%{public}s input parameter is invalid", __func__);
+        delete asyncCallbackInfo;
+        asyncCallbackInfo = nullptr;
         return nullptr;
     }
     char *mode = static_cast<char *>(malloc((bufLength + 1) * sizeof(char)));
-    if (mode == 0) {
+    if (mode == nullptr) {
         HiLog::Error(LABEL, "%{public}s malloc fail", __func__);
+        delete asyncCallbackInfo;
+        asyncCallbackInfo = nullptr;
         return nullptr;
     }
     status = napi_get_value_string_utf8(env, args[0], mode, bufLength + 1, &bufLength);
