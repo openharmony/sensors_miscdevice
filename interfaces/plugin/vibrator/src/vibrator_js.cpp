@@ -53,11 +53,19 @@ static napi_value Vibrate(napi_env env, napi_callback_info info)
     } else if (IsMatchType(args[0], napi_string, env)) {
         size_t bufLength = 0;
         napi_status status = napi_get_value_string_utf8(env, args[0], nullptr, 0, &bufLength);
-        if (bufLength < 0) {
+        if (status != napi_ok) {
             HiLog::Error(LABEL, "%{public}s input parameter is invalid", __func__);
+            delete asyncCallbackInfo;
+            asyncCallbackInfo = nullptr;
             return nullptr;
         }
-        char *vibratorEffect = (char *)malloc((bufLength + 1) * sizeof(char));
+        char *vibratorEffect = static_cast<char *>(malloc((bufLength + 1) * sizeof(char)));
+        if (vibratorEffect == nullptr) {
+            HiLog::Error(LABEL, "%{public}s malloc fail", __func__);
+            delete asyncCallbackInfo;
+            asyncCallbackInfo = nullptr;
+            return nullptr;
+        }
         status = napi_get_value_string_utf8(env, args[0], vibratorEffect, bufLength + 1, &bufLength);
         asyncCallbackInfo->error.code = StartVibrator(vibratorEffect);
         if (vibratorEffect != nullptr) {
@@ -105,11 +113,19 @@ static napi_value Stop(napi_env env, napi_callback_info info)
     };
     size_t bufLength = 0;
     napi_status status = napi_get_value_string_utf8(env, args[0], nullptr, 0, &bufLength);
-    if (bufLength < 0) {
+    if (status != napi_ok) {
         HiLog::Error(LABEL, "%{public}s input parameter is invalid", __func__);
+        delete asyncCallbackInfo;
+        asyncCallbackInfo = nullptr;
         return nullptr;
     }
-    char *mode = (char *)malloc((bufLength + 1) * sizeof(char));
+    char *mode = static_cast<char *>(malloc((bufLength + 1) * sizeof(char)));
+    if (mode == nullptr) {
+        HiLog::Error(LABEL, "%{public}s malloc fail", __func__);
+        delete asyncCallbackInfo;
+        asyncCallbackInfo = nullptr;
+        return nullptr;
+    }
     status = napi_get_value_string_utf8(env, args[0], mode, bufLength + 1, &bufLength);
     asyncCallbackInfo->error.code = StopVibrator(mode);
     if (mode != nullptr) {

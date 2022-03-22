@@ -95,6 +95,10 @@ std::vector<int32_t> MiscdeviceServiceProxy::GetVibratorIdList()
         return idVec;
     }
     uint32_t setCount = reply.ReadUint32();
+    if (setCount <= 0 || setCount > idVec.max_size()) {
+        HiLog::Error(LABEL, "%{public}s setCount: %{public}d is invalid", __func__, setCount);
+        return idVec;
+    }
     idVec.resize(setCount);
     reply.ReadInt32Vector(&idVec);
     return idVec;
@@ -301,6 +305,10 @@ std::vector<int32_t> MiscdeviceServiceProxy::GetLightSupportId()
         HiLog::Error(LABEL, "%{public}s failed, ret : %{public}d", __func__, ret);
     }
     int32_t setCount = reply.ReadInt32();
+    if (setCount <= 0 || setCount > idVec.max_size()) {
+        HiLog::Error(LABEL, "%{public}s setCount: %{public}d is invalid", __func__, setCount);
+        return idVec;
+    }
     idVec.resize(setCount);
     reply.ReadInt32Vector(&idVec);
     return idVec;
