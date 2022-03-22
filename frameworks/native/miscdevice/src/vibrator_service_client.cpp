@@ -132,7 +132,7 @@ int32_t VibratorServiceClient::Stop(int32_t vibratorId, const std::string &type)
         HiLog::Error(LABEL, "%{public}s InitServiceClient failed, ret : %{public}d", __func__, ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
-    if ((type == "customized") || (type == "time")) {
+    if (type == "time") {
         ret = miscdeviceProxy_->CancelVibrator(vibratorId);
     } else {
         ret = miscdeviceProxy_->StopVibratorEffect(vibratorId, type);

@@ -54,7 +54,7 @@ int32_t StartVibrator(const char *effectId)
 
 int32_t StartVibratorOnce(uint32_t duration)
 {
-    if (duration <= 0) {
+    if (duration == 0) {
         HiLog::Error(LABEL, "%{public}s duration is invalid", __func__);
         return OHOS::Sensors::ERROR;
     }
