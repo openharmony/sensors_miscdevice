@@ -35,17 +35,14 @@ constexpr uint32_t WAIT_MS = 200;
 
 int32_t LightServiceClient::InitServiceClient()
 {
-    HiLog::Debug(LABEL, "%{public}s begin", __func__);
+    CALL_LOG_ENTER;
     std::lock_guard<std::mutex> clientLock(clientMutex_);
     if (miscdeviceProxy_ != nullptr) {
         HiLog::Debug(LABEL, "%{public}s already init", __func__);
         return ERR_OK;
     }
     auto sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (sm == nullptr) {
-        HiLog::Error(LABEL, "%{public}s sm cannot be null", __func__);
-        return MISC_NATIVE_SAM_ERR;
-    }
+    CHKPR(sm, MISC_NATIVE_SAM_ERR);
     int32_t retry = 0;
     while (retry < GET_SERVICE_MAX_COUNT) {
         miscdeviceProxy_ = iface_cast<IMiscdeviceService>(sm->GetSystemAbility(MISCDEVICE_SERVICE_ABILITY_ID));
@@ -57,7 +54,7 @@ int32_t LightServiceClient::InitServiceClient()
             }
             return ERR_OK;
         }
-        HiLog::Warn(LABEL, "%{public}s get service failed, retry : %{public}d", __func__, retry);
+        MISC_LOGW("get service failed, retry : %{public}d", retry);
         std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_MS));
         retry++;
     }
