@@ -48,9 +48,6 @@
             "header_base": "//base/sensors/miscdevice/interfaces/native/vibrator/include"
           }
         }
-      ],
-      "test": [
-        "//base/sensors/miscdevice/interfaces/plugin/vibrator/test/unittest:unittest"
       ]
     }
   }
