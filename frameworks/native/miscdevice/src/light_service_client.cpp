@@ -54,7 +54,7 @@ int32_t LightServiceClient::InitServiceClient()
             }
             return ERR_OK;
         }
-        MISC_LOGW("get service failed, retry : %{public}d", retry);
+        MISC_HILOGW("get service failed, retry : %{public}d", retry);
         std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_MS));
         retry++;
     }

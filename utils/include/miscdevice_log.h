@@ -33,16 +33,16 @@ constexpr uint32_t MISC_LOG_DOMAIN = 0xD002800;
 #define MISC_FUNC_INFO __FUNCTION__, __LINE__
 #endif
 
-#define MISC_LOGD(fmt, ...) do { \
+#define MISC_HILOGD(fmt, ...) do { \
     OHOS::HiviewDFX::HiLog::Debug(LABEL, MISC_FUNC_FMT fmt, MISC_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
-#define MISC_LOGI(fmt, ...) do { \
+#define MISC_HILOGI(fmt, ...) do { \
     OHOS::HiviewDFX::HiLog::Info(LABEL, MISC_FUNC_FMT fmt, MISC_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
-#define MISC_LOGW(fmt, ...) do { \
+#define MISC_HILOGW(fmt, ...) do { \
     OHOS::HiviewDFX::HiLog::Warn(LABEL, MISC_FUNC_FMT fmt, MISC_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
-#define MISC_LOGE(fmt, ...) do { \
+#define MISC_HILOGE(fmt, ...) do { \
     OHOS::HiviewDFX::HiLog::Error(LABEL, MISC_FUNC_FMT fmt, MISC_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 #define MISC_LOGF(fmt, ...) do { \
