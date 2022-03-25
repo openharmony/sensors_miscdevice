@@ -38,8 +38,8 @@ public:
 
 private:
     int32_t InitServiceClient();
-    sptr<IRemoteObject::DeathRecipient> serviceDeathObserver_;
-    sptr<IMiscdeviceService> miscdeviceProxy_;
+    sptr<IRemoteObject::DeathRecipient> serviceDeathObserver_ = nullptr;
+    sptr<IMiscdeviceService> miscdeviceProxy_ = nullptr;
     std::mutex clientMutex_;
 };
 }  // namespace Sensors
