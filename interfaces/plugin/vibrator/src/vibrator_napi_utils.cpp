@@ -30,7 +30,7 @@ AsyncCallbackInfo::~AsyncCallbackInfo()
         HiLog::Debug(LABEL, "%{public}s delete work", __func__);
         napi_delete_async_work(env, asyncWork);
     }
-    for (size_t i = 0; i < CALLBACK_NUM; ++i) {
+    for (int32_t i = 0; i < CALLBACK_NUM; ++i) {
         if (callback[i] != nullptr) {
             HiLog::Debug(LABEL, "%{public}s delete reference, i: %{public}d", __func__, i);
             napi_delete_reference(env, callback[i]);
