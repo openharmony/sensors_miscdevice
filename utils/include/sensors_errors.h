@@ -102,7 +102,7 @@ private:
 #define CHKPL(cond, ...) \
     do { \
         if ((cond) == nullptr) { \
-            MISC_HILOGE("%{public}s, (%{public}d), CHKPL(%{public}s) is null, do nothing", \
+            MISC_HILOGW("%{public}s, (%{public}d), CHKPL(%{public}s) is null, do nothing", \
                 __FILE__, __LINE__, #cond); \
         } \
     } while (0)
@@ -128,7 +128,7 @@ private:
 #define CHKPC(cond) \
     { \
         if ((cond) == nullptr) { \
-            MISC_HILOGE("%{public}s, (%{public}d), CHKPC(%{public}s) is null, skip then continue", \
+            MISC_HILOGW("%{public}s, (%{public}d), CHKPC(%{public}s) is null, skip then continue", \
                 __FILE__, __LINE__, #cond); \
             continue; \
         } \
@@ -137,7 +137,7 @@ private:
 #define CHKPB(cond) \
     { \
         if ((cond) == nullptr) { \
-            MISC_HILOGE("%{public}s, (%{public}d), CHKPC(%{public}s) is null, skip then break", \
+            MISC_HILOGW("%{public}s, (%{public}d), CHKPC(%{public}s) is null, skip then break", \
                 __FILE__, __LINE__, #cond); \
             break; \
         } \
@@ -173,7 +173,7 @@ private:
 #define CHKPL(cond) \
     do { \
         if ((cond) == nullptr) { \
-            MISC_HILOGE("CHKPL(%{public}s) is null, do nothing", #cond); \
+            MISC_HILOGW("CHKPL(%{public}s) is null, do nothing", #cond); \
         } \
     } while (0)
 
@@ -196,7 +196,7 @@ private:
 #define CHKPC(cond) \
     { \
         if ((cond) == nullptr) { \
-            MISC_HILOGE("CHKPC(%{public}s) is null, skip then continue", #cond); \
+            MISC_HILOGW("CHKPC(%{public}s) is null, skip then continue", #cond); \
             continue; \
         } \
     }
@@ -204,7 +204,7 @@ private:
 #define CHKPB(cond) \
     { \
         if ((cond) == nullptr) { \
-            MISC_HILOGE("CHKPC(%{public}s) is null, skip then break", #cond); \
+            MISC_HILOGW("CHKPC(%{public}s) is null, skip then break", #cond); \
             break; \
         } \
     }
