@@ -99,7 +99,8 @@ static bool GetCallbackInfo(const napi_env &env, napi_value args[],
     NAPI_CALL_BASE(env, napi_has_named_property(env, args[0], "mode", &result), false);
     if (result) {
         NAPI_CALL_BASE(env, napi_get_named_property(env, args[0], "mode", &value), false);
-        NAPI_ASSERT_BASE(env, GetStringValue(env, value, mode), "Wrong argument type. String or function expected", false);
+        NAPI_ASSERT_BASE(env, GetStringValue(env, value, mode),
+            "Wrong argument type. String or function expected", false);
         NAPI_ASSERT_BASE(env, (mode == "long" || mode == "short"),
             "Wrong argument type. Invalid mode value", false);
     }

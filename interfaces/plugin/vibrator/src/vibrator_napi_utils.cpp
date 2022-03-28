@@ -124,7 +124,7 @@ napi_value GreateCallbackError(const napi_env &env, const int32_t errCode,
     return result;
 }
 
-void emitSystemCallback(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo )
+void emitSystemCallback(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo)
 {
     CHKPV(asyncCallbackInfo);
     if (asyncCallbackInfo->error.code == SUCCESS) {
