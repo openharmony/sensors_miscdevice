@@ -16,128 +16,223 @@
 #include "vibrator_napi_utils.h"
 #include <string>
 #include "hilog/log.h"
+#include "miscdevice_log.h"
 
-
+namespace OHOS {
+namespace Sensors {
 using namespace OHOS::HiviewDFX;
 static constexpr HiLogLabel LABEL = {LOG_CORE, 0xD002708, "VibratorJsAPI"};
 
-bool IsMatchType(napi_value value, napi_valuetype type, napi_env env)
+AsyncCallbackInfo::~AsyncCallbackInfo()
 {
-    napi_valuetype paramType;
-    napi_typeof(env, value, &paramType);
+    CALL_LOG_ENTER;
+    if (asyncWork != nullptr) {
+        HiLog::Debug(LABEL, "%{public}s delete work", __func__);
+        napi_delete_async_work(env, asyncWork);
+    }
+    for (int32_t i = 0; i < CALLBACK_NUM; ++i) {
+        if (callback[i] != nullptr) {
+            HiLog::Debug(LABEL, "%{public}s delete reference, i: %{public}d", __func__, i);
+            napi_delete_reference(env, callback[i]);
+        }
+    }
+}
+
+bool IsMatchType(const napi_env &env, const napi_value &value, const napi_valuetype &type)
+{
+    napi_valuetype paramType = napi_undefined;
+    NAPI_CALL_BASE(env, napi_typeof(env, value, &paramType), false);
     if (paramType != type) {
-        HiLog::Error(LABEL, "%{public}s  failed!", __func__);
+        HiLog::Error(LABEL, "%{public}s Type mismatch", __func__);
         return false;
     }
     return true;
 }
 
-napi_value GetNapiInt32(int32_t number, napi_env env)
+bool GetNapiInt32(const napi_env &env, const int32_t value, napi_value &result)
 {
-    napi_value value;
-    napi_create_int32(env, number, &value);
-    return value;
+    CALL_LOG_ENTER;
+    NAPI_CALL_BASE(env, napi_create_int32(env, value, &result), false);
+    return true;
 }
 
-napi_value NapiGetNamedProperty(napi_value jsonObject, string name, napi_env env)
+bool GetInt32Value(const napi_env &env, const napi_value &value, int32_t &result)
 {
-    napi_value value;
-    napi_get_named_property(env, jsonObject, name.c_str(), &value);
-    return value;
+    CALL_LOG_ENTER;
+    napi_valuetype valuetype = napi_undefined;
+    NAPI_CALL_BASE(env, napi_typeof(env, value, &valuetype), false);
+    NAPI_ASSERT_BASE(env, valuetype == napi_number,
+        "Wrong argument type. Number or function expected", false);
+    NAPI_CALL_BASE(env, napi_get_value_int32(env, value, &result), false);
+    return true;
 }
 
-int32_t GetCppInt32(napi_value value, napi_env env)
+bool GetUint32Value(const napi_env &env, const napi_value &value, uint32_t &result)
 {
-    int32_t number;
-    napi_get_value_int32(env, value, &number);
-    return number;
+    CALL_LOG_ENTER;
+    napi_valuetype valuetype = napi_undefined;
+    NAPI_CALL_BASE(env, napi_typeof(env, value, &valuetype), false);
+    NAPI_ASSERT_BASE(env, valuetype == napi_number,
+        "Wrong argument type. Number or function expected", false);
+    NAPI_CALL_BASE(env, napi_get_value_uint32(env, value, &result), false);
+    return true;
 }
 
-int64_t GetCppInt64(napi_value value, napi_env env)
+bool GetInt64Value(const napi_env &env, const napi_value &value, int64_t &result)
 {
-    int64_t number;
-    napi_get_value_int64(env, value, &number);
-    return number;
+    CALL_LOG_ENTER;
+    napi_valuetype valuetype = napi_undefined;
+    NAPI_CALL_BASE(env, napi_typeof(env, value, &valuetype), false);
+    NAPI_ASSERT_BASE(env, valuetype == napi_number,
+        "Wrong argument type. Number or function expected", false);
+    NAPI_CALL_BASE(env, napi_get_value_int64(env, value, &result), false);
+    return true;
 }
 
-napi_value GreateBusinessError(napi_env env, int32_t errCode, string errMessage, string errName, string errStack)
+bool GetStringValue(const napi_env &env, const napi_value &value, string &result)
 {
-    napi_value result = nullptr;
+    CALL_LOG_ENTER;
+    napi_valuetype valuetype = napi_undefined;
+    NAPI_CALL_BASE(env, napi_typeof(env, value, &valuetype), false);
+    NAPI_ASSERT_BASE(env, (valuetype == napi_string), "Wrong argument type. String or function expected", false);
+    size_t bufLength = 0;
+    NAPI_CALL_BASE(env, napi_get_value_string_utf8(env, value, nullptr, 0, &bufLength), false);
+    char str[STRING_LENGTH_MAX] = {0};
+    size_t strLen = 0;
+    NAPI_CALL_BASE(env, napi_get_value_string_utf8(env, value, str, bufLength, &strLen), false);
+    result = str;
+    return true;
+}
+
+napi_value GreateCallbackError(const napi_env &env, const int32_t errCode,
+    const string errMessage, const string errName, const string errStack)
+{
     napi_value code = nullptr;
+    NAPI_CALL(env, napi_create_int32(env, errCode, &code));
     napi_value message = nullptr;
+    NAPI_CALL(env, napi_create_string_utf8(env, errMessage.data(), NAPI_AUTO_LENGTH, &message));
     napi_value name = nullptr;
+    NAPI_CALL(env, napi_create_string_utf8(env, errName.data(), NAPI_AUTO_LENGTH, &name));
     napi_value stack = nullptr;
-    napi_create_int32(env, errCode, &code);
-    napi_create_string_utf8(env, errMessage.data(), NAPI_AUTO_LENGTH, &message);
-    napi_create_string_utf8(env, errName.data(), NAPI_AUTO_LENGTH, &name);
-    napi_create_string_utf8(env, errStack.data(), NAPI_AUTO_LENGTH, &stack);
-    napi_create_object(env, &result);
-    napi_set_named_property(env, result, "code", code);
-    napi_set_named_property(env, result, "message", message);
-    napi_set_named_property(env, result, "name", name);
-    napi_set_named_property(env, result, "stack", stack);
+    NAPI_CALL(env, napi_create_string_utf8(env, errStack.data(), NAPI_AUTO_LENGTH, &stack));
+    napi_value result = nullptr;
+    NAPI_CALL(env, napi_create_object(env, &result));
+    NAPI_CALL(env, napi_set_named_property(env, result, "code", code));
+    NAPI_CALL(env, napi_set_named_property(env, result, "message", message));
+    NAPI_CALL(env, napi_set_named_property(env, result, "name", name));
+    NAPI_CALL(env, napi_set_named_property(env, result, "stack", stack));
     return result;
 }
 
-void EmitAsyncCallbackWork(AsyncCallbackInfo *asyncCallbackInfo)
+void emitSystemCallback(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo)
 {
-    HiLog::Debug(LABEL, "%s begin", __func__);
-    if (asyncCallbackInfo == nullptr) {
-        HiLog::Error(LABEL, "%s asyncCallbackInfo is nullptr!", __func__);
+    CHKPV(asyncCallbackInfo);
+    if (asyncCallbackInfo->error.code == SUCCESS) {
+        CHKPV(asyncCallbackInfo->callback[0]);
+        napi_value callback = nullptr;
+        NAPI_CALL_RETURN_VOID(env, napi_get_reference_value(env, asyncCallbackInfo->callback[0], &callback));
+        napi_value result = nullptr;
+        NAPI_CALL_RETURN_VOID(env, napi_get_undefined(env, &result));
+        napi_value callResult = nullptr;
+        NAPI_CALL_RETURN_VOID(env, napi_call_function(env, nullptr, callback, 1, &result, &callResult));
         return;
     }
-    napi_value resourceName;
-    napi_create_string_latin1(asyncCallbackInfo->env, "AsyncCallback", NAPI_AUTO_LENGTH, &resourceName);
-    napi_create_async_work(
-        asyncCallbackInfo->env, nullptr, resourceName, [](napi_env env, void* data) {},
-        [](napi_env env, napi_status status, void* data) {      
-            AsyncCallbackInfo *asyncCallbackInfo = (AsyncCallbackInfo *)data;
-            napi_value callback;
-            napi_get_reference_value(env, asyncCallbackInfo->callback[0], &callback);
-            napi_value result = nullptr;
-            napi_value callResult = nullptr;
-            if (asyncCallbackInfo->error.code < 0) {
-                result = GreateBusinessError(env, asyncCallbackInfo->error.code, asyncCallbackInfo->error.message,
-                    asyncCallbackInfo->error.name, asyncCallbackInfo->error.stack);
-            } else {
-                napi_get_undefined(env, &result);
-            }
-            napi_call_function(env, nullptr, callback, 1, &result, &callResult);
-            napi_delete_reference(env, asyncCallbackInfo->callback[0]);
-            napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
-            delete asyncCallbackInfo;
-            asyncCallbackInfo = nullptr;
-        },
-        asyncCallbackInfo, &asyncCallbackInfo->asyncWork);
-    napi_queue_async_work(asyncCallbackInfo->env, asyncCallbackInfo->asyncWork);
-    HiLog::Debug(LABEL, "%{public}s  end", __func__);
+    CHKPV(asyncCallbackInfo->callback[1]);
+    napi_value callback = nullptr;
+    NAPI_CALL_RETURN_VOID(env, napi_get_reference_value(env, asyncCallbackInfo->callback[1], &callback));
+    napi_value result[2] = {0};
+    NAPI_CALL_RETURN_VOID(env, napi_create_string_utf8(env, asyncCallbackInfo->error.message.data(),
+        NAPI_AUTO_LENGTH, &result[0]));
+    NAPI_CALL_RETURN_VOID(env, napi_create_int32(env, asyncCallbackInfo->error.code, &result[1]));
+    napi_value callResult = nullptr;
+    NAPI_CALL_RETURN_VOID(env, napi_call_function(env, nullptr, callback, 1, result, &callResult));
 }
 
-void EmitPromiseWork(AsyncCallbackInfo *asyncCallbackInfo)
+void EmitAsyncCallbackWork(sptr<AsyncCallbackInfo> asyncCallbackInfo)
 {
-    if (asyncCallbackInfo == nullptr) {
-        HiLog::Error(LABEL, "%s asyncCallbackInfo is nullptr!", __func__);
-        return;
+    CALL_LOG_ENTER;
+    CHKPV(asyncCallbackInfo);
+    CHKPV(asyncCallbackInfo->env);
+    napi_env env = asyncCallbackInfo->env;
+    napi_value resourceName = nullptr;
+    NAPI_CALL_RETURN_VOID(env,
+        napi_create_string_latin1(env, "AsyncCallback", NAPI_AUTO_LENGTH, &resourceName));
+    // Make the reference count of asyncCallbackInfo add 1, and the function exits the non-destructor
+    asyncCallbackInfo->callbackInfo = asyncCallbackInfo;
+    napi_status status = napi_create_async_work(
+        env, nullptr, resourceName, [](napi_env env, void* data) {},
+        [](napi_env env, napi_status status, void* data) {
+            CHKPV(data);
+            sptr<AsyncCallbackInfo> asyncCallbackInfo = reinterpret_cast<AsyncCallbackInfo *>(data)->callbackInfo;
+            // The reference count of asyncCallbackInfo is subtracted by 1, and the function exits the destructor
+            asyncCallbackInfo->callbackInfo = nullptr;
+            if (asyncCallbackInfo->callbackType == TYPE_SYSTEM_VIBRATE) {
+                emitSystemCallback(env, asyncCallbackInfo);
+                return;
+            }
+            CHKPV(asyncCallbackInfo->callback[0]);
+            napi_value callback = nullptr;
+            NAPI_CALL_RETURN_VOID(env, napi_get_reference_value(env, asyncCallbackInfo->callback[0], &callback));
+            napi_value result = nullptr;
+            if (asyncCallbackInfo->error.code < 0) {
+                result = GreateCallbackError(env, asyncCallbackInfo->error.code, asyncCallbackInfo->error.message,
+                    asyncCallbackInfo->error.name, asyncCallbackInfo->error.stack);
+                CHKPV(result);
+            } else {
+                NAPI_CALL_RETURN_VOID(env, napi_get_undefined(env, &result));
+            }
+            napi_value callResult = nullptr;
+            NAPI_CALL_RETURN_VOID(env, napi_call_function(env, nullptr, callback, 1, &result, &callResult));
+        },
+        asyncCallbackInfo.GetRefPtr(), &asyncCallbackInfo->asyncWork);
+    if (status != napi_ok
+        || napi_queue_async_work(asyncCallbackInfo->env, asyncCallbackInfo->asyncWork) != napi_ok) {
+        MISC_HILOGE("Create async work fail");
+        // The reference count of asyncCallbackInfo is subtracted by 1, and the function exits the destructor
+        asyncCallbackInfo->callbackInfo = nullptr;
     }
-    napi_value resourceName;
-    napi_create_string_latin1(asyncCallbackInfo->env, "Promise", NAPI_AUTO_LENGTH, &resourceName);
-    napi_create_async_work(
+}
+
+void EmitPromiseWork(sptr<AsyncCallbackInfo> asyncCallbackInfo)
+{
+    CALL_LOG_ENTER;
+    CHKPV(asyncCallbackInfo);
+    CHKPV(asyncCallbackInfo->env);
+    napi_env env = asyncCallbackInfo->env;
+    napi_value resourceName = nullptr;
+    NAPI_CALL_RETURN_VOID(env,
+        napi_create_string_latin1(asyncCallbackInfo->env, "Promise", NAPI_AUTO_LENGTH, &resourceName));
+    // Make the reference count of asyncCallbackInfo add 1, and the function exits the non-destructor
+    asyncCallbackInfo->callbackInfo = asyncCallbackInfo;
+    napi_status status = napi_create_async_work(
         asyncCallbackInfo->env, nullptr, resourceName, [](napi_env env, void* data) {},
         [](napi_env env, napi_status status, void* data) {
-            AsyncCallbackInfo *asyncCallbackInfo = (AsyncCallbackInfo *)data;
+            CHKPV(data);
+            sptr<AsyncCallbackInfo> asyncCallbackInfo = reinterpret_cast<AsyncCallbackInfo *>(data)->callbackInfo;
+            // The reference count of asyncCallbackInfo is subtracted by 1, and the function exits the destructor
+            asyncCallbackInfo->callbackInfo = nullptr;
+            CHKPV(asyncCallbackInfo->deferred);
+            if (asyncCallbackInfo->callbackType == TYPE_SYSTEM_VIBRATE) {
+                emitSystemCallback(env, asyncCallbackInfo);
+                return;
+            }
             napi_value result = nullptr;
             if (asyncCallbackInfo->error.code == 0) {
-                napi_get_undefined(env, &result);
-                napi_resolve_deferred(env, asyncCallbackInfo->deferred, result);
+                NAPI_CALL_RETURN_VOID(env, napi_get_undefined(env, &result));
+                NAPI_CALL_RETURN_VOID(env, napi_resolve_deferred(env, asyncCallbackInfo->deferred, result));
             } else {
-                result = GreateBusinessError(env, asyncCallbackInfo->error.code, asyncCallbackInfo->error.message,
+                result = GreateCallbackError(env, asyncCallbackInfo->error.code, asyncCallbackInfo->error.message,
                     asyncCallbackInfo->error.name, asyncCallbackInfo->error.stack);
-                napi_reject_deferred(env, asyncCallbackInfo->deferred, result);
+                CHKPV(result);
+                NAPI_CALL_RETURN_VOID(env, napi_reject_deferred(env, asyncCallbackInfo->deferred, result));
             }
-            napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
-            delete asyncCallbackInfo;
-            asyncCallbackInfo = nullptr;
-        },
-        (void*)asyncCallbackInfo, &asyncCallbackInfo->asyncWork);
-    napi_queue_async_work(asyncCallbackInfo->env, asyncCallbackInfo->asyncWork);
+        }, asyncCallbackInfo.GetRefPtr(), &asyncCallbackInfo->asyncWork);
+    if (status != napi_ok
+        || napi_queue_async_work(asyncCallbackInfo->env, asyncCallbackInfo->asyncWork) != napi_ok) {
+        MISC_HILOGE("Create async work fail");
+        // The reference count of asyncCallbackInfo is subtracted by 1, and the function exits the destructor
+        asyncCallbackInfo->callbackInfo = nullptr;
+    }
 }
+}  // namespace Sensors
+}  // namespace OHOS

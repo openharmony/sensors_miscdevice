@@ -19,136 +19,172 @@
 #include <unistd.h>
 
 #include "hilog/log.h"
+#include "miscdevice_log.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "vibrator_agent.h"
 #include "vibrator_napi_utils.h"
 
+namespace OHOS {
+namespace Sensors {
 using namespace OHOS::HiviewDFX;
 static constexpr HiLogLabel LABEL = { LOG_CORE, 0xD002757, "VibratorJsAPI" };
+static constexpr uint32_t VIBRATE_SHORT_DURATION = 35;
+static constexpr uint32_t VIBRATE_LONG_DURATION = 1000;
 
+static napi_value VibrateTime(napi_env env, napi_value args[], size_t argc)
+{
+    NAPI_ASSERT(env, (argc == 1 || argc == 2), "Wrong argument number");
+    int32_t duration = 0;
+    NAPI_ASSERT(env, GetInt32Value(env, args[0], duration), "Get int number fail");
+    sptr<AsyncCallbackInfo> asyncCallbackInfo = new (std::nothrow) AsyncCallbackInfo(env);
+    CHKPP(asyncCallbackInfo);
+    if (duration < 0) {
+        MISC_HILOGE("Vibrate duration is invalid, duration: %{public}d", duration);
+        asyncCallbackInfo->error.code = ERROR;
+        asyncCallbackInfo->error.message = "Vibrate duration is invalid";
+    } else {
+        asyncCallbackInfo->error.code = StartVibratorOnce(static_cast<uint32_t>(duration));
+    }
+
+    if (argc == 2) {
+        NAPI_ASSERT(env, IsMatchType(env, args[1], napi_function), "Wrong argument type. function expected");
+        NAPI_CALL(env, napi_create_reference(env, args[1], 1, &asyncCallbackInfo->callback[0]));
+        EmitAsyncCallbackWork(asyncCallbackInfo);
+        return nullptr;
+    }
+
+    napi_deferred deferred = nullptr;
+    napi_value promise = nullptr;
+    NAPI_CALL(env, napi_create_promise(env, &deferred, &promise));
+    asyncCallbackInfo->deferred = deferred;
+    EmitPromiseWork(asyncCallbackInfo);
+    return promise;
+}
+
+static napi_value VibrateEffectId(napi_env env, napi_value args[], size_t argc)
+{
+    NAPI_ASSERT(env, (argc == 1 || argc == 2), "Wrong argument number");
+    string effectId;
+    NAPI_ASSERT(env, GetStringValue(env, args[0], effectId), "Wrong argument type. String or function expected");
+    sptr<AsyncCallbackInfo> asyncCallbackInfo = new (std::nothrow) AsyncCallbackInfo(env);
+    CHKPP(asyncCallbackInfo);
+    asyncCallbackInfo->error.code = StartVibrator(effectId.c_str());
+
+    if (argc == 2) {
+        NAPI_ASSERT(env, IsMatchType(env, args[1], napi_function), "Wrong argument type. function expected");
+        NAPI_CALL(env, napi_create_reference(env, args[1], 1, &asyncCallbackInfo->callback[0]));
+        EmitAsyncCallbackWork(asyncCallbackInfo);
+        return nullptr;
+    }
+
+    napi_deferred deferred = nullptr;
+    napi_value promise = nullptr;
+    NAPI_CALL(env, napi_create_promise(env, &deferred, &promise));
+    asyncCallbackInfo->deferred = deferred;
+    EmitPromiseWork(asyncCallbackInfo);
+    return promise;
+}
+
+static bool GetCallbackInfo(const napi_env &env, napi_value args[],
+    sptr<AsyncCallbackInfo> &asyncCallbackInfo, string &mode)
+{
+    CHKPF(asyncCallbackInfo);
+    CHKPF(args);
+    napi_value value = nullptr;
+    NAPI_CALL_BASE(env, napi_get_named_property(env, args[0], "success", &value), false);
+    NAPI_CALL_BASE(env, napi_create_reference(env, value, 1, &asyncCallbackInfo->callback[0]), false);
+
+    bool result = false;
+    NAPI_CALL_BASE(env, napi_has_named_property(env, args[0], "mode", &result), false);
+    if (result) {
+        NAPI_CALL_BASE(env, napi_get_named_property(env, args[0], "mode", &value), false);
+        NAPI_ASSERT_BASE(env, GetStringValue(env, value, mode),
+            "Wrong argument type. String or function expected", false);
+        NAPI_ASSERT_BASE(env, (mode == "long" || mode == "short"),
+            "Wrong argument type. Invalid mode value", false);
+    }
+    NAPI_CALL_BASE(env, napi_has_named_property(env, args[0], "fail", &result), false);
+    if (result) {
+        NAPI_CALL_BASE(env, napi_get_named_property(env, args[0], "fail", &value), false);
+        NAPI_CALL_BASE(env, napi_create_reference(env, value, 1, &asyncCallbackInfo->callback[1]), false);
+    }
+    NAPI_CALL_BASE(env, napi_has_named_property(env, args[0], "complete", &result), false);
+    if (result) {
+        NAPI_CALL_BASE(env, napi_get_named_property(env, args[0], "complete", &value), false);
+        NAPI_CALL_BASE(env, napi_create_reference(env, value, 1, &asyncCallbackInfo->callback[2]), false);
+    }
+    return true;
+}
+
+static napi_value VibrateMode(napi_env env, napi_value args[], size_t argc)
+{
+    if (argc == 0) {
+        NAPI_ASSERT(env, (StartVibratorOnce(VIBRATE_LONG_DURATION) == 0), "Vibrate long mode fail");
+        return nullptr;
+    }
+    NAPI_ASSERT(env, (argc == 1), "Param number is invalid");
+    sptr<AsyncCallbackInfo> asyncCallbackInfo = new (std::nothrow) AsyncCallbackInfo(env);
+    CHKPP(asyncCallbackInfo);
+    asyncCallbackInfo->callbackType = TYPE_SYSTEM_VIBRATE;
+    string mode = "long";
+    NAPI_ASSERT(env, GetCallbackInfo(env, args, asyncCallbackInfo, mode), "Get callback info fail");
+    uint32_t duration = ((mode == "long") ? VIBRATE_LONG_DURATION : VIBRATE_SHORT_DURATION);
+    asyncCallbackInfo->error.code = StartVibratorOnce(duration);
+    if (asyncCallbackInfo->error.code != SUCCESS) {
+        asyncCallbackInfo->error.message = "Vibrator vibrate fail";
+    }
+    EmitAsyncCallbackWork(asyncCallbackInfo);
+    return nullptr;
+}
 
 static napi_value Vibrate(napi_env env, napi_callback_info info)
 {
+    CHKPP(env);
+    CHKPP(info);
     size_t argc = 2;
-    napi_value args[CALLBACK_RESULT_LENGTH];
-    napi_value thisArg;
-    napi_get_cb_info(env, info, &argc, args, &thisArg, nullptr);
-    if (argc < 1 || argc > CALLBACK_RESULT_LENGTH) {
-        HiLog::Error(LABEL, "%{public}s the number of input parameters does not match", __func__);
-        return nullptr;
+    napi_value args[2] = {};
+    napi_value thisArg = nullptr;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, args, &thisArg, nullptr));
+    NAPI_ASSERT(env, (argc <= 2), "Wrong argument number");
+
+    if (IsMatchType(env, args[0], napi_number)) {
+        return VibrateTime(env, args, argc);
     }
-    if (!IsMatchType(args[0], napi_number, env) && !IsMatchType(args[0], napi_string, env)) {
-        HiLog::Error(LABEL, "%{public}s input parameter type does not match number or string", __func__);
-        return nullptr;
+    if (IsMatchType(env, args[0], napi_string)) {
+        return VibrateEffectId(env, args, argc);
     }
-    AsyncCallbackInfo *asyncCallbackInfo = new AsyncCallbackInfo {
-        .env = env,
-        .asyncWork = nullptr,
-        .deferred = nullptr,
-    };
-    if (IsMatchType(args[0], napi_number, env)) {
-        int32_t duration = GetCppInt32(args[0], env);
-        asyncCallbackInfo->error.code = StartVibratorOnce(duration);
-    } else if (IsMatchType(args[0], napi_string, env)) {
-        size_t bufLength = 0;
-        napi_status status = napi_get_value_string_utf8(env, args[0], nullptr, 0, &bufLength);
-        if (status != napi_ok) {
-            HiLog::Error(LABEL, "%{public}s input parameter is invalid", __func__);
-            delete asyncCallbackInfo;
-            asyncCallbackInfo = nullptr;
-            return nullptr;
-        }
-        char *vibratorEffect = static_cast<char *>(malloc((bufLength + 1) * sizeof(char)));
-        if (vibratorEffect == nullptr) {
-            HiLog::Error(LABEL, "%{public}s malloc fail", __func__);
-            delete asyncCallbackInfo;
-            asyncCallbackInfo = nullptr;
-            return nullptr;
-        }
-        status = napi_get_value_string_utf8(env, args[0], vibratorEffect, bufLength + 1, &bufLength);
-        asyncCallbackInfo->error.code = StartVibrator(vibratorEffect);
-        if (vibratorEffect != nullptr) {
-            free(vibratorEffect);
-        }
+    if (IsMatchType(env, args[0], napi_object)) {
+        return VibrateMode(env, args, argc);
     }
-    if (argc == CALLBACK_RESULT_LENGTH) {
-        if (!IsMatchType(args[1], napi_function, env)) {
-            HiLog::Error(LABEL, "%{public}s input parameter type does not match function", __func__);
-            delete asyncCallbackInfo;
-            asyncCallbackInfo = nullptr;
-            return nullptr;
-        }
-        napi_create_reference(env, args[1], 1, &asyncCallbackInfo->callback[0]);
-        EmitAsyncCallbackWork(asyncCallbackInfo);
-    } else if (argc == 1) {
-        napi_deferred deferred;
-        napi_value promise;
-        napi_create_promise(env, &deferred, &promise);
-        asyncCallbackInfo->deferred = deferred;
-        EmitPromiseWork(asyncCallbackInfo);
-        return promise;
-    }
+    NAPI_CALL(env, napi_throw_error((env), nullptr, "Wrong argument type"));
     return nullptr;
 }
 
 static napi_value Stop(napi_env env, napi_callback_info info)
 {
     size_t argc = 2;
-    napi_value args[2];
-    napi_value thisArg;
-    napi_get_cb_info(env, info, &argc, args, &thisArg, nullptr);
-    if (argc < 1 || argc > CALLBACK_RESULT_LENGTH) {
-        HiLog::Error(LABEL, "%{public}s the number of input parameters does not match", __func__);
-        return nullptr;
-    }
-    if (!IsMatchType(args[0], napi_string, env)) {
-        HiLog::Error(LABEL, "%{public}s input parameter type does not match string", __func__);
-        return nullptr;
-    }
-    AsyncCallbackInfo *asyncCallbackInfo = new AsyncCallbackInfo {
-        .env = env,
-        .asyncWork = nullptr,
-        .deferred = nullptr,
-    };
-    size_t bufLength = 0;
-    napi_status status = napi_get_value_string_utf8(env, args[0], nullptr, 0, &bufLength);
-    if (status != napi_ok) {
-        HiLog::Error(LABEL, "%{public}s input parameter is invalid", __func__);
-        delete asyncCallbackInfo;
-        asyncCallbackInfo = nullptr;
-        return nullptr;
-    }
-    char *mode = static_cast<char *>(malloc((bufLength + 1) * sizeof(char)));
-    if (mode == nullptr) {
-        HiLog::Error(LABEL, "%{public}s malloc fail", __func__);
-        delete asyncCallbackInfo;
-        asyncCallbackInfo = nullptr;
-        return nullptr;
-    }
-    status = napi_get_value_string_utf8(env, args[0], mode, bufLength + 1, &bufLength);
-    asyncCallbackInfo->error.code = StopVibrator(mode);
-    if (mode != nullptr) {
-        free(mode);
-    }
-    if (argc == CALLBACK_RESULT_LENGTH) {
-        if (!IsMatchType(args[1], napi_function, env) || !IsMatchType(args[0], napi_string, env)) {
-            HiLog::Error(LABEL, "%{public}s input parameter type does not match", __func__);
-            delete asyncCallbackInfo;
-            asyncCallbackInfo = nullptr;
-            return nullptr;
-        }
-        napi_create_reference(env, args[1], 1, &asyncCallbackInfo->callback[0]);
+    napi_value args[2] = {};
+    napi_value thisArg = nullptr;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, args, &thisArg, nullptr));
+    NAPI_ASSERT(env, (argc == 1 || argc == 2), "Wrong argument number");
+    string mode;
+    NAPI_ASSERT(env, GetStringValue(env, args[0], mode), "Wrong argument type. String or function expected");
+    sptr<AsyncCallbackInfo> asyncCallbackInfo = new (std::nothrow) AsyncCallbackInfo(env);
+    CHKPP(asyncCallbackInfo);
+    asyncCallbackInfo->error.code = StopVibrator(mode.c_str());
+    if (argc == 2) {
+        NAPI_ASSERT(env, IsMatchType(env, args[1], napi_function), "Wrong argument type. function expected");
+        NAPI_CALL(env, napi_create_reference(env, args[1], 1, &asyncCallbackInfo->callback[0]));
         EmitAsyncCallbackWork(asyncCallbackInfo);
-    } else if (argc == 1) {
-        napi_deferred deferred;
-        napi_value promise;
-        napi_create_promise(env, &deferred, &promise);
-        asyncCallbackInfo->deferred = deferred;
-        EmitPromiseWork(asyncCallbackInfo);
-        return promise;
+        return nullptr;
     }
-    return nullptr;
+    napi_deferred deferred = nullptr;
+    napi_value promise = nullptr;
+    NAPI_CALL(env, napi_create_promise(env, &deferred, &promise));
+    asyncCallbackInfo->deferred = deferred;
+    EmitPromiseWork(asyncCallbackInfo);
+    return promise;
 }
 
 static napi_value EnumClassConstructor(const napi_env env, const napi_callback_info info)
@@ -157,10 +193,7 @@ static napi_value EnumClassConstructor(const napi_env env, const napi_callback_i
     napi_value args[1] = {0};
     napi_value res = nullptr;
     void *data = nullptr;
-    napi_status status = napi_get_cb_info(env, info, &argc, args, &res, &data);
-    if (status != napi_ok) {
-        return nullptr;
-    }
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, args, &res, &data));
     return res;
 }
 
@@ -168,17 +201,17 @@ static napi_value CreateEnumStopMode(const napi_env env, napi_value exports)
 {
     napi_value timeMode = nullptr;
     napi_value presetMode = nullptr;
-    napi_create_string_utf8(env, "time", NAPI_AUTO_LENGTH, &timeMode);
-    napi_create_string_utf8(env, "preset", NAPI_AUTO_LENGTH, &presetMode);
+    NAPI_CALL(env, napi_create_string_utf8(env, "time", NAPI_AUTO_LENGTH, &timeMode));
+    NAPI_CALL(env, napi_create_string_utf8(env, "preset", NAPI_AUTO_LENGTH, &presetMode));
 
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_PROPERTY("VIBRATOR_STOP_MODE_TIME", timeMode),
         DECLARE_NAPI_STATIC_PROPERTY("VIBRATOR_STOP_MODE_PRESET", presetMode),
     };
     napi_value result = nullptr;
-    napi_define_class(env, "VibratorStopMode", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
-        sizeof(desc) / sizeof(*desc), desc, &result);
-    napi_set_named_property(env, exports, "VibratorStopMode", result);
+    NAPI_CALL(env, napi_define_class(env, "VibratorStopMode", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+        sizeof(desc) / sizeof(*desc), desc, &result));
+    NAPI_CALL(env, napi_set_named_property(env, exports, "VibratorStopMode", result));
     return exports;
 }
 
@@ -191,13 +224,11 @@ static napi_value CreateEnumEffectId(const napi_env env, const napi_value export
         DECLARE_NAPI_STATIC_PROPERTY("EFFECT_CLOCK_TIMER", clockTime),
     };
     napi_value result = nullptr;
-    napi_define_class(env, "EffectId", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
-        sizeof(desc) / sizeof(*desc), desc, &result);
-    napi_set_named_property(env, exports, "EffectId", result);
+    NAPI_CALL(env, napi_define_class(env, "EffectId", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+        sizeof(desc) / sizeof(*desc), desc, &result));
+    NAPI_CALL(env, napi_set_named_property(env, exports, "EffectId", result));
     return exports;
 }
-
-EXTERN_C_START
 
 static napi_value Init(napi_env env, napi_value exports)
 {
@@ -206,11 +237,10 @@ static napi_value Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("stop", Stop)
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(napi_property_descriptor), desc));
-    CreateEnumStopMode(env, exports);
-    CreateEnumEffectId(env, exports);
+    NAPI_ASSERT_BASE(env, CreateEnumStopMode(env, exports) != nullptr, "Create enum stop mode fail", exports);
+    NAPI_ASSERT_BASE(env, CreateEnumEffectId(env, exports) != nullptr, "Create enum effect id fail", exports);
     return exports;
 }
-EXTERN_C_END
 
 static napi_module _module = {
     .nm_version = 1,
@@ -226,3 +256,5 @@ extern "C" __attribute__((constructor)) void RegisterModule(void)
 {
     napi_module_register(&_module);
 }
+}  // namespace Sensors
+}  // namespace OHOS
