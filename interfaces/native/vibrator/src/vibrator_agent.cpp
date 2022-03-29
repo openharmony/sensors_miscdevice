@@ -38,7 +38,7 @@ int32_t DisableLooping()
 
 int32_t StartVibrator(const char *effectId)
 {
-    if (effectId == NULL) {
+    if (effectId == nullptr) {
         HiLog::Error(LABEL, "%{public}s effectId is null", __func__);
         return OHOS::Sensors::ERROR;
     }
