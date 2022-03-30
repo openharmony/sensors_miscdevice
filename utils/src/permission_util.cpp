@@ -34,7 +34,7 @@ bool PermissionUtil::CheckVibratePermission(AccessTokenID callerToken, std::stri
         MISC_HILOGW("result grant failed, result: %{public}d", result);
         return false;
     }
-    MISC_HILOGD( "result grant success");
+    MISC_HILOGD("result grant success");
     return true;
 }
 }  // namespace Sensors

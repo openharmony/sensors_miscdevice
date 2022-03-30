@@ -17,8 +17,9 @@
 
 #include "hilog/log.h"
 
-#include "miscdevice_log.h"
 #include "sensors_errors.h"
+#include "miscdevice_log.h"
+
 
 namespace OHOS {
 namespace Sensors {

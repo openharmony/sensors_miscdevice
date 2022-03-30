@@ -154,7 +154,7 @@ bool MiscdeviceService::IsAbilityAvailable(MiscdeviceDeviceId groupID)
 {
     auto it = miscDdeviceIdMap_.find(groupID);
     if (it == miscDdeviceIdMap_.end()) {
-        MISC_HILOGE("cannot find groupID : %{public}d",groupID);
+        MISC_HILOGE("cannot find groupID : %{public}d", groupID);
         return false;
     }
     return it->second;
@@ -195,7 +195,7 @@ int32_t MiscdeviceService::CancelVibrator(int32_t vibratorId)
     std::lock_guard<std::mutex> vibratorEffectLock(vibratorEffectMutex_);
     auto it = vibratorEffectMap_.find(vibratorId);
     if (it != vibratorEffectMap_.end() && it->second == "time") {
-        MISC_HILOGI("stop mode is %{public}s",it->second.c_str());
+        MISC_HILOGI("stop mode is %{public}s", it->second.c_str());
         vibratorEffectMap_.clear();
     } else {
         MISC_HILOGE("vibratorEffectMap_ is failed");
