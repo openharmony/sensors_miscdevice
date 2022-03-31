@@ -27,12 +27,12 @@ AsyncCallbackInfo::~AsyncCallbackInfo()
 {
     CALL_LOG_ENTER;
     if (asyncWork != nullptr) {
-        HiLog::Debug(LABEL, "%{public}s delete work", __func__);
+        MISC_HILOGD("delete work");
         napi_delete_async_work(env, asyncWork);
     }
     for (int32_t i = 0; i < CALLBACK_NUM; ++i) {
         if (callback[i] != nullptr) {
-            HiLog::Debug(LABEL, "%{public}s delete reference, i: %{public}d", __func__, i);
+            MISC_HILOGD("delete reference, i: %{public}d", i);
             napi_delete_reference(env, callback[i]);
         }
     }
@@ -43,7 +43,7 @@ bool IsMatchType(const napi_env &env, const napi_value &value, const napi_valuet
     napi_valuetype paramType = napi_undefined;
     NAPI_CALL_BASE(env, napi_typeof(env, value, &paramType), false);
     if (paramType != type) {
-        HiLog::Error(LABEL, "%{public}s Type mismatch", __func__);
+        MISC_HILOGE("Type mismatch");
         return false;
     }
     return true;

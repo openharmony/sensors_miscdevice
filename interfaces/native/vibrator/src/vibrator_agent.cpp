@@ -38,15 +38,12 @@ int32_t DisableLooping()
 
 int32_t StartVibrator(const char *effectId)
 {
-    if (effectId == nullptr) {
-        HiLog::Error(LABEL, "%{public}s effectId is null", __func__);
-        return OHOS::Sensors::ERROR;
-    }
+    CHKPR(effectId, OHOS::Sensors::ERROR);
     bool isLooping = (g_loopingFlag == 1) ? true : false;
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.Vibrate(DEFAULT_VIBRATOR_ID, effectId, isLooping);
     if (ret != OHOS::ERR_OK) {
-        HiLog::Error(LABEL, "%{public}s vibrator effectId failed, ret: %{public}d", __func__, ret);
+        MISC_HILOGE("vibrator effectId failed, ret: %{public}d", ret);
         return OHOS::Sensors::ERROR;
     }
     return OHOS::Sensors::SUCCESS;
@@ -55,13 +52,13 @@ int32_t StartVibrator(const char *effectId)
 int32_t StartVibratorOnce(uint32_t duration)
 {
     if (duration == 0) {
-        HiLog::Error(LABEL, "%{public}s duration is invalid", __func__);
+        MISC_HILOGE("duration is invalid");
         return OHOS::Sensors::ERROR;
     }
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.Vibrate(DEFAULT_VIBRATOR_ID, duration);
     if (ret != OHOS::ERR_OK) {
-        HiLog::Error(LABEL, "%{public}s vibrator duration failed, ret: %{public}d", __func__, ret);
+        MISC_HILOGE("vibrator duration failed, ret: %{public}d", ret);
         return OHOS::Sensors::ERROR;
     }
     return OHOS::Sensors::SUCCESS;
@@ -69,18 +66,15 @@ int32_t StartVibratorOnce(uint32_t duration)
 
 int32_t StopVibrator(const char *mode)
 {
-    if (mode == nullptr) {
-        HiLog::Error(LABEL, "%{public}s mode is invalid", __func__);
-        return OHOS::Sensors::ERROR;
-    }
+    CHKPR(mode, OHOS::Sensors::ERROR);
     if (strcmp(mode, "time") != 0 && strcmp(mode, "preset") != 0) {
-        HiLog::Error(LABEL, "%{public}s mode is invalid, mode is %{public}s", __func__, mode);
+        MISC_HILOGE("mode is invalid, mode is %{public}s", mode);
         return OHOS::Sensors::ERROR;
     }
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.Stop(DEFAULT_VIBRATOR_ID, mode);
     if (ret != OHOS::ERR_OK) {
-        HiLog::Error(LABEL, "%{public}s is failed, ret: %{public}d", __func__, ret);
+        MISC_HILOGE("client is failed, ret: %{public}d", ret);
         return OHOS::Sensors::ERROR;
     }
     return OHOS::Sensors::SUCCESS;

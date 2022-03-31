@@ -36,15 +36,15 @@ std::atomic_bool CompatibleConnection::isStop_ = false;
 
 int32_t CompatibleConnection::ConnectHdi()
 {
-    HiLog::Info(LABEL, "%{public}s in", __func__);
+    CALL_LOG_ENTER;
     return ERR_OK;
 }
 
 int32_t CompatibleConnection::StartOnce(uint32_t duration)
 {
-    HiLog::Info(LABEL, "%{public}s in", __func__);
+    CALL_LOG_ENTER;
     if (duration > MAX_VIBRATOR_TIME || duration <= MIN_VIBRATOR_TIME) {
-        HiLog::Error(LABEL, "%{public}s duration: %{public}d invalid", __func__, duration);
+        MISC_HILOGE("duration: %{public}d invalid", duration);
         return VIBRATOR_ON_ERR;
     }
     duration_ = duration;
@@ -59,9 +59,9 @@ int32_t CompatibleConnection::StartOnce(uint32_t duration)
 
 int32_t CompatibleConnection::Start(const char *effectType)
 {
-    HiLog::Info(LABEL, "%{public}s in", __func__);
+    CALL_LOG_ENTER;
     if (std::find(vibratorEffect_.begin(), vibratorEffect_.end(), effectType) == vibratorEffect_.end()) {
-        HiLog::Error(LABEL, "%{public}s not support %{public}s type", __func__, effectType);
+        MISC_HILOGE("Not support %{public}s type", effectType);
         return VIBRATOR_ON_ERR;
     }
     if (!vibrateThread_.joinable()) {
@@ -75,17 +75,17 @@ int32_t CompatibleConnection::Start(const char *effectType)
 
 int32_t CompatibleConnection::Stop(VibratorStopMode mode)
 {
-    HiLog::Info(LABEL, "%{public}s in", __func__);
+    CALL_LOG_ENTER;
     if (mode < 0 || mode >= VIBRATOR_STOP_MODE_INVALID) {
-        HiLog::Error(LABEL, "%{public}s mode: %{public}d invalid", __func__, mode);
+        MISC_HILOGE("mode: %{public}d invalid", mode);
         return VIBRATOR_OFF_ERR;
     }
     if (vibrateMode_ != mode) {
-        HiLog::Error(LABEL, "%{public}s should start vibrate first", __func__);
+        MISC_HILOGE("should start vibrate first");
         return VIBRATOR_OFF_ERR;
     }
     if (vibrateThread_.joinable()) {
-        HiLog::Info(LABEL, "%{public}s stop vibrate thread", __func__);
+        MISC_HILOGI("stop vibrate thread");
         isStop_ = true;
         vibrateThread_.join();
     }
@@ -94,21 +94,20 @@ int32_t CompatibleConnection::Stop(VibratorStopMode mode)
 
 int32_t CompatibleConnection::DestroyHdiConnection()
 {
-    HiLog::Info(LABEL, "%{public}s in", __func__);
+    CALL_LOG_ENTER;
     return ERR_OK;
 }
 
 void CompatibleConnection::VibrateProcess()
 {
-    HiLog::Info(LABEL, "%{public}s in", __func__);
+    CALL_LOG_ENTER;
     clock_t vibrateStartTime = clock();
     while (static_cast<uint32_t>(clock() - vibrateStartTime) < duration_) {
         if (isStop_) {
-            HiLog::Info(LABEL, "%{public}s thread should stop", __func__);
+            MISC_HILOGI("thread should stop");
             break;
         }
     }
-    HiLog::Info(LABEL, "%{public}s end", __func__);
     return;
 }
 }  // namespace Sensors

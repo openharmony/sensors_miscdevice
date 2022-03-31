@@ -36,7 +36,7 @@ const std::string VIBRATE_PERMISSION = "ohos.permission.VIBRATE";
 
 MiscdeviceServiceStub::MiscdeviceServiceStub()
 {
-    HiLog::Info(LABEL, "%{public}s begin,  %{public}p", __func__, this);
+    MISC_HILOGI("MiscdeviceServiceStub begin,  %{public}p", this);
     baseFuncs_[IS_ABILITY_AVAILABLE] = &MiscdeviceServiceStub::IsAbilityAvailablePb;
     baseFuncs_[IS_VIBRATOR_EFFECT_AVAILABLE] = &MiscdeviceServiceStub::IsVibratorEffectAvailablePb;
     baseFuncs_[GET_VIBRATOR_ID_LIST] = &MiscdeviceServiceStub::GetVibratorIdListPb;
@@ -56,7 +56,7 @@ MiscdeviceServiceStub::MiscdeviceServiceStub()
 
 MiscdeviceServiceStub::~MiscdeviceServiceStub()
 {
-    HiLog::Info(LABEL, "%{public}s begin, xigou %{public}p", __func__, this);
+    MISC_HILOGI("~MiscdeviceServiceStub begin, xigou %{public}p", this);
     baseFuncs_.clear();
 }
 
@@ -79,7 +79,7 @@ int32_t MiscdeviceServiceStub::VibratePb(MessageParcel &data, MessageParcel &rep
 {
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
     if (!permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION)) {
-        HiLog::Error(LABEL, "%{public}s permission denied", __func__);
+        MISC_HILOGE("permissionUtil denied");
         return ERR_PERMISSION_DENIED;
     }
     return Vibrate(data.ReadInt32(), data.ReadUint32());
@@ -97,7 +97,7 @@ int32_t MiscdeviceServiceStub::CancelVibratorPb(MessageParcel &data, MessageParc
 {
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
     if (!permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION)) {
-        HiLog::Error(LABEL, "%{public}s permission denied", __func__);
+        MISC_HILOGE("permissionUtil denied");
         return ERR_PERMISSION_DENIED;
     }
     int32_t vibratorId = data.ReadInt32();
@@ -108,7 +108,7 @@ int32_t MiscdeviceServiceStub::PlayVibratorEffectPb(MessageParcel &data, Message
 {
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
     if (!permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION)) {
-        HiLog::Error(LABEL, "%{public}s permission denied", __func__);
+        MISC_HILOGE("permissionUtil denied");
         return ERR_PERMISSION_DENIED;
     }
     int32_t vibratorId = data.ReadInt32();
@@ -121,7 +121,7 @@ int32_t MiscdeviceServiceStub::PlayCustomVibratorEffectPb(MessageParcel &data, M
 {
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
     if (!permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION)) {
-        HiLog::Error(LABEL, "%{public}s permission denied", __func__);
+        MISC_HILOGE("permissionUtil denied");
         return ERR_PERMISSION_DENIED;
     }
     int32_t vibratorId = data.ReadInt32();
@@ -137,7 +137,7 @@ int32_t MiscdeviceServiceStub::StopVibratorEffectPb(MessageParcel &data, Message
 {
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
     if (!permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION)) {
-        HiLog::Error(LABEL, "%{public}s permission denied", __func__);
+        MISC_HILOGE("permissionUtil denied");
         return ERR_PERMISSION_DENIED;
     }
     int32_t vibratorId = data.ReadInt32();
@@ -149,7 +149,7 @@ int32_t MiscdeviceServiceStub::SetVibratorParameterPb(MessageParcel &data, Messa
 {
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
     if (!permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION)) {
-        HiLog::Error(LABEL, "%{public}s permission denied", __func__);
+        MISC_HILOGE("permissionUtil denied");
         return ERR_PERMISSION_DENIED;
     }
     int32_t vibratorId = data.ReadInt32();
@@ -208,11 +208,11 @@ int32_t MiscdeviceServiceStub::StopLightEffectPb(MessageParcel &data, MessagePar
 int32_t MiscdeviceServiceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
                                                MessageOption &option)
 {
-    HiLog::Debug(LABEL, "%{public}s begin, cmd : %{public}u", __func__, code);
+    MISC_HILOGD("remoterequest begin, cmd : %{public}u", code);
     std::u16string descriptor = MiscdeviceServiceStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {
-        HiLog::Error(LABEL, "%{public}s client and service descriptors are inconsistent", __func__);
+        MISC_HILOGE("client and service descriptors are inconsistent");
         return OBJECT_NULL;
     }
     auto itFunc = baseFuncs_.find(code);
@@ -222,7 +222,7 @@ int32_t MiscdeviceServiceStub::OnRemoteRequest(uint32_t code, MessageParcel &dat
             return (this->*memberFunc)(data, reply);
         }
     }
-    HiLog::Debug(LABEL, "%{public}s no member function default process", __func__);
+    MISC_HILOGD("remoterequest no member function default process");
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 }  // namespace Sensors

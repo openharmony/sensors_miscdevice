@@ -63,11 +63,11 @@ static std::string GetEventName(int32_t eventId)
 
 void DmdReport::ReportException(int32_t eventId, const std::string &interfaceName, int32_t error)
 {
-    HiLog::Debug(LABEL, "%{public}s begin", __func__);
+    CALL_LOG_ENTER;
     std::lock_guard<std::mutex> eventLock(eventMutex_);
     auto eventIt = eventMap_.find(eventId);
     if (eventIt == eventMap_.end()) {
-        HiLog::Error(LABEL, "%{public}s eventId : %{public}d doesn't support", __func__, eventId);
+        MISC_HILOGE("%{public}d doesn't support", eventId);
         return;
     }
     int64_t curTime = GetSecondsSince1970ToNow();
@@ -75,10 +75,9 @@ void DmdReport::ReportException(int32_t eventId, const std::string &interfaceNam
         HiviewDFX::HiSysEvent::Write(HiviewDFX::HiSysEvent::Domain::SENSORS, GetEventName(eventId),
             HiviewDFX::HiSysEvent::EventType::FAULT, interfaceName, error);
         eventMap_[eventId] = curTime;
-        HiLog::Debug(LABEL, "%{public}s end", __func__);
+        MISC_HILOGD("More than half an hour");
         return;
     }
-    HiLog::Warn(LABEL, "%{public}s every eventId report one time half an hour", __func__);
 }
 }  // namespace Sensors
 }  // namespace OHOS

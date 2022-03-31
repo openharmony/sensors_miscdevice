@@ -93,43 +93,42 @@ MiscdeviceService::~MiscdeviceService()
 
 void MiscdeviceService::OnDump()
 {
-    HiLog::Info(LABEL, "%{public}s is invoked", __func__);
+    MISC_HILOGI("ondump is invoked");
 }
 
 void MiscdeviceService::OnStart()
 {
-    HiLog::Info(LABEL, "%{public}s begin", __func__);
+    CALL_LOG_ENTER;
     if (state_ == MiscdeviceServiceState::STATE_RUNNING) {
-        HiLog::Warn(LABEL, "%{public}s already started", __func__);
+        MISC_HILOGW("state_ already started");
         return;
     }
     if (!InitInterface()) {
-        HiLog::Error(LABEL, "%{public}s Init interface error", __func__);
+        MISC_HILOGE("Init interface error");
         return;
     }
     if (!SystemAbility::Publish(this)) {
-        HiLog::Error(LABEL, "%{public}s publish MiscdeviceService failed", __func__);
+        MISC_HILOGE("publish MiscdeviceService failed");
         return;
     }
     auto ret = miscDdeviceIdMap_.insert(std::make_pair(MiscdeviceDeviceId::LED, lightExist_));
     if (!ret.second) {
-        HiLog::Info(LABEL, "%{public}s light exist in miscDdeviceIdMap_", __func__);
+        MISC_HILOGI("light exist in miscDdeviceIdMap_");
         ret.first->second = lightExist_;
     }
     ret = miscDdeviceIdMap_.insert(std::make_pair(MiscdeviceDeviceId::VIBRATOR, vibratorExist_));
     if (!ret.second) {
-        HiLog::Info(LABEL, "%{public}s vibrator exist in miscDdeviceIdMap_", __func__);
+        MISC_HILOGI("vibrator exist in miscDdeviceIdMap_");
         ret.first->second = vibratorExist_;
     }
     state_ = MiscdeviceServiceState::STATE_RUNNING;
-    HiLog::Info(LABEL, "%{public}s end", __func__);
 }
 
 bool MiscdeviceService::InitInterface()
 {
     auto ret = vibratorHdiConnection_.ConnectHdi();
     if (ret != ERR_OK) {
-        HiLog::Error(LABEL, "%{public}s InitVibratorServiceImpl failed", __func__);
+        MISC_HILOGE("InitVibratorServiceImpl failed");
         return false;
     }
     return true;
@@ -137,24 +136,23 @@ bool MiscdeviceService::InitInterface()
 
 void MiscdeviceService::OnStop()
 {
-    HiLog::Info(LABEL, "%{public}s begin", __func__);
+    CALL_LOG_ENTER;
     if (state_ == MiscdeviceServiceState::STATE_STOPPED) {
-        HiLog::Warn(LABEL, "%{public}s MiscdeviceService stopped already", __func__);
+        MISC_HILOGW("MiscdeviceService stopped already");
         return;
     }
     state_ = MiscdeviceServiceState::STATE_STOPPED;
     int32_t ret = vibratorHdiConnection_.DestroyHdiConnection();
     if (ret != ERR_OK) {
-        HiLog::Error(LABEL, "%{public}s destroy hdi connection fail", __func__);
+        MISC_HILOGE("destroy hdi connection fail");
     }
-    HiLog::Info(LABEL, "%{public}s end", __func__);
 }
 
 bool MiscdeviceService::IsAbilityAvailable(MiscdeviceDeviceId groupID)
 {
     auto it = miscDdeviceIdMap_.find(groupID);
     if (it == miscDdeviceIdMap_.end()) {
-        HiLog::Error(LABEL, "%{public}s cannot find groupID : %{public}d", __func__, groupID);
+        MISC_HILOGE("cannot find groupID : %{public}d", groupID);
         return false;
     }
     return it->second;
@@ -174,7 +172,7 @@ std::vector<int32_t> MiscdeviceService::GetVibratorIdList()
 int32_t MiscdeviceService::Vibrate(int32_t vibratorId, uint32_t timeOut)
 {
     if ((timeOut < MIN_VIBRATOR_TIME) || (timeOut > MAX_VIBRATOR_TIME)) {
-        HiLog::Error(LABEL, "%{public}s timeOut is invalid, timeOut : %{public}u", __func__, timeOut);
+        MISC_HILOGE("timeOut is invalid, timeOut : %{public}u", timeOut);
         return ERR_INVALID_VALUE;
     }
     std::lock_guard<std::mutex> vibratorEffectLock(vibratorEffectMutex_);
@@ -195,16 +193,15 @@ int32_t MiscdeviceService::CancelVibrator(int32_t vibratorId)
     std::lock_guard<std::mutex> vibratorEffectLock(vibratorEffectMutex_);
     auto it = vibratorEffectMap_.find(vibratorId);
     if (it != vibratorEffectMap_.end() && it->second == "time") {
-        HiLog::Info(LABEL, "%{public}s stop mode is %{public}s", __func__, it->second.c_str());
+        MISC_HILOGI("stop mode is %{public}s", it->second.c_str());
         vibratorEffectMap_.clear();
     } else {
-        HiLog::Error(LABEL, "%{public}s is failed", __func__);
+        MISC_HILOGE("vibratorEffectMap_ is failed");
         return ERROR;
     }
     if (vibratorThread_ != nullptr) {
         while (vibratorThread_->IsRunning()) {
-            HiLog::Info(LABEL, "%{public}s stop previous vibratorThread, vibratorId : %{public}d", __func__,
-                        vibratorId);
+            MISC_HILOGI("stop previous vibratorThread, vibratorId : %{public}d", vibratorId);
             vibratorThread_->NotifyExit();
             vibratorThread_->NotifyExitSync();
         }
@@ -219,7 +216,7 @@ int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::str
     if (it != vibratorEffectMap_.end()) {
         if (it->second == "time") {
             if ((vibratorThread_ != nullptr) && (vibratorThread_->IsRunning())) {
-                HiLog::Info(LABEL, "%{public}s stop previous vibratorThread", __func__);
+                MISC_HILOGI("stop previous vibratorThread");
                 vibratorThread_->NotifyExit();
                 vibratorThread_->NotifyExitSync();
             }
@@ -235,7 +232,7 @@ int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::str
     }
     std::unordered_map<std::string, int32_t>::iterator iter = hapticRingMap_.find(effect);
     if (iter == hapticRingMap_.end()) {
-        HiLog::Error(LABEL, "%{public}s is not exist", __func__);
+        MISC_HILOGE("hapticRingMap_ is not exist");
         return ERROR;
     }
     vibratorEffectMap_[vibratorId] = effect;
@@ -245,18 +242,18 @@ int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::str
         if (vibratorEffectThread_ == nullptr) {
             vibratorEffectThread_ = std::make_unique<VibratorEffectThread>(*this);
             if (vibratorEffectThread_ == nullptr) {
-                HiLog::Error(LABEL, "%{public}s vibratorEffectThread_ cannot be null", __func__);
+                MISC_HILOGE("vibratorEffectThread_ cannot be null");
                 return ERROR;
             }
         }
     }
     while (vibratorEffectThread_->IsRunning()) {
-        HiLog::Debug(LABEL, "%{public}s notify the vibratorEffectThread", __func__);
+        MISC_HILOGD("notify the vibratorEffectThread");
         ready_ = true;
         conditionVar_.notify_one();
         ready_ = false;
     }
-    HiLog::Debug(LABEL, "%{public}s update vibrator effect data and start", __func__);
+    MISC_HILOGD("update vibrator effect data and start");
     vibratorEffectThread_->UpdateVibratorEffectData(effect, delayTiming);
     vibratorEffectThread_->Start("VibratorEffectThread");
     return NO_ERROR;
@@ -266,7 +263,7 @@ int32_t MiscdeviceService::PlayCustomVibratorEffect(int32_t vibratorId, const st
                                                     const std::vector<int32_t> &intensity, int32_t periodCount)
 {
     if (!MiscdeviceCommon::CheckCustomVibratorEffect(timing, intensity, periodCount)) {
-        HiLog::Error(LABEL, "%{public}s params are invalid", __func__);
+        MISC_HILOGE("params are invalid");
         return ERR_INVALID_VALUE;
     }
     std::lock_guard<std::mutex> vibratorEffectLock(vibratorEffectMutex_);
@@ -284,18 +281,18 @@ int32_t MiscdeviceService::PlayCustomVibratorEffect(int32_t vibratorId, const st
         if (vibratorThread_ == nullptr) {
             vibratorThread_ = new (std::nothrow) VibratorThread(*this);
             if (vibratorThread_ == nullptr) {
-                HiLog::Error(LABEL, "%{public}s vibratorThread_ cannot be null", __func__);
+                MISC_HILOGE("vibratorThread_ cannot be null");
                 return ERROR;
             }
         }
     }
     // check current vibrator execution sequences and abort
     while (vibratorThread_->IsRunning()) {
-        HiLog::Info(LABEL, "%{public}s stop previous vibratorThread, vibratorId : %{public}d", __func__, vibratorId);
+        MISC_HILOGI("stop previous vibratorThread, vibratorId : %{public}d", vibratorId);
         vibratorThread_->NotifyExit();
         vibratorThread_->NotifyExitSync();
     }
-    HiLog::Info(LABEL, "%{public}s update vibrator data and start, vibratorId : %{public}d", __func__, vibratorId);
+    MISC_HILOGI("update vibrator data and start, vibratorId : %{public}d", vibratorId);
     vibratorThread_->UpdateVibratorData(timing, intensity, periodCount);
     vibratorThread_->Start("VibratorThread");
     return NO_ERROR;
@@ -307,18 +304,17 @@ int32_t MiscdeviceService::StopVibratorEffect(int32_t vibratorId, const std::str
     std::lock_guard<std::mutex> vibratorEffectLock(vibratorEffectMutex_);
     auto it = vibratorEffectMap_.find(vibratorId);
     if ((it != vibratorEffectMap_.end()) && (it->second != "time")) {
-        HiLog::Info(LABEL, "%{public}s vibrator effect is %{public}s", __func__, it->second.c_str());
+        MISC_HILOGI("vibrator effect is %{public}s", it->second.c_str());
         curEffect = it->second;
         vibratorEffectMap_.clear();
     } else {
-        HiLog::Error(LABEL, "%{public}s is failed", __func__);
+        MISC_HILOGE("vibrator effect is failed");
         return ERROR;
     }
-    HiLog::Info(LABEL, "%{public}s curEffect : %{public}s", __func__, curEffect.c_str());
+    MISC_HILOGI("curEffect : %{public}s", curEffect.c_str());
     if (vibratorEffectThread_ != nullptr) {
         while (vibratorEffectThread_->IsRunning()) {
-            HiLog::Debug(LABEL, "%{public}s notify the vibratorEffectThread, vibratorId : %{public}d",
-                         __func__, vibratorId);
+            MISC_HILOGD("notify the vibratorEffectThread, vibratorId : %{public}d", vibratorId);
             ready_ = true;
             conditionVar_.notify_one();
             ready_ = false;

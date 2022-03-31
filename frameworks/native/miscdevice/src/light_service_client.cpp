@@ -38,7 +38,7 @@ int32_t LightServiceClient::InitServiceClient()
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> clientLock(clientMutex_);
     if (miscdeviceProxy_ != nullptr) {
-        HiLog::Debug(LABEL, "%{public}s already init", __func__);
+        MISC_HILOGD("miscdeviceProxy_ already init");
         return ERR_OK;
     }
     auto sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -47,7 +47,7 @@ int32_t LightServiceClient::InitServiceClient()
     while (retry < GET_SERVICE_MAX_COUNT) {
         miscdeviceProxy_ = iface_cast<IMiscdeviceService>(sm->GetSystemAbility(MISCDEVICE_SERVICE_ABILITY_ID));
         if (miscdeviceProxy_ != nullptr) {
-            HiLog::Debug(LABEL, "%{public}s get service success, retry : %{public}d", __func__, retry);
+            MISC_HILOGD("miscdeviceProxy_ get service success, retry : %{public}d", retry);
             serviceDeathObserver_ = new (std::nothrow) DeathRecipientTemplate(*const_cast<LightServiceClient *>(this));
             if (serviceDeathObserver_ != nullptr) {
                 miscdeviceProxy_->AsObject()->AddDeathRecipient(serviceDeathObserver_);
@@ -59,16 +59,16 @@ int32_t LightServiceClient::InitServiceClient()
         retry++;
     }
     DmdReport::ReportException(MISC_SERVICE_EXCEPTION, "InitServiceClient", MISC_NATIVE_GET_SERVICE_ERR);
-    HiLog::Error(LABEL, "%{public}s get service failed", __func__);
+    MISC_HILOGE("get service failed");
     return MISC_NATIVE_GET_SERVICE_ERR;
 }
 
 std::vector<int32_t> LightServiceClient::GetLightIdList()
 {
-    HiLog::Debug(LABEL, "%{public}s begin", __func__);
+    CALL_LOG_ENTER;
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
-        HiLog::Error(LABEL, "%{public}s InitServiceClient failed, ret : %{public}d", __func__, ret);
+        MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
         return {};
     }
     return miscdeviceProxy_->GetLightSupportId();
@@ -76,10 +76,10 @@ std::vector<int32_t> LightServiceClient::GetLightIdList()
 
 bool LightServiceClient::IsLightEffectSupport(int32_t lightId, const std::string &effectId)
 {
-    HiLog::Debug(LABEL, "%{public}s begin", __func__);
+    CALL_LOG_ENTER;
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
-        HiLog::Error(LABEL, "%{public}s InitServiceClient failed, ret : %{public}d", __func__, ret);
+        MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
         return false;
     }
     return miscdeviceProxy_->IsLightEffectSupport(lightId, effectId);
@@ -87,10 +87,10 @@ bool LightServiceClient::IsLightEffectSupport(int32_t lightId, const std::string
 
 int32_t LightServiceClient::Light(int32_t lightId, uint64_t brightness, uint32_t timeOn, uint32_t timeOff)
 {
-    HiLog::Debug(LABEL, "%{public}s begin", __func__);
+    CALL_LOG_ENTER;
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
-        HiLog::Error(LABEL, "%{public}s InitServiceClient failed, ret : %{public}d", __func__, ret);
+        MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
     return miscdeviceProxy_->Light(lightId, brightness, timeOn, timeOff);
@@ -98,10 +98,10 @@ int32_t LightServiceClient::Light(int32_t lightId, uint64_t brightness, uint32_t
 
 int32_t LightServiceClient::PlayLightEffect(int32_t lightId, const std::string &type)
 {
-    HiLog::Debug(LABEL, "%{public}s begin", __func__);
+    CALL_LOG_ENTER;
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
-        HiLog::Error(LABEL, "%{public}s InitServiceClient failed, ret : %{public}d", __func__, ret);
+        MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
     return miscdeviceProxy_->PlayLightEffect(lightId, type);
@@ -109,10 +109,10 @@ int32_t LightServiceClient::PlayLightEffect(int32_t lightId, const std::string &
 
 int32_t LightServiceClient::StopLightEffect(int32_t lightId)
 {
-    HiLog::Debug(LABEL, "%{public}s begin", __func__);
+    CALL_LOG_ENTER;
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
-        HiLog::Error(LABEL, "%{public}s InitServiceClient failed, ret : %{public}d", __func__, ret);
+        MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
     return miscdeviceProxy_->StopLightEffect(lightId);
@@ -120,12 +120,12 @@ int32_t LightServiceClient::StopLightEffect(int32_t lightId)
 
 void LightServiceClient::ProcessDeathObserver(const wptr<IRemoteObject> &object)
 {
-    HiLog::Debug(LABEL, "%{public}s begin", __func__);
+    CALL_LOG_ENTER;
     (void)object;
     miscdeviceProxy_ = nullptr;
     auto ret = InitServiceClient();
     if (ret != ERR_OK) {
-        HiLog::Error(LABEL, "%{public}s InitServiceClient failed, ret : %{public}d", __func__, ret);
+        MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
         return;
     }
 }

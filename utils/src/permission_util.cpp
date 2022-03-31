@@ -31,10 +31,10 @@ bool PermissionUtil::CheckVibratePermission(AccessTokenID callerToken, std::stri
 {
     int32_t result = AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
     if (result != PERMISSION_GRANTED) {
-        HiLog::Error(LABEL, "%{public}s grant failed, result: %{public}d", __func__, result);
+        MISC_HILOGE("result grant failed, result: %{public}d", result);
         return false;
     }
-    HiLog::Debug(LABEL, "%{public}s grant success", __func__);
+    MISC_HILOGD("result grant success");
     return true;
 }
 }  // namespace Sensors
