@@ -35,11 +35,11 @@ bool MiscdeviceCommon::CheckCustomVibratorEffect(const std::vector<int32_t> &tim
                                                  const std::vector<int32_t> &intensity, int32_t periodCount)
 {
     if ((periodCount < MIN_VIBRATOR_COUNT) || (periodCount > MAX_VIBRATOR_COUNT)) {
-        MISC_HILOGW("input param invalid is failed");
+        MISC_HILOGE("input param invalid is failed");
         return false;
     }
     if (timing.size() != intensity.size()) {
-        MISC_HILOGW("timing size invalid is failed");
+        MISC_HILOGE("timing size invalid is failed");
         return false;
     }
     int32_t totalTime = 0;
@@ -47,7 +47,7 @@ bool MiscdeviceCommon::CheckCustomVibratorEffect(const std::vector<int32_t> &tim
         totalTime += timing[i];
     }
     if (totalTime > HALF_AN_HOUR) {
-        MISC_HILOGW("totalTime invalid is failed");
+        MISC_HILOGE("totalTime invalid is failed");
         return false;
     }
     for (uint32_t i = 0; i < intensity.size(); i++) {

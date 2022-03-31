@@ -31,7 +31,7 @@ bool PermissionUtil::CheckVibratePermission(AccessTokenID callerToken, std::stri
 {
     int32_t result = AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
     if (result != PERMISSION_GRANTED) {
-        MISC_HILOGW("result grant failed, result: %{public}d", result);
+        MISC_HILOGE("result grant failed, result: %{public}d", result);
         return false;
     }
     MISC_HILOGD("result grant success");
