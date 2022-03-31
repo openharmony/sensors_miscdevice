@@ -38,10 +38,7 @@ int32_t DisableLooping()
 
 int32_t StartVibrator(const char *effectId)
 {
-    if (effectId == nullptr) {
-        MISC_HILOGE("effectId is null");
-        return OHOS::Sensors::ERROR;
-    }
+    CHKPR(effectId, OHOS::Sensors::ERROR);
     bool isLooping = (g_loopingFlag == 1) ? true : false;
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.Vibrate(DEFAULT_VIBRATOR_ID, effectId, isLooping);
@@ -69,10 +66,7 @@ int32_t StartVibratorOnce(uint32_t duration)
 
 int32_t StopVibrator(const char *mode)
 {
-    if (mode == nullptr) {
-        MISC_HILOGE("mode is invalid");
-        return OHOS::Sensors::ERROR;
-    }
+    CHKPR(mode, OHOS::Sensors::ERROR);
     if (strcmp(mode, "time") != 0 && strcmp(mode, "preset") != 0) {
         MISC_HILOGE("mode is invalid, mode is %{public}s", mode);
         return OHOS::Sensors::ERROR;

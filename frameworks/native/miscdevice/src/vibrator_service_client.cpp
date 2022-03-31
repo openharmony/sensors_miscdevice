@@ -35,7 +35,7 @@ constexpr uint32_t WAIT_MS = 200;
 
 int32_t VibratorServiceClient::InitServiceClient()
 {
-    MISC_HILOGD("initServiceClient begin");
+    CALL_LOG_ENTER;
     std::lock_guard<std::mutex> clientLock(clientMutex_);
     if (miscdeviceProxy_ != nullptr) {
         MISC_HILOGW("miscdeviceProxy_ already init");
@@ -69,7 +69,7 @@ int32_t VibratorServiceClient::InitServiceClient()
 
 std::vector<int32_t> VibratorServiceClient::GetVibratorIdList()
 {
-    MISC_HILOGD("getVibratorIdList begin");
+    CALL_LOG_ENTER;
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
         MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
@@ -80,7 +80,7 @@ std::vector<int32_t> VibratorServiceClient::GetVibratorIdList()
 
 bool VibratorServiceClient::IsVibratorEffectSupport(int32_t vibratorId, const std::string &effect)
 {
-    MISC_HILOGD("vibratorEffectSupport begin");
+    CALL_LOG_ENTER;
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
         MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
@@ -114,7 +114,7 @@ int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, const std::string &ef
 int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, std::vector<int32_t> timing, std::vector<int32_t> intensity,
                                        int32_t periodCount)
 {
-    MISC_HILOGD("Vibrate begin");
+    CALL_LOG_ENTER;
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
         MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
@@ -141,7 +141,7 @@ int32_t VibratorServiceClient::Stop(int32_t vibratorId, const std::string &type)
 
 int32_t VibratorServiceClient::SetVibratorParameter(int32_t vibratorId, const std::string &cmd)
 {
-    MISC_HILOGD("SetVibratorParameter begin");
+    CALL_LOG_ENTER;
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
         MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
@@ -152,7 +152,7 @@ int32_t VibratorServiceClient::SetVibratorParameter(int32_t vibratorId, const st
 
 std::string VibratorServiceClient::GetVibratorParameter(int32_t vibratorId, const std::string &command)
 {
-    MISC_HILOGD("GetVibratorParameter begin");
+    CALL_LOG_ENTER;
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
         MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
@@ -163,7 +163,7 @@ std::string VibratorServiceClient::GetVibratorParameter(int32_t vibratorId, cons
 
 void VibratorServiceClient::ProcessDeathObserver(const wptr<IRemoteObject> &object)
 {
-    MISC_HILOGD("ProcessDeathObserver begin");
+    CALL_LOG_ENTER;
     (void)object;
     miscdeviceProxy_ = nullptr;
     int32_t ret = InitServiceClient();

@@ -98,7 +98,7 @@ void MiscdeviceService::OnDump()
 
 void MiscdeviceService::OnStart()
 {
-    MISC_HILOGI("onstart begin");
+    CALL_LOG_ENTER;
     if (state_ == MiscdeviceServiceState::STATE_RUNNING) {
         MISC_HILOGW("state_ already started");
         return;
@@ -122,7 +122,6 @@ void MiscdeviceService::OnStart()
         ret.first->second = vibratorExist_;
     }
     state_ = MiscdeviceServiceState::STATE_RUNNING;
-    MISC_HILOGI("onstart end");
 }
 
 bool MiscdeviceService::InitInterface()
@@ -137,7 +136,7 @@ bool MiscdeviceService::InitInterface()
 
 void MiscdeviceService::OnStop()
 {
-    MISC_HILOGI("onstop begin");
+    CALL_LOG_ENTER;
     if (state_ == MiscdeviceServiceState::STATE_STOPPED) {
         MISC_HILOGW("MiscdeviceService stopped already");
         return;
@@ -147,7 +146,6 @@ void MiscdeviceService::OnStop()
     if (ret != ERR_OK) {
         MISC_HILOGE("destroy hdi connection fail");
     }
-    MISC_HILOGI("onstop end");
 }
 
 bool MiscdeviceService::IsAbilityAvailable(MiscdeviceDeviceId groupID)

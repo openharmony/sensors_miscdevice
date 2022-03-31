@@ -28,7 +28,7 @@ constexpr uint32_t WAIT_MS = 100;
 
 int32_t HdiConnection::ConnectHdi()
 {
-    HiLog::Debug(LABEL, "%{public}s in", __func__);
+    CALL_LOG_ENTER;
     int32_t retry = 0;
     while (retry < GET_HDI_SERVICE_COUNT) {
         vibratorInterface_ = IVibratorInterface::Get();
@@ -37,10 +37,10 @@ int32_t HdiConnection::ConnectHdi()
             return ERR_OK;
         }
         retry++;
-        HiLog::Warn(LABEL, "%{public}s connect hdi service failed, retry : %{public}d", __func__, retry);
+        MISC_HILOGW("connect hdi service failed, retry : %{public}d", retry);
         std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_MS));
     }
-    HiLog::Error(LABEL, "%{public}s failed, vibrator interface initialization failed", __func__);
+    MISC_HILOGE("vibrator interface initialization failed");
     return ERR_INVALID_VALUE;
 }
 
@@ -48,7 +48,7 @@ int32_t HdiConnection::StartOnce(uint32_t duration)
 {
     int32_t ret = vibratorInterface_->StartOnce(duration);
     if (ret < 0) {
-        HiLog::Error(LABEL, "%{public}s failed", __func__);
+        MISC_HILOGE("StartOnce failed");
         return ret;
     }
     return ERR_OK;
@@ -57,12 +57,12 @@ int32_t HdiConnection::StartOnce(uint32_t duration)
 int32_t HdiConnection::Start(const char *effectType)
 {
     if (effectType == nullptr) {
-        HiLog::Error(LABEL, "%{public}s effectType is null", __func__);
+        MISC_HILOGE("effectType is null");
         return VIBRATOR_ON_ERR;
     }
     int32_t ret = vibratorInterface_->Start(effectType);
     if (ret < 0) {
-        HiLog::Error(LABEL, "%{public}s failed", __func__);
+        MISC_HILOGE("Start failed");
         return ret;
     }
     return ERR_OK;
@@ -72,7 +72,7 @@ int32_t HdiConnection::Stop(VibratorStopMode mode)
 {
     int32_t ret = vibratorInterface_->Stop(static_cast<OHOS::HDI::Vibrator::V1_0::HdfVibratorMode>(mode));
     if (ret < 0) {
-        HiLog::Error(LABEL, "%{public}s failed", __func__);
+        MISC_HILOGE("Stop failed");
         return ret;
     }
     return ERR_OK;
@@ -86,14 +86,14 @@ int32_t HdiConnection::DestroyHdiConnection()
 
 void HdiConnection::RegisterHdiDeathRecipient()
 {
-    HiLog::Debug(LABEL, "%{public}s begin", __func__);
+    CALL_LOG_ENTER;
     if (vibratorInterface_ == nullptr) {
-        HiLog::Error(LABEL, "%{public}s connect v1_0 hdi failed", __func__);
+        MISC_HILOGE("connect v1_0 hdi failed");
         return;
     }
     hdiDeathObserver_ = new (std::nothrow) DeathRecipientTemplate(*const_cast<HdiConnection *>(this));
     if (hdiDeathObserver_ == nullptr) {
-        HiLog::Error(LABEL, "%{public}s hdiDeathObserver_ cannot be null", __func__);
+        MISC_HILOGE("hdiDeathObserver_ cannot be null");
         return;
     }
     vibratorInterface_->AsObject()->AddDeathRecipient(hdiDeathObserver_);
@@ -101,9 +101,9 @@ void HdiConnection::RegisterHdiDeathRecipient()
 
 void HdiConnection::UnregisterHdiDeathRecipient()
 {
-    HiLog::Debug(LABEL, "%{public}s begin", __func__);
+    CALL_LOG_ENTER;
     if (vibratorInterface_ == nullptr || hdiDeathObserver_ == nullptr) {
-        HiLog::Error(LABEL, "%{public}s vibratorInterface_ or hdiDeathObserver_ is null", __func__);
+        MISC_HILOGE("vibratorInterface_ or hdiDeathObserver_ is null");
         return;
     }
     vibratorInterface_->AsObject()->RemoveDeathRecipient(hdiDeathObserver_);
@@ -111,10 +111,10 @@ void HdiConnection::UnregisterHdiDeathRecipient()
 
 void HdiConnection::ProcessDeathObserver(const wptr<IRemoteObject> &object)
 {
-    HiLog::Debug(LABEL, "%{public}s begin", __func__);
+    CALL_LOG_ENTER;
     sptr<IRemoteObject> hdiService = object.promote();
     if (hdiService == nullptr || hdiDeathObserver_ == nullptr) {
-        HiLog::Error(LABEL, "%{public}s invalid remote object or hdiDeathObserver_ is null", __func__);
+        MISC_HILOGE("invalid remote object or hdiDeathObserver_ is null");
         return;
     }
     hdiService->RemoveDeathRecipient(hdiDeathObserver_);
@@ -125,7 +125,7 @@ void HdiConnection::reconnect()
 {
     int32_t ret = ConnectHdi();
     if (ret != ERR_OK) {
-        HiLog::Error(LABEL, "%{public}s connect hdi fail", __func__);
+        MISC_HILOGE("connect hdi fail");
     }
 }
 }  // namespace Sensors

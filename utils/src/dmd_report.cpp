@@ -63,7 +63,7 @@ static std::string GetEventName(int32_t eventId)
 
 void DmdReport::ReportException(int32_t eventId, const std::string &interfaceName, int32_t error)
 {
-    MISC_HILOGD("ReportException begin");
+    CALL_LOG_ENTER;
     std::lock_guard<std::mutex> eventLock(eventMutex_);
     auto eventIt = eventMap_.find(eventId);
     if (eventIt == eventMap_.end()) {
@@ -75,10 +75,9 @@ void DmdReport::ReportException(int32_t eventId, const std::string &interfaceNam
         HiviewDFX::HiSysEvent::Write(HiviewDFX::HiSysEvent::Domain::SENSORS, GetEventName(eventId),
             HiviewDFX::HiSysEvent::EventType::FAULT, interfaceName, error);
         eventMap_[eventId] = curTime;
-        MISC_HILOGD("ReportException end");
+        MISC_HILOGD("More than half an hour");
         return;
     }
-    MISC_HILOGW("every eventId report one time half an hour");
 }
 }  // namespace Sensors
 }  // namespace OHOS

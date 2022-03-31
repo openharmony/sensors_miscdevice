@@ -65,7 +65,7 @@ int32_t LightServiceClient::InitServiceClient()
 
 std::vector<int32_t> LightServiceClient::GetLightIdList()
 {
-    MISC_HILOGD("getLightIdList begin");
+    CALL_LOG_ENTER;
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
         MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
@@ -76,7 +76,7 @@ std::vector<int32_t> LightServiceClient::GetLightIdList()
 
 bool LightServiceClient::IsLightEffectSupport(int32_t lightId, const std::string &effectId)
 {
-    MISC_HILOGD("light effect support begin");
+    CALL_LOG_ENTER;
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
         MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
@@ -87,7 +87,7 @@ bool LightServiceClient::IsLightEffectSupport(int32_t lightId, const std::string
 
 int32_t LightServiceClient::Light(int32_t lightId, uint64_t brightness, uint32_t timeOn, uint32_t timeOff)
 {
-    MISC_HILOGD("Light begin");
+    CALL_LOG_ENTER;
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
         MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
@@ -98,7 +98,7 @@ int32_t LightServiceClient::Light(int32_t lightId, uint64_t brightness, uint32_t
 
 int32_t LightServiceClient::PlayLightEffect(int32_t lightId, const std::string &type)
 {
-    MISC_HILOGD("playLightEffect begin");
+    CALL_LOG_ENTER;
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
         MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
@@ -109,7 +109,7 @@ int32_t LightServiceClient::PlayLightEffect(int32_t lightId, const std::string &
 
 int32_t LightServiceClient::StopLightEffect(int32_t lightId)
 {
-    MISC_HILOGD("stopLightEffect begin");
+    CALL_LOG_ENTER;
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
         MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
@@ -120,7 +120,7 @@ int32_t LightServiceClient::StopLightEffect(int32_t lightId)
 
 void LightServiceClient::ProcessDeathObserver(const wptr<IRemoteObject> &object)
 {
-    MISC_HILOGD("processDeathObserver begin");
+    CALL_LOG_ENTER;
     (void)object;
     miscdeviceProxy_ = nullptr;
     auto ret = InitServiceClient();
