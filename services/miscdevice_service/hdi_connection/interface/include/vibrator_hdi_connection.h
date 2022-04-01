@@ -18,6 +18,7 @@
 
 #include "i_vibrator_hdi_connection.h"
 #include "singleton.h"
+#include <string>
 
 namespace OHOS {
 namespace Sensors {
@@ -31,7 +32,7 @@ public:
 
     int32_t StartOnce(uint32_t duration) override;
 
-    int32_t Start(const char *effectType) override;
+    int32_t Start(const std::string effectType) override;
 
     int32_t Stop(VibratorStopMode mode) override;
 

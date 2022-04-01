@@ -17,6 +17,7 @@
 #define I_VIBRATOR_HDI_CONNECTION_H
 #include <nocopyable.h>
 #include <stdint.h>
+#include <string>
 namespace OHOS {
 namespace Sensors {
 class IVibratorHdiConnection {

@@ -61,7 +61,7 @@ int32_t CompatibleConnection::Start(const std::string effectType)
 {
     CALL_LOG_ENTER;
     if (std::find(vibratorEffect_.begin(), vibratorEffect_.end(), effectType) == vibratorEffect_.end()) {
-        MISC_HILOGE("Not support %{public}s type", effectType);
+        MISC_HILOGE("Not support %{public}s type", effectType.c_str());
         return VIBRATOR_ON_ERR;
     }
     if (!vibrateThread_.joinable()) {
