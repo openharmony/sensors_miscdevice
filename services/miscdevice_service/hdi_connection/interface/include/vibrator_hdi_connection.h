@@ -18,7 +18,6 @@
 
 #include "i_vibrator_hdi_connection.h"
 #include "singleton.h"
-#include <string>
 
 namespace OHOS {
 namespace Sensors {
