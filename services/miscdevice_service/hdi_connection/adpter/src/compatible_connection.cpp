@@ -57,7 +57,7 @@ int32_t CompatibleConnection::StartOnce(uint32_t duration)
     return ERR_OK;
 }
 
-int32_t CompatibleConnection::Start(const char *effectType)
+int32_t CompatibleConnection::Start(const std::string effectType)
 {
     CALL_LOG_ENTER;
     if (std::find(vibratorEffect_.begin(), vibratorEffect_.end(), effectType) == vibratorEffect_.end()) {
