@@ -31,12 +31,12 @@
 #include <stdint.h>
 #define VIBRATOR_AGENT_H
 
-namespace OHOS {
-namespace Sensors {
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+namespace OHOS {
+namespace Sensors {
 /**
  * @brief Indicates the mode of stopping a one-shot vibration effect.
  *
@@ -109,11 +109,11 @@ int32_t DisableLooping();
  */
 int32_t StopVibrator(const char *mode);
 
+}  // namespace Sensors
+}  // namespace OHOS
 #ifdef __cplusplus
 };
 #endif
 
 /** @} */
 #endif // endif VIBRATOR_AGENT_H
-}  // namespace Sensors
-}  // namespace OHOS
