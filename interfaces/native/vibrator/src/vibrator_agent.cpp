@@ -17,6 +17,8 @@
 #include "sensors_log_domain.h"
 #include "vibrator_service_client.h"
 
+namespace OHOS {
+namespace Sensors {
 using OHOS::HiviewDFX::HiLog;
 using OHOS::HiviewDFX::HiLogLabel;
 using OHOS::Sensors::VibratorServiceClient;
@@ -79,3 +81,5 @@ int32_t StopVibrator(const char *mode)
     }
     return OHOS::Sensors::SUCCESS;
 }
+}  // namespace Sensors
+}  // namespace OHOS

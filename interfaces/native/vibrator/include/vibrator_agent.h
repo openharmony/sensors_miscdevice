@@ -31,6 +31,8 @@
 #include <stdint.h>
 #define VIBRATOR_AGENT_H
 
+namespace OHOS {
+namespace Sensors {
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -113,3 +115,5 @@ int32_t StopVibrator(const char *mode);
 
 /** @} */
 #endif // endif VIBRATOR_AGENT_H
+}  // namespace Sensors
+}  // namespace OHOS
