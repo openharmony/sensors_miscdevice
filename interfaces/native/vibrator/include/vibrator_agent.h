@@ -103,7 +103,6 @@ int32_t DisableLooping();
  * @since 6
  */
 int32_t StopVibrator(const char *mode);
-
 } // namespace Sensors
 } // namespace OHOS
 #ifdef __cplusplus
