@@ -56,10 +56,6 @@ int32_t HdiConnection::StartOnce(uint32_t duration)
 
 int32_t HdiConnection::Start(const std::string effectType)
 {
-    if (effectType.empty()) {
-        MISC_HILOGE("effectType is null");
-        return VIBRATOR_ON_ERR;
-    }
     int32_t ret = vibratorInterface_->Start(effectType);
     if (ret < 0) {
         MISC_HILOGE("Start failed");
