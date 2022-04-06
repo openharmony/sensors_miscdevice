@@ -44,7 +44,6 @@ namespace Sensors {
  */
 const char *VIBRATOR_STOP_MODE_TIME = "time";
 
-
 /**
  * @brief Indicates the mode of stopping a preset vibration effect.
  *
@@ -69,7 +68,6 @@ const char *VIBRATOR_STOP_MODE_PRESET = "preset";
  */
 int32_t StartVibrator(const char *effectId);
 
-
 /**
  * @brief Controls this vibrator to perform a one-shot vibration at a given duration.
  *
@@ -81,13 +79,11 @@ int32_t StartVibrator(const char *effectId);
  */
 int32_t StartVibratorOnce(uint32_t duration);
 
-
 /**
  * @brief Enables this vibrator to perform a periodic vibration.
  * @since 6
  */
 void EnableLooping();
-
 
 /**
  * @brief Disables this vibrator from performing a periodic vibration.
@@ -97,7 +93,6 @@ void EnableLooping();
  * @since 6
  */
 int32_t DisableLooping();
-
 
 /**
  * @brief Stops the vibration of this vibrator.
