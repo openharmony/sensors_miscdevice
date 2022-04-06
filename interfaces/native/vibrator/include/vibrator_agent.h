@@ -114,6 +114,5 @@ int32_t StopVibrator(const char *mode);
 #ifdef __cplusplus
 };
 #endif
-
 /** @} */
 #endif // endif VIBRATOR_AGENT_H
