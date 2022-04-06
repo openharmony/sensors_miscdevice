@@ -36,7 +36,7 @@ public:
 
     virtual int32_t StartOnce(uint32_t duration) = 0;
 
-    virtual int32_t Start(const std::string effectType) = 0;
+    virtual int32_t Start(const std::string &effectType) = 0;
 
     virtual int32_t Stop(VibratorStopMode mode) = 0;
 
