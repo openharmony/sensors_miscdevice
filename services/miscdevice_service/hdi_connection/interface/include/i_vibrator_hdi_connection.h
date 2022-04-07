@@ -17,6 +17,7 @@
 #define I_VIBRATOR_HDI_CONNECTION_H
 #include <nocopyable.h>
 #include <stdint.h>
+#include <string>
 namespace OHOS {
 namespace Sensors {
 class IVibratorHdiConnection {
@@ -35,7 +36,7 @@ public:
 
     virtual int32_t StartOnce(uint32_t duration) = 0;
 
-    virtual int32_t Start(const char *effectType) = 0;
+    virtual int32_t Start(const std::string &effectType) = 0;
 
     virtual int32_t Stop(VibratorStopMode mode) = 0;
 

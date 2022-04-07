@@ -17,6 +17,8 @@
 #include "sensors_log_domain.h"
 #include "vibrator_service_client.h"
 
+namespace OHOS {
+namespace Sensors {
 using OHOS::HiviewDFX::HiLog;
 using OHOS::HiviewDFX::HiLogLabel;
 using OHOS::Sensors::VibratorServiceClient;
@@ -38,44 +40,46 @@ int32_t DisableLooping()
 
 int32_t StartVibrator(const char *effectId)
 {
-    CHKPR(effectId, OHOS::Sensors::ERROR);
+    CHKPR(effectId, ERROR);
     bool isLooping = (g_loopingFlag == 1) ? true : false;
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.Vibrate(DEFAULT_VIBRATOR_ID, effectId, isLooping);
-    if (ret != OHOS::ERR_OK) {
+    if (ret != ERR_OK) {
         MISC_HILOGE("vibrator effectId failed, ret: %{public}d", ret);
-        return OHOS::Sensors::ERROR;
+        return ERROR;
     }
-    return OHOS::Sensors::SUCCESS;
+    return SUCCESS;
 }
 
 int32_t StartVibratorOnce(uint32_t duration)
 {
     if (duration == 0) {
         MISC_HILOGE("duration is invalid");
-        return OHOS::Sensors::ERROR;
+        return ERROR;
     }
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.Vibrate(DEFAULT_VIBRATOR_ID, duration);
-    if (ret != OHOS::ERR_OK) {
+    if (ret != ERR_OK) {
         MISC_HILOGE("vibrator duration failed, ret: %{public}d", ret);
-        return OHOS::Sensors::ERROR;
+        return ERROR;
     }
-    return OHOS::Sensors::SUCCESS;
+    return SUCCESS;
 }
 
 int32_t StopVibrator(const char *mode)
 {
-    CHKPR(mode, OHOS::Sensors::ERROR);
+    CHKPR(mode, ERROR);
     if (strcmp(mode, "time") != 0 && strcmp(mode, "preset") != 0) {
         MISC_HILOGE("mode is invalid, mode is %{public}s", mode);
-        return OHOS::Sensors::ERROR;
+        return ERROR;
     }
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.Stop(DEFAULT_VIBRATOR_ID, mode);
-    if (ret != OHOS::ERR_OK) {
+    if (ret != ERR_OK) {
         MISC_HILOGE("client is failed, ret: %{public}d", ret);
-        return OHOS::Sensors::ERROR;
+        return ERROR;
     }
-    return OHOS::Sensors::SUCCESS;
+    return SUCCESS;
 }
+}  // namespace Sensors
+}  // namespace OHOS

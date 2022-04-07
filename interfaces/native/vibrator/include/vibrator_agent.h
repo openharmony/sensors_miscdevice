@@ -35,13 +35,14 @@
 extern "C" {
 #endif
 
+namespace OHOS {
+namespace Sensors {
 /**
  * @brief Indicates the mode of stopping a one-shot vibration effect.
  *
  * @since 6
  */
 const char *VIBRATOR_STOP_MODE_TIME = "time";
-
 
 /**
  * @brief Indicates the mode of stopping a preset vibration effect.
@@ -67,7 +68,6 @@ const char *VIBRATOR_STOP_MODE_PRESET = "preset";
  */
 int32_t StartVibrator(const char *effectId);
 
-
 /**
  * @brief Controls this vibrator to perform a one-shot vibration at a given duration.
  *
@@ -79,13 +79,11 @@ int32_t StartVibrator(const char *effectId);
  */
 int32_t StartVibratorOnce(uint32_t duration);
 
-
 /**
  * @brief Enables this vibrator to perform a periodic vibration.
  * @since 6
  */
 void EnableLooping();
-
 
 /**
  * @brief Disables this vibrator from performing a periodic vibration.
@@ -96,7 +94,6 @@ void EnableLooping();
  */
 int32_t DisableLooping();
 
-
 /**
  * @brief Stops the vibration of this vibrator.
  *
@@ -106,10 +103,10 @@ int32_t DisableLooping();
  * @since 6
  */
 int32_t StopVibrator(const char *mode);
-
+} // namespace Sensors
+} // namespace OHOS
 #ifdef __cplusplus
 };
 #endif
-
 /** @} */
 #endif // endif VIBRATOR_AGENT_H

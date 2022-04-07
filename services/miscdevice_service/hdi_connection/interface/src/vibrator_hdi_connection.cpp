@@ -53,7 +53,7 @@ int32_t VibratorHdiConnection::StartOnce(uint32_t duration)
     return ERR_OK;
 }
 
-int32_t VibratorHdiConnection::Start(const char *effectType)
+int32_t VibratorHdiConnection::Start(const std::string &effectType)
 {
     int32_t ret = iVibratorHdiConnection_->Start(effectType);
     if (ret < 0) {

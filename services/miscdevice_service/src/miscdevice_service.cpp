@@ -227,8 +227,7 @@ int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::str
     }
     if (!isLooping) {
         vibratorEffectMap_[vibratorId] = effect;
-        const char *effectType = (char *)effect.data();
-        return vibratorHdiConnection_.Start(effectType);
+        return vibratorHdiConnection_.Start(effect);
     }
     std::unordered_map<std::string, int32_t>::iterator iter = hapticRingMap_.find(effect);
     if (iter == hapticRingMap_.end()) {

@@ -54,9 +54,9 @@ int32_t HdiConnection::StartOnce(uint32_t duration)
     return ERR_OK;
 }
 
-int32_t HdiConnection::Start(const char *effectType)
+int32_t HdiConnection::Start(const std::string &effectType)
 {
-    if (effectType == nullptr) {
+    if (effectType.empty()) {
         MISC_HILOGE("effectType is null");
         return VIBRATOR_ON_ERR;
     }
