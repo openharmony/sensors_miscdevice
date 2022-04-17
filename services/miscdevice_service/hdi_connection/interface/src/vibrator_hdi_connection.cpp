@@ -46,7 +46,7 @@ int32_t VibratorHdiConnection::ConnectHdi()
 int32_t VibratorHdiConnection::StartOnce(uint32_t duration)
 {
     int32_t ret = iVibratorHdiConnection_->StartOnce(duration);
-    if (ret < 0) {
+    if (ret != 0) {
         MISC_HILOGE("StartOnce failed");
         return VIBRATOR_ON_ERR;
     }
@@ -56,7 +56,7 @@ int32_t VibratorHdiConnection::StartOnce(uint32_t duration)
 int32_t VibratorHdiConnection::Start(const std::string &effectType)
 {
     int32_t ret = iVibratorHdiConnection_->Start(effectType);
-    if (ret < 0) {
+    if (ret != 0) {
         MISC_HILOGE("Start failed");
         return VIBRATOR_ON_ERR;
     }
@@ -66,7 +66,7 @@ int32_t VibratorHdiConnection::Start(const std::string &effectType)
 int32_t VibratorHdiConnection::Stop(VibratorStopMode mode)
 {
     int32_t ret = iVibratorHdiConnection_->Stop(mode);
-    if (ret < 0) {
+    if (ret != 0) {
         MISC_HILOGE("Stop failed");
         return VIBRATOR_OFF_ERR;
     }
@@ -76,7 +76,7 @@ int32_t VibratorHdiConnection::Stop(VibratorStopMode mode)
 int32_t VibratorHdiConnection::DestroyHdiConnection()
 {
     int32_t ret = iVibratorHdiConnection_->DestroyHdiConnection();
-    if (ret < 0) {
+    if (ret != 0) {
         MISC_HILOGE("DestroyHdiConnection failed");
         return VIBRATOR_HDF_CONNECT_ERR;
     }
