@@ -43,7 +43,6 @@ public:
     napi_ref callback[CALLBACK_NUM] = {0};
     AsyncCallbackError error;
     uint32_t callbackType = 0;
-    sptr<AsyncCallbackInfo> callbackInfo = nullptr;
     AsyncCallbackInfo(napi_env env) : env(env) {}
     ~AsyncCallbackInfo();
 private:
