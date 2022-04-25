@@ -305,7 +305,7 @@ std::vector<int32_t> MiscdeviceServiceProxy::GetLightSupportId()
         MISC_HILOGE("sendRequest failed, ret : %{public}d", ret);
     }
     int32_t setCount = reply.ReadInt32();
-    if (setCount <= 0 || setCount > idVec.max_size()) {
+    if (setCount <= 0 || setCount > static_cast<int32_t>(idVec.max_size())) {
         MISC_HILOGE("setCount: %{public}d is invalid", setCount);
         return idVec;
     }
