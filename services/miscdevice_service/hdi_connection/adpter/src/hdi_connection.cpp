@@ -96,7 +96,7 @@ void HdiConnection::RegisterHdiDeathRecipient()
         MISC_HILOGE("hdiDeathObserver_ cannot be null");
         return;
     }
-    vibratorInterface_->AsObject()->AddDeathRecipient(hdiDeathObserver_);
+    OHOS::HDI::hdi_objcast<IVibratorInterface>(vibratorInterface_)->AddDeathRecipient(hdiDeathObserver_);
 }
 
 void HdiConnection::UnregisterHdiDeathRecipient()
@@ -106,7 +106,7 @@ void HdiConnection::UnregisterHdiDeathRecipient()
         MISC_HILOGE("vibratorInterface_ or hdiDeathObserver_ is null");
         return;
     }
-    vibratorInterface_->AsObject()->RemoveDeathRecipient(hdiDeathObserver_);
+    OHOS::HDI::hdi_objcast<IVibratorInterface>(vibratorInterface_)->RemoveDeathRecipient(hdiDeathObserver_);
 }
 
 void HdiConnection::ProcessDeathObserver(const wptr<IRemoteObject> &object)
