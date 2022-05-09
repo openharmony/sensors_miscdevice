@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 import vibrator from '@ohos.vibrator'
+import systemVibrator from '@system.vibrator'
 
 import {describe, beforeAll, beforeEach, afterEach, afterAll, it, expect} from 'deccjsunit/index'
 
@@ -498,5 +499,98 @@ describe("VibratorJsTest", function () {
             console.info("VibratorJsTest018 reject");
         })
         done();
+    })
+
+    /*
+     * @tc.name:VibratorJsTest019
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: Issue Number
+     */
+    it("VibratorJsTest019", 0, async function (done) {
+        systemVibrator.vibrate({
+            mode: 'short',
+            success: function() {
+              expect(true).assertTrue();
+              console.log('vibrate is successful');
+              done();
+            },
+            fail: function(data, code) {
+              expect(false).assertTrue();
+              console.log('vibrate is failed, data: ' + data + "code: " + code);
+              done();
+            },
+            complete: function() {
+              console.log('vibrate is completed');
+              done();
+            }
+          });
+    })
+
+    /*
+     * @tc.name:VibratorJsTest020
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: Issue Number
+     */
+    it("VibratorJsTest020", 0, async function (done) {
+        systemVibrator.vibrate({
+            mode: 'long',
+            success: function() {
+              expect(true).assertTrue();
+              console.log('vibrate is successful');
+              done();
+            },
+            fail: function(data, code) {
+              expect(false).assertTrue();
+              console.log('vibrate is failed, data: ' + data + "code: " + code);
+              done();
+            },
+            complete: function() {
+              console.log('vibrate is completed');
+              done();
+            }
+          });
+    })
+
+    /*
+     * @tc.name:VibratorJsTest021
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: Issue Number
+     */
+    it("VibratorJsTest021", 0, async function (done) {
+        systemVibrator.vibrate({
+            success: function() {
+              expect(true).assertTrue();
+              console.log('vibrate is successful');
+              done();
+            },
+            fail: function(data, code) {
+              expect(false).assertTrue();
+              console.log('vibrate is failed, data: ' + data + "code: " + code);
+              done();
+            },
+            complete: function() {
+              console.log('vibrate is completed');
+              done();
+            }
+          });
+    })
+
+    /*
+     * @tc.name:VibratorJsTest022
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: Issue Number
+     */
+    it("VibratorJsTest022", 0, async function (done) {
+        systemVibrator.vibrate({
+            success: function() {
+              expect(true).assertTrue();
+              console.log('vibrate is successful');
+              done();
+            },
+          });
     })
 })

@@ -12,35 +12,53 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef VIBRATOR_NAPI_UTILS_H
+#define VIBRATOR_NAPI_UTILS_H
 
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include <cstring>
 #include <iostream>
+#include "refbase.h"
 
+namespace OHOS {
+namespace Sensors {
 using std::string;
-const int32_t CALLBACK_RESULT_LENGTH = 2;
-struct AsyncCallbackError {
-    int32_t code;
-    string message;
-    string name;
-    string stack;
-};
+constexpr int32_t CALLBACK_NUM = 3;
+constexpr uint32_t TYPE_SYSTEM_VIBRATE = 1;
+constexpr uint32_t STRING_LENGTH_MAX = 64;
 
-struct AsyncCallbackInfo {
-    napi_env env;
-    napi_async_work asyncWork;
-    napi_deferred deferred;
-    napi_ref callback[1] = { 0 };
+class AsyncCallbackInfo : public RefBase {
+public:
+    struct AsyncCallbackError {
+        int32_t code {0};
+        string message;
+        string name;
+        string stack;
+    };
+
+    napi_env env = nullptr;
+    napi_async_work asyncWork = nullptr;
+    napi_deferred deferred = nullptr;
+    napi_ref callback[CALLBACK_NUM] = {0};
     AsyncCallbackError error;
+    uint32_t callbackType = 0;
+    AsyncCallbackInfo(napi_env env) : env(env) {}
+    ~AsyncCallbackInfo();
+private:
 };
 
-bool IsMatchType(napi_value value, napi_valuetype type, napi_env env);
-napi_value GetNapiInt32(int32_t number, napi_env env);
-int32_t GetCppInt32(napi_value value, napi_env env);
-void EmitAsyncCallbackWork(AsyncCallbackInfo *async_callback_info);
-int64_t GetCppInt64(napi_value value, napi_env env);
-napi_value NapiGetNamedProperty(napi_value jsonObject, string name, napi_env env);
-void EmitPromiseWork(AsyncCallbackInfo *asyncCallbackInfo);
-napi_value GreateBusinessError(napi_env env, int32_t errCode, string errMessage,
-    string errName, string errStack);
+bool IsMatchType(const napi_env &env, const napi_value &value, const napi_valuetype &type);
+bool GetNapiInt32(const napi_env &env, const int32_t value, napi_value &result);
+bool GetInt32Value(const napi_env &env, const napi_value &value, int32_t &result);
+bool GetUint32Value(const napi_env &env, const napi_value &value, uint32_t &result);
+bool GetStringValue(const napi_env &env, const napi_value &value, string &result);
+bool GetNapiParam(const napi_env &env, const napi_callback_info &info, size_t &argc, napi_value &argv);
+void EmitAsyncCallbackWork(sptr<AsyncCallbackInfo> async_callback_info);
+bool GetInt64Value(const napi_env &env, const napi_value &value, int32_t &result);
+void EmitPromiseWork(sptr<AsyncCallbackInfo> asyncCallbackInfo);
+napi_value GreateCallbackError(const napi_env &env, const int32_t errCode,
+    const string errMessage, const string errName, const string errStack);
+}  // namespace Sensors
+}  // namespace OHOS
+#endif // VIBRATOR_NAPI_UTILS_H

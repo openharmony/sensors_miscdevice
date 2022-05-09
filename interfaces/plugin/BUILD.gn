@@ -21,6 +21,7 @@ ohos_shared_library("vibrator") {
     "./include",
     "./vibrator/include",
     "//utils/native/base/include",
+    "//base/sensors/miscdevice/utils/include",
   ]
   defines = [
     "APP_LOG_TAG = \"vibratorJs\"",
