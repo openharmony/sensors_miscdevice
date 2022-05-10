@@ -99,7 +99,7 @@ bool GetStringValue(const napi_env &env, const napi_value &value, string &result
     NAPI_CALL_BASE(env, napi_get_value_string_utf8(env, value, nullptr, 0, &bufLength), false);
     char str[STRING_LENGTH_MAX] = {0};
     size_t strLen = 0;
-    NAPI_CALL_BASE(env, napi_get_value_string_utf8(env, value, str, bufLength, &strLen), false);
+    NAPI_CALL_BASE(env, napi_get_value_string_utf8(env, value, str, bufLength + 1, &strLen), false);
     result = str;
     return true;
 }
