@@ -34,10 +34,7 @@ ohos_shared_library("libmiscdevice_service") {
   ]
 
   cflags = [ "-Wno-error=inconsistent-missing-override" ]
-  deps = [
-    "$SUBSYSTEM_DIR/miscdevice/utils:libmiscdevice_utils",
-    "//drivers/interface/vibrator/v1_0:libvibrator_proxy_1.0",
-  ]
+  deps = [ "$SUBSYSTEM_DIR/miscdevice/utils:libmiscdevice_utils" ]
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
@@ -46,6 +43,7 @@ ohos_shared_library("libmiscdevice_service") {
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
     "utils_base:utils",
+    "vibrator_device_driver_interface:libvibrator_proxy_1.0",
   ]
 
   part_name = "miscdevice"
