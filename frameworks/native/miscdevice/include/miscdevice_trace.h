@@ -12,13 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef MISCDEVICE_TRACE_H
 #define MISCDEVICE_TRACE_H
 
 #include "hitrace_meter.h"
 
 namespace OHOS {
-namespace Sensors { 
+namespace Sensors {
 #define HITRACE_BEGIN(name) StartTrace(HITRACE_TAG_SENSORS, name)
 #define HITRACE_END() FinishTrace(HITRACE_TAG_SENSORS)
 } // namespace Sensors
