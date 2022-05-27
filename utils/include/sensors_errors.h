@@ -143,6 +143,14 @@ private:
         } \
     }
 
+#define CHKPS(cond) \
+    do { \
+        if ((cond) == nullptr) { \
+            MISC_HILOGW("CHKPC(%{public}s) is null, skip then break", #cond); \
+            return ""; \
+        } \
+    } while (0)
+
 #define CHKPR(cond, r) \
     do { \
         if ((cond) == nullptr) { \
@@ -214,6 +222,14 @@ private:
         if ((cond) == nullptr) { \
             MISC_HILOGE("CHKPR(%{public}s) is null, return value is %{public}d", #cond, r); \
             return r; \
+        } \
+    } while (0)
+
+#define CHKPS(cond) \
+    do { \
+        if ((cond) == nullptr) { \
+            MISC_HILOGW("CHKPS(%{public}s) is null, skip then break", #cond); \
+            return ""; \
         } \
     } while (0)
 

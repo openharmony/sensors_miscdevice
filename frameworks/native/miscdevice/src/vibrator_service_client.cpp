@@ -94,7 +94,7 @@ bool VibratorServiceClient::IsVibratorEffectSupport(int32_t vibratorId, const st
         MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
         return false;
     }
-    CHKPR(miscdeviceProxy_, ERR_OK);
+    CHKPF(miscdeviceProxy_);
     HITRACE_BEGIN("IsVibratorEffectSupport");
     bool status = miscdeviceProxy_->IsVibratorEffectAvailable(vibratorId, effect);
     HITRACE_END();
@@ -189,10 +189,7 @@ std::string VibratorServiceClient::GetVibratorParameter(int32_t vibratorId, cons
         MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
         return "";
     }
-    if (miscdeviceProxy_ == nullptr) {
-        MISC_HILOGE("miscdeviceProxy_ is null");
-        return "";
-    }
+    CHKPS(miscdeviceProxy_);
     HITRACE_BEGIN("GetVibratorParameter");
     std::string parameter = miscdeviceProxy_->GetVibratorParameter(vibratorId, command);
     HITRACE_END();
