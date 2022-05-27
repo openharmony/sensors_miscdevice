@@ -78,7 +78,7 @@ std::vector<int32_t> VibratorServiceClient::GetVibratorIdList()
     }
     if (miscdeviceProxy_ == nullptr) {
         MISC_HILOGE("miscdeviceProxy_ is null");
-        return std::vector<int32_t>{};
+        return {};
     }
     HITRACE_BEGIN("GetVibratorIdList");
     std::vector<int32_t> vibratorIdList = miscdeviceProxy_->GetVibratorIdList();
@@ -187,11 +187,11 @@ std::string VibratorServiceClient::GetVibratorParameter(int32_t vibratorId, cons
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
         MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
-        return {};
+        return "";
     }
     if (miscdeviceProxy_ == nullptr) {
         MISC_HILOGE("miscdeviceProxy_ is null");
-        return std::string{};
+        return "";
     }
     HITRACE_BEGIN("GetVibratorParameter");
     std::string parameter = miscdeviceProxy_->GetVibratorParameter(vibratorId, command);
