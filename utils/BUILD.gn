@@ -26,6 +26,7 @@ ohos_shared_library("libmiscdevice_utils") {
   ]
 
   external_deps = [
+    "hitrace_native:hitrace_meter",
     "access_token:libaccesstoken_sdk",
     "hisysevent_native:libhisysevent",
     "hiviewdfx_hilog_native:libhilog",

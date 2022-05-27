@@ -37,6 +37,7 @@ ohos_shared_library("libmiscdevice_service") {
   deps = [ "$SUBSYSTEM_DIR/miscdevice/utils:libmiscdevice_utils" ]
 
   external_deps = [
+    "hitrace_native:hitrace_meter",
     "access_token:libaccesstoken_sdk",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
