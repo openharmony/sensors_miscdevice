@@ -18,6 +18,7 @@
 #include <thread>
 #include "death_recipient_template.h"
 #include "dmd_report.h"
+#include "miscdevice_trace.h"
 #include "iservice_registry.h"
 #include "sensors_errors.h"
 #include "sensors_log_domain.h"
@@ -75,7 +76,14 @@ std::vector<int32_t> VibratorServiceClient::GetVibratorIdList()
         MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
         return {};
     }
-    return miscdeviceProxy_->GetVibratorIdList();
+    if (miscdeviceProxy_ == nullptr) {
+        MISC_HILOGE("miscdeviceProxy_ is null");
+        return {};
+    }
+    HITRACE_BEGIN("GetVibratorIdList");
+    std::vector<int32_t> vibratorIdList = miscdeviceProxy_->GetVibratorIdList();
+    HITRACE_END();
+    return vibratorIdList;
 }
 
 bool VibratorServiceClient::IsVibratorEffectSupport(int32_t vibratorId, const std::string &effect)
@@ -86,7 +94,11 @@ bool VibratorServiceClient::IsVibratorEffectSupport(int32_t vibratorId, const st
         MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
         return false;
     }
-    return miscdeviceProxy_->IsVibratorEffectAvailable(vibratorId, effect);
+    CHKPF(miscdeviceProxy_);
+    HITRACE_BEGIN("IsVibratorEffectSupport");
+    bool status = miscdeviceProxy_->IsVibratorEffectAvailable(vibratorId, effect);
+    HITRACE_END();
+    return status;
 }
 
 int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, uint32_t timeOut)
@@ -97,7 +109,11 @@ int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, uint32_t timeOut)
         MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
-    return miscdeviceProxy_->Vibrate(vibratorId, timeOut);
+    CHKPR(miscdeviceProxy_, ERROR);
+    HITRACE_BEGIN("VibrateTime");
+    ret = miscdeviceProxy_->Vibrate(vibratorId, timeOut);
+    HITRACE_END();
+    return ret;
 }
 
 int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, const std::string &effect, bool isLooping)
@@ -108,7 +124,11 @@ int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, const std::string &ef
         MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
-    return miscdeviceProxy_->PlayVibratorEffect(vibratorId, effect, isLooping);
+    CHKPR(miscdeviceProxy_, ERROR);
+    HITRACE_BEGIN("VibratorEffect");
+    ret = miscdeviceProxy_->PlayVibratorEffect(vibratorId, effect, isLooping);
+    HITRACE_END();
+    return ret;
 }
 
 int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, std::vector<int32_t> timing, std::vector<int32_t> intensity,
@@ -120,7 +140,11 @@ int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, std::vector<int32_t> 
         MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
-    return miscdeviceProxy_->PlayCustomVibratorEffect(vibratorId, timing, intensity, periodCount);
+    CHKPR(miscdeviceProxy_, ERROR);
+    HITRACE_BEGIN("CustomVibrate");
+    ret = miscdeviceProxy_->PlayCustomVibratorEffect(vibratorId, timing, intensity, periodCount);
+    HITRACE_END();
+    return ret;
 }
 
 int32_t VibratorServiceClient::Stop(int32_t vibratorId, const std::string &type)
@@ -131,11 +155,14 @@ int32_t VibratorServiceClient::Stop(int32_t vibratorId, const std::string &type)
         MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
+    CHKPR(miscdeviceProxy_, ERROR);
+    HITRACE_BEGIN("Stop");
     if (type == "time") {
         ret = miscdeviceProxy_->CancelVibrator(vibratorId);
     } else {
         ret = miscdeviceProxy_->StopVibratorEffect(vibratorId, type);
     }
+    HITRACE_END();
     return ret;
 }
 
@@ -147,7 +174,11 @@ int32_t VibratorServiceClient::SetVibratorParameter(int32_t vibratorId, const st
         MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
-    return miscdeviceProxy_->SetVibratorParameter(vibratorId, cmd);
+    CHKPR(miscdeviceProxy_, ERROR);
+    HITRACE_BEGIN("SetVibratorParameter");
+    ret = miscdeviceProxy_->SetVibratorParameter(vibratorId, cmd);
+    HITRACE_END();
+    return ret;
 }
 
 std::string VibratorServiceClient::GetVibratorParameter(int32_t vibratorId, const std::string &command)
@@ -156,9 +187,13 @@ std::string VibratorServiceClient::GetVibratorParameter(int32_t vibratorId, cons
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
         MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
-        return {};
+        return "";
     }
-    return miscdeviceProxy_->GetVibratorParameter(vibratorId, command);
+    CHKPS(miscdeviceProxy_);
+    HITRACE_BEGIN("GetVibratorParameter");
+    std::string parameter = miscdeviceProxy_->GetVibratorParameter(vibratorId, command);
+    HITRACE_END();
+    return parameter;
 }
 
 void VibratorServiceClient::ProcessDeathObserver(const wptr<IRemoteObject> &object)
