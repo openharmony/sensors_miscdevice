@@ -109,7 +109,7 @@ int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, uint32_t timeOut)
         MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
-    CHKPR(miscdeviceProxy_, ERR_OK);
+    CHKPR(miscdeviceProxy_, ERROR);
     HITRACE_BEGIN("VibrateTime");
     ret = miscdeviceProxy_->Vibrate(vibratorId, timeOut);
     HITRACE_END();
@@ -124,7 +124,7 @@ int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, const std::string &ef
         MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
-    CHKPR(miscdeviceProxy_, ERR_OK);
+    CHKPR(miscdeviceProxy_, ERROR);
     HITRACE_BEGIN("VibratorEffect");
     ret = miscdeviceProxy_->PlayVibratorEffect(vibratorId, effect, isLooping);
     HITRACE_END();
@@ -140,7 +140,7 @@ int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, std::vector<int32_t> 
         MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
-    CHKPR(miscdeviceProxy_, ERR_OK);
+    CHKPR(miscdeviceProxy_, ERROR);
     HITRACE_BEGIN("CustomVibrate");
     ret = miscdeviceProxy_->PlayCustomVibratorEffect(vibratorId, timing, intensity, periodCount);
     HITRACE_END();
@@ -155,7 +155,7 @@ int32_t VibratorServiceClient::Stop(int32_t vibratorId, const std::string &type)
         MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
-    CHKPR(miscdeviceProxy_, ERR_OK);
+    CHKPR(miscdeviceProxy_, ERROR);
     HITRACE_BEGIN("Stop");
     if (type == "time") {
         ret = miscdeviceProxy_->CancelVibrator(vibratorId);
@@ -174,7 +174,7 @@ int32_t VibratorServiceClient::SetVibratorParameter(int32_t vibratorId, const st
         MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
-    CHKPR(miscdeviceProxy_, ERR_OK);
+    CHKPR(miscdeviceProxy_, ERROR);
     HITRACE_BEGIN("SetVibratorParameter");
     ret = miscdeviceProxy_->SetVibratorParameter(vibratorId, cmd);
     HITRACE_END();
