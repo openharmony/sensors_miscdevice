@@ -44,7 +44,7 @@ ohos_shared_library("libmiscdevice_service") {
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
     "utils_base:utils",
-    "vibrator_device_driver_interface:libvibrator_proxy_1.0",
+    "vibrator_device_driver_interface:libvibrator_proxy_1.1",
   ]
 
   part_name = "miscdevice"

@@ -70,7 +70,7 @@ int32_t HdiConnection::Start(const std::string &effectType)
 
 int32_t HdiConnection::Stop(VibratorStopMode mode)
 {
-    int32_t ret = vibratorInterface_->Stop(static_cast<OHOS::HDI::Vibrator::V1_0::HdfVibratorMode>(mode));
+    int32_t ret = vibratorInterface_->Stop(static_cast<OHOS::HDI::Vibrator::V1_1::HdfVibratorMode>(mode));
     if (ret < 0) {
         MISC_HILOGE("Stop failed");
         return ret;
@@ -88,7 +88,7 @@ void HdiConnection::RegisterHdiDeathRecipient()
 {
     CALL_LOG_ENTER;
     if (vibratorInterface_ == nullptr) {
-        MISC_HILOGE("connect v1_0 hdi failed");
+        MISC_HILOGE("connect v1_1 hdi failed");
         return;
     }
     hdiDeathObserver_ = new (std::nothrow) DeathRecipientTemplate(*const_cast<HdiConnection *>(this));
