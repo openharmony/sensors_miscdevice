@@ -25,8 +25,8 @@ using namespace OHOS::HiviewDFX;
 
 namespace {
 constexpr HiLogLabel LABEL = { LOG_CORE, SensorsLogDomain::MISCDEVICE_SERVICE, "MiscdeviceServiceProxy" };
-constexpr uint23_t MAX_VIBRATOR_COUNT = 0XFF;
-constexpr uint23_t MAX_LIGHT_COUNT = 0XFF;
+constexpr uint32_t MAX_VIBRATOR_COUNT = 0XFF;
+constexpr uint32_t MAX_LIGHT_COUNT = 0XFF;
 }
 
 MiscdeviceServiceProxy::MiscdeviceServiceProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IMiscdeviceService>(impl)
@@ -46,7 +46,7 @@ bool MiscdeviceServiceProxy::IsAbilityAvailable(MiscdeviceDeviceId groupID)
         return false;
     }
     auto remote = Remote();
-    CHKPR(remote, INVALID_POINTER);
+    CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(IS_ABILITY_AVAILABLE, data, reply, option);
     if (ret != NO_ERROR) {
         DmdReport::ReportException(MISC_SERVICE_IPC_EXCEPTION, "IsAbilityAvailable", ret);
@@ -74,7 +74,7 @@ bool MiscdeviceServiceProxy::IsVibratorEffectAvailable(int32_t vibratorId, const
         return false;
     }
     auto remote = Remote();
-    CHKPR(remote, INVALID_POINTER);
+    CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(IS_VIBRATOR_EFFECT_AVAILABLE, data, reply, option);
     if (ret != NO_ERROR) {
         DmdReport::ReportException(MISC_SERVICE_IPC_EXCEPTION, "IsVibratorEffectAvailable", ret);
@@ -95,7 +95,10 @@ std::vector<int32_t> MiscdeviceServiceProxy::GetVibratorIdList()
         return idVec;
     }
     auto remote = Remote();
-    CHKPR(remote, INVALID_POINTER);
+    if (remote == nullptr) {
+        MISC_HILOGE("remote is null");
+        return idVec;
+    }
     int32_t ret = remote->SendRequest(GET_VIBRATOR_ID_LIST, data, reply, option);
     if (ret != NO_ERROR) {
         DmdReport::ReportException(MISC_SERVICE_IPC_EXCEPTION, "GetVibratorIdList", ret);
@@ -130,7 +133,7 @@ int32_t MiscdeviceServiceProxy::Vibrate(int32_t vibratorId, uint32_t timeOut)
         return WRITE_MSG_ERR;
     }
     auto remote = Remote();
-    CHKPR(remote, INVALID_POINTER);
+    CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(VIBRATE, data, reply, option);
     if (ret != NO_ERROR) {
         DmdReport::ReportException(MISC_SERVICE_IPC_EXCEPTION, "Vibrate", ret);
@@ -153,7 +156,7 @@ int32_t MiscdeviceServiceProxy::CancelVibrator(int32_t vibratorId)
         return WRITE_MSG_ERR;
     }
     auto remote = Remote();
-    CHKPR(remote, INVALID_POINTER);
+    CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(CANCEL_VIBRATOR, data, reply, option);
     if (ret != NO_ERROR) {
         DmdReport::ReportException(MISC_SERVICE_IPC_EXCEPTION, "CancelVibrator", ret);
@@ -184,7 +187,7 @@ int32_t MiscdeviceServiceProxy::PlayVibratorEffect(int32_t vibratorId, const std
         return WRITE_MSG_ERR;
     }
     auto remote = Remote();
-    CHKPR(remote, INVALID_POINTER);
+    CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(PLAY_VIBRATOR_EFFECT, data, reply, option);
     if (ret != NO_ERROR) {
         DmdReport::ReportException(MISC_SERVICE_IPC_EXCEPTION, "PlayVibratorEffect", ret);
@@ -220,7 +223,7 @@ int32_t MiscdeviceServiceProxy::PlayCustomVibratorEffect(int32_t vibratorId, con
         return WRITE_MSG_ERR;
     }
     auto remote = Remote();
-    CHKPR(remote, INVALID_POINTER);
+    CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(PLAY_CUSTOM_VIBRATOR_EFFECT, data, reply, option);
     if (ret != NO_ERROR) {
         DmdReport::ReportException(MISC_SERVICE_IPC_EXCEPTION, "PlayCustomVibratorEffect", ret);
@@ -247,7 +250,7 @@ int32_t MiscdeviceServiceProxy::StopVibratorEffect(int32_t vibratorId, const std
         return WRITE_MSG_ERR;
     }
     auto remote = Remote();
-    CHKPR(remote, INVALID_POINTER);
+    CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(STOP_VIBRATOR_EFFECT, data, reply, option);
     if (ret != NO_ERROR) {
         DmdReport::ReportException(MISC_SERVICE_IPC_EXCEPTION, "StopVibratorEffect", ret);
@@ -274,7 +277,7 @@ int32_t MiscdeviceServiceProxy::SetVibratorParameter(int32_t vibratorId, const s
         return WRITE_MSG_ERR;
     }
     auto remote = Remote();
-    CHKPR(remote, INVALID_POINTER);
+    CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(SET_VIBRATOR_PARA, data, reply, option);
     if (ret != NO_ERROR) {
         DmdReport::ReportException(MISC_SERVICE_IPC_EXCEPTION, "SetVibratorParameter", ret);
@@ -301,7 +304,7 @@ std::string MiscdeviceServiceProxy::GetVibratorParameter(int32_t vibratorId, con
         return "";
     }
     auto remote = Remote();
-    CHKPR(remote, INVALID_POINTER);
+    CHKPS(remote);
     int32_t ret = remote->SendRequest(GET_VIBRATOR_PARA, data, reply, option);
     if (ret != NO_ERROR) {
         DmdReport::ReportException(MISC_SERVICE_IPC_EXCEPTION, "SetVibratorParameter", ret);
@@ -322,7 +325,10 @@ std::vector<int32_t> MiscdeviceServiceProxy::GetLightSupportId()
         return idVec;
     }
     auto remote = Remote();
-    CHKPR(remote, INVALID_POINTER);
+    if (remote == nullptr) {
+        MISC_HILOGE("remote is null");
+        return idVec;
+    }
     int32_t ret = remote->SendRequest(GET_LIGHT_SUPPORT_ID, data, reply, option);
     if (ret != NO_ERROR) {
         DmdReport::ReportException(MISC_SERVICE_IPC_EXCEPTION, "GetLightSupportId", ret);
@@ -356,7 +362,7 @@ bool MiscdeviceServiceProxy::IsLightEffectSupport(int32_t lightId, const std::st
         return false;
     }
     auto remote = Remote();
-    CHKPR(remote, INVALID_POINTER);
+    CHKPF(remote);
     int32_t ret = remote->SendRequest(IS_LIGHT_EFFECT_SUPPORT, data, reply, option);
     if (ret != NO_ERROR) {
         DmdReport::ReportException(MISC_SERVICE_IPC_EXCEPTION, "IsLightEffectSupport", ret);
@@ -392,7 +398,7 @@ int32_t MiscdeviceServiceProxy::Light(int32_t id, uint64_t brightness, uint32_t 
         return WRITE_MSG_ERR;
     }
     auto remote = Remote();
-    CHKPR(remote, INVALID_POINTER);
+    CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(LIGHT, data, reply, option);
     if (ret != NO_ERROR) {
         DmdReport::ReportException(MISC_SERVICE_IPC_EXCEPTION, "Light", ret);
@@ -419,7 +425,7 @@ int32_t MiscdeviceServiceProxy::PlayLightEffect(int32_t id, const std::string &t
         return WRITE_MSG_ERR;
     }
     auto remote = Remote();
-    CHKPR(remote, INVALID_POINTER);
+    CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(PLAY_LIGHT_EFFECT, data, reply, option);
     if (ret != NO_ERROR) {
         DmdReport::ReportException(MISC_SERVICE_IPC_EXCEPTION, "PlayLightEffect", ret);
@@ -442,7 +448,7 @@ int32_t MiscdeviceServiceProxy::StopLightEffect(int32_t id)
         return WRITE_MSG_ERR;
     }
     auto remote = Remote();
-    CHKPR(remote, INVALID_POINTER);
+    CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(STOP_LIGHT_EFFECT, data, reply, option);
     if (ret != NO_ERROR) {
         DmdReport::ReportException(MISC_SERVICE_IPC_EXCEPTION, "StopLightEffect", ret);
