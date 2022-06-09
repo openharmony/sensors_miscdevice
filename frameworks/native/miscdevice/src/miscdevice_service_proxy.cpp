@@ -45,7 +45,7 @@ bool MiscdeviceServiceProxy::IsAbilityAvailable(MiscdeviceDeviceId groupID)
         MISC_HILOGE("write groupID failed");
         return false;
     }
-    auto remote = Remote();
+    sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(IS_ABILITY_AVAILABLE, data, reply, option);
     if (ret != NO_ERROR) {
@@ -73,7 +73,7 @@ bool MiscdeviceServiceProxy::IsVibratorEffectAvailable(int32_t vibratorId, const
         MISC_HILOGE("WriteString failed");
         return false;
     }
-    auto remote = Remote();
+    sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(IS_VIBRATOR_EFFECT_AVAILABLE, data, reply, option);
     if (ret != NO_ERROR) {
@@ -94,7 +94,7 @@ std::vector<int32_t> MiscdeviceServiceProxy::GetVibratorIdList()
         MISC_HILOGE("write descriptor failed");
         return idVec;
     }
-    auto remote = Remote();
+    sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {
         MISC_HILOGE("remote is null");
         return idVec;
@@ -132,7 +132,7 @@ int32_t MiscdeviceServiceProxy::Vibrate(int32_t vibratorId, uint32_t timeOut)
         MISC_HILOGE("WriteUint32 timeOut failed");
         return WRITE_MSG_ERR;
     }
-    auto remote = Remote();
+    sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(VIBRATE, data, reply, option);
     if (ret != NO_ERROR) {
@@ -155,7 +155,7 @@ int32_t MiscdeviceServiceProxy::CancelVibrator(int32_t vibratorId)
         MISC_HILOGE("WriteInt32 failed");
         return WRITE_MSG_ERR;
     }
-    auto remote = Remote();
+    sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(CANCEL_VIBRATOR, data, reply, option);
     if (ret != NO_ERROR) {
@@ -186,7 +186,7 @@ int32_t MiscdeviceServiceProxy::PlayVibratorEffect(int32_t vibratorId, const std
         MISC_HILOGE("WriteBool effect failed");
         return WRITE_MSG_ERR;
     }
-    auto remote = Remote();
+    sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(PLAY_VIBRATOR_EFFECT, data, reply, option);
     if (ret != NO_ERROR) {
@@ -222,7 +222,7 @@ int32_t MiscdeviceServiceProxy::PlayCustomVibratorEffect(int32_t vibratorId, con
         MISC_HILOGE("WriteInt32 periodCount failed");
         return WRITE_MSG_ERR;
     }
-    auto remote = Remote();
+    sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(PLAY_CUSTOM_VIBRATOR_EFFECT, data, reply, option);
     if (ret != NO_ERROR) {
@@ -249,7 +249,7 @@ int32_t MiscdeviceServiceProxy::StopVibratorEffect(int32_t vibratorId, const std
         MISC_HILOGE("WriteString effect failed");
         return WRITE_MSG_ERR;
     }
-    auto remote = Remote();
+    sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(STOP_VIBRATOR_EFFECT, data, reply, option);
     if (ret != NO_ERROR) {
@@ -276,7 +276,7 @@ int32_t MiscdeviceServiceProxy::SetVibratorParameter(int32_t vibratorId, const s
         MISC_HILOGE("WriteString cmd failed");
         return WRITE_MSG_ERR;
     }
-    auto remote = Remote();
+    sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(SET_VIBRATOR_PARA, data, reply, option);
     if (ret != NO_ERROR) {
@@ -303,7 +303,7 @@ std::string MiscdeviceServiceProxy::GetVibratorParameter(int32_t vibratorId, con
         MISC_HILOGE("WriteString cmd failed");
         return "";
     }
-    auto remote = Remote();
+    sptr<IRemoteObject> remote = Remote();
     CHKPS(remote);
     int32_t ret = remote->SendRequest(GET_VIBRATOR_PARA, data, reply, option);
     if (ret != NO_ERROR) {
@@ -324,7 +324,7 @@ std::vector<int32_t> MiscdeviceServiceProxy::GetLightSupportId()
         MISC_HILOGE("write descriptor failed");
         return idVec;
     }
-    auto remote = Remote();
+    sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {
         MISC_HILOGE("remote is null");
         return idVec;
@@ -361,7 +361,7 @@ bool MiscdeviceServiceProxy::IsLightEffectSupport(int32_t lightId, const std::st
         MISC_HILOGE("WriteString effectId failed");
         return false;
     }
-    auto remote = Remote();
+    sptr<IRemoteObject> remote = Remote();
     CHKPF(remote);
     int32_t ret = remote->SendRequest(IS_LIGHT_EFFECT_SUPPORT, data, reply, option);
     if (ret != NO_ERROR) {
@@ -397,7 +397,7 @@ int32_t MiscdeviceServiceProxy::Light(int32_t id, uint64_t brightness, uint32_t 
         MISC_HILOGE("WriteUint32 timeOff failed");
         return WRITE_MSG_ERR;
     }
-    auto remote = Remote();
+    sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(LIGHT, data, reply, option);
     if (ret != NO_ERROR) {
@@ -424,7 +424,7 @@ int32_t MiscdeviceServiceProxy::PlayLightEffect(int32_t id, const std::string &t
         MISC_HILOGE("WriteString type failed");
         return WRITE_MSG_ERR;
     }
-    auto remote = Remote();
+    sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(PLAY_LIGHT_EFFECT, data, reply, option);
     if (ret != NO_ERROR) {
@@ -447,7 +447,7 @@ int32_t MiscdeviceServiceProxy::StopLightEffect(int32_t id)
         MISC_HILOGE("WriteInt32 id failed");
         return WRITE_MSG_ERR;
     }
-    auto remote = Remote();
+    sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(STOP_LIGHT_EFFECT, data, reply, option);
     if (ret != NO_ERROR) {
