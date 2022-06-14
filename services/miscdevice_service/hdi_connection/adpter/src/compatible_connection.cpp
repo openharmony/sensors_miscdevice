@@ -19,13 +19,12 @@
 #include <vector>
 
 #include "sensors_errors.h"
-#include "sensors_log_domain.h"
 
 namespace OHOS {
 namespace Sensors {
 using namespace OHOS::HiviewDFX;
 namespace {
-constexpr HiLogLabel LABEL = { LOG_CORE, SensorsLogDomain::SENSOR_SERVICE, "CompatibleConnection" };
+constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "CompatibleConnection" };
 std::vector<std::string> vibratorEffect_ = {"haptic.clock.timer"};
 IVibratorHdiConnection::VibratorStopMode vibrateMode_;
 constexpr uint32_t MAX_VIBRATOR_TIME = 1800000;

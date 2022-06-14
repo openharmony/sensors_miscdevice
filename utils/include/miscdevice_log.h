@@ -24,14 +24,14 @@
 namespace OHOS {
 namespace Sensors {
 namespace {
-constexpr uint32_t MISC_LOG_DOMAIN = 0xD002800;
+constexpr uint32_t MISC_LOG_DOMAIN = 0xD002701;
 } // namespace
 #ifndef MISC_FUNC_FMT
-#define MISC_FUNC_FMT "in %{public}s, #%{public}d, "
+#define MISC_FUNC_FMT "in %{public}s "
 #endif
 
 #ifndef MISC_FUNC_INFO
-#define MISC_FUNC_INFO __FUNCTION__, __LINE__
+#define MISC_FUNC_INFO __FUNCTION__
 #endif
 
 #define MISC_HILOGD(fmt, ...) do { \

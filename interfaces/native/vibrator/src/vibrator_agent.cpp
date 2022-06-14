@@ -14,7 +14,6 @@
  */
 #include "vibrator_agent.h"
 #include "sensors_errors.h"
-#include "sensors_log_domain.h"
 #include "vibrator_service_client.h"
 
 namespace OHOS {
@@ -23,7 +22,7 @@ using OHOS::HiviewDFX::HiLog;
 using OHOS::HiviewDFX::HiLogLabel;
 using OHOS::Sensors::VibratorServiceClient;
 
-static const HiLogLabel LABEL = { LOG_CORE, OHOS::SensorsLogDomain::MISCDEVICE_VIBRATOR_INTERFACE, "VibratorNDK" };
+static const HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "VibratorNDK" };
 static const int32_t DEFAULT_VIBRATOR_ID = 123;
 static int32_t g_loopingFlag = 0;
 
