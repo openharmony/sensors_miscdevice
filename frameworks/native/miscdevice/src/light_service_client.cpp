@@ -20,7 +20,6 @@
 #include "dmd_report.h"
 #include "iservice_registry.h"
 #include "sensors_errors.h"
-#include "sensors_log_domain.h"
 #include "system_ability_definition.h"
 
 namespace OHOS {
@@ -28,7 +27,7 @@ namespace Sensors {
 using namespace OHOS::HiviewDFX;
 
 namespace {
-constexpr HiLogLabel LABEL = { LOG_CORE, SensorsLogDomain::SENSOR_NATIVE, "LightServiceClient" };
+constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "LightServiceClient" };
 constexpr int32_t GET_SERVICE_MAX_COUNT = 30;
 constexpr uint32_t WAIT_MS = 200;
 }  // namespace

@@ -28,7 +28,7 @@
 namespace OHOS {
 namespace Sensors {
 using namespace OHOS::HiviewDFX;
-static constexpr HiLogLabel LABEL = { LOG_CORE, 0xD002757, "VibratorJsAPI" };
+static constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "VibratorJsAPI" };
 static constexpr uint32_t VIBRATE_SHORT_DURATION = 35;
 static constexpr uint32_t VIBRATE_LONG_DURATION = 1000;
 

@@ -17,14 +17,13 @@
 
 #include <thread>
 #include "sensors_errors.h"
-#include "sensors_log_domain.h"
 
 namespace OHOS {
 namespace Sensors {
 using namespace OHOS::HiviewDFX;
 
 namespace {
-constexpr HiLogLabel LABEL = { LOG_CORE, SensorsLogDomain::SENSOR_UTILS, "PermissionUtil" };
+constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "PermissionUtil" };
 }  // namespace
 
 bool PermissionUtil::CheckVibratePermission(AccessTokenID callerToken, std::string permissionName)

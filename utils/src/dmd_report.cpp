@@ -19,14 +19,13 @@
 #include "hisysevent.h"
 
 #include "sensors_errors.h"
-#include "sensors_log_domain.h"
 
 namespace OHOS {
 namespace Sensors {
 using namespace OHOS::HiviewDFX;
 
 namespace {
-constexpr HiLogLabel LABEL = { LOG_CORE, SensorsLogDomain::SENSOR_UTILS, "DmdReport" };
+constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "DmdReport" };
 constexpr int32_t SECONDS_HALF_HOUR = 1800;
 }  // namespace
 

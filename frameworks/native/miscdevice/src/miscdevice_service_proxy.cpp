@@ -17,14 +17,13 @@
 
 #include "dmd_report.h"
 #include "sensors_errors.h"
-#include "sensors_log_domain.h"
 
 namespace OHOS {
 namespace Sensors {
 using namespace OHOS::HiviewDFX;
 
 namespace {
-constexpr HiLogLabel LABEL = { LOG_CORE, SensorsLogDomain::MISCDEVICE_SERVICE, "MiscdeviceServiceProxy" };
+constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "MiscdeviceServiceProxy" };
 constexpr uint32_t MAX_VIBRATOR_COUNT = 0XFF;
 constexpr uint32_t MAX_LIGHT_COUNT = 0XFF;
 }
