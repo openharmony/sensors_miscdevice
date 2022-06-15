@@ -19,6 +19,7 @@ ohos_shared_library("libmiscdevice_service") {
     "hdi_connection/adpter/src/compatible_connection.cpp",
     "hdi_connection/adpter/src/hdi_connection.cpp",
     "hdi_connection/interface/src/vibrator_hdi_connection.cpp",
+    "src/miscdevice_dump.cpp",
     "src/miscdevice_service.cpp",
     "src/miscdevice_service_stub.cpp",
   ]
