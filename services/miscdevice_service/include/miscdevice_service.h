@@ -28,6 +28,7 @@
 #include "thread_ex.h"
 
 #include "miscdevice_common.h"
+#include "miscdevice_dump.h"
 #include "miscdevice_service_stub.h"
 #include "nocopyable.h"
 #include "vibrator_hdi_connection.h"
@@ -114,6 +115,7 @@ private:
     static std::mutex conditionVarMutex_;
     static std::condition_variable conditionVar_;
     static std::unordered_map<std::string, int32_t> hapticRingMap_;
+    MiscdeviceDump &miscdeviceDump_ = MiscdeviceDump::GetInstance();
 };
 }  // namespace Sensors
 }  // namespace OHOS

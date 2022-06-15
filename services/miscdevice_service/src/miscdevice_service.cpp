@@ -15,6 +15,8 @@
 
 #include "miscdevice_service.h"
 
+#include <string_ex.h>
+
 #include "sensors_errors.h"
 #include "system_ability_definition.h"
 
@@ -175,6 +177,7 @@ int32_t MiscdeviceService::Vibrate(int32_t vibratorId, uint32_t timeOut)
         return ERR_INVALID_VALUE;
     }
     std::lock_guard<std::mutex> vibratorEffectLock(vibratorEffectMutex_);
+    miscdeviceDump_.SaveVibrator(GetCallingTokenID(), GetCallingUid(), GetCallingPid(), timeOut);
     auto it = vibratorEffectMap_.find(vibratorId);
     if (it != vibratorEffectMap_.end()) {
         if (it->second == "time") {
@@ -211,6 +214,7 @@ int32_t MiscdeviceService::CancelVibrator(int32_t vibratorId)
 int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::string &effect, bool isLooping)
 {
     std::lock_guard<std::mutex> vibratorEffectLock(vibratorEffectMutex_);
+    miscdeviceDump_.SaveVibratorEffect(GetCallingTokenID(), GetCallingUid(), GetCallingPid(), effect);
     auto it = vibratorEffectMap_.find(vibratorId);
     if (it != vibratorEffectMap_.end()) {
         if (it->second == "time") {
@@ -400,7 +404,24 @@ void MiscdeviceService::VibratorEffectThread::UpdateVibratorEffectData(const std
 
 int32_t MiscdeviceService::Dump(int32_t fd, const std::vector<std::u16string> &args)
 {
-    return 0;
+    CALL_LOG_ENTER;
+    if (fd < 0) {
+        MISC_HILOGE("fd is invalid");
+        return DUMP_PARAM_ERR;
+    }
+    if (args.empty()) {
+        MISC_HILOGE("args cannot be empty");
+        dprintf(fd, "args cannot be empty\n");
+        miscdeviceDump_.DumpHelp(fd);
+        return DUMP_PARAM_ERR;
+    }
+    std::vector<std::string> argList = { "" };
+    std::transform(args.begin(), args.end(), std::back_inserter(argList),
+        [](const std::u16string &arg) {
+        return Str16ToStr8(arg);
+    });
+    miscdeviceDump_.ParseCommand(fd, argList);
+    return ERR_OK;
 }
 }  // namespace Sensors
 }  // namespace OHOS
