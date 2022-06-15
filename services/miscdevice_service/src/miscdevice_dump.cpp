@@ -121,7 +121,7 @@ void MiscdeviceDump::DumpCurrentTime(std::string &startTime)
         .append(std::to_string(timeinfo->tm_mon + BASE_MON)).append("-").append(std::to_string(timeinfo->tm_mday))
         .append(" ").append(std::to_string(timeinfo->tm_hour)).append(":").append(std::to_string(timeinfo->tm_min))
         .append(":").append(std::to_string(timeinfo->tm_sec)).append(".")
-        .append(std::to_string(curTime.tv_nsec / 1000000));
+        .append(std::to_string(curTime.tv_nsec / (1000 * 1000)));
 }
 
 std::string MiscdeviceDump::GetPackageName(AccessTokenID tokenId)
