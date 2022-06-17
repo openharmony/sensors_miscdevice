@@ -82,8 +82,8 @@ void MiscdeviceDump::ParseCommand(int32_t fd, const std::vector<std::string>& ar
 void MiscdeviceDump::DumpHelp(int32_t fd)
 {
     dprintf(fd, "Usage:\n");
-    dprintf(fd, "      -h: dump help\n");
-    dprintf(fd, "      -r: dump the list of vibrate recorded\n");
+    dprintf(fd, "      -h, --help: dump help\n");
+    dprintf(fd, "      -r, --record: dump the list of vibrate recorded\n");
 }
 
 void MiscdeviceDump::DumpMiscdeviceRecord(int32_t fd)
