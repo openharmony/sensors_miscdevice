@@ -16,7 +16,7 @@
 
 #include "compatible_connection.h"
 #include "hdi_connection.h"
-#include "miscdevice_trace.h"
+#include "hitrace_meter.h"
 #include "sensors_errors.h"
 
 namespace OHOS {
@@ -45,9 +45,9 @@ int32_t VibratorHdiConnection::ConnectHdi()
 
 int32_t VibratorHdiConnection::StartOnce(uint32_t duration)
 {
-    HITRACE_BEGIN("StartOnce");
+    StartTrace(HITRACE_TAG_SENSORS, "StartOnce");
     int32_t ret = iVibratorHdiConnection_->StartOnce(duration);
-    HITRACE_END();
+    FinishTrace(HITRACE_TAG_SENSORS);
     if (ret != 0) {
         MISC_HILOGE("StartOnce failed");
         return VIBRATOR_ON_ERR;
@@ -57,9 +57,9 @@ int32_t VibratorHdiConnection::StartOnce(uint32_t duration)
 
 int32_t VibratorHdiConnection::Start(const std::string &effectType)
 {
-    HITRACE_BEGIN("Start");
+    StartTrace(HITRACE_TAG_SENSORS, "Start");
     int32_t ret = iVibratorHdiConnection_->Start(effectType);
-    HITRACE_END();
+    FinishTrace(HITRACE_TAG_SENSORS);
     if (ret != 0) {
         MISC_HILOGE("Start failed");
         return VIBRATOR_ON_ERR;
@@ -69,9 +69,9 @@ int32_t VibratorHdiConnection::Start(const std::string &effectType)
 
 int32_t VibratorHdiConnection::Stop(VibratorStopMode mode)
 {
-    HITRACE_BEGIN("Stop");
+    StartTrace(HITRACE_TAG_SENSORS, "Stop");
     int32_t ret = iVibratorHdiConnection_->Stop(mode);
-    HITRACE_END();
+    FinishTrace(HITRACE_TAG_SENSORS);
     if (ret != 0) {
         MISC_HILOGE("Stop failed");
         return VIBRATOR_OFF_ERR;
