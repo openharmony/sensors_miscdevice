@@ -18,7 +18,7 @@
 #include <thread>
 #include "death_recipient_template.h"
 #include "dmd_report.h"
-#include "miscdevice_trace.h"
+#include "hitrace_meter.h"
 #include "iservice_registry.h"
 #include "sensors_errors.h"
 #include "system_ability_definition.h"
@@ -79,9 +79,9 @@ std::vector<int32_t> VibratorServiceClient::GetVibratorIdList()
         MISC_HILOGE("miscdeviceProxy_ is null");
         return {};
     }
-    HITRACE_BEGIN("GetVibratorIdList");
+    StartTrace(HITRACE_TAG_SENSORS, "GetVibratorIdList");
     std::vector<int32_t> vibratorIdList = miscdeviceProxy_->GetVibratorIdList();
-    HITRACE_END();
+    FinishTrace(HITRACE_TAG_SENSORS);
     return vibratorIdList;
 }
 
@@ -94,9 +94,9 @@ bool VibratorServiceClient::IsVibratorEffectSupport(int32_t vibratorId, const st
         return false;
     }
     CHKPF(miscdeviceProxy_);
-    HITRACE_BEGIN("IsVibratorEffectSupport");
+    StartTrace(HITRACE_TAG_SENSORS, "IsVibratorEffectSupport");
     bool status = miscdeviceProxy_->IsVibratorEffectAvailable(vibratorId, effect);
-    HITRACE_END();
+    FinishTrace(HITRACE_TAG_SENSORS);
     return status;
 }
 
@@ -109,9 +109,9 @@ int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, uint32_t timeOut)
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
     CHKPR(miscdeviceProxy_, ERROR);
-    HITRACE_BEGIN("VibrateTime");
+    StartTrace(HITRACE_TAG_SENSORS, "VibrateTime");
     ret = miscdeviceProxy_->Vibrate(vibratorId, timeOut);
-    HITRACE_END();
+    FinishTrace(HITRACE_TAG_SENSORS);
     return ret;
 }
 
@@ -124,9 +124,9 @@ int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, const std::string &ef
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
     CHKPR(miscdeviceProxy_, ERROR);
-    HITRACE_BEGIN("VibratorEffect");
+    StartTrace(HITRACE_TAG_SENSORS, "VibratorEffect");
     ret = miscdeviceProxy_->PlayVibratorEffect(vibratorId, effect, isLooping);
-    HITRACE_END();
+    FinishTrace(HITRACE_TAG_SENSORS);
     return ret;
 }
 
@@ -140,9 +140,9 @@ int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, std::vector<int32_t> 
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
     CHKPR(miscdeviceProxy_, ERROR);
-    HITRACE_BEGIN("CustomVibrate");
+    StartTrace(HITRACE_TAG_SENSORS, "CustomVibrate");
     ret = miscdeviceProxy_->PlayCustomVibratorEffect(vibratorId, timing, intensity, periodCount);
-    HITRACE_END();
+    FinishTrace(HITRACE_TAG_SENSORS);
     return ret;
 }
 
@@ -155,13 +155,13 @@ int32_t VibratorServiceClient::Stop(int32_t vibratorId, const std::string &type)
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
     CHKPR(miscdeviceProxy_, ERROR);
-    HITRACE_BEGIN("Stop");
+    StartTrace(HITRACE_TAG_SENSORS, "Stop");
     if (type == "time") {
         ret = miscdeviceProxy_->CancelVibrator(vibratorId);
     } else {
         ret = miscdeviceProxy_->StopVibratorEffect(vibratorId, type);
     }
-    HITRACE_END();
+    FinishTrace(HITRACE_TAG_SENSORS);
     return ret;
 }
 
@@ -174,9 +174,9 @@ int32_t VibratorServiceClient::SetVibratorParameter(int32_t vibratorId, const st
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
     CHKPR(miscdeviceProxy_, ERROR);
-    HITRACE_BEGIN("SetVibratorParameter");
+    StartTrace(HITRACE_TAG_SENSORS, "SetVibratorParameter");
     ret = miscdeviceProxy_->SetVibratorParameter(vibratorId, cmd);
-    HITRACE_END();
+    FinishTrace(HITRACE_TAG_SENSORS);
     return ret;
 }
 
@@ -189,9 +189,9 @@ std::string VibratorServiceClient::GetVibratorParameter(int32_t vibratorId, cons
         return "";
     }
     CHKPS(miscdeviceProxy_);
-    HITRACE_BEGIN("GetVibratorParameter");
+    StartTrace(HITRACE_TAG_SENSORS, "GetVibratorParameter");
     std::string parameter = miscdeviceProxy_->GetVibratorParameter(vibratorId, command);
-    HITRACE_END();
+    FinishTrace(HITRACE_TAG_SENSORS);
     return parameter;
 }
 
