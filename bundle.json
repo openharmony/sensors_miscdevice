@@ -50,7 +50,8 @@
         }
       ],
       "test": [
-        "//base/sensors/miscdevice/interfaces/plugin/vibrator/test/unittest:unittest"
+        "//base/sensors/miscdevice/interfaces/plugin/vibrator/test/unittest:unittest",
+        "//base/sensors/miscdevice/interfaces/native/vibrator/test/fuzztest:fuzztest"
       ]
     }
   }
