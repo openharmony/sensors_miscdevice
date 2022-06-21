@@ -19,8 +19,7 @@ module_output_path = "sensors/vibrator"
 ohos_fuzztest("VibratorAgentFuzzTest") {
   module_out_path = module_output_path
 
-  fuzz_config_file =
-      "//base/sensors/miscdevice/interfaces/native/vibrator/test/fuzztest/vibratoragent_fuzzer"
+  fuzz_config_file = "//base/sensors/miscdevice/interfaces/native/vibrator/test/fuzztest/vibratoragent_fuzzer"
 
   include_dirs = [
     "//base/sensors/miscdevice/interfaces/native/vibrator/test/fuzztest/vibratoragent_fuzzer",

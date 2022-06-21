@@ -14,14 +14,17 @@
  */
 
 #include "vibratoragent_fuzzer.h"
-#include "vibrator_agent.h"
-#include <unistd.h>
+
 #include <thread>
+#include <unistd.h>
+
+#include "vibrator_agent.h"
 
 namespace {
 constexpr int32_t MAX_VIBRATOR_TIME = 1800000;
 }  // namespace
 
+namespace OHOS {
 bool VibratorAgentFuzzTest(const uint8_t* data, size_t size)
 {
     const char *argv = reinterpret_cast<const char *>(data);
@@ -42,9 +45,10 @@ bool VibratorAgentFuzzTest(const uint8_t* data, size_t size)
     }
     return true;
 }
+}
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-   VibratorAgentFuzzTest(data, size);
+    OHOS::VibratorAgentFuzzTest(data, size);
     return 0;
 }
