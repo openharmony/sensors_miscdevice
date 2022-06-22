@@ -24,7 +24,7 @@
         "utils_base",
         "napi",
         "hisysevent_native",
-        "vibrator_device_driver"
+        "drivers_peripheral_vibrator"
       ],
       "third_party": []
     },
