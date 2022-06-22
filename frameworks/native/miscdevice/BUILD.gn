@@ -30,10 +30,7 @@ ohos_shared_library("liblight_native") {
     "//utils/jni/jnikit/include",
   ]
   cflags = [ "-fstack-protector-all" ]
-  deps = [
-    "$SUBSYSTEM_DIR/miscdevice/services/miscdevice_service:libmiscdevice_service",
-    "$SUBSYSTEM_DIR/miscdevice/utils:libmiscdevice_utils",
-  ]
+  deps = [ "$SUBSYSTEM_DIR/miscdevice/utils:libmiscdevice_utils" ]
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
