@@ -24,8 +24,8 @@ namespace OHOS {
 bool StopVibratorFuzzTest(const uint8_t* data, size_t size)
 {
     const char *argv = reinterpret_cast<const char *>(data);
-     int32_t ret = OHOS::Sensors::StopVibrator(argv);
-     int32_t ret2 = strcmp(argv, "time") != 0 && strcmp(argv, "preset");
+    int32_t ret = OHOS::Sensors::StopVibrator(argv);
+    int32_t ret2 = strcmp(argv, "time") != 0 && strcmp(argv, "preset");
     if ((ret2 != 0 && ret == 0) || (ret2 == 0 && ret != 0)) {
         return false;
     }
