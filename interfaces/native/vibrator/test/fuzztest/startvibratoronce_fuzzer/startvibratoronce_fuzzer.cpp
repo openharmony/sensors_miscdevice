@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "vibratoragent_fuzzer.h"
+#include "startvibratoronce_fuzzer.h"
 
 #include <thread>
 #include <unistd.h>
@@ -25,21 +25,10 @@ constexpr int32_t MAX_VIBRATOR_TIME = 1800000;
 }  // namespace
 
 namespace OHOS {
-bool VibratorAgentFuzzTest(const uint8_t* data, size_t size)
+bool StartVibratorOnceFuzzTest(const uint8_t* data, size_t size)
 {
-    const char *argv = reinterpret_cast<const char *>(data);
-    int32_t ret = OHOS::Sensors::StartVibrator(argv);
-    int32_t ret2 = std::strcmp(argv, "haptic.clock.timer");
-    if ((ret2 != 0 && ret == 0) || (ret2 == 0 && ret != 0)) {
-        return false;
-    }
-    ret = OHOS::Sensors::StopVibrator(argv);
-    ret2 = strcmp(argv, "time") != 0 && strcmp(argv, "preset");
-    if ((ret2 != 0 && ret == 0) || (ret2 == 0 && ret != 0)) {
-        return false;
-    }
     uintptr_t duration = reinterpret_cast<uintptr_t>(data);
-    ret = OHOS::Sensors::StartVibratorOnce(duration);
+    int32_t ret = OHOS::Sensors::StartVibratorOnce(duration);
     if ((duration > MAX_VIBRATOR_TIME && ret == 0) || (duration <= MAX_VIBRATOR_TIME && ret != 0)) {
         return false;
     }
@@ -49,6 +38,6 @@ bool VibratorAgentFuzzTest(const uint8_t* data, size_t size)
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    OHOS::VibratorAgentFuzzTest(data, size);
+    OHOS::StartVibratorOnceFuzzTest(data, size);
     return 0;
 }

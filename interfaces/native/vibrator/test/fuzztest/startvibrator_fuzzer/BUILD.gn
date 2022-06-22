@@ -14,13 +14,35 @@
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
+module_output_path = "sensors/vibrator"
+
+ohos_fuzztest("StartVibratorFuzzTest") {
+  module_out_path = module_output_path
+
+  fuzz_config_file = "//base/sensors/miscdevice/interfaces/native/vibrator/test/fuzztest/startvibrator_fuzzer"
+
+  include_dirs = [
+    "//base/sensors/miscdevice/interfaces/native/vibrator/test/fuzztest/startvibrator_fuzzer",
+    "//base/sensors/miscdevice/interfaces/native/vibrator/include",
+  ]
+
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+
+  sources = [ "startvibrator_fuzzer.cpp" ]
+
+  deps = [ "//base/sensors/miscdevice/interfaces/native/vibrator:vibrator_interface_native" ]
+}
 
 group("fuzztest") {
   testonly = true
   deps = []
   deps += [
-    "startvibrator_fuzzer:fuzztest",
-    "startvibratoronce_fuzzer:fuzztest",
-    "stopvibrator_fuzzer:fuzztest",
+    # deps file
+    ":StartVibratorFuzzTest",
   ]
 }
