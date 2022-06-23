@@ -15,7 +15,6 @@
 
 #include "permission_util.h"
 
-#include <thread>
 #include "sensors_errors.h"
 
 namespace OHOS {
