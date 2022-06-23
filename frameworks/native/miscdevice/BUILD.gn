@@ -33,8 +33,8 @@ ohos_shared_library("liblight_native") {
   deps = [ "$SUBSYSTEM_DIR/miscdevice/utils:libmiscdevice_utils" ]
 
   external_deps = [
-    "hiviewdfx_hilog_native:libhilog",
     "hisysevent_native:libhisysevent",
+    "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
@@ -62,8 +62,8 @@ ohos_shared_library("libvibrator_native") {
   deps = [ "$SUBSYSTEM_DIR/miscdevice/utils:libmiscdevice_utils" ]
 
   external_deps = [
-    "hitrace_native:hitrace_meter",
     "hisysevent_native:libhisysevent",
+    "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
