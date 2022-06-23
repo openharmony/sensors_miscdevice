@@ -39,13 +39,13 @@ ohos_shared_library("libmiscdevice_service") {
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
+    "drivers_interface_vibrator:libvibrator_proxy_1.1",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
     "utils_base:utils",
-    "vibrator_device_driver_interface:libvibrator_proxy_1.1",
   ]
 
   part_name = "miscdevice"
