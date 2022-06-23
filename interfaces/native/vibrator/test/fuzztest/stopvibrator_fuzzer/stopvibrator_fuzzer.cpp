@@ -13,10 +13,28 @@
  * limitations under the License.
  */
 
-#ifndef SENSOR_DISABLE_FUZZER_H
-#define SENSOR_DISABLE_FUZZER_H
+#include "stopvibrator_fuzzer.h"
 
-#define FUZZ_PROJECT_NAME "vibratoragent_fuzzer"
+#include <thread>
+#include <unistd.h>
 
-#endif
+#include "vibrator_agent.h"
 
+namespace OHOS {
+bool StopVibratorFuzzTest(const uint8_t* data, size_t size)
+{
+    const char *argv = reinterpret_cast<const char *>(data);
+    int32_t ret = OHOS::Sensors::StopVibrator(argv);
+    int32_t ret2 = strcmp(argv, "time") != 0 && strcmp(argv, "preset");
+    if ((ret2 != 0 && ret == 0) || (ret2 == 0 && ret != 0)) {
+        return false;
+    }
+    return true;
+}
+}
+
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+{
+    OHOS::StopVibratorFuzzTest(data, size);
+    return 0;
+}
