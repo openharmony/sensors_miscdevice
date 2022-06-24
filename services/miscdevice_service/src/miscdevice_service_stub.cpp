@@ -80,7 +80,7 @@ int32_t MiscdeviceServiceStub::VibratePb(MessageParcel &data, MessageParcel &rep
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
     int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
     if (ret != PERMISSION_GRANTED) {
-        HiSysEvent::Write(HiSysEvent::Domain::SENSORS_MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
+        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
             HiSysEvent::EventType::SECURITY, "FUNC_NAME", "VibratePb", "ERROR_CODE", ret);
         MISC_HILOGE("result: %{public}d", ret);
         return ERR_PERMISSION_DENIED;
@@ -101,7 +101,7 @@ int32_t MiscdeviceServiceStub::CancelVibratorPb(MessageParcel &data, MessageParc
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
     int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
     if (ret != PERMISSION_GRANTED) {
-        HiSysEvent::Write(HiSysEvent::Domain::SENSORS_MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
+        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
             HiSysEvent::EventType::SECURITY, "FUNC_NAME", "CancelVibratorPb", "ERROR_CODE", ret);
         MISC_HILOGE("result: %{public}d", ret);
         return ERR_PERMISSION_DENIED;
@@ -115,7 +115,7 @@ int32_t MiscdeviceServiceStub::PlayVibratorEffectPb(MessageParcel &data, Message
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
     int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
     if (ret != PERMISSION_GRANTED) {
-        HiSysEvent::Write(HiSysEvent::Domain::SENSORS_MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
+        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
             HiSysEvent::EventType::SECURITY, "FUNC_NAME", "PlayVibratorEffectPb", "ERROR_CODE", ret);
         MISC_HILOGE("result: %{public}d", ret);
         return ERR_PERMISSION_DENIED;
@@ -131,7 +131,7 @@ int32_t MiscdeviceServiceStub::PlayCustomVibratorEffectPb(MessageParcel &data, M
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
     int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
     if (ret != PERMISSION_GRANTED) {
-        HiSysEvent::Write(HiSysEvent::Domain::SENSORS_MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
+        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
             HiSysEvent::EventType::SECURITY, "FUNC_NAME", "PlayCustomVibratorEffectPb", "ERROR_CODE", ret);
         MISC_HILOGE("result: %{public}d", ret);
         return ERR_PERMISSION_DENIED;
@@ -150,7 +150,7 @@ int32_t MiscdeviceServiceStub::StopVibratorEffectPb(MessageParcel &data, Message
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
     int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
     if (ret != PERMISSION_GRANTED) {
-        HiSysEvent::Write(HiSysEvent::Domain::SENSORS_MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
+        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
             HiSysEvent::EventType::SECURITY, "FUNC_NAME", "StopVibratorEffectPb", "ERROR_CODE", ret);
         MISC_HILOGE("result: %{public}d", ret);
         return ERR_PERMISSION_DENIED;
@@ -165,7 +165,7 @@ int32_t MiscdeviceServiceStub::SetVibratorParameterPb(MessageParcel &data, Messa
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
     int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
     if (ret != PERMISSION_GRANTED) {
-        HiSysEvent::Write(HiSysEvent::Domain::SENSORS_MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
+        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
             HiSysEvent::EventType::SECURITY, "FUNC_NAME", "SetVibratorParameterPb", "ERROR_CODE", ret);
         MISC_HILOGE("result: %{public}d", ret);
         return ERR_PERMISSION_DENIED;
