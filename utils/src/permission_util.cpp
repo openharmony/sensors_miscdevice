@@ -15,26 +15,15 @@
 
 #include "permission_util.h"
 
-#include <thread>
 #include "sensors_errors.h"
 
 namespace OHOS {
 namespace Sensors {
 using namespace OHOS::HiviewDFX;
 
-namespace {
-constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "PermissionUtil" };
-}  // namespace
-
-bool PermissionUtil::CheckVibratePermission(AccessTokenID callerToken, std::string permissionName)
+int32_t PermissionUtil::CheckVibratePermission(AccessTokenID callerToken, std::string permissionName)
 {
-    int32_t result = AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
-    if (result != PERMISSION_GRANTED) {
-        MISC_HILOGE("result grant failed, result: %{public}d", result);
-        return false;
-    }
-    MISC_HILOGD("result grant success");
-    return true;
+    return AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
 }
 }  // namespace Sensors
 }  // namespace OHOS

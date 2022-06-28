@@ -18,6 +18,7 @@
 #include <string>
 #include <unistd.h>
 
+#include "hisysevent.h"
 #include "ipc_skeleton.h"
 #include "message_parcel.h"
 
@@ -77,8 +78,11 @@ int32_t MiscdeviceServiceStub::IsVibratorEffectAvailablePb(MessageParcel &data, 
 int32_t MiscdeviceServiceStub::VibratePb(MessageParcel &data, MessageParcel &reply)
 {
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
-    if (!permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION)) {
-        MISC_HILOGE("permissionUtil denied");
+    int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
+    if (ret != PERMISSION_GRANTED) {
+        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
+            HiSysEvent::EventType::SECURITY, "FUNC_NAME", "VibratePb", "ERROR_CODE", ret);
+        MISC_HILOGE("result: %{public}d", ret);
         return ERR_PERMISSION_DENIED;
     }
     return Vibrate(data.ReadInt32(), data.ReadUint32());
@@ -95,8 +99,11 @@ int32_t MiscdeviceServiceStub::GetVibratorIdListPb(MessageParcel &data, MessageP
 int32_t MiscdeviceServiceStub::CancelVibratorPb(MessageParcel &data, MessageParcel &reply)
 {
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
-    if (!permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION)) {
-        MISC_HILOGE("permissionUtil denied");
+    int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
+    if (ret != PERMISSION_GRANTED) {
+        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
+            HiSysEvent::EventType::SECURITY, "FUNC_NAME", "CancelVibratorPb", "ERROR_CODE", ret);
+        MISC_HILOGE("result: %{public}d", ret);
         return ERR_PERMISSION_DENIED;
     }
     int32_t vibratorId = data.ReadInt32();
@@ -106,8 +113,11 @@ int32_t MiscdeviceServiceStub::CancelVibratorPb(MessageParcel &data, MessageParc
 int32_t MiscdeviceServiceStub::PlayVibratorEffectPb(MessageParcel &data, MessageParcel &reply)
 {
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
-    if (!permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION)) {
-        MISC_HILOGE("permissionUtil denied");
+    int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
+    if (ret != PERMISSION_GRANTED) {
+        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
+            HiSysEvent::EventType::SECURITY, "FUNC_NAME", "PlayVibratorEffectPb", "ERROR_CODE", ret);
+        MISC_HILOGE("result: %{public}d", ret);
         return ERR_PERMISSION_DENIED;
     }
     int32_t vibratorId = data.ReadInt32();
@@ -119,8 +129,11 @@ int32_t MiscdeviceServiceStub::PlayVibratorEffectPb(MessageParcel &data, Message
 int32_t MiscdeviceServiceStub::PlayCustomVibratorEffectPb(MessageParcel &data, MessageParcel &reply)
 {
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
-    if (!permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION)) {
-        MISC_HILOGE("permissionUtil denied");
+    int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
+    if (ret != PERMISSION_GRANTED) {
+        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
+            HiSysEvent::EventType::SECURITY, "FUNC_NAME", "PlayCustomVibratorEffectPb", "ERROR_CODE", ret);
+        MISC_HILOGE("result: %{public}d", ret);
         return ERR_PERMISSION_DENIED;
     }
     int32_t vibratorId = data.ReadInt32();
@@ -135,8 +148,11 @@ int32_t MiscdeviceServiceStub::PlayCustomVibratorEffectPb(MessageParcel &data, M
 int32_t MiscdeviceServiceStub::StopVibratorEffectPb(MessageParcel &data, MessageParcel &reply)
 {
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
-    if (!permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION)) {
-        MISC_HILOGE("permissionUtil denied");
+    int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
+    if (ret != PERMISSION_GRANTED) {
+        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
+            HiSysEvent::EventType::SECURITY, "FUNC_NAME", "StopVibratorEffectPb", "ERROR_CODE", ret);
+        MISC_HILOGE("result: %{public}d", ret);
         return ERR_PERMISSION_DENIED;
     }
     int32_t vibratorId = data.ReadInt32();
@@ -147,8 +163,11 @@ int32_t MiscdeviceServiceStub::StopVibratorEffectPb(MessageParcel &data, Message
 int32_t MiscdeviceServiceStub::SetVibratorParameterPb(MessageParcel &data, MessageParcel &reply)
 {
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
-    if (!permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION)) {
-        MISC_HILOGE("permissionUtil denied");
+    int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
+    if (ret != PERMISSION_GRANTED) {
+        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
+            HiSysEvent::EventType::SECURITY, "FUNC_NAME", "SetVibratorParameterPb", "ERROR_CODE", ret);
+        MISC_HILOGE("result: %{public}d", ret);
         return ERR_PERMISSION_DENIED;
     }
     int32_t vibratorId = data.ReadInt32();

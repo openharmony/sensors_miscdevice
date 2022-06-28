@@ -15,7 +15,7 @@
 
 #include "miscdevice_service_proxy.h"
 
-#include "dmd_report.h"
+#include "hisysevent.h"
 #include "sensors_errors.h"
 
 namespace OHOS {
@@ -48,7 +48,8 @@ bool MiscdeviceServiceProxy::IsAbilityAvailable(MiscdeviceDeviceId groupID)
     CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(IS_ABILITY_AVAILABLE, data, reply, option);
     if (ret != NO_ERROR) {
-        DmdReport::ReportException(MISC_SERVICE_IPC_EXCEPTION, "IsAbilityAvailable", ret);
+        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "FUNC_NAME", "IsAbilityAvailable", "ERROR_CODE", ret);
         MISC_HILOGE("sendRequest failed, ret : %{public}d", ret);
         return false;
     }
@@ -76,7 +77,8 @@ bool MiscdeviceServiceProxy::IsVibratorEffectAvailable(int32_t vibratorId, const
     CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(IS_VIBRATOR_EFFECT_AVAILABLE, data, reply, option);
     if (ret != NO_ERROR) {
-        DmdReport::ReportException(MISC_SERVICE_IPC_EXCEPTION, "IsVibratorEffectAvailable", ret);
+        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "FUNC_NAME", "IsVibratorEffectAvailable", "ERROR_CODE", ret);
         MISC_HILOGE("SendRequest failed, ret : %{public}d", ret);
         return false;
     }
@@ -100,7 +102,8 @@ std::vector<int32_t> MiscdeviceServiceProxy::GetVibratorIdList()
     }
     int32_t ret = remote->SendRequest(GET_VIBRATOR_ID_LIST, data, reply, option);
     if (ret != NO_ERROR) {
-        DmdReport::ReportException(MISC_SERVICE_IPC_EXCEPTION, "GetVibratorIdList", ret);
+        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "FUNC_NAME", "GetVibratorIdList", "ERROR_CODE", ret);
         MISC_HILOGE("SendRequest failed, ret : %{public}d", ret);
         return idVec;
     }
@@ -135,7 +138,8 @@ int32_t MiscdeviceServiceProxy::Vibrate(int32_t vibratorId, uint32_t timeOut)
     CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(VIBRATE, data, reply, option);
     if (ret != NO_ERROR) {
-        DmdReport::ReportException(MISC_SERVICE_IPC_EXCEPTION, "Vibrate", ret);
+        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "FUNC_NAME", "Vibrate", "ERROR_CODE", ret);
         MISC_HILOGE("sendRequest ret : %{public}d", ret);
     }
     return ret;
@@ -158,7 +162,8 @@ int32_t MiscdeviceServiceProxy::CancelVibrator(int32_t vibratorId)
     CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(CANCEL_VIBRATOR, data, reply, option);
     if (ret != NO_ERROR) {
-        DmdReport::ReportException(MISC_SERVICE_IPC_EXCEPTION, "CancelVibrator", ret);
+        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "FUNC_NAME", "CancelVibrator", "ERROR_CODE", ret);
         MISC_HILOGE("ret : %{public}d", ret);
     }
     return ret;
@@ -189,7 +194,8 @@ int32_t MiscdeviceServiceProxy::PlayVibratorEffect(int32_t vibratorId, const std
     CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(PLAY_VIBRATOR_EFFECT, data, reply, option);
     if (ret != NO_ERROR) {
-        DmdReport::ReportException(MISC_SERVICE_IPC_EXCEPTION, "PlayVibratorEffect", ret);
+        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "FUNC_NAME", "PlayVibratorEffect", "ERROR_CODE", ret);
         MISC_HILOGE("ret : %{public}d", ret);
     }
     return ret;
@@ -225,7 +231,8 @@ int32_t MiscdeviceServiceProxy::PlayCustomVibratorEffect(int32_t vibratorId, con
     CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(PLAY_CUSTOM_VIBRATOR_EFFECT, data, reply, option);
     if (ret != NO_ERROR) {
-        DmdReport::ReportException(MISC_SERVICE_IPC_EXCEPTION, "PlayCustomVibratorEffect", ret);
+        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "FUNC_NAME", "PlayCustomVibratorEffect", "ERROR_CODE", ret);
         MISC_HILOGE("ret : %{public}d", ret);
     }
     return ret;
@@ -252,7 +259,8 @@ int32_t MiscdeviceServiceProxy::StopVibratorEffect(int32_t vibratorId, const std
     CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(STOP_VIBRATOR_EFFECT, data, reply, option);
     if (ret != NO_ERROR) {
-        DmdReport::ReportException(MISC_SERVICE_IPC_EXCEPTION, "StopVibratorEffect", ret);
+        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "FUNC_NAME", "StopVibratorEffect", "ERROR_CODE", ret);
         MISC_HILOGE("ret : %{public}d", ret);
     }
     return ret;
@@ -279,7 +287,8 @@ int32_t MiscdeviceServiceProxy::SetVibratorParameter(int32_t vibratorId, const s
     CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(SET_VIBRATOR_PARA, data, reply, option);
     if (ret != NO_ERROR) {
-        DmdReport::ReportException(MISC_SERVICE_IPC_EXCEPTION, "SetVibratorParameter", ret);
+        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "FUNC_NAME", "SetVibratorParameter", "ERROR_CODE", ret);
         MISC_HILOGE("ret : %{public}d", ret);
     }
     return ret;
@@ -306,7 +315,8 @@ std::string MiscdeviceServiceProxy::GetVibratorParameter(int32_t vibratorId, con
     CHKPS(remote);
     int32_t ret = remote->SendRequest(GET_VIBRATOR_PARA, data, reply, option);
     if (ret != NO_ERROR) {
-        DmdReport::ReportException(MISC_SERVICE_IPC_EXCEPTION, "SetVibratorParameter", ret);
+        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "FUNC_NAME", "GetVibratorParameter", "ERROR_CODE", ret);
         MISC_HILOGE("ret : %{public}d", ret);
         return "";
     }
@@ -330,7 +340,8 @@ std::vector<int32_t> MiscdeviceServiceProxy::GetLightSupportId()
     }
     int32_t ret = remote->SendRequest(GET_LIGHT_SUPPORT_ID, data, reply, option);
     if (ret != NO_ERROR) {
-        DmdReport::ReportException(MISC_SERVICE_IPC_EXCEPTION, "GetLightSupportId", ret);
+        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "FUNC_NAME", "GetLightSupportId", "ERROR_CODE", ret);
         MISC_HILOGE("sendRequest failed, ret : %{public}d", ret);
     }
     int32_t setCount = reply.ReadInt32();
@@ -364,7 +375,8 @@ bool MiscdeviceServiceProxy::IsLightEffectSupport(int32_t lightId, const std::st
     CHKPF(remote);
     int32_t ret = remote->SendRequest(IS_LIGHT_EFFECT_SUPPORT, data, reply, option);
     if (ret != NO_ERROR) {
-        DmdReport::ReportException(MISC_SERVICE_IPC_EXCEPTION, "IsLightEffectSupport", ret);
+        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "FUNC_NAME", "IsLightEffectSupport", "ERROR_CODE", ret);
         MISC_HILOGE("sendRequest failed, ret : %{public}d", ret);
         return false;
     }
@@ -400,7 +412,8 @@ int32_t MiscdeviceServiceProxy::Light(int32_t id, uint64_t brightness, uint32_t 
     CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(LIGHT, data, reply, option);
     if (ret != NO_ERROR) {
-        DmdReport::ReportException(MISC_SERVICE_IPC_EXCEPTION, "Light", ret);
+        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "FUNC_NAME", "Light", "ERROR_CODE", ret);
         MISC_HILOGE("sendRequest failed, ret : %{public}d", ret);
     }
     return ret;
@@ -427,7 +440,8 @@ int32_t MiscdeviceServiceProxy::PlayLightEffect(int32_t id, const std::string &t
     CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(PLAY_LIGHT_EFFECT, data, reply, option);
     if (ret != NO_ERROR) {
-        DmdReport::ReportException(MISC_SERVICE_IPC_EXCEPTION, "PlayLightEffect", ret);
+        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "FUNC_NAME", "PlayLightEffect", "ERROR_CODE", ret);
         MISC_HILOGE("sendRequest failed, ret : %{public}d", ret);
     }
     return ret;
@@ -450,7 +464,8 @@ int32_t MiscdeviceServiceProxy::StopLightEffect(int32_t id)
     CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(STOP_LIGHT_EFFECT, data, reply, option);
     if (ret != NO_ERROR) {
-        DmdReport::ReportException(MISC_SERVICE_IPC_EXCEPTION, "StopLightEffect", ret);
+        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "FUNC_NAME", "StopLightEffect", "ERROR_CODE", ret);
         MISC_HILOGE("sendRequest failed, ret : %{public}d", ret);
     }
     return ret;
