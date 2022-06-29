@@ -19,15 +19,16 @@
     ],
     "deps": {
       "components": [
-        "access_token",
+        "hisysevent_native",
+        "napi",
         "hiviewdfx_hilog_native",
+        "drivers_interface_vibrator",
+        "access_token",
+        "utils_base",
+        "hitrace_native",
         "ipc",
         "safwk",
-        "samgr_standard",
-        "utils_base",
-        "napi",
-        "hisysevent_native",
-        "drivers_peripheral_vibrator"
+        "samgr_standard"
       ],
       "third_party": []
     },
