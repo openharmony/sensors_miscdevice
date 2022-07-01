@@ -187,9 +187,11 @@ int32_t MiscdeviceService::Vibrate(int32_t vibratorId, uint32_t timeOut)
     }
     vibratorEffectMap_[vibratorId] = "time";
     int32_t ret = vibratorHdiConnection_.StartOnce((timeOut < MIN_VIBRATOR_TIME) ? MIN_VIBRATOR_TIME : timeOut);
-    if (ret == ERR_OK) {
-        miscdeviceDump_.SaveVibrator(GetCallingTokenID(), GetCallingUid(), GetCallingPid(), timeOut);
+    if (ret != ERR_OK) {
+        MISC_HILOGE("Vibrate failed, error: %{public}d", ret);
+        return ERROR;
     }
+    miscdeviceDump_.SaveVibrator(GetCallingTokenID(), GetCallingUid(), GetCallingPid(), timeOut);
     return ret;
 }
 
@@ -233,9 +235,11 @@ int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::str
     if (!isLooping) {
         vibratorEffectMap_[vibratorId] = effect;
         int32_t ret = vibratorHdiConnection_.Start(effect);
-        if (ret == ERR_OK) {
-            miscdeviceDump_.SaveVibratorEffect(GetCallingTokenID(), GetCallingUid(), GetCallingPid(), effect);
+        if (ret != ERR_OK) {
+            MISC_HILOGE("PlayVibratorEffect failed, error: %{public}d", ret);
+            return ERROR;
         }
+        miscdeviceDump_.SaveVibratorEffect(GetCallingTokenID(), GetCallingUid(), GetCallingPid(), effect);
         return ret;
     }
     std::unordered_map<std::string, int32_t>::iterator iter = hapticRingMap_.find(effect);
