@@ -177,7 +177,6 @@ int32_t MiscdeviceService::Vibrate(int32_t vibratorId, uint32_t timeOut)
         return ERR_INVALID_VALUE;
     }
     std::lock_guard<std::mutex> vibratorEffectLock(vibratorEffectMutex_);
-    miscdeviceDump_.SaveVibrator(GetCallingTokenID(), GetCallingUid(), GetCallingPid(), timeOut);
     auto it = vibratorEffectMap_.find(vibratorId);
     if (it != vibratorEffectMap_.end()) {
         if (it->second == "time") {
@@ -187,7 +186,13 @@ int32_t MiscdeviceService::Vibrate(int32_t vibratorId, uint32_t timeOut)
         }
     }
     vibratorEffectMap_[vibratorId] = "time";
-    return vibratorHdiConnection_.StartOnce((timeOut < MIN_VIBRATOR_TIME) ? MIN_VIBRATOR_TIME : timeOut);
+    int32_t ret = vibratorHdiConnection_.StartOnce((timeOut < MIN_VIBRATOR_TIME) ? MIN_VIBRATOR_TIME : timeOut);
+    if (ret != ERR_OK) {
+        MISC_HILOGE("Vibrate failed, error: %{public}d", ret);
+        return ERROR;
+    }
+    miscdeviceDump_.SaveVibrator(GetCallingTokenID(), GetCallingUid(), GetCallingPid(), timeOut);
+    return ret;
 }
 
 int32_t MiscdeviceService::CancelVibrator(int32_t vibratorId)
@@ -214,7 +219,6 @@ int32_t MiscdeviceService::CancelVibrator(int32_t vibratorId)
 int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::string &effect, bool isLooping)
 {
     std::lock_guard<std::mutex> vibratorEffectLock(vibratorEffectMutex_);
-    miscdeviceDump_.SaveVibratorEffect(GetCallingTokenID(), GetCallingUid(), GetCallingPid(), effect);
     auto it = vibratorEffectMap_.find(vibratorId);
     if (it != vibratorEffectMap_.end()) {
         if (it->second == "time") {
@@ -230,7 +234,13 @@ int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::str
     }
     if (!isLooping) {
         vibratorEffectMap_[vibratorId] = effect;
-        return vibratorHdiConnection_.Start(effect);
+        int32_t ret = vibratorHdiConnection_.Start(effect);
+        if (ret != ERR_OK) {
+            MISC_HILOGE("PlayVibratorEffect failed, error: %{public}d", ret);
+            return ERROR;
+        }
+        miscdeviceDump_.SaveVibratorEffect(GetCallingTokenID(), GetCallingUid(), GetCallingPid(), effect);
+        return ret;
     }
     std::unordered_map<std::string, int32_t>::iterator iter = hapticRingMap_.find(effect);
     if (iter == hapticRingMap_.end()) {
@@ -255,7 +265,6 @@ int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::str
         conditionVar_.notify_one();
         ready_ = false;
     }
-    MISC_HILOGD("update vibrator effect data and start");
     vibratorEffectThread_->UpdateVibratorEffectData(effect, delayTiming);
     vibratorEffectThread_->Start("VibratorEffectThread");
     return NO_ERROR;

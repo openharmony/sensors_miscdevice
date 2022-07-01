@@ -66,8 +66,7 @@ void MiscdeviceDump::ParseCommand(int32_t fd, const std::vector<std::string>& ar
                 break;
             }
             default: {
-                dprintf(fd, "cmd param is error\n");
-                DumpHelp(fd);
+                dprintf(fd, "Unrecognized option: %s\nMore info with: \"hidumper -s 3602 -a -h\"\n", argv[optind-1]);
                 break;
             }
         }
