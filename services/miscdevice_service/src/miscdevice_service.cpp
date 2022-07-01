@@ -265,7 +265,6 @@ int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::str
         conditionVar_.notify_one();
         ready_ = false;
     }
-    MISC_HILOGD("update vibrator effect data and start");
     vibratorEffectThread_->UpdateVibratorEffectData(effect, delayTiming);
     vibratorEffectThread_->Start("VibratorEffectThread");
     return NO_ERROR;
