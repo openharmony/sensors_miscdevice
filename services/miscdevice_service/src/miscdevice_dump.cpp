@@ -98,7 +98,7 @@ void MiscdeviceDump::DumpMiscdeviceRecord(int32_t fd)
         CHKPV(record);
         dumpQueue_.push(record);
         dumpQueue_.pop();
-        if (record->mode == "duration") {
+        if (record->mode == "time") {
             dprintf(fd, "startTime:%s | uid:%d | pid:%d | mode:%s | duration:%8u | packageName:%s\n",
                 record->startTime.c_str(), record->uid, record->pid, record->mode.c_str(), record->duration,
                 record->packageName.c_str());
@@ -175,7 +175,7 @@ void MiscdeviceDump::SaveVibrator(AccessTokenID callerToken, int32_t uid, int32_
     record->pid = pid;
     record->packageName = GetPackageName(callerToken);
     record->duration = timeOut;
-    record->mode = "duration";
+    record->mode = "time";
     DumpCurrentTime(record->startTime);
     UpdateRecordQueue(record);
 }
