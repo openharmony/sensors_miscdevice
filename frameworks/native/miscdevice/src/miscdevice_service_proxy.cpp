@@ -108,7 +108,7 @@ std::vector<int32_t> MiscdeviceServiceProxy::GetVibratorIdList()
         return idVec;
     }
     uint32_t setCount = reply.ReadUint32();
-    if (setCount <= 0 || setCount > MAX_VIBRATOR_COUNT) {
+    if (setCount == 0 || setCount > MAX_VIBRATOR_COUNT) {
         MISC_HILOGE("setCount: %{public}d is invalid", setCount);
         return idVec;
     }
@@ -344,8 +344,8 @@ std::vector<int32_t> MiscdeviceServiceProxy::GetLightSupportId()
             HiSysEvent::EventType::FAULT, "FUNC_NAME", "GetLightSupportId", "ERROR_CODE", ret);
         MISC_HILOGE("sendRequest failed, ret : %{public}d", ret);
     }
-    int32_t setCount = reply.ReadInt32();
-    if (setCount <= 0 || setCount > MAX_LIGHT_COUNT) {
+    uint32_t setCount = reply.ReadInt32();
+    if (setCount == 0 || setCount > MAX_LIGHT_COUNT) {
         MISC_HILOGE("setCount: %{public}d is invalid", setCount);
         return idVec;
     }
