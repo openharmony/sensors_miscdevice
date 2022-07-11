@@ -187,8 +187,7 @@ int32_t MiscdeviceServiceStub::GetVibratorParameterPb(MessageParcel &data, Messa
 int32_t MiscdeviceServiceStub::GetLightSupportIdPb(MessageParcel &data, MessageParcel &reply)
 {
     std::vector<int32_t> idSet = GetLightSupportId();
-    int32_t setCount = int32_t { idSet.size() };
-    reply.WriteInt32(setCount);
+    reply.WriteUint32(static_cast<uint32_t>(idSet.size()));
     reply.WriteInt32Vector(idSet);
     return NO_ERROR;
 }
