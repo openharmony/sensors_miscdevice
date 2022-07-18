@@ -14,21 +14,21 @@
 domain: MISCDEVICE
 
 VIBRATOR_PERMISSIONS_EXCEPTION:
-  __BASE: {type: SECURITY, level: MINOR, tag: PowerStats, desc: sensor verify access token fail}
-  FUNC_NAME: {type: STRING, desc: function name}
+  __BASE: {type: SECURITY, level: MINOR, desc: sensor verify access token fail}
+  PKG_NAME: {type: STRING, desc: package name}
   ERROR_CODE: {type: INT32, desc: error code}
 
 MISC_SERVICE_IPC_EXCEPTION:
-  __BASE: {type: FAULT, level: MINOR, tag: PowerStats, desc: sensor service ipc exception}
-  FUNC_NAME: {type: STRING, desc: function name}
+  __BASE: {type: FAULT, level: MINOR, desc: sensor service ipc exception}
+  PKG_NAME: {type: STRING, desc: package name}
   ERROR_CODE: {type: INT32, desc: error code}
 
 VIBRATOR_HDF_SERVICE_EXCEPTION:
-  __BASE: {type: FAULT, level: MINOR, tag: PowerStats, desc: sensor hdf service exception}
-  FUNC_NAME: {type: STRING, desc: function name}
+  __BASE: {type: FAULT, level: MINOR, desc: sensor hdf service exception}
+  PKG_NAME: {type: STRING, desc: package name}
   ERROR_CODE: {type: INT32, desc: error code}
 
 MISC_SERVICE_EXCEPTION:
-  __BASE: {type: FAULT, level: MINOR, tag: PowerStats, desc: sensor service exception}
-  FUNC_NAME: {type: STRING, desc: function name}
+  __BASE: {type: FAULT, level: MINOR, desc: sensor service exception}
+  PKG_NAME: {type: STRING, desc: package name}
   ERROR_CODE: {type: INT32, desc: error code}
