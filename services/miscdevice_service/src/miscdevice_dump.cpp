@@ -128,15 +128,6 @@ std::string MiscdeviceDump::GetPackageName(AccessTokenID tokenId)
     std::string packageName;
     int32_t tokenType = AccessTokenKit::GetTokenTypeFlag(tokenId);
     switch (tokenType) {
-        case ATokenTypeEnum::TOKEN_NATIVE: {
-            NativeTokenInfo tokenInfo;
-            if (AccessTokenKit::GetNativeTokenInfo(tokenId, tokenInfo) != 0) {
-                MISC_HILOGE("get native token info fail");
-                return {};
-            }
-            packageName = tokenInfo.processName;
-            break;
-        }
         case ATokenTypeEnum::TOKEN_HAP: {
             HapTokenInfo hapInfo;
             if (AccessTokenKit::GetHapTokenInfo(tokenId, hapInfo) != 0) {
@@ -144,6 +135,17 @@ std::string MiscdeviceDump::GetPackageName(AccessTokenID tokenId)
                 return {};
             }
             packageName = hapInfo.bundleName;
+            break;
+        }
+        case ATokenTypeEnum::TOKEN_NATIVE: { // Native type and shell type get processname in the same way
+        }
+        case ATokenTypeEnum::TOKEN_SHELL: {
+            NativeTokenInfo tokenInfo;
+            if (AccessTokenKit::GetNativeTokenInfo(tokenId, tokenInfo) != 0) {
+                MISC_HILOGE("get native token info fail");
+                return {};
+            }
+            packageName = tokenInfo.processName;
             break;
         }
         default: {
