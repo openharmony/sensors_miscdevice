@@ -41,7 +41,7 @@ int32_t HdiConnection::ConnectHdi()
         std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_MS));
     }
     HiSysEvent::Write(HiviewDFX::HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
-        HiSysEvent::EventType::FAULT, "FUNC_NAME", "ConnectHdi", "ERROR_CODE", VIBRATOR_HDF_CONNECT_ERR);
+        HiSysEvent::EventType::FAULT, "PKG_NAME", "ConnectHdi", "ERROR_CODE", VIBRATOR_HDF_CONNECT_ERR);
     MISC_HILOGE("vibrator interface initialization failed");
     return ERR_INVALID_VALUE;
 }
@@ -51,7 +51,7 @@ int32_t HdiConnection::StartOnce(uint32_t duration)
     int32_t ret = vibratorInterface_->StartOnce(duration);
     if (ret < 0) {
         HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
-            HiSysEvent::EventType::FAULT, "FUNC_NAME", "StartOnce", "ERROR_CODE", ret);
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "StartOnce", "ERROR_CODE", ret);
         MISC_HILOGE("StartOnce failed");
         return ret;
     }
@@ -67,7 +67,7 @@ int32_t HdiConnection::Start(const std::string &effectType)
     int32_t ret = vibratorInterface_->Start(effectType);
     if (ret < 0) {
         HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
-            HiSysEvent::EventType::FAULT, "FUNC_NAME", "Start", "ERROR_CODE", ret);
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "Start", "ERROR_CODE", ret);
         MISC_HILOGE("Start failed");
         return ret;
     }
@@ -79,7 +79,7 @@ int32_t HdiConnection::Stop(VibratorStopMode mode)
     int32_t ret = vibratorInterface_->Stop(static_cast<OHOS::HDI::Vibrator::V1_1::HdfVibratorMode>(mode));
     if (ret < 0) {
         HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
-            HiSysEvent::EventType::FAULT, "FUNC_NAME", "Stop", "ERROR_CODE", ret);
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "Stop", "ERROR_CODE", ret);
         MISC_HILOGE("Stop failed");
         return ret;
     }
@@ -134,7 +134,7 @@ void HdiConnection::reconnect()
     int32_t ret = ConnectHdi();
     if (ret != ERR_OK) {
         HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
-            HiSysEvent::EventType::FAULT, "FUNC_NAME", "reconnect", "ERROR_CODE", ret);
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "reconnect", "ERROR_CODE", ret);
         MISC_HILOGE("connect hdi fail");
     }
 }
