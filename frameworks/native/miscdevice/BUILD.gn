@@ -24,7 +24,7 @@ ohos_shared_library("liblight_native") {
 
   include_dirs = [
     "include",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//utils/system/safwk/native/include",
     "$SUBSYSTEM_DIR/miscdevice/utils/include",
     "//utils/jni/jnikit/include",
@@ -33,12 +33,12 @@ ohos_shared_library("liblight_native") {
   deps = [ "$SUBSYSTEM_DIR/miscdevice/utils:libmiscdevice_utils" ]
 
   external_deps = [
+    "c_utils:utils",
     "hisysevent_native:libhisysevent",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
-    "utils_base:utils",
   ]
   part_name = "miscdevice"
   subsystem_name = "sensors"
@@ -53,7 +53,7 @@ ohos_shared_library("libvibrator_native") {
 
   include_dirs = [
     "include",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//utils/system/safwk/native/include",
     "$SUBSYSTEM_DIR/miscdevice/utils/include",
     "//utils/jni/jnikit/include",
@@ -62,13 +62,13 @@ ohos_shared_library("libvibrator_native") {
   deps = [ "$SUBSYSTEM_DIR/miscdevice/utils:libmiscdevice_utils" ]
 
   external_deps = [
+    "c_utils:utils",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
-    "utils_base:utils",
   ]
   part_name = "miscdevice"
   subsystem_name = "sensors"

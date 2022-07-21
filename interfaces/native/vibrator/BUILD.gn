@@ -38,7 +38,7 @@ ohos_shared_library("vibrator_interface_native") {
 
   include_dirs = [
     "include",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//base/sensors/miscdevice/utils/include",
     "//base/sensors/miscdevice/frameworks/native/miscdevice/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
@@ -52,9 +52,9 @@ ohos_shared_library("vibrator_interface_native") {
   ]
 
   external_deps = [
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "utils_base:utils",
   ]
 
   public_configs = [ ":vibrator_config" ]
