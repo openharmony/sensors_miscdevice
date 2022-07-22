@@ -15,8 +15,9 @@
 
 #include "startvibrator_fuzzer.h"
 
-#include <thread>
-#include <unistd.h>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
 
 #include "vibrator_agent.h"
 
