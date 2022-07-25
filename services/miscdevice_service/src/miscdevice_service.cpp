@@ -89,6 +89,7 @@ MiscdeviceService::~MiscdeviceService()
             vibratorThread_->NotifyExitSync();
         }
         delete vibratorThread_;
+        vibratorThread_ = nullptr;
     }
 }
 
