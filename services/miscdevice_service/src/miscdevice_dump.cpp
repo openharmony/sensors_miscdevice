@@ -137,8 +137,7 @@ std::string MiscdeviceDump::GetPackageName(AccessTokenID tokenId)
             packageName = hapInfo.bundleName;
             break;
         }
-        case ATokenTypeEnum::TOKEN_NATIVE: { // Native type and shell type get processname in the same way
-        }
+        case ATokenTypeEnum::TOKEN_NATIVE:
         case ATokenTypeEnum::TOKEN_SHELL: {
             NativeTokenInfo tokenInfo;
             if (AccessTokenKit::GetNativeTokenInfo(tokenId, tokenInfo) != 0) {
