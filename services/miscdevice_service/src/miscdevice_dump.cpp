@@ -46,9 +46,13 @@ void MiscdeviceDump::ParseCommand(int32_t fd, const std::vector<std::string>& ar
     };
     char **argv = new (std::nothrow) char *[args.size()];
     CHKPV(argv);
+    memset_s(argv, args.size() * sizeof(char *), 0, args.size() * sizeof(char *));
     for (size_t i = 0; i < args.size(); ++i) {
         argv[i] = new (std::nothrow) char[args[i].size() + 1];
-        CHKPV(argv[i]);
+        if (argv[i] == nullptr) {
+            MISC_HILOGE("alloc failure");
+            goto RELEASE_RES;
+        }
         if (strcpy_s(argv[i], args[i].size() + 1, args[i].c_str()) != EOK) {
             MISC_HILOGE("strcpy_s error");
             goto RELEASE_RES;
