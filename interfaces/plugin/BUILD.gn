@@ -20,7 +20,7 @@ ohos_shared_library("vibrator") {
     "../native/vibrator/include",
     "./include",
     "./vibrator/include",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//base/sensors/miscdevice/utils/include",
   ]
   defines = [
@@ -35,9 +35,9 @@ ohos_shared_library("vibrator") {
 
   deps = [ "//base/sensors/miscdevice/interfaces/native/vibrator:vibrator_interface_native" ]
   external_deps = [
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "napi:ace_napi",
-    "utils_base:utils",
   ]
   relative_install_dir = "module"
   part_name = "miscdevice"

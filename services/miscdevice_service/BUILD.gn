@@ -26,7 +26,7 @@ ohos_shared_library("libmiscdevice_service") {
 
   include_dirs = [
     "include",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//utils/system/safwk/native/include",
     "$SUBSYSTEM_DIR/miscdevice/frameworks/native/miscdevice/include",
     "$SUBSYSTEM_DIR/miscdevice/utils/include",
@@ -39,6 +39,7 @@ ohos_shared_library("libmiscdevice_service") {
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
+    "c_utils:utils",
     "drivers_interface_vibrator:libvibrator_proxy_1.1",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
@@ -46,7 +47,6 @@ ohos_shared_library("libmiscdevice_service") {
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
-    "utils_base:utils",
   ]
 
   part_name = "miscdevice"
