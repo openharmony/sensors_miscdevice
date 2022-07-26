@@ -415,8 +415,8 @@ void MiscdeviceService::VibratorEffectThread::UpdateVibratorEffectData(const std
 int32_t MiscdeviceService::Dump(int32_t fd, const std::vector<std::u16string> &args)
 {
     CALL_LOG_ENTER;
-    if (fd < 0) {
-        MISC_HILOGE("fd is invalid");
+    if (fd < 0 || args.size() > 32) {
+        MISC_HILOGE("fd is invalid or wrong number of parameters");
         return DUMP_PARAM_ERR;
     }
     if (args.empty()) {
