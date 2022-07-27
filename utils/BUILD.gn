@@ -32,7 +32,7 @@ ohos_shared_library("libmiscdevice_utils") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
   ]
   part_name = "miscdevice"
   subsystem_name = "sensors"
