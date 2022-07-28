@@ -48,6 +48,7 @@ void MiscdeviceDump::ParseCommand(int32_t fd, const std::vector<std::string>& ar
     CHKPV(argv);
     if (memset_s(argv, args.size() * sizeof(char *), 0, args.size() * sizeof(char *)) != EOK) {
         MISC_HILOGE("Call memset_s failed");
+        delete[] argv;
         return;
     }
     for (size_t i = 0; i < args.size(); ++i) {
