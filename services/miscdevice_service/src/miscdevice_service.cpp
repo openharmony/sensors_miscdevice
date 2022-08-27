@@ -29,7 +29,6 @@ constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "MiscdeviceService" };
 constexpr int32_t MIN_VIBRATOR_TIME = 0;
 constexpr int32_t MAX_VIBRATOR_TIME = 1800000;
 constexpr int32_t DEFAULT_VIBRATOR_ID = 123;
-constexpr int32_t MAX_DUMP_PARAMETERS = 32;
 }  // namespace
 
 bool MiscdeviceService::ready_ = false;
@@ -416,8 +415,8 @@ void MiscdeviceService::VibratorEffectThread::UpdateVibratorEffectData(const std
 int32_t MiscdeviceService::Dump(int32_t fd, const std::vector<std::u16string> &args)
 {
     CALL_LOG_ENTER;
-    if (fd < 0 || args.size() > MAX_DUMP_PARAMETERS) {
-        MISC_HILOGE("fd is invalid or wrong number of parameters");
+    if (fd < 0) {
+        MISC_HILOGE("Invalid fd");
         return DUMP_PARAM_ERR;
     }
     if (args.empty()) {
