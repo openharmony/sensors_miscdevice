@@ -34,10 +34,27 @@ constexpr uint32_t BASE_YEAR = 1900;
 constexpr uint32_t BASE_MON = 1;
 constexpr int32_t INVALID_PID = -1;
 constexpr int32_t INVALID_UID = -1;
+constexpr int32_t MAX_DUMP_PARAMETERS = 32;
 }  // namespace
 
 void MiscdeviceDump::ParseCommand(int32_t fd, const std::vector<std::string>& args)
 {
+    int32_t count = 0;
+    for (const auto &str : args) {
+        if (str.find("--") == 0) {
+            ++count;
+            continue;
+        }
+        if (str.find("-") == 0) {
+            count += str.size() - 1;
+            continue;
+        }
+    }
+    if (count > MAX_DUMP_PARAMETERS) {
+        MISC_HILOGE("cmd param number not more than 32");
+        dprintf(fd, "cmd param number not more than 32\n");
+        return;
+    }
     int32_t optionIndex = 0;
     struct option dumpOptions[] = {
         {"record", no_argument, 0, 'r'},
