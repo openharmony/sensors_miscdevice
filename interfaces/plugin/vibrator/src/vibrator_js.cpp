@@ -27,10 +27,31 @@
 
 namespace OHOS {
 namespace Sensors {
-using namespace OHOS::HiviewDFX;
-static constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "VibratorJsAPI" };
-static constexpr uint32_t VIBRATE_SHORT_DURATION = 35;
-static constexpr uint32_t VIBRATE_LONG_DURATION = 1000;
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "VibratorJsAPI" };
+constexpr int32_t VIBRATE_SHORT_DURATION = 35;
+constexpr int32_t VIBRATE_LONG_DURATION = 1000;
+}  // namespace
+
+static std::map<std::string, int32_t> g_usageType = {
+    {"unknown", USAGE_UNKNOWN},
+    {"alarm", USAGE_ALARM},
+    {"ring", USAGE_RING},
+    {"notification", USAGE_NOTIFICATION},
+    {"communication", USAGE_COMMUNICATION},
+    {"touch", USAGE_TOUCH},
+    {"media", USAGE_MEDIA},
+    {"physicalFeedback", USAGE_PHYSICAL_FEEDBACK},
+    {"simulateReality", USAGE_SIMULATE_REALITY},
+};
+
+struct VibrateInfo {
+    std::string type;
+    std::string usage;
+    int32_t duration = 0;
+    std::string effectId;
+    int32_t count = 0;
+};
 
 static napi_value VibrateTime(napi_env env, napi_value args[], size_t argc)
 {
@@ -39,14 +60,8 @@ static napi_value VibrateTime(napi_env env, napi_value args[], size_t argc)
     NAPI_ASSERT(env, GetInt32Value(env, args[0], duration), "Get int number fail");
     sptr<AsyncCallbackInfo> asyncCallbackInfo = new (std::nothrow) AsyncCallbackInfo(env);
     CHKPP(asyncCallbackInfo);
-    if (duration < 0) {
-        MISC_HILOGE("Vibrate duration is invalid, duration: %{public}d", duration);
-        asyncCallbackInfo->error.code = ERROR;
-        asyncCallbackInfo->error.message = "Vibrate duration is invalid";
-    } else {
-        asyncCallbackInfo->error.code = StartVibratorOnce(static_cast<uint32_t>(duration));
-    }
 
+    asyncCallbackInfo->error.code = StartVibratorOnce(duration);
     if (argc == 2) {
         NAPI_ASSERT(env, IsMatchType(env, args[1], napi_function), "Wrong argument type. function expected");
         NAPI_CALL(env, napi_create_reference(env, args[1], 1, &asyncCallbackInfo->callback[0]));
@@ -129,7 +144,7 @@ static napi_value VibrateMode(napi_env env, napi_value args[], size_t argc)
     asyncCallbackInfo->callbackType = TYPE_SYSTEM_VIBRATE;
     string mode = "long";
     NAPI_ASSERT(env, GetCallbackInfo(env, args, asyncCallbackInfo, mode), "Get callback info fail");
-    uint32_t duration = ((mode == "long") ? VIBRATE_LONG_DURATION : VIBRATE_SHORT_DURATION);
+    int32_t duration = ((mode == "long") ? VIBRATE_LONG_DURATION : VIBRATE_SHORT_DURATION);
     asyncCallbackInfo->error.code = StartVibratorOnce(duration);
     if (asyncCallbackInfo->error.code != SUCCESS) {
         asyncCallbackInfo->error.message = "Vibrator vibrate fail";
@@ -138,27 +153,96 @@ static napi_value VibrateMode(napi_env env, napi_value args[], size_t argc)
     return nullptr;
 }
 
+bool ParseParameter(napi_env env, napi_value args[], size_t argc, VibrateInfo &info)
+{
+    CHKNRF(env, (argc >= 2), true, "Wrong argument number");
+    CHKNRF(env, GetPropertyString(env, args[0], "type", info.type), true, "Get vibrate type fail");
+    if (info.type == "time") {
+        CHKNRF(env, GetPropertyInt32(env, args[0], "duration", info.duration), true, "Get vibrate type fail");
+    } else if (info.type == "preset") {
+        CHKNRF(env, GetPropertyInt32(env, args[0], "count", info.count), true, "Get vibrate count fail");
+        CHKNRF(env, GetPropertyString(env, args[0], "effectId", info.effectId), true, "Get vibrate effectId fail");
+    }
+    CHKNRF(env, GetPropertyString(env, args[1], "usage", info.usage), true, "Get vibrate usage fail");
+    return true;
+}
+
+bool SetUsage(const std::string &usage)
+{
+    if (auto iter = g_usageType.find(usage); iter == g_usageType.end()) {
+        MISC_HILOGE("Wrong usage type");
+        return false;
+    }
+    return SetUsage(g_usageType[usage]);
+}
+
+int32_t StartVibrate(const VibrateInfo &info)
+{
+    if (!SetUsage(info.usage)) {
+        MISC_HILOGE("SetUsage fail");
+        return ERROR;
+    }
+    if ((info.type != "time") && (info.type != "preset")) {
+        MISC_HILOGE("Invalid vibrate type");
+        return ERROR;
+    }
+    if (info.type == "preset") {
+        if (!SetLoopCount(info.count)) {
+            MISC_HILOGE("SetLoopCount fail");
+            return ERROR;
+        }
+        return StartVibrator(info.effectId.c_str());
+    }
+    return StartVibratorOnce(info.duration);
+}
+
+static napi_value VibrateEffect(napi_env env, napi_value args[], size_t argc)
+{
+    VibrateInfo info;
+    if (!ParseParameter(env, args, argc, info)) {
+        MISC_HILOGE("Wrong input parameter");
+        return nullptr;
+    }
+    sptr<AsyncCallbackInfo> asyncCallbackInfo = new (std::nothrow) AsyncCallbackInfo(env);
+    CHKPP(asyncCallbackInfo);
+    asyncCallbackInfo->error.code = StartVibrate(info);
+    if (asyncCallbackInfo->error.code != SUCCESS) {
+        MISC_HILOGE("Vibrate failed");
+        asyncCallbackInfo->error.message = "vibrate failed";
+    }
+    if (argc >= 3) {
+        NAPI_ASSERT(env, IsMatchType(env, args[2], napi_function), "Wrong argument type, function expected");
+        NAPI_CALL(env, napi_create_reference(env, args[2], 1, &asyncCallbackInfo->callback[0]));
+        EmitAsyncCallbackWork(asyncCallbackInfo);
+        return nullptr;
+    }
+    napi_deferred deferred = nullptr;
+    napi_value promise = nullptr;
+    NAPI_CALL(env, napi_create_promise(env, &deferred, &promise));
+    asyncCallbackInfo->deferred = deferred;
+    EmitPromiseWork(asyncCallbackInfo);
+    return promise;
+}
+
 static napi_value Vibrate(napi_env env, napi_callback_info info)
 {
     CHKPP(env);
     CHKPP(info);
-    size_t argc = 2;
-    napi_value args[2] = {};
+    size_t argc = 3;
+    napi_value args[3] = {};
     napi_value thisArg = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, args, &thisArg, nullptr));
-    NAPI_ASSERT(env, (argc <= 2), "Wrong argument number");
-
+    NAPI_ASSERT(env, (argc <= 3), "Wrong argument number");
     if (IsMatchType(env, args[0], napi_number)) {
         return VibrateTime(env, args, argc);
     }
     if (IsMatchType(env, args[0], napi_string)) {
         return VibrateEffectId(env, args, argc);
     }
-    if (IsMatchType(env, args[0], napi_object)) {
+    if (IsMatchType(env, args[0], napi_object) && argc == 1) {
         return VibrateMode(env, args, argc);
     }
-    NAPI_CALL(env, napi_throw_error((env), nullptr, "Wrong argument type"));
-    return nullptr;
+    return VibrateEffect(env, args, argc);
 }
 
 static napi_value Stop(napi_env env, napi_callback_info info)

@@ -17,12 +17,13 @@
 #include <string>
 #include "hilog/log.h"
 #include "miscdevice_log.h"
+#include "securec.h"
 
 namespace OHOS {
 namespace Sensors {
-using namespace OHOS::HiviewDFX;
-static constexpr HiLogLabel LABEL = {LOG_CORE, MISC_LOG_DOMAIN, "VibratorJsAPI"};
-
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MISC_LOG_DOMAIN, "VibratorJsAPI"};
+}  // namespace
 AsyncCallbackInfo::~AsyncCallbackInfo()
 {
     CALL_LOG_ENTER;
@@ -97,10 +98,47 @@ bool GetStringValue(const napi_env &env, const napi_value &value, string &result
     NAPI_ASSERT_BASE(env, (valuetype == napi_string), "Wrong argument type. String or function expected", false);
     size_t bufLength = 0;
     NAPI_CALL_BASE(env, napi_get_value_string_utf8(env, value, nullptr, 0, &bufLength), false);
+    bufLength = bufLength > STRING_LENGTH_MAX ? STRING_LENGTH_MAX : bufLength;
     char str[STRING_LENGTH_MAX] = {0};
     size_t strLen = 0;
     NAPI_CALL_BASE(env, napi_get_value_string_utf8(env, value, str, bufLength + 1, &strLen), false);
     result = str;
+    return true;
+}
+
+bool GetPropertyString(const napi_env &env, const napi_value &value, const std::string &type, std::string &result)
+{
+    bool exist = false;
+    napi_status status = napi_has_named_property(env, value, type.c_str(), &exist);
+    if ((status != napi_ok) || (!exist)) {
+        MISC_HILOGE("can not find %{public}s property", type.c_str());
+        napi_throw_error(env, nullptr, "can not find property of string");
+        return false;
+    }
+
+    napi_value item = nullptr;
+    CHKNRF(env, napi_get_named_property(env, value, type.c_str(), &item), napi_ok, "napi get property fail");
+    if (!GetStringValue(env, item, result)) {
+        return false;
+    }
+    return true;
+}
+
+bool GetPropertyInt32(const napi_env &env, const napi_value &value, const std::string &type, int32_t &result)
+{
+    napi_value item = nullptr;
+    bool exist = false;
+    napi_status status = napi_has_named_property(env, value, type.c_str(), &exist);
+    if (status != napi_ok || !exist) {
+        MISC_HILOGE("can not find %{public}s property", type.c_str());
+        napi_throw_error(env, nullptr, "can not find property of int");
+        return false;
+    }
+    CHKNRF(env, napi_get_named_property(env, value, type.c_str(), &item), napi_ok, "napi get property fail");
+    if (!GetInt32Value(env, item, result)) {
+        MISC_HILOGE("Get int value fail");
+        return false;
+    }
     return true;
 }
 

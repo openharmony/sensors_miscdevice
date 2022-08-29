@@ -53,12 +53,44 @@ bool GetNapiInt32(const napi_env &env, const int32_t value, napi_value &result);
 bool GetInt32Value(const napi_env &env, const napi_value &value, int32_t &result);
 bool GetUint32Value(const napi_env &env, const napi_value &value, uint32_t &result);
 bool GetStringValue(const napi_env &env, const napi_value &value, string &result);
+bool GetPropertyString(const napi_env &env, const napi_value &value, const std::string &type, std::string &result);
+bool GetPropertyInt32(const napi_env &env, const napi_value &value, const std::string &type, int32_t &result);
 bool GetNapiParam(const napi_env &env, const napi_callback_info &info, size_t &argc, napi_value &argv);
 void EmitAsyncCallbackWork(sptr<AsyncCallbackInfo> async_callback_info);
 bool GetInt64Value(const napi_env &env, const napi_value &value, int32_t &result);
 void EmitPromiseWork(sptr<AsyncCallbackInfo> asyncCallbackInfo);
 napi_value GreateCallbackError(const napi_env &env, const int32_t errCode,
     const string errMessage, const string errName, const string errStack);
+
+#define CHKNRR(env, state, message, retVal) \
+    do { \
+        if ((state) != napi_ok) { \
+            MISC_HILOGE("(%{public}s) fail", #message); \
+            auto errDesc = std::string(__FUNCTION__) + ": " + #message; \
+            napi_throw_error(env, nullptr, errDesc.c_str()); \
+            return retVal; \
+        } \
+    } while (0)
+
+#define CHKNCP(env, cond, message) \
+    do { \
+        if (!(cond)) { \
+            MISC_HILOGE("(%{public}s)", #message); \
+            auto errDesc = std::string(__FUNCTION__) + ": " + #message; \
+            napi_throw_error(env, nullptr, errDesc.c_str()); \
+            return nullptr; \
+        } \
+    } while (0)
+
+#define CHKNRF(env, state, ret, message) \
+    do { \
+        if ((state) != (ret)) { \
+            MISC_HILOGE("(%{public}s)", #message); \
+            auto errDesc = std::string(__FUNCTION__) + ": " + #message; \
+            napi_throw_error(env, nullptr, errDesc.c_str()); \
+            return false; \
+        } \
+    } while (0)
 }  // namespace Sensors
 }  // namespace OHOS
 #endif // VIBRATOR_NAPI_UTILS_H
