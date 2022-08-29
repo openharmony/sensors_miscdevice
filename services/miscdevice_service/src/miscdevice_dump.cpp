@@ -150,38 +150,6 @@ void MiscdeviceDump::DumpCurrentTime(std::string &startTime)
         .append(std::to_string(curTime.tv_nsec / (1000 * 1000)));
 }
 
-std::string MiscdeviceDump::GetPackageName(AccessTokenID tokenId)
-{
-    std::string packageName;
-    int32_t tokenType = AccessTokenKit::GetTokenTypeFlag(tokenId);
-    switch (tokenType) {
-        case ATokenTypeEnum::TOKEN_HAP: {
-            HapTokenInfo hapInfo;
-            if (AccessTokenKit::GetHapTokenInfo(tokenId, hapInfo) != 0) {
-                MISC_HILOGE("get hap token info fail");
-                return {};
-            }
-            packageName = hapInfo.bundleName;
-            break;
-        }
-        case ATokenTypeEnum::TOKEN_NATIVE:
-        case ATokenTypeEnum::TOKEN_SHELL: {
-            NativeTokenInfo tokenInfo;
-            if (AccessTokenKit::GetNativeTokenInfo(tokenId, tokenInfo) != 0) {
-                MISC_HILOGE("get native token info fail");
-                return {};
-            }
-            packageName = tokenInfo.processName;
-            break;
-        }
-        default: {
-            MISC_HILOGW("token type not match");
-            break;
-        }
-    }
-    return packageName;
-}
-
 void MiscdeviceDump::UpdateRecordQueue(std::shared_ptr<VibrateRecord> record)
 {
     std::lock_guard<std::mutex> queueLock(recordQueueMutex_);
@@ -191,7 +159,7 @@ void MiscdeviceDump::UpdateRecordQueue(std::shared_ptr<VibrateRecord> record)
     }
 }
 
-void MiscdeviceDump::SaveVibrator(AccessTokenID callerToken, int32_t uid, int32_t pid, uint32_t timeOut)
+void MiscdeviceDump::SaveVibrator(const std::string &name, int32_t uid, int32_t pid, int32_t timeOut)
 {
     if ((uid == INVALID_UID) || (pid <= INVALID_PID)) {
         MISC_HILOGE("uid or pid is invalid");
@@ -201,14 +169,14 @@ void MiscdeviceDump::SaveVibrator(AccessTokenID callerToken, int32_t uid, int32_
     CHKPV(record);
     record->uid = uid;
     record->pid = pid;
-    record->packageName = GetPackageName(callerToken);
+    record->packageName = name;
     record->duration = timeOut;
     record->mode = "time";
     DumpCurrentTime(record->startTime);
     UpdateRecordQueue(record);
 }
 
-void MiscdeviceDump::SaveVibratorEffect(AccessTokenID callerToken, int32_t uid, int32_t pid,
+void MiscdeviceDump::SaveVibratorEffect(const std::string &name, int32_t uid, int32_t pid,
     const std::string &effect)
 {
     if ((uid == INVALID_UID) || (pid <= INVALID_PID)) {
@@ -219,7 +187,7 @@ void MiscdeviceDump::SaveVibratorEffect(AccessTokenID callerToken, int32_t uid, 
     CHKPV(record);
     record->uid = uid;
     record->pid = pid;
-    record->packageName = GetPackageName(callerToken);
+    record->packageName = name;
     record->effect = effect;
     record->mode = "preset";
     DumpCurrentTime(record->startTime);

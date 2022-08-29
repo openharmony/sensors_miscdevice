@@ -34,11 +34,12 @@ public:
 
     virtual std::vector<int32_t> GetVibratorIdList() override;
 
-    virtual int32_t Vibrate(int32_t vibratorId, uint32_t timeOut) override;
+    virtual int32_t Vibrate(int32_t vibratorId, int32_t timeOut, int32_t usage) override;
 
     virtual int32_t CancelVibrator(int32_t vibratorId) override;
 
-    virtual int32_t PlayVibratorEffect(int32_t vibratorId, const std::string &effect, bool isLooping) override;
+    virtual int32_t PlayVibratorEffect(int32_t vibratorId, const std::string &effect,
+	                                   int32_t loopCount, int32_t usage) override;
 
     virtual int32_t PlayCustomVibratorEffect(int32_t vibratorId, const std::vector<int32_t> &timing,
                                              const std::vector<int32_t> &intensity, int32_t periodCount) override;
