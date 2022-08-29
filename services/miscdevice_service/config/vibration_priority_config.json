@@ -1,0 +1,31 @@
+{
+    "privilegePkgs": [],
+    "trustLists": {
+        "globalSettings": {
+            "byPassUsages": [],
+            "byPassPkgs": [],
+            "filterUsages": [],
+            "filterPkgs": []
+        },
+        "lowPowerMode": {
+            "byPassUsages": [],
+            "byPassPkgs": [],
+            "filterUsages": [],
+            "filterPkgs": []
+        },
+        "specialForeground": {
+            "calling": {
+                "byPassUsages": [],
+                "byPassPkgs": [],
+                "filterUsages": [],
+                "filterPkgs": []  
+            },
+            "camera": {
+                "byPassUsages": [],
+                "byPassPkgs": [],
+                "filterUsages": [],
+                "filterPkgs": []
+            }
+        }
+    }
+}
