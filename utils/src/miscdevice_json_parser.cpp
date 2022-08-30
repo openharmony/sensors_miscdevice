@@ -48,11 +48,6 @@ MiscdeviceJsonParser::~MiscdeviceJsonParser() {
     cJson_ = nullptr;
 };
 
-cJSON* MiscdeviceJsonParser::GetJsonData() const
-{
-    return cJson_;
-}
-
 std::string MiscdeviceJsonParser::ReadJsonFile()
 {
     if (filePath_.empty()) {
@@ -84,6 +79,12 @@ cJSON* MiscdeviceJsonParser::GetObjectItem(cJSON *json, const std::string& key) 
     return cJSON_GetObjectItem(json, key.c_str());
 }
 
+cJSON* MiscdeviceJsonParser::GetObjectItem(const std::string& key) const
+{
+    return GetObjectItem(cJson_, key);
+}
+
+
 int32_t MiscdeviceJsonParser::ParseJsonArray(cJSON *json, const std::string& key,
     std::vector<std::string>& vals) const
 {
@@ -100,6 +101,11 @@ int32_t MiscdeviceJsonParser::ParseJsonArray(cJSON *json, const std::string& key
         }
     }
     return SUCCESS;
+}
+
+int32_t MiscdeviceJsonParser::ParseJsonArray(const std::string& key, std::vector<std::string>& vals) const
+{
+    return ParseJsonArray(cJson_, key, vals);
 }
 
 int32_t MiscdeviceJsonParser::GetFileSize(const std::string& filePath)

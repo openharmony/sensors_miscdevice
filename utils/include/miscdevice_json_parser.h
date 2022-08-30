@@ -28,8 +28,9 @@ public:
     explicit MiscdeviceJsonParser(const std::string &filePath);
     ~MiscdeviceJsonParser();
     int32_t ParseJsonArray(cJSON *json, const std::string& key, std::vector<std::string>& vals) const;
-    cJSON* GetJsonData() const;
+    int32_t ParseJsonArray(const std::string& key, std::vector<std::string>& vals) const;
     cJSON* GetObjectItem(cJSON *json, const std::string& key) const;
+    cJSON* GetObjectItem(const std::string& key) const;
 
 private:
     cJSON* cJson_ = nullptr;

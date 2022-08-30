@@ -68,11 +68,10 @@ VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(VibrateInfo vibrateI
 int32_t VibrationPriorityManager::LoadPriorityConfig(const std::string &configPath)
 {
     jsonParser_ = std::make_unique<MiscdeviceJsonParser>(configPath);
-    cJSON* cJson = jsonParser_->GetJsonData();
-    int32_t ret = jsonParser_->ParseJsonArray(cJson, "privilegePkgs", PriorityConfig_.privilegePkgs);
+    int32_t ret = jsonParser_->ParseJsonArray("privilegePkgs", PriorityConfig_.privilegePkgs);
     CHKCR((ret == SUCCESS), ERROR, "parse privilegePkgs fail");
 
-    cJSON* trustLists = jsonParser_->GetObjectItem(cJson, "trustLists");
+    cJSON* trustLists = jsonParser_->GetObjectItem("trustLists");
     ret = ParserPriorityItem(trustLists, "globalSettings", PriorityConfig_.globalSettings);
     CHKCR((ret == SUCCESS), ERROR, "parse globalSettings fail");
 
