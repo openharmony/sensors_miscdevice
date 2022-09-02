@@ -17,8 +17,9 @@
 #define VIBRATOR_THREAD_H
 
 #include <condition_variable>
-#include <stdint.h>
+#include <cstdint>
 #include <thread>
+
 #include "thread_ex.h"
 #include "vibrator_infos.h"
 
@@ -27,18 +28,22 @@ namespace Sensors {
 class VibratorThread : public Thread {
 public:
     void UpdateVibratorEffect(VibrateInfo vibrateInfo);
-    VibrateInfo GetCurrentVibrateInfo() const;
-    void SetReadyStatus(bool status);
-    static std::condition_variable conditionVar_;
+    VibrateInfo GetCurrentVibrateInfo();
+    void NotifyExit();
 
 protected:
     virtual bool Run();
 
 private:
+    void SetReadyStatus(bool status);
     VibrateInfo currentVibration_;
-    static std::mutex conditionVarMutex_;
-    bool ready_;
+    std::condition_variable cv_;
+    std::mutex currentVibrationMutex_;
+    std::mutex readyMutex_;
+    std::mutex vibrateMutex_;
+    bool ready_ = false;
 };
+#define VibratorDevice VibratorHdiConnection::GetInstance()
 }  // namespace Sensors
 }  // namespace OHOS
 #endif  // VIBRATOR_THREAD_H

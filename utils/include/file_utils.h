@@ -13,30 +13,21 @@
  * limitations under the License.
  */
 
-#ifndef VIBRATOR_INFOS_H
-#define VIBRATOR_INFOS_H
+#ifndef MISCDEVICE_FILE_UTILS_H
+#define MISCDEVICE_FILE_UTILS_H
 
+#include <cstdint>
 #include <string>
-#include <unordered_map>
 
 namespace OHOS {
 namespace Sensors {
-namespace {
-std::unordered_map<std::string, int32_t> vibratorEffects = {
-    {"haptic.clock.timer", 2000},
-    {"haptic.default.effect", 804}
-};
-} // namespace
-
-struct VibrateInfo {
-    std::string mode;
-    std::string packageName;
-    int32_t pid = -1;
-    int32_t usage = 0;
-    int32_t duration = 0;
-    std::string effect;
-    int32_t count = 0;
-};
+std::string ReadJsonFile(const std::string &filePath);
+std::string ReadFile(const std::string &filePath);
+bool CheckFileDir(const std::string& filePath, const std::string& dir);
+bool CheckFileExtendName(const std::string& filePath, const std::string& checkExtension);
+bool CheckFileSize(const std::string& filePath);
+bool IsFileExists(const std::string& fileName);
+int32_t GetFileSize(const std::string& filePath);
 }  // namespace Sensors
 }  // namespace OHOS
-#endif  // VIBRATOR_INFOS_H
+#endif  // MISCDEVICE_FILE_UTILS_H

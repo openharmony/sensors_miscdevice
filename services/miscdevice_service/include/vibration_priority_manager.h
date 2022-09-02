@@ -15,74 +15,82 @@
 
 #ifndef VIBRATION_PRIORITY_MANAGER_H
 #define VIBRATION_PRIORITY_MANAGER_H
+
+#include <cstdint>
 #include <cstring>
 #include <memory>
-#include <stdint.h>
 #include <vector>
 
-#include "miscdevice_json_parser.h"
 #include "singleton.h"
+
 #include "vibrator_infos.h"
 #include "vibrator_thread.h"
+#include "json_parser.h"
+
 namespace OHOS {
 namespace Sensors {
-
-typedef enum {
+enum VibrateStatus {
     VIBRATION = 0,
-    IGNORE_FOR_BACKGROUND = 1,
-    IGNORE_FOR_LOW_POWER = 2,
-    IGNORE_FOR_GLOBAL_SETTINGS = 3,
-    IGNORE_FOR_RINGTONE = 4,
-    IGNORE_FOR_REPEAT = 5,
-    IGNORE_FOR_ALARM = 6,
-    IGNORE_FOR_UNKNOWN = 7,
-} VibrateStatus;
+    IGNORE_BACKGROUND = 1,
+    IGNORE_LOW_POWER = 2,
+    IGNORE_GLOBAL_SETTINGS = 3,
+    IGNORE_RINGTONE = 4,
+    IGNORE_REPEAT = 5,
+    IGNORE_ALARM = 6,
+    IGNORE_UNKNOWN = 7,
+};
 
-typedef enum {
-    USAGE_UNKNOWN = 0,            /**< Vibration is used for unknown, lowest priority */
-    USAGE_ALARM = 1,              /**< Vibration is used for alarm */
-    USAGE_RING = 2,               /**< Vibration is used for ring */
-    USAGE_NOTIFICATION = 3,       /**< Vibration is used for notification */
-    USAGE_COMMUNICATION = 4,      /**< Vibration is used for communication */
-    USAGE_TOUCH = 5,              /**< Vibration is used for touch */
-    USAGE_MEDIA = 6,              /**< Vibration is used for media */
-    USAGE_PHYSICAL_FEEDBACK = 7,  /**< Vibration is used for physical feedback */
-    USAGE_SIMULATE_REALITY = 8,   /**< Vibration is used for simulate reality */
+enum VibrateUsage {
+    USAGE_UNKNOWN = 0,
+    USAGE_ALARM = 1,
+    USAGE_RING = 2,
+    USAGE_NOTIFICATION = 3,
+    USAGE_COMMUNICATION = 4,
+    USAGE_TOUCH = 5,
+    USAGE_MEDIA = 6,
+    USAGE_PHYSICAL_FEEDBACK = 7,
+    USAGE_SIMULATE_REALITY = 8,
     USAGE_MAX = 9,
-} VibrateUsage;
+};
 
-typedef struct {
+struct PriorityItem {
     std::vector<std::string> byPassUsages;
     std::vector<std::string> byPassPkgs;
     std::vector<std::string> filterUsages;
     std::vector<std::string> filterPkgs;
-} PriorityItem;
+};
 
-typedef struct {
+struct SpecialForeground {
     PriorityItem calling;
     PriorityItem camera;
-} SpecialForeground;
+};
 
-typedef struct {
+struct PriorityConfig {
     std::vector<std::string> privilegePkgs;
     PriorityItem globalSettings;
     PriorityItem lowPowerMode;
     SpecialForeground specialForeground;
-} PriorityConfig;
-
-class VibrationPriorityManager : public Singleton<VibrationPriorityManager> {
-public:
-    VibrationPriorityManager();
-    VibrateStatus ShouldIgnoreVibrate(VibrateInfo vibrateInfo, std::shared_ptr<VibratorThread> vibratorThread);
-
-private:
-    int32_t LoadPriorityConfig(const std::string &configPath);
-    int32_t ParserPriorityItem(cJSON *json, const std::string& key, PriorityItem& item);
-    PriorityConfig PriorityConfig_;
-    std::unique_ptr<MiscdeviceJsonParser> jsonParser_;
-    DISALLOW_COPY_AND_MOVE(VibrationPriorityManager);
 };
 
+class VibrationPriorityManager {
+    DECLARE_DELAYED_SINGLETON(VibrationPriorityManager);
+public:
+    DISALLOW_COPY_AND_MOVE(VibrationPriorityManager);
+    VibrateStatus ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo,
+        std::shared_ptr<VibratorThread> vibratorThread);
+    int32_t LoadPriorityConfig(const std::string &configPath, PriorityConfig &config);
+
+private:
+    bool IsPrivilegeApp(const std::string &name) const;
+    bool IsCurrentVibrate(std::shared_ptr<VibratorThread> vibratorThread) const;
+    bool IsLoopVibrate(const VibrateInfo &vibrateInfo) const;
+    VibrateStatus ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo, VibrateInfo currentVibrateInfo) const;
+    void CopyPriorityConfig(PriorityConfig config);
+    int32_t ParserPriorityItem(const JsonParser &parser, cJSON *json, const std::string &key,
+        PriorityItem &item);
+    PriorityConfig priorityConfig_;
+};
+#define PriorityManager DelayedSingleton<VibrationPriorityManager>::GetInstance()
 }  // namespace Sensors
 }  // namespace OHOS
 #endif  // VIBRATION_PRIORITY_MANAGER_H

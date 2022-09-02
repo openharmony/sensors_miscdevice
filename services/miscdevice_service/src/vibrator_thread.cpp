@@ -20,43 +20,45 @@
 
 namespace OHOS {
 namespace Sensors {
-using namespace OHOS::HiviewDFX;
 namespace {
-constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "VibratorThread" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "VibratorThread" };
 }  // namespace
-
-std::mutex VibratorThread::conditionVarMutex_;
-std::condition_variable VibratorThread::conditionVar_;
 
 bool VibratorThread::Run()
 {
+    VibrateInfo info = GetCurrentVibrateInfo();
+    std::unique_lock<std::mutex> vibrateLck(vibrateMutex_);
     if (currentVibration_.mode == "time") {
-        std::unique_lock<std::mutex> lck(conditionVarMutex_);
-        int32_t ret = VibratorHdiConnection::GetInstance().StartOnce(currentVibration_.duration);
-        if (ret != ERR_OK) {
+        int32_t ret = VibratorDevice.StartOnce(static_cast<uint32_t>(info.duration));
+        if (ret != SUCCESS) {
             MISC_HILOGE("StartOnce fail, duration: %{public}d, pid: %{public}d",
-                currentVibration_.duration, currentVibration_.pid);
+                info.duration, info.pid);
             return false;
         }
-        conditionVar_.wait_for(lck, std::chrono::milliseconds(currentVibration_.duration));
+        cv_.wait_for(vibrateLck, std::chrono::milliseconds(info.duration));
+        VibratorDevice.Stop(IVibratorHdiConnection::VIBRATOR_STOP_MODE_TIME);
+        std::unique_lock<std::mutex> readyLck(readyMutex_);
         if (ready_) {
-            MISC_HILOGD("stop vibration");
+            MISC_HILOGI("Stop duration: %{public}d, pid: %{public}d",
+                info.duration, info.pid);
+            SetReadyStatus(false);
         }
-        VibratorHdiConnection::GetInstance().Stop(IVibratorHdiConnection::VIBRATOR_STOP_MODE_TIME);
-    } else if (currentVibration_.mode == "preset") {
-        for (uint32_t i = 0; i < currentVibration_.count; ++i) {
-            std::unique_lock<std::mutex> lck(conditionVarMutex_);
-            std::string effect = currentVibration_.effect;
-            int32_t ret = VibratorHdiConnection::GetInstance().Start(effect);
-            if (ret != ERR_OK) {
-                MISC_HILOGE("vibrate effect %{public}s failed, pid: %{public}d", effect.c_str(), currentVibration_.pid);
+    } else if (info.mode == "preset") {
+        for (int32_t i = 0; i < info.count; ++i) {
+            std::string effect = info.effect;
+            int32_t ret = VibratorDevice.Start(effect);
+            if (ret != SUCCESS) {
+                MISC_HILOGE("Vibrate effect %{public}s failed, pid: %{public}d", effect.c_str(), info.pid);
                 return false;
             }
-            conditionVar_.wait_for(lck, std::chrono::milliseconds(currentVibration_.duration));
+            cv_.wait_for(vibrateLck, std::chrono::milliseconds(info.duration));
+            VibratorDevice.Stop(IVibratorHdiConnection::VIBRATOR_STOP_MODE_PRESET);
+            std::unique_lock<std::mutex> readyLck(readyMutex_);
             if (ready_) {
-                MISC_HILOGD("stop vibration");
+                MISC_HILOGI("Stop effect %{public}s failed, pid: %{public}d", effect.c_str(), currentVibration_.pid);
+                SetReadyStatus(false);
+                break;
             }
-            VibratorHdiConnection::GetInstance().Stop(IVibratorHdiConnection::VIBRATOR_STOP_MODE_PRESET);
         }
     }
     return false;
@@ -64,17 +66,26 @@ bool VibratorThread::Run()
 
 void VibratorThread::UpdateVibratorEffect(VibrateInfo info)
 {
+    std::unique_lock<std::mutex> lck(currentVibrationMutex_);
     currentVibration_ = info;
 }
 
-VibrateInfo VibratorThread::GetCurrentVibrateInfo() const
+VibrateInfo VibratorThread::GetCurrentVibrateInfo()
 {
+    std::unique_lock<std::mutex> lck(currentVibrationMutex_);
     return currentVibration_;
 }
 
 void VibratorThread::SetReadyStatus(bool status)
 {
     ready_ = status;
+}
+
+void VibratorThread::NotifyExit()
+{
+    std::unique_lock<std::mutex> readyLck(readyMutex_);
+    SetReadyStatus(true);
+    cv_.notify_one();
 }
 }  // namespace Sensors
 }  // namespace OHOS

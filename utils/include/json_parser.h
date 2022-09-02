@@ -15,18 +15,19 @@
 
 #ifndef MISCDEVICE_JSON_PARSER_H
 #define MISCDEVICE_JSON_PARSER_H
+
+#include <cstdint>
 #include <string>
-#include <stdint.h>
+#include <vector>
 
 #include "cJSON.h"
 
 namespace OHOS {
 namespace Sensors {
-
-class MiscdeviceJsonParser {
+class JsonParser {
 public:
-    explicit MiscdeviceJsonParser(const std::string &filePath);
-    ~MiscdeviceJsonParser();
+    explicit JsonParser(const std::string &filePath);
+    ~JsonParser();
     int32_t ParseJsonArray(cJSON *json, const std::string& key, std::vector<std::string>& vals) const;
     int32_t ParseJsonArray(const std::string& key, std::vector<std::string>& vals) const;
     cJSON* GetObjectItem(cJSON *json, const std::string& key) const;
@@ -34,13 +35,6 @@ public:
 
 private:
     cJSON* cJson_ = nullptr;
-    std::string filePath_;
-    std::string ReadJsonFile();
-    bool IsValidPath(const std::string &path);
-    bool CheckFileExtendName(const std::string& filePath, const std::string& checkExtension);
-    bool IsFileExists(const std::string& fileName);
-    std::string ReadFile(const std::string &filePath);
-    int32_t GetFileSize(const std::string& filePath);
 };
 }  // namespace Sensors
 }  // namespace OHOS

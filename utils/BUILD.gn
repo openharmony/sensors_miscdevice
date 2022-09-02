@@ -14,8 +14,9 @@
 import("//build/ohos.gni")
 ohos_shared_library("libmiscdevice_utils") {
   sources = [
+    "src/file_utils.cpp",
+    "src/json_parser.cpp",
     "src/miscdevice_common.cpp",
-    "src/miscdevice_json_parser.cpp",
     "src/permission_util.cpp",
   ]
 
