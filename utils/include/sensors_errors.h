@@ -241,6 +241,13 @@ private:
         } \
     } while (0)
 
+#define CHKCR(cond, r, errDesc) \
+    do { \
+        if (!(cond)) { \
+            MISC_HILOGE("%{public}s, errCode:%{public}d", #errDesc, r); \
+            return r; \
+        } \
+    } while (0)
 #endif
 }  // namespace Sensors
 }  // namespace OHOS

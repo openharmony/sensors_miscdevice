@@ -22,6 +22,8 @@ ohos_shared_library("libmiscdevice_service") {
     "src/miscdevice_dump.cpp",
     "src/miscdevice_service.cpp",
     "src/miscdevice_service_stub.cpp",
+    "src/vibration_priority_manager.cpp",
+    "src/vibrator_thread.cpp",
   ]
 
   include_dirs = [
@@ -32,6 +34,7 @@ ohos_shared_library("libmiscdevice_service") {
     "$SUBSYSTEM_DIR/miscdevice/utils/include",
     "hdi_connection/adpter/include",
     "hdi_connection/interface/include",
+    "//third_party/cJSON",
   ]
 
   cflags = [ "-Wno-error=inconsistent-missing-override" ]
@@ -53,6 +56,17 @@ ohos_shared_library("libmiscdevice_service") {
   subsystem_name = "sensors"
 }
 
+ohos_prebuilt_etc("vibration_config") {
+  source = "config/vibration_policy_config.json"
+  install_enable = true
+  install_images = [ "vendor" ]
+  module_install_dir = "etc/vibrator"
+  part_name = "miscdevice"
+}
+
 group("miscdevice_service_target") {
-  deps = [ ":libmiscdevice_service" ]
+  deps = [
+    ":libmiscdevice_service",
+    ":vibration_config",
+  ]
 }
