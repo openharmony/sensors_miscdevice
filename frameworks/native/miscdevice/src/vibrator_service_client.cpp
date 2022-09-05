@@ -101,7 +101,7 @@ bool VibratorServiceClient::IsVibratorEffectSupport(int32_t vibratorId, const st
     return status;
 }
 
-int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, uint32_t timeOut)
+int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, int32_t timeOut, int32_t usage)
 {
     MISC_HILOGD("Vibrate begin, timeOut : %{public}u", timeOut);
     int32_t ret = InitServiceClient();
@@ -111,12 +111,13 @@ int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, uint32_t timeOut)
     }
     CHKPR(miscdeviceProxy_, ERROR);
     StartTrace(HITRACE_TAG_SENSORS, "VibrateTime");
-    ret = miscdeviceProxy_->Vibrate(vibratorId, timeOut);
+    ret = miscdeviceProxy_->Vibrate(vibratorId, timeOut, usage);
     FinishTrace(HITRACE_TAG_SENSORS);
     return ret;
 }
 
-int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, const std::string &effect, bool isLooping)
+int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, const std::string &effect,
+    int32_t loopCount, int32_t usage)
 {
     MISC_HILOGD("Vibrate begin, effect : %{public}s", effect.c_str());
     int32_t ret = InitServiceClient();
@@ -126,7 +127,7 @@ int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, const std::string &ef
     }
     CHKPR(miscdeviceProxy_, ERROR);
     StartTrace(HITRACE_TAG_SENSORS, "VibratorEffect");
-    ret = miscdeviceProxy_->PlayVibratorEffect(vibratorId, effect, isLooping);
+    ret = miscdeviceProxy_->PlayVibratorEffect(vibratorId, effect, loopCount, usage);
     FinishTrace(HITRACE_TAG_SENSORS);
     return ret;
 }

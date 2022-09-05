@@ -85,7 +85,14 @@ int32_t MiscdeviceServiceStub::VibratePb(MessageParcel &data, MessageParcel &rep
         MISC_HILOGE("result: %{public}d", ret);
         return ERR_PERMISSION_DENIED;
     }
-    return Vibrate(data.ReadInt32(), data.ReadUint32());
+    int32_t vibratorId;
+    int32_t duration;
+    int32_t usage;
+    if ((!data.ReadInt32(vibratorId)) || (!data.ReadInt32(duration)) || (!data.ReadInt32(usage))) {
+        MISC_HILOGE("Parcel read failed");
+        return ERROR;
+    }
+    return Vibrate(vibratorId, duration, usage);
 }
 
 int32_t MiscdeviceServiceStub::GetVibratorIdListPb(MessageParcel &data, MessageParcel &reply)
@@ -120,10 +127,16 @@ int32_t MiscdeviceServiceStub::PlayVibratorEffectPb(MessageParcel &data, Message
         MISC_HILOGE("result: %{public}d", ret);
         return ERR_PERMISSION_DENIED;
     }
-    int32_t vibratorId = data.ReadInt32();
-    std::string effectType = data.ReadString();
-    bool isLooping = data.ReadBool();
-    return PlayVibratorEffect(vibratorId, effectType, isLooping);
+    int32_t vibratorId;
+    std::string effect;
+    int32_t count;
+    int32_t usage;
+    if ((!data.ReadInt32(vibratorId)) || (!data.ReadString(effect)) ||
+        (!data.ReadInt32(count)) || (!data.ReadInt32(usage))) {
+        MISC_HILOGE("Parcel read failed");
+        return ERROR;
+    }
+    return PlayVibratorEffect(vibratorId, effect, count, usage);
 }
 
 int32_t MiscdeviceServiceStub::PlayCustomVibratorEffectPb(MessageParcel &data, MessageParcel &reply)

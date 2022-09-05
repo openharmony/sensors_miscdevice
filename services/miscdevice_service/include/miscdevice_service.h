@@ -16,14 +16,14 @@
 #ifndef MISCDEVICE_SERVICE_H
 #define MISCDEVICE_SERVICE_H
 
-#include <condition_variable>
+#include <memory>
 #include <mutex>
 #include <set>
 #include <string>
-#include <thread>
 #include <unordered_map>
 #include <vector>
 
+#include "accesstoken_kit.h"
 #include "system_ability.h"
 #include "thread_ex.h"
 
@@ -32,9 +32,11 @@
 #include "miscdevice_service_stub.h"
 #include "nocopyable.h"
 #include "vibrator_hdi_connection.h"
-
+#include "vibrator_infos.h"
+#include "vibrator_thread.h"
 namespace OHOS {
 namespace Sensors {
+using namespace Security::AccessToken;
 enum class MiscdeviceServiceState {
     STATE_STOPPED,
     STATE_RUNNING,
@@ -52,9 +54,10 @@ public:
     virtual bool IsAbilityAvailable(MiscdeviceDeviceId groupID) override;
     virtual bool IsVibratorEffectAvailable(int32_t vibratorId, const std::string &effectType) override;
     virtual std::vector<int32_t> GetVibratorIdList() override;
-    virtual int32_t Vibrate(int32_t vibratorId, uint32_t timeOut) override;
+    virtual int32_t Vibrate(int32_t vibratorId, int32_t timeOut, int32_t usage) override;
     virtual int32_t CancelVibrator(int32_t vibratorId) override;
-    virtual int32_t PlayVibratorEffect(int32_t vibratorId, const std::string &effect, bool isLooping) override;
+    virtual int32_t PlayVibratorEffect(int32_t vibratorId, const std::string &effect,
+                                       int32_t loopCount, int32_t usage) override;
     virtual int32_t PlayCustomVibratorEffect(int32_t vibratorId, const std::vector<int32_t> &timing,
                                              const std::vector<int32_t> &intensity, int32_t periodCount) override;
     virtual int32_t StopVibratorEffect(int32_t vibratorId, const std::string &effect) override;
@@ -69,52 +72,17 @@ public:
 private:
     DISALLOW_COPY_AND_MOVE(MiscdeviceService);
     bool InitInterface();
+    std::string GetPackageName(AccessTokenID tokenId);
+    void StartVibrateThread(VibrateInfo info);
+    bool ShouldIgnoreVibrate(const VibrateInfo &info);
     VibratorHdiConnection &vibratorHdiConnection_ = VibratorHdiConnection::GetInstance();
-    class VibratorThread : public Thread {
-    public:
-        explicit VibratorThread(const MiscdeviceService &service);
-        ~VibratorThread() = default;
-        void UpdateVibratorData(const std::vector<int32_t> &timing, const std::vector<int32_t> &intensity,
-                                int32_t &periodCount);
-        void NotifyExit();
-
-    protected:
-        virtual bool Run();
-
-    private:
-        std::timed_mutex mtx_;
-        std::vector<int32_t> vecTimingMs_;
-        std::vector<int32_t> intensitys_;
-        int32_t periodCount_;
-    };
-    class VibratorEffectThread : public Thread {
-    public:
-        explicit VibratorEffectThread(const MiscdeviceService &service);
-        ~VibratorEffectThread() = default;
-        void UpdateVibratorEffectData(const std::string effect, int32_t delayTiming);
-
-    protected:
-        virtual bool Run();
-
-    private:
-        std::string hapticEffect_;
-        int32_t delayTimingMs_;
-    };
     bool lightExist_;
     bool vibratorExist_;
     std::set<LightId> lightSupportId_;
     std::map<MiscdeviceDeviceId, bool> miscDdeviceIdMap_;
     MiscdeviceServiceState state_;
-    VibratorThread *vibratorThread_ = nullptr;
-    std::unique_ptr<VibratorEffectThread> vibratorEffectThread_;
+    std::shared_ptr<VibratorThread> vibratorThread_;
     std::mutex vibratorThreadMutex_;
-    std::mutex vibratorEffectMutex_;
-    std::mutex vibratorEffectThreadMutex_;
-    std::map<int32_t, std::string> vibratorEffectMap_;
-    static bool ready_;
-    static std::mutex conditionVarMutex_;
-    static std::condition_variable conditionVar_;
-    static std::unordered_map<std::string, int32_t> hapticRingMap_;
     MiscdeviceDump &miscdeviceDump_ = MiscdeviceDump::GetInstance();
 };
 }  // namespace Sensors

@@ -24,44 +24,46 @@ using OHOS::Sensors::VibratorServiceClient;
 
 static const HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "VibratorNDK" };
 static const int32_t DEFAULT_VIBRATOR_ID = 123;
-static int32_t g_loopingFlag = 0;
+static int32_t g_loopCount = 1;
+static int32_t g_usage = USAGE_UNKNOWN;
 
-void EnableLooping()
+bool SetLoopCount(int32_t count)
 {
-    g_loopingFlag = 1;
-}
-
-int32_t DisableLooping()
-{
-    g_loopingFlag = 0;
-    return StopVibrator(VIBRATOR_STOP_MODE_PRESET);
+    if (count <= 0) {
+        MISC_HILOGE("input invalid, count is %{public}d", count);
+        return false;
+    }
+    g_loopCount = count;
+    return true;
 }
 
 int32_t StartVibrator(const char *effectId)
 {
     CHKPR(effectId, ERROR);
-    bool isLooping = (g_loopingFlag == 1) ? true : false;
     auto &client = VibratorServiceClient::GetInstance();
-    int32_t ret = client.Vibrate(DEFAULT_VIBRATOR_ID, effectId, isLooping);
+    int32_t ret = client.Vibrate(DEFAULT_VIBRATOR_ID, effectId, g_loopCount, g_usage);
     if (ret != ERR_OK) {
         MISC_HILOGE("vibrator effectId failed, ret: %{public}d", ret);
         return ERROR;
     }
+    g_loopCount = 1;
+    g_usage = USAGE_UNKNOWN;
     return SUCCESS;
 }
 
-int32_t StartVibratorOnce(uint32_t duration)
+int32_t StartVibratorOnce(int32_t duration)
 {
-    if (duration == 0) {
+    if (duration <= 0) {
         MISC_HILOGE("duration is invalid");
         return ERROR;
     }
     auto &client = VibratorServiceClient::GetInstance();
-    int32_t ret = client.Vibrate(DEFAULT_VIBRATOR_ID, duration);
+    int32_t ret = client.Vibrate(DEFAULT_VIBRATOR_ID, duration, g_usage);
     if (ret != ERR_OK) {
         MISC_HILOGE("vibrator duration failed, ret: %{public}d", ret);
         return ERROR;
     }
+    g_usage = USAGE_UNKNOWN;
     return SUCCESS;
 }
 
@@ -79,6 +81,16 @@ int32_t StopVibrator(const char *mode)
         return ERROR;
     }
     return SUCCESS;
+}
+
+bool SetUsage(int32_t usage)
+{
+    if ((usage < 0) || (usage >= USAGE_MAX)) {
+        MISC_HILOGE("input invalid, usage is %{public}d", usage);
+        return false;
+    }
+    g_usage = usage;
+    return true;
 }
 }  // namespace Sensors
 }  // namespace OHOS

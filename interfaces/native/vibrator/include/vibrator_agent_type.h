@@ -27,6 +27,24 @@ extern "C" {
  */
 const char *VIBRATOR_TYPE_CLOCK_TIMER = "haptic.clock.timer";
 
+/**
+ * @brief Enumerates vibration usages.
+ *
+ * @since 9
+ */
+typedef enum VibratorUsage {
+    USAGE_UNKNOWN = 0,            /**< Vibration is used for unknown, lowest priority */
+    USAGE_ALARM = 1,              /**< Vibration is used for alarm */
+    USAGE_RING = 2,               /**< Vibration is used for ring */
+    USAGE_NOTIFICATION = 3,       /**< Vibration is used for notification */
+    USAGE_COMMUNICATION = 4,      /**< Vibration is used for communication */
+    USAGE_TOUCH = 5,              /**< Vibration is used for touch */
+    USAGE_MEDIA = 6,              /**< Vibration is used for media */
+    USAGE_PHYSICAL_FEEDBACK = 7,  /**< Vibration is used for physical feedback */
+    USAGE_SIMULATE_REALITY = 8,   /**< Vibration is used for simulate reality */
+    USAGE_MAX = 9
+} VibratorUsage;
+
 /** @} */
 #ifdef __cplusplus
 };

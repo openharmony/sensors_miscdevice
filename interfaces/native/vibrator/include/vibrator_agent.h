@@ -29,6 +29,7 @@
  */
 #ifndef VIBRATOR_AGENT_H
 #include <stdint.h>
+#include "vibrator_agent_type.h"
 #define VIBRATOR_AGENT_H
 
 #ifdef __cplusplus
@@ -56,11 +57,7 @@ const char *VIBRATOR_STOP_MODE_PRESET = "preset";
  *
  * @param effectId Indicates the preset vibration effect, which is described in {@link vibrator_agent_type.h}, for
  * example:
- * {@link VIBRATOR_TYPE_CAMERA_LONG_PRESS}: describes the vibration effect of the vibrator when a user touches and holds
- * the viewfinder.
- * {@link VIBRATOR_TYPE_CAMERA_FOCUS}: describes the vibration effect of the vibrator when the camera is focusing.
- * {@link VIBRATOR_TYPE_CONTROL_TEXT_EDIT}: describes the vibration effect of the vibrator when a user touches and holds
- * the editing text.
+ * {@link VIBRATOR_TYPE_CLOCK_TIMER}: Describes the vibration effect of the vibrator when a user adjusts the timer.
  * @return Returns <b>0</b> if the vibrator vibrates as expected; returns <b>-1</b> otherwise, for example, the preset
  * vibration effect is not supported.
  *
@@ -77,22 +74,14 @@ int32_t StartVibrator(const char *effectId);
  *
  * @since 6
  */
-int32_t StartVibratorOnce(uint32_t duration);
+int32_t StartVibratorOnce(int32_t duration);
 
 /**
- * @brief Enables this vibrator to perform a periodic vibration.
- * @since 6
+ * @brief Sets the number of cycles for vibration.
+ * @param count Indicates the number of cycles for vibration.
+ * @since 9
  */
-void EnableLooping();
-
-/**
- * @brief Disables this vibrator from performing a periodic vibration.
- *
- * @return Returns <b>0</b> if the periodic vibration is stopped as expected; returns <b>-1</b> otherwise.
- *
- * @since 6
- */
-int32_t DisableLooping();
+bool SetLoopCount(int32_t count);
 
 /**
  * @brief Stops the vibration of this vibrator.
@@ -103,6 +92,17 @@ int32_t DisableLooping();
  * @since 6
  */
 int32_t StopVibrator(const char *mode);
+
+/**
+ * @brief Set the usage of vibration.
+ *
+ * @param usage Indicates the vibration usage, which is described in {@link vibrator_agent_type.h},for
+ * example:
+ * {@link USAGE_ALARM}: Describes the vibration is used for alarm.
+ *
+ * @since 9
+ */
+bool SetUsage(int32_t usage);
 } // namespace Sensors
 } // namespace OHOS
 #ifdef __cplusplus

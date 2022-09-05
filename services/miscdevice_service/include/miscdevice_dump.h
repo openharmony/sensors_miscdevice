@@ -18,18 +18,15 @@
 
 #include <queue>
 
-#include "accesstoken_kit.h"
 #include "singleton.h"
 
 #include "nocopyable.h"
 
 namespace OHOS {
 namespace Sensors {
-using namespace Security::AccessToken;
-using Security::AccessToken::AccessTokenID;
 struct VibrateRecord {
     std::string startTime;
-    uint32_t duration = 0;
+    int32_t duration = 0;
     int32_t uid = 0;
     int32_t pid = 0;
     std::string mode;
@@ -43,8 +40,8 @@ public:
     void DumpHelp(int32_t fd);
     void DumpMiscdeviceRecord(int32_t fd);
     void ParseCommand(int32_t fd, const std::vector<std::string>& args);
-    void SaveVibrator(AccessTokenID callerToken, int32_t uid, int32_t pid, uint32_t timeOut);
-    void SaveVibratorEffect(AccessTokenID callerToken, int32_t uid, int32_t pid, const std::string &effect);
+    void SaveVibrator(const std::string &name, int32_t uid, int32_t pid, int32_t timeOut);
+    void SaveVibratorEffect(const std::string &name, int32_t uid, int32_t pid, const std::string &effect);
 
 private:
     DISALLOW_COPY_AND_MOVE(MiscdeviceDump);
@@ -52,7 +49,6 @@ private:
     std::mutex recordQueueMutex_;
     void DumpCurrentTime(std::string &startTime);
     void UpdateRecordQueue(std::shared_ptr<VibrateRecord> record);
-    std::string GetPackageName(AccessTokenID tokenId);
 };
 }  // namespace Sensors
 }  // namespace OHOS

@@ -19,6 +19,7 @@
 
 #include "sensors_errors.h"
 #include "system_ability_definition.h"
+#include "vibration_priority_manager.h"
 
 namespace OHOS {
 namespace Sensors {
@@ -30,46 +31,6 @@ constexpr int32_t MIN_VIBRATOR_TIME = 0;
 constexpr int32_t MAX_VIBRATOR_TIME = 1800000;
 constexpr int32_t DEFAULT_VIBRATOR_ID = 123;
 }  // namespace
-
-bool MiscdeviceService::ready_ = false;
-std::mutex MiscdeviceService::conditionVarMutex_;
-std::condition_variable MiscdeviceService::conditionVar_;
-std::unordered_map<std::string, int32_t> MiscdeviceService::hapticRingMap_ = {
-    {"haptic.ringtone.Bounce", 6762},
-    {"haptic.ringtone.Cartoon", 2118},
-    {"haptic.ringtone.Chilled", 11947},
-    {"haptic.ringtone.Classic_Bell", 5166},
-    {"haptic.ringtone.Concentrate", 15707},
-    {"haptic.ringtone.Day_lily", 5695},
-    {"haptic.ringtone.Digital_Ringtone", 3756},
-    {"haptic.ringtone.Dream", 6044},
-    {"haptic.ringtone.Dream_It_Possible", 39710},
-    {"haptic.ringtone.Dynamo", 15148},
-    {"haptic.ringtone.Flipped", 20477},
-    {"haptic.ringtone.Forest_Day", 6112},
-    {"haptic.ringtone.Free", 9917},
-    {"haptic.ringtone.Halo", 16042},
-    {"haptic.ringtone.Harp", 10030},
-    {"haptic.ringtone.Hello_Ya", 35051},
-    {"haptic.ringtone.Menuet", 8261},
-    {"haptic.ringtone.Neon", 23925},
-    {"haptic.ringtone.Notes", 9051},
-    {"haptic.ringtone.Pulse", 27550},
-    {"haptic.ringtone.Sailing", 19188},
-    {"haptic.ringtone.Sax", 4780},
-    {"haptic.ringtone.Spin", 6000},
-    {"haptic.ringtone.Tune_Clean", 13342},
-    {"haptic.ringtone.Tune_Living", 17249},
-    {"haptic.ringtone.Tune_Orchestral", 15815},
-    {"haptic.ringtone.Westlake", 11654},
-    {"haptic.ringtone.Whistle", 20276},
-    {"haptic.ringtone.Amusement_Park", 9441},
-    {"haptic.ringtone.Breathe_Freely", 30887},
-    {"haptic.ringtone.Summer_Afternoon", 31468},
-    {"haptic.ringtone.Surging_Power", 17125},
-    {"haptic.ringtone.Sunlit_Garden", 38330},
-    {"haptic.ringtone.Fantasy_World", 15301}
-};
 
 REGISTER_SYSTEM_ABILITY_BY_ID(MiscdeviceService, MISCDEVICE_SERVICE_ABILITY_ID, true);
 
@@ -86,10 +47,7 @@ MiscdeviceService::~MiscdeviceService()
     if (vibratorThread_ != nullptr) {
         while (vibratorThread_->IsRunning()) {
             vibratorThread_->NotifyExit();
-            vibratorThread_->NotifyExitSync();
         }
-        delete vibratorThread_;
-        vibratorThread_ = nullptr;
     }
 }
 
@@ -171,104 +129,86 @@ std::vector<int32_t> MiscdeviceService::GetVibratorIdList()
     return vibratorIds;
 }
 
-int32_t MiscdeviceService::Vibrate(int32_t vibratorId, uint32_t timeOut)
+bool MiscdeviceService::ShouldIgnoreVibrate(const VibrateInfo &info)
 {
-    if ((timeOut < MIN_VIBRATOR_TIME) || (timeOut > MAX_VIBRATOR_TIME)) {
-        MISC_HILOGE("timeOut is invalid, timeOut : %{public}u", timeOut);
-        return ERR_INVALID_VALUE;
-    }
-    std::lock_guard<std::mutex> vibratorEffectLock(vibratorEffectMutex_);
-    auto it = vibratorEffectMap_.find(vibratorId);
-    if (it != vibratorEffectMap_.end()) {
-        if (it->second == "time") {
-            vibratorHdiConnection_.Stop(IVibratorHdiConnection::VIBRATOR_STOP_MODE_TIME);
-        } else {
-            vibratorHdiConnection_.Stop(IVibratorHdiConnection::VIBRATOR_STOP_MODE_PRESET);
-        }
-    }
-    vibratorEffectMap_[vibratorId] = "time";
-    int32_t ret = vibratorHdiConnection_.StartOnce((timeOut < MIN_VIBRATOR_TIME) ? MIN_VIBRATOR_TIME : timeOut);
-    if (ret != ERR_OK) {
-        MISC_HILOGE("Vibrate failed, error: %{public}d", ret);
+    return (PriorityManager->ShouldIgnoreVibrate(info, vibratorThread_) != VIBRATION);
+}
+
+int32_t MiscdeviceService::Vibrate(int32_t vibratorId, int32_t timeOut, int32_t usage)
+{
+    if ((timeOut < MIN_VIBRATOR_TIME) || (timeOut > MAX_VIBRATOR_TIME)
+        || (usage >= USAGE_MAX) || (usage < 0)) {
+        MISC_HILOGE("Invalid parameter");
         return ERROR;
     }
-    miscdeviceDump_.SaveVibrator(GetCallingTokenID(), GetCallingUid(), GetCallingPid(), timeOut);
-    return ret;
+    VibrateInfo info = {
+        .mode = "time",
+        .packageName = GetPackageName(GetCallingTokenID()),
+        .pid = GetCallingPid(),
+        .usage = usage,
+        .duration = timeOut
+    };
+    std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
+    if (ShouldIgnoreVibrate(info)) {
+        MISC_HILOGE("Vibration is ignored and high priority is vibrating");
+        return ERROR;
+    }
+    StartVibrateThread(info);
+    miscdeviceDump_.SaveVibrator(info.packageName, GetCallingUid(), GetCallingPid(), timeOut);
+    return NO_ERROR;
 }
 
 int32_t MiscdeviceService::CancelVibrator(int32_t vibratorId)
 {
-    std::lock_guard<std::mutex> vibratorEffectLock(vibratorEffectMutex_);
-    auto it = vibratorEffectMap_.find(vibratorId);
-    if (it != vibratorEffectMap_.end() && it->second == "time") {
-        MISC_HILOGI("stop mode is %{public}s", it->second.c_str());
-        vibratorEffectMap_.clear();
-    } else {
-        MISC_HILOGE("vibratorEffectMap_ is failed");
+    std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
+    if ((vibratorThread_ == nullptr) || (!vibratorThread_->IsRunning())) {
+        MISC_HILOGE("No vibration, no need to stop");
         return ERROR;
     }
-    if (vibratorThread_ != nullptr) {
-        while (vibratorThread_->IsRunning()) {
-            MISC_HILOGI("stop previous vibratorThread, vibratorId : %{public}d", vibratorId);
-            vibratorThread_->NotifyExit();
-            vibratorThread_->NotifyExitSync();
-        }
+    while (vibratorThread_->IsRunning()) {
+        MISC_HILOGD("Notify the vibratorThread, vibratorId : %{public}d", vibratorId);
+        vibratorThread_->NotifyExit();
     }
-    return vibratorHdiConnection_.Stop(IVibratorHdiConnection::VIBRATOR_STOP_MODE_TIME);
+    return NO_ERROR;
 }
 
-int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::string &effect, bool isLooping)
+int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::string &effect,
+    int32_t count, int32_t usage)
 {
-    std::lock_guard<std::mutex> vibratorEffectLock(vibratorEffectMutex_);
-    auto it = vibratorEffectMap_.find(vibratorId);
-    if (it != vibratorEffectMap_.end()) {
-        if (it->second == "time") {
-            if ((vibratorThread_ != nullptr) && (vibratorThread_->IsRunning())) {
-                MISC_HILOGI("stop previous vibratorThread");
-                vibratorThread_->NotifyExit();
-                vibratorThread_->NotifyExitSync();
-            }
-            vibratorHdiConnection_.Stop(IVibratorHdiConnection::VIBRATOR_STOP_MODE_TIME);
-        } else {
-            vibratorHdiConnection_.Stop(IVibratorHdiConnection::VIBRATOR_STOP_MODE_PRESET);
-        }
-    }
-    if (!isLooping) {
-        vibratorEffectMap_[vibratorId] = effect;
-        int32_t ret = vibratorHdiConnection_.Start(effect);
-        if (ret != ERR_OK) {
-            MISC_HILOGE("PlayVibratorEffect failed, error: %{public}d", ret);
-            return ERROR;
-        }
-        miscdeviceDump_.SaveVibratorEffect(GetCallingTokenID(), GetCallingUid(), GetCallingPid(), effect);
-        return ret;
-    }
-    std::unordered_map<std::string, int32_t>::iterator iter = hapticRingMap_.find(effect);
-    if (iter == hapticRingMap_.end()) {
-        MISC_HILOGE("hapticRingMap_ is not exist");
+    if ((vibratorEffects.find(effect) == vibratorEffects.end()) || (count < 1)
+        || (usage >= USAGE_MAX) || (usage < 0)) {
+        MISC_HILOGE("Invalid parameter");
         return ERROR;
     }
-    vibratorEffectMap_[vibratorId] = effect;
-    int32_t delayTiming = iter->second;
-    if (vibratorEffectThread_ == nullptr) {
-        std::lock_guard<std::mutex> lock(vibratorEffectThreadMutex_);
-        if (vibratorEffectThread_ == nullptr) {
-            vibratorEffectThread_ = std::make_unique<VibratorEffectThread>(*this);
-            if (vibratorEffectThread_ == nullptr) {
-                MISC_HILOGE("vibratorEffectThread_ cannot be null");
-                return ERROR;
-            }
-        }
+    VibrateInfo info = {
+        .mode = "preset",
+        .packageName = GetPackageName(GetCallingTokenID()),
+        .pid = GetCallingPid(),
+        .usage = usage,
+        .duration = vibratorEffects[effect],
+        .effect = effect,
+        .count = count
+    };
+    std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
+    if (ShouldIgnoreVibrate(info)) {
+        MISC_HILOGE("Vibration is ignored and high priority is vibrating");
+        return ERROR;
     }
-    while (vibratorEffectThread_->IsRunning()) {
-        MISC_HILOGD("notify the vibratorEffectThread");
-        ready_ = true;
-        conditionVar_.notify_one();
-        ready_ = false;
-    }
-    vibratorEffectThread_->UpdateVibratorEffectData(effect, delayTiming);
-    vibratorEffectThread_->Start("VibratorEffectThread");
+    StartVibrateThread(info);
+    miscdeviceDump_.SaveVibratorEffect(info.packageName, GetCallingUid(), GetCallingPid(), effect);
     return NO_ERROR;
+}
+
+void MiscdeviceService::StartVibrateThread(VibrateInfo info)
+{
+    if (vibratorThread_ == nullptr) {
+        vibratorThread_ = std::make_shared<VibratorThread>();
+    }
+    while (vibratorThread_->IsRunning()) {
+        vibratorThread_->NotifyExit();
+    }
+    vibratorThread_->UpdateVibratorEffect(info);
+    vibratorThread_->Start("VibratorThread");
 }
 
 int32_t MiscdeviceService::PlayCustomVibratorEffect(int32_t vibratorId, const std::vector<int32_t> &timing,
@@ -278,62 +218,58 @@ int32_t MiscdeviceService::PlayCustomVibratorEffect(int32_t vibratorId, const st
         MISC_HILOGE("params are invalid");
         return ERR_INVALID_VALUE;
     }
-    std::lock_guard<std::mutex> vibratorEffectLock(vibratorEffectMutex_);
-    auto it = vibratorEffectMap_.find(vibratorId);
-    if (it != vibratorEffectMap_.end()) {
-        if (it->second == "time") {
-            vibratorHdiConnection_.Stop(IVibratorHdiConnection::VIBRATOR_STOP_MODE_TIME);
-        } else {
-            vibratorHdiConnection_.Stop(IVibratorHdiConnection::VIBRATOR_STOP_MODE_PRESET);
-        }
-    }
-    vibratorEffectMap_[vibratorId] = "time";
-    if (vibratorThread_ == nullptr) {
-        std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
-        if (vibratorThread_ == nullptr) {
-            vibratorThread_ = new (std::nothrow) VibratorThread(*this);
-            if (vibratorThread_ == nullptr) {
-                MISC_HILOGE("vibratorThread_ cannot be null");
-                return ERROR;
-            }
-        }
-    }
-    // check current vibrator execution sequences and abort
-    while (vibratorThread_->IsRunning()) {
-        MISC_HILOGI("stop previous vibratorThread, vibratorId : %{public}d", vibratorId);
-        vibratorThread_->NotifyExit();
-        vibratorThread_->NotifyExitSync();
-    }
-    MISC_HILOGI("update vibrator data and start, vibratorId : %{public}d", vibratorId);
-    vibratorThread_->UpdateVibratorData(timing, intensity, periodCount);
-    vibratorThread_->Start("VibratorThread");
     return NO_ERROR;
 }
 
 int32_t MiscdeviceService::StopVibratorEffect(int32_t vibratorId, const std::string &effect)
 {
-    std::string curEffect = effect;
-    std::lock_guard<std::mutex> vibratorEffectLock(vibratorEffectMutex_);
-    auto it = vibratorEffectMap_.find(vibratorId);
-    if ((it != vibratorEffectMap_.end()) && (it->second != "time")) {
-        MISC_HILOGI("vibrator effect is %{public}s", it->second.c_str());
-        curEffect = it->second;
-        vibratorEffectMap_.clear();
-    } else {
-        MISC_HILOGE("vibrator effect is failed");
+    std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
+    if ((vibratorThread_ == nullptr) || (!vibratorThread_->IsRunning())) {
+        MISC_HILOGE("No vibration, no need to stop");
         return ERROR;
     }
-    MISC_HILOGI("curEffect : %{public}s", curEffect.c_str());
-    if (vibratorEffectThread_ != nullptr) {
-        while (vibratorEffectThread_->IsRunning()) {
-            MISC_HILOGD("notify the vibratorEffectThread, vibratorId : %{public}d", vibratorId);
-            ready_ = true;
-            conditionVar_.notify_one();
-            ready_ = false;
+    const VibrateInfo info = vibratorThread_->GetCurrentVibrateInfo();
+    if ((info.mode != effect) || (info.pid != GetCallingPid())) {
+        MISC_HILOGE("Stop vibration information mismatch");
+        return ERROR;
+    }
+    while (vibratorThread_->IsRunning()) {
+        MISC_HILOGD("notify the vibratorThread, vibratorId : %{public}d", vibratorId);
+        vibratorThread_->NotifyExit();
+    }
+    return NO_ERROR;
+}
+
+std::string MiscdeviceService::GetPackageName(AccessTokenID tokenId)
+{
+    std::string packageName;
+    int32_t tokenType = AccessTokenKit::GetTokenTypeFlag(tokenId);
+    switch (tokenType) {
+        case ATokenTypeEnum::TOKEN_HAP: {
+            HapTokenInfo hapInfo;
+            if (AccessTokenKit::GetHapTokenInfo(tokenId, hapInfo) != 0) {
+                MISC_HILOGE("get hap token info fail");
+                return {};
+            }
+            packageName = hapInfo.bundleName;
+            break;
+        }
+        case ATokenTypeEnum::TOKEN_NATIVE:
+        case ATokenTypeEnum::TOKEN_SHELL: {
+            NativeTokenInfo tokenInfo;
+            if (AccessTokenKit::GetNativeTokenInfo(tokenId, tokenInfo) != 0) {
+                MISC_HILOGE("get native token info fail");
+                return {};
+            }
+            packageName = tokenInfo.processName;
+            break;
+        }
+        default: {
+            MISC_HILOGW("token type not match");
+            break;
         }
     }
-    int32_t ret = vibratorHdiConnection_.Stop(IVibratorHdiConnection::VIBRATOR_STOP_MODE_PRESET);
-    return ret;
+    return packageName;
 }
 
 int32_t MiscdeviceService::SetVibratorParameter(int32_t vibratorId, const std::string &cmd)
@@ -370,46 +306,6 @@ int32_t MiscdeviceService::PlayLightEffect(int32_t lightId, const std::string &t
 int32_t MiscdeviceService::StopLightEffect(int32_t lightId)
 {
     return 0;
-}
-
-MiscdeviceService::VibratorThread::VibratorThread(const MiscdeviceService &service)
-    : periodCount_(0)
-{
-    mtx_.lock();
-}
-
-void MiscdeviceService::VibratorThread::NotifyExit()
-{
-    mtx_.unlock();
-}
-
-bool MiscdeviceService::VibratorThread::Run()
-{
-    return false;
-}
-
-void MiscdeviceService::VibratorThread::UpdateVibratorData(const std::vector<int32_t> &timing,
-                                                           const std::vector<int32_t> &intensity, int32_t &periodCount)
-{
-    vecTimingMs_ = timing;
-    intensitys_ = intensity;
-    periodCount_ = periodCount;
-}
-
-MiscdeviceService::VibratorEffectThread::VibratorEffectThread(const MiscdeviceService &service)
-    : delayTimingMs_(0)
-{
-}
-
-bool MiscdeviceService::VibratorEffectThread::Run()
-{
-    return false;
-}
-
-void MiscdeviceService::VibratorEffectThread::UpdateVibratorEffectData(const std::string effect, int32_t delayTiming)
-{
-    hapticEffect_ = effect;
-    delayTimingMs_ = delayTiming;
 }
 
 int32_t MiscdeviceService::Dump(int32_t fd, const std::vector<std::u16string> &args)

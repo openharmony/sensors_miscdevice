@@ -24,8 +24,8 @@ using namespace OHOS::HiviewDFX;
 
 namespace {
 constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "MiscdeviceServiceProxy" };
-constexpr uint32_t MAX_VIBRATOR_COUNT = 0XFF;
-constexpr uint32_t MAX_LIGHT_COUNT = 0XFF;
+constexpr int32_t MAX_VIBRATOR_COUNT = 0XFF;
+constexpr int32_t MAX_LIGHT_COUNT = 0XFF;
 }
 
 MiscdeviceServiceProxy::MiscdeviceServiceProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IMiscdeviceService>(impl)
@@ -117,7 +117,7 @@ std::vector<int32_t> MiscdeviceServiceProxy::GetVibratorIdList()
     return idVec;
 }
 
-int32_t MiscdeviceServiceProxy::Vibrate(int32_t vibratorId, uint32_t timeOut)
+int32_t MiscdeviceServiceProxy::Vibrate(int32_t vibratorId, int32_t timeOut, int32_t usage)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -130,8 +130,12 @@ int32_t MiscdeviceServiceProxy::Vibrate(int32_t vibratorId, uint32_t timeOut)
         MISC_HILOGE("WriteInt32 vibratorId failed");
         return WRITE_MSG_ERR;
     }
-    if (!data.WriteUint32(timeOut)) {
+    if (!data.WriteInt32(timeOut)) {
         MISC_HILOGE("WriteUint32 timeOut failed");
+        return WRITE_MSG_ERR;
+    }
+    if (!data.WriteInt32(usage)) {
+        MISC_HILOGE("WriteUint32 usage failed");
         return WRITE_MSG_ERR;
     }
     sptr<IRemoteObject> remote = Remote();
@@ -169,7 +173,8 @@ int32_t MiscdeviceServiceProxy::CancelVibrator(int32_t vibratorId)
     return ret;
 }
 
-int32_t MiscdeviceServiceProxy::PlayVibratorEffect(int32_t vibratorId, const std::string &effect, bool isLooping)
+int32_t MiscdeviceServiceProxy::PlayVibratorEffect(int32_t vibratorId, const std::string &effect,
+    int32_t loopCount, int32_t usage)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -186,8 +191,12 @@ int32_t MiscdeviceServiceProxy::PlayVibratorEffect(int32_t vibratorId, const std
         MISC_HILOGE("WriteString effect failed");
         return WRITE_MSG_ERR;
     }
-    if (!data.WriteBool(isLooping)) {
+    if (!data.WriteInt32(loopCount)) {
         MISC_HILOGE("WriteBool effect failed");
+        return WRITE_MSG_ERR;
+    }
+    if (!data.WriteInt32(usage)) {
+        MISC_HILOGE("WriteUint32 usage failed");
         return WRITE_MSG_ERR;
     }
     sptr<IRemoteObject> remote = Remote();
