@@ -22,28 +22,30 @@ describe("VibratorJsTest", function () {
         /*
          * @tc.setup: setup invoked before all testcases
          */
-         console.info('beforeAll caled')
+         console.info('beforeAll called')
     })
     
     afterAll(function() {
         /*
          * @tc.teardown: teardown invoked after all testcases
          */
-         console.info('afterAll caled')
+         console.info('afterAll called')
     })
     
     beforeEach(function() {
         /*
          * @tc.setup: setup invoked before each testcases
          */
-         console.info('beforeEach caled')
+         console.info('beforeEach called')
     })
     
     afterEach(function() {
         /*
          * @tc.teardown: teardown invoked after each testcases
          */
-         console.info('afterEach caled')
+        vibrator.stop("preset");
+        vibrator.stop("time");
+        console.info('afterEach called')
     })
 
     /*
@@ -207,19 +209,50 @@ describe("VibratorJsTest", function () {
      * @tc.require: Issue Number
      */
     it("VibratorJsTest008", 0, async function (done) {
-        function vibrateCallback(error) {
-            if (error) {
-                console.info('VibratorJsTest008  stop error');
-                expect(false).assertTrue();
-            } else {
-                console.info('VibratorJsTest008  stop success');
-                expect(true).assertTrue();
-            }
-            setTimeout(()=>{
-                done();
-            }, 500);
+        function stopPromise() {
+            return new Promise((resolve, reject) => {
+                vibrator.stop("preset", (error)=>{
+                    if (error) {
+                        console.info('VibratorJsTest009 stop error');
+                        expect(false).assertTrue();
+                        setTimeout(()=>{
+                            reject();
+                        }, 500);
+                    } else {
+                        console.info('VibratorJsTest009 stop success');
+                        expect(true).assertTrue();
+                        setTimeout(()=>{
+                            resolve();
+                        }, 500);
+                    }
+                });
+            })
         }
-        vibrator.stop("preset", vibrateCallback);
+
+        let promise = new Promise((resolve, reject) => {
+            vibrator.vibrate("haptic.clock.timer", (error)=>{
+                if (error) {
+                    console.info('VibratorJsTest009  vibrate error');
+                    expect(false).assertTrue();
+                    setTimeout(()=>{
+                        reject();
+                    }, 500);
+                } else {
+                    console.info('VibratorJsTest009  vibrate success');
+                    expect(true).assertTrue();
+                    setTimeout(()=>{
+                        resolve();
+                    }, 500);
+                }
+            });
+        })
+
+        await promise.then(() =>{
+            return stopPromise();
+        }, ()=>{
+            console.info("VibratorJsTest009 reject");
+        })
+        done();
     })
 
     /*
@@ -234,13 +267,13 @@ describe("VibratorJsTest", function () {
             return new Promise((resolve, reject) => {
                 vibrator.stop("time", (error)=>{
                     if (error) {
-                        console.info('VibratorJsTest009  stop error');
+                        console.info('VibratorJsTest009 stop error');
                         expect(false).assertTrue();
                         setTimeout(()=>{
                             reject();
                         }, 500);
                     } else {
-                        console.info('VibratorJsTest009  stop success');
+                        console.info('VibratorJsTest009 stop success');
                         expect(true).assertTrue();
                         setTimeout(()=>{
                             resolve();
@@ -393,19 +426,46 @@ describe("VibratorJsTest", function () {
      * @tc.require: Issue Number
      */
     it("VibratorJsTest015", 0, async function (done) {
-        vibrator.vibrate("").then(() => {
-            console.log("VibratorJsTest015  vibrate error");
-            expect(false).assertTrue();
-            setTimeout(()=>{
-                done();
-            }, 500);
-        }, (error)=>{
-            expect(true).assertTrue();
-            console.log("VibratorJsTest015  vibrate success");
-            setTimeout(()=>{
-                done();
-            }, 500);
-        });
+        function stopPromise() {
+            return new Promise((resolve, reject) => {
+                vibrator.stop("preset").then(() => {
+                    console.log("VibratorJsTest015  off success");
+                    expect(true).assertTrue();
+                    setTimeout(()=>{
+                        resolve();
+                    }, 500);
+                }, (error)=>{
+                    expect(false).assertTrue();
+                    console.log("VibratorJsTest015  off error");
+                    setTimeout(()=>{
+                        reject();
+                    }, 500);
+                });
+            })
+        }
+
+        let promise = new Promise((resolve, reject) => {
+            vibrator.vibrate("haptic.clock.timer").then(() => {
+                console.log("VibratorJsTest015  vibrate success");
+                expect(true).assertTrue();
+                setTimeout(()=>{
+                    resolve();
+                }, 500);
+            }, (error)=>{
+                expect(false).assertTrue();
+                console.log("VibratorJsTest015  vibrate error");
+                setTimeout(()=>{
+                    reject();
+                }, 500);
+            });
+        })
+
+        await promise.then(() =>{
+            return stopPromise();
+        }, ()=>{
+            console.info("VibratorJsTest009 reject");
+        })
+        done();
     })
 
     /*
@@ -415,15 +475,15 @@ describe("VibratorJsTest", function () {
      * @tc.require: Issue Number
      */
     it("VibratorJsTest016", 0, async function (done) {
-        vibrator.stop("").then(() => {
-            console.log("VibratorJsTest016  stop error");
+        vibrator.vibrate("").then(() => {
+            console.log("VibratorJsTest016  vibrate error");
             expect(false).assertTrue();
             setTimeout(()=>{
                 done();
             }, 500);
         }, (error)=>{
             expect(true).assertTrue();
-            console.log("VibratorJsTest016  stop success");
+            console.log("VibratorJsTest016  vibrate success");
             setTimeout(()=>{
                 done();
             }, 500);
@@ -437,15 +497,15 @@ describe("VibratorJsTest", function () {
      * @tc.require: Issue Number
      */
     it("VibratorJsTest017", 0, async function (done) {
-        vibrator.stop("preset").then(() => {
-            console.log("VibratorJsTest017  off success");
-            expect(true).assertTrue();
+        vibrator.stop("").then(() => {
+            console.log("VibratorJsTest017  stop error");
+            expect(false).assertTrue();
             setTimeout(()=>{
                 done();
             }, 500);
         }, (error)=>{
-            expect(false).assertTrue();
-            console.log("VibratorJsTest017  off error");
+            expect(true).assertTrue();
+            console.log("VibratorJsTest017  stop success");
             setTimeout(()=>{
                 done();
             }, 500);
@@ -592,5 +652,754 @@ describe("VibratorJsTest", function () {
               done();
             },
           });
+    })
+
+    /*
+     * @tc.name:VibrateTest001
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: I53SGE
+     */
+    it("VibrateTest001", 0, async function (done) {
+        vibrator.vibrate({
+            type: "time",
+            duration: 1000
+        }, {
+            usage: "unknown"
+        }, (error)=>{
+            if (error) {
+                console.info('VibrateTest001 vibrator error');
+                expect(false).assertTrue();
+            } else {
+                console.info('VibrateTest001 vibrator success');
+                expect(true).assertTrue();
+            }
+            setTimeout(()=>{
+                done();
+            }, 500);
+        });
+    })
+
+    /*
+     * @tc.name:VibrateTest002
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: I53SGE
+     */
+    it("VibrateTest002", 0, async function (done) {
+        vibrator.vibrate({
+            type: "",
+            duration: 1000
+        }, {
+            usage: "unknown"
+        }, (error)=>{
+            if (error) {
+                expect(true).assertTrue();
+            } else {
+                expect(false).assertTrue();
+            }
+            setTimeout(()=>{
+                done();
+            }, 500);
+        });
+    })
+
+    /*
+     * @tc.name:VibrateTest003
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: I53SGE
+     */
+    it("VibrateTest003", 0, async function (done) {
+        vibrator.vibrate({
+            type: "preset",
+            effectId: "haptic.clock.timer",
+            count: 1,
+        }, {
+            usage: "unknown"
+        }, (error)=>{
+            if (error) {
+                console.info('VibrateTest001 vibrator error');
+                expect(false).assertTrue();
+            } else {
+                console.info('VibrateTest001 vibrator success');
+                expect(true).assertTrue();
+            }
+            setTimeout(()=>{
+                done();
+            }, 500);
+        });
+    })
+
+    /*
+     * @tc.name:VibrateTest004
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: I53SGE
+     */
+    it("VibrateTest004", 0, async function (done) {
+        vibrator.vibrate({
+            type: "preset",
+            effectId: "",
+            count: 3,
+        }, {
+            usage: "unknown"
+        }, (error)=>{
+            if (error) {
+                expect(true).assertTrue();
+            } else {
+                expect(false).assertTrue();
+            }
+            setTimeout(()=>{
+                done();
+            }, 500);
+        });
+    })
+
+    /*
+     * @tc.name:VibrateTest005
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: I53SGE
+     */
+    it("VibrateTest005", 0, async function (done) {
+        vibrator.vibrate({
+            type: "preset",
+            effectId: "haptic.clock.timer",
+            count: 3,
+        }, {
+            usage: ""
+        }, (error)=>{
+            if (error) {
+                expect(true).assertTrue();
+            } else {
+                expect(false).assertTrue();
+            }
+            setTimeout(()=>{
+                done();
+            }, 500);
+        });
+    })
+
+    /*
+     * @tc.name:VibrateTest006
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: I53SGE
+     */
+    it("VibrateTest006", 0, async function (done) {
+        try {
+            vibrator.vibrate(null, null);
+        } catch (error) {
+            console.info(error);
+            expect(true).assertTrue();
+            done();
+        }
+    })
+
+    /*
+     * @tc.name:VibrateTest009
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: I53SGE
+     */
+    it("VibrateTest007", 0, async function (done) {
+        await vibrator.vibrate({
+            type: "time",
+            duration: 1000,
+        }, {
+            usage: "unknown"
+        }).then(()=>{
+            expect(true).assertTrue();
+        }).catch((error)=>{
+            expect(false).assertTrue();
+        });
+        done();
+    })
+
+    /*
+     * @tc.name:VibrateTest008
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: I53SGE
+     */
+    it("VibrateTest008", 0, async function (done) {
+        await vibrator.vibrate({
+            type: "",
+            duration: 1000
+        }, {
+            usage: "unknown"
+        }).then(()=>{
+            expect(false).assertTrue();
+        }).catch((error)=>{
+            expect(true).assertTrue();
+        });
+        done();
+    })
+
+    /*
+     * @tc.name:VibrateTest009
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: I53SGE
+     */
+    it("VibrateTest009", 0, async function (done) {
+        await vibrator.vibrate({
+            type: "preset",
+            effectId: "haptic.clock.timer",
+            count: 1,
+        }, {
+            usage: "unknown"
+        }).then(()=>{
+            expect(true).assertTrue();
+        }).catch((error)=>{
+            expect(false).assertTrue();
+        });
+        done();
+    })
+
+    /*
+     * @tc.name:VibrateTest010
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: I53SGE
+     */
+    it("VibrateTest010", 0, async function (done) {
+        vibrator.vibrate({
+            type: "preset",
+            effectId: "",
+            count: 3,
+        }, {
+            usage: "unknown"
+        }).then(()=>{
+            expect(false).assertTrue();
+            done();
+        }).catch((error)=>{
+            expect(true).assertTrue();
+            done();
+        });
+    })
+
+    /*
+     * @tc.name:VibrateTest011
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: I53SGE
+     */
+    it("VibrateTest011", 0, async function (done) {
+        vibrator.vibrate({
+            type: "preset",
+            effectId: "haptic.clock.timer",
+            count: 3,
+        }, {
+            usage: ""
+        }).then(()=>{
+            expect(false).assertTrue();
+            done();
+        }).catch((error)=>{
+            expect(true).assertTrue();
+            done();
+        });
+    })
+
+    /*
+     * @tc.name:VibrateTest012
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: I53SGE
+     */
+    it("VibrateTest012", 0, async function (done) {
+        try {
+            vibrator.vibrate({
+                type: 1,
+                count: 3,
+            }, {
+                usage: ""
+            })
+        } catch (error) {
+            console.info(error);
+            expect(true).assertTrue();
+            done();
+        }
+    })
+
+    /*
+     * @tc.name:VibrateTest013
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: I53SGE
+     */
+    it("VibrateTest013", 0, async function (done) {
+        function vibratePromise() {
+            return new Promise((resolve, reject) => {
+                vibrator.vibrate({
+                    type: "time",
+                    duration: 100
+                }, {
+                    usage: "unknown"
+                }, (error)=>{
+                    if (error) {
+                        expect(false).assertTrue();
+                    } else {
+                        expect(true).assertTrue();
+                    }
+                    setTimeout(()=>{
+                        done();
+                    }, 500);
+                });
+            })
+        }
+
+        let promise = new Promise((resolve, reject) => {
+            vibrator.vibrate({
+                type: "time",
+                duration: 100
+            }, {
+                usage: "unknown"
+            }, (error)=>{
+                if (error) {
+                    expect(false).assertTrue();
+                    reject();
+                } else {
+                    expect(true).assertTrue();
+                    resolve();
+                }
+            });
+        })
+
+        await promise.then(() =>{
+            return vibratePromise();
+        }, ()=>{
+            console.info("VibratorJsTest013 reject");
+        })
+        done();
+    })
+
+    /*
+     * @tc.name:VibrateTest014
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: I53SGE
+     */
+    it("VibrateTest014", 0, async function (done) {
+        function vibratePromise() {
+            return new Promise((resolve, reject) => {
+                vibrator.vibrate({
+                    type: "preset",
+                    effectId: "haptic.clock.timer",
+                    count: 1,
+                }, {
+                    usage: "unknown"
+                }, (error)=>{
+                    if (error) {
+                        expect(true).assertTrue();
+                    } else {
+                        expect(false).assertTrue();
+                    }
+                    setTimeout(()=>{
+                        done();
+                    }, 500);
+                });
+            })
+        }
+
+        let promise = new Promise((resolve, reject) => {
+            vibrator.vibrate({
+                type: "time",
+                duration: 100
+            }, {
+                usage: "alarm"
+            }, (error)=>{
+                if (error) {
+                    expect(false).assertTrue();
+                    reject();
+                } else {
+                    expect(true).assertTrue();
+                    resolve();
+                }
+            });
+        })
+
+        await promise.then(() =>{
+            return vibratePromise();
+        }, ()=>{
+            console.info("VibratorJsTest014 reject");
+        })
+        done();
+    })
+
+    /*
+     * @tc.name:VibrateTest015
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: I53SGE
+     */
+    it("VibrateTest015", 0, async function (done) {
+        function vibratePromise() {
+            return new Promise((resolve, reject) => {
+                vibrator.vibrate({
+                    type: "preset",
+                    effectId: "haptic.clock.timer",
+                    count: 3,
+                }, {
+                    usage: "unknown",
+                }, (error)=>{
+                    if (error) {
+                        console.info("VibratorJsTest015 success");
+                        expect(false).assertTrue();
+                    } else {
+                        expect(true).assertTrue();
+                    }
+                    setTimeout(()=>{
+                        done();
+                    }, 500);
+                });
+            })
+        }
+
+        let promise = new Promise((resolve, reject) => {
+            vibrator.vibrate({
+                type: "time",
+                duration: 10000
+            }, {
+                usage: "alarm"
+            }, (error)=>{
+                if (error) {
+                    expect(false).assertTrue();
+                    reject();
+                } else {
+                    expect(true).assertTrue();
+                    resolve();
+                }
+            });
+        })
+        await promise.then(() =>{
+            return vibratePromise();
+        }, ()=>{
+            console.info("VibrateTest015 reject");
+        })
+        done();
+    })
+
+    /*
+     * @tc.name:VibrateTest016
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: I53SGE
+     */
+    it("VibrateTest016", 0, async function (done) {
+        function vibratePromise() {
+            return new Promise((resolve, reject) => {
+                vibrator.vibrate({
+                    type: "preset",
+                    effectId: "haptic.clock.timer",
+                    count: 1,
+                }, {
+                    usage: "unknown",
+                }, (error)=>{
+                    if (error) {
+                        expect(true).assertTrue();
+                    } else {
+                        expect(false).assertTrue();
+                    }
+                    setTimeout(()=>{
+                        done();
+                    }, 500);
+                });
+            })
+        }
+
+        let promise = new Promise((resolve, reject) => {
+            vibrator.vibrate({
+                type: "preset",
+                effectId: "haptic.clock.timer",
+                count: 3,
+            }, {
+                usage: "unknown",
+            }, (error)=>{
+                if (error) {
+                    expect(false).assertTrue();
+                    reject();
+                } else {
+                    expect(true).assertTrue();
+                    resolve();
+                }
+            });
+        })
+
+        await promise.then(() =>{
+            return vibratePromise();
+        }, ()=>{
+            console.info("VibrateTest016 reject");
+        })
+        done();
+    })
+
+    /*
+     * @tc.name:VibrateTest017
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: I53SGE
+     */
+    it("VibrateTest017", 0, async function (done) {
+        function vibratePromise() {
+            return new Promise((resolve, reject) => {
+                vibrator.vibrate({
+                    type: "time",
+                    duration: 3000,
+                }, {
+                    usage: "alarm"
+                }, (error)=>{
+                    if (error) {
+                        expect(true).assertTrue();
+                    } else {
+                        expect(false).assertTrue();
+                    }
+                    setTimeout(()=>{
+                        done();
+                    }, 500);
+                });
+            })
+        }
+
+        let promise = new Promise((resolve, reject) => {
+            vibrator.vibrate({
+                type: "preset",
+                effectId: "haptic.clock.timer",
+                count: 3,
+            }, {
+                usage: "unknown"
+            }, (error)=>{
+                if (error) {
+                    expect(false).assertTrue();
+                    reject();
+                } else {
+                    expect(true).assertTrue();
+                    resolve();
+                }
+            });
+        })
+
+        await promise.then(() =>{
+            return vibratePromise();
+        }, ()=>{
+            console.info("VibrateTest017 reject");
+        })
+        done();
+    })
+
+    /*
+     * @tc.name:VibrateTest018
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: I53SGE
+     */
+    it("VibrateTest018", 0, async function (done) {
+        function vibratePromise() {
+            return new Promise((resolve, reject) => {
+                vibrator.vibrate({
+                    type: "time",
+                    duration: 3000,
+                }, {
+                    usage: "alarm"
+                }, (error)=>{
+                    if (error) {
+                        expect(false).assertTrue();
+                    } else {
+                        expect(true).assertTrue();
+                    }
+                    setTimeout(()=>{
+                        done();
+                    }, 500);
+                });
+            })
+        }
+
+        let promise = new Promise((resolve, reject) => {
+            vibrator.vibrate({
+                type: "preset",
+                effectId: "haptic.clock.timer",
+                count: 1,
+            }, {
+                usage: "unknown"
+            }, (error)=>{
+                if (error) {
+                    expect(false).assertTrue();
+                    reject();
+                } else {
+                    expect(true).assertTrue();
+                    resolve();
+                }
+            });
+        })
+
+        await promise.then(() =>{
+            return vibratePromise();
+        }, ()=>{
+            console.info("VibrateTest018 reject");
+        })
+        done();
+    })
+
+    /*
+     * @tc.name:VibrateTest019
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: I53SGE
+     */
+    it("VibrateTest019", 0, async function (done) {
+        function vibratePromise() {
+            return new Promise((resolve, reject) => {
+                vibrator.vibrate({
+                    type: "preset",
+                    effectId: "haptic.clock.timer",
+                    count: 3,
+                }, {
+                    usage: "unknown"
+                }, (error)=>{
+                    if (error) {
+                        expect(false).assertTrue();
+                    } else {
+                        expect(true).assertTrue();
+                    }
+                    setTimeout(()=>{
+                        done();
+                    }, 500);
+                });
+            })
+        }
+
+        let promise = new Promise((resolve, reject) => {
+            vibrator.vibrate({
+                type: "preset",
+                effectId: "haptic.clock.timer",
+                count: 3,
+            }, {
+                usage: "unknown"
+            }, (error)=>{
+                if (error) {
+                    expect(false).assertTrue();
+                    reject();
+                } else {
+                    expect(true).assertTrue();
+                    resolve();
+                }
+            });
+        })
+
+        await promise.then(() =>{
+            return vibratePromise();
+        }, ()=>{
+            console.info("VibrateTest019 reject");
+        })
+        done();
+    })
+
+    /*
+     * @tc.name:VibrateTest020
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: I53SGE
+     */
+    it("VibrateTest020", 0, async function (done) {
+        function vibratePromise() {
+            return new Promise((resolve, reject) => {
+                vibrator.vibrate({
+                    type: "preset",
+                    effectId: "haptic.clock.timer",
+                    count: 1,
+                }, {
+                    usage: "ring"
+                }, (error)=>{
+                    if (error) {
+                        expect(false).assertTrue();
+                    } else {
+                        expect(true).assertTrue();
+                    }
+                    setTimeout(()=>{
+                        done();
+                    }, 500);
+                });
+            })
+        }
+
+        let promise = new Promise((resolve, reject) => {
+            vibrator.vibrate({
+                type: "preset",
+                effectId: "haptic.clock.timer",
+                count: 1,
+            }, {
+                usage: "notification"
+            }, (error)=>{
+                if (error) {
+                    expect(false).assertTrue();
+                    reject();
+                } else {
+                    expect(true).assertTrue();
+                    resolve();
+                }
+            });
+        })
+
+        await promise.then(() =>{
+            return vibratePromise();
+        }, ()=>{
+            console.info("VibrateTest020 reject");
+        })
+        done();
+    })
+
+    /*
+     * @tc.name:VibrateTest021
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: I53SGE
+     */
+    it("VibrateTest021", 0, async function (done) {
+        function vibratePromise() {
+            return new Promise((resolve, reject) => {
+                vibrator.vibrate({
+                    type: "preset",
+                    effectId: "haptic.clock.timer",
+                    count: 1,
+                }, {
+                    usage: "unknown"
+                }, (error)=>{
+                    if (error) {
+                        expect(true).assertTrue();
+                    } else {
+                        expect(false).assertTrue();
+                    }
+                    setTimeout(()=>{
+                        done();
+                    }, 500);
+                });
+            })
+        }
+
+        let promise = new Promise((resolve, reject) => {
+            vibrator.vibrate({
+                type: "preset",
+                effectId: "haptic.clock.timer",
+                count: 1,
+            }, {
+                usage: "notification"
+            }, (error)=>{
+                if (error) {
+                    expect(false).assertTrue();
+                    reject();
+                } else {
+                    expect(true).assertTrue();
+                    resolve();
+                }
+            });
+        })
+
+        await promise.then(() =>{
+            return vibratePromise();
+        }, ()=>{
+            console.info("VibrateTest020 reject");
+        })
+        done();
     })
 })
