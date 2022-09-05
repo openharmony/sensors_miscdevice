@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <string>
 
 #include "vibrator_agent.h"
 
@@ -27,7 +28,8 @@ constexpr int32_t MAX_VIBRATOR_TIME = 1800000;
 namespace OHOS {
 bool StartVibratorOnceFuzzTest(const uint8_t* data, size_t size)
 {
-    uintptr_t duration = reinterpret_cast<uintptr_t>(data);
+    std::string argv(reinterpret_cast<const char *>(data), size);
+    uint32_t duration = static_cast<uint32_t>(std::atoi(argv.c_str()));
     int32_t ret = OHOS::Sensors::StartVibratorOnce(duration);
     if ((duration > MAX_VIBRATOR_TIME && ret == 0) || (duration <= MAX_VIBRATOR_TIME && ret != 0)) {
         return false;

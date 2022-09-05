@@ -18,15 +18,16 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <string>
 
 #include "vibrator_agent.h"
 
 namespace OHOS {
 bool StartVibratorFuzzTest(const uint8_t* data, size_t size)
 {
-    const char *argv = reinterpret_cast<const char *>(data);
-    int32_t ret = OHOS::Sensors::StartVibrator(argv);
-    int32_t ret2 = std::strcmp(argv, "haptic.clock.timer");
+    std::string argv(reinterpret_cast<const char *>(data), size);
+    int32_t ret = OHOS::Sensors::StartVibrator(argv.c_str());
+    int32_t ret2 = std::strcmp(argv.c_str(), "haptic.clock.timer");
     if ((ret2 != 0 && ret == 0) || (ret2 == 0 && ret != 0)) {
         return false;
     }

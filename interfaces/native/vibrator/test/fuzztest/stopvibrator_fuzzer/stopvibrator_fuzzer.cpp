@@ -18,15 +18,16 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <string>
 
 #include "vibrator_agent.h"
 
 namespace OHOS {
 bool StopVibratorFuzzTest(const uint8_t* data, size_t size)
 {
-    const char *argv = reinterpret_cast<const char *>(data);
-    int32_t ret = OHOS::Sensors::StopVibrator(argv);
-    int32_t ret2 = strcmp(argv, "time") != 0 && strcmp(argv, "preset");
+    std::string argv(reinterpret_cast<const char *>(data), size);
+    int32_t ret = OHOS::Sensors::StopVibrator(argv.c_str());
+    int32_t ret2 = strcmp(argv.c_str(), "time") != 0 && strcmp(argv.c_str(), "preset");
     if ((ret2 != 0 && ret == 0) || (ret2 == 0 && ret != 0)) {
         return false;
     }
