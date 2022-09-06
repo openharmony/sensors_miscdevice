@@ -72,7 +72,7 @@ int32_t JsonParser::ParseJsonArray(cJSON *json, const std::string& key,
     int32_t size = cJSON_GetArraySize(jsonArray);
     for (int32_t i = 0; i < size; ++i) {
         cJSON* val = cJSON_GetArrayItem(jsonArray, i);
-        if (!cJSON_IsString(val)) {
+        if ((!cJSON_IsString(val)) || (val->valuestring == nullptr)) {
             MISC_HILOGE("The value of index %{public}d is not string", i);
             return ERROR;
         }
