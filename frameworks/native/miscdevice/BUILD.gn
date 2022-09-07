@@ -37,7 +37,6 @@ ohos_shared_library("liblight_native") {
     "hisysevent_native:libhisysevent",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
   part_name = "miscdevice"
@@ -59,7 +58,6 @@ ohos_shared_library("libvibrator_native") {
     "//utils/jni/jnikit/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
   ]
-  deps = [ "$SUBSYSTEM_DIR/miscdevice/utils:libmiscdevice_utils" ]
 
   external_deps = [
     "c_utils:utils",
@@ -67,7 +65,6 @@ ohos_shared_library("libvibrator_native") {
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
   part_name = "miscdevice"
