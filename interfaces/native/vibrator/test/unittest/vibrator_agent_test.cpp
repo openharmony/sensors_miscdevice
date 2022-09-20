@@ -187,5 +187,47 @@ HWTEST_F(VibratorAgentTest, StopVibratorTest_005, TestSize.Level1)
     ret = StopVibrator("time");
     ASSERT_EQ(ret, 0);
 }
+
+HWTEST_F(VibratorAgentTest, SetLoopCount_001, TestSize.Level1)
+{
+    HiLog::Info(LABEL, "%{public}s begin", __func__);
+    bool ret = SetLoopCount(300);
+    ASSERT_TRUE(ret);
+}
+
+HWTEST_F(VibratorAgentTest, SetLoopCount_002, TestSize.Level1)
+{
+    HiLog::Info(LABEL, "%{public}s begin", __func__);
+    bool ret = SetLoopCount(-1);
+    ASSERT_FALSE(ret);
+}
+
+HWTEST_F(VibratorAgentTest, SetLoopCount_003, TestSize.Level1)
+{
+    HiLog::Info(LABEL, "%{public}s begin", __func__);
+    bool ret = SetLoopCount(0);
+    ASSERT_FALSE(ret);
+}
+
+HWTEST_F(VibratorAgentTest, SetUsage_001, TestSize.Level1)
+{
+    HiLog::Info(LABEL, "%{public}s begin", __func__);
+    bool ret = SetUsage(0);
+    ASSERT_TRUE(ret);
+}
+
+HWTEST_F(VibratorAgentTest, SetUsage_002, TestSize.Level1)
+{
+    HiLog::Info(LABEL, "%{public}s begin", __func__);
+    bool ret = SetUsage(-1);
+    ASSERT_FALSE(ret);
+}
+
+HWTEST_F(VibratorAgentTest, SetUsage_003, TestSize.Level1)
+{
+    HiLog::Info(LABEL, "%{public}s begin", __func__);
+    bool ret = SetUsage(USAGE_MAX);
+    ASSERT_FALSE(ret);
+}
 }  // namespace Sensors
 }  // namespace OHOS
