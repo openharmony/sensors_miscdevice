@@ -40,19 +40,6 @@ enum VibrateStatus {
     IGNORE_UNKNOWN = 7,
 };
 
-enum VibrateUsage {
-    USAGE_UNKNOWN = 0,
-    USAGE_ALARM = 1,
-    USAGE_RING = 2,
-    USAGE_NOTIFICATION = 3,
-    USAGE_COMMUNICATION = 4,
-    USAGE_TOUCH = 5,
-    USAGE_MEDIA = 6,
-    USAGE_PHYSICAL_FEEDBACK = 7,
-    USAGE_SIMULATE_REALITY = 8,
-    USAGE_MAX = 9,
-};
-
 struct PriorityItem {
     std::vector<std::string> byPassUsages;
     std::vector<std::string> byPassPkgs;

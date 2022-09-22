@@ -20,6 +20,7 @@
 #include <cinttypes>
 #include <cstring>
 #include <ctime>
+#include <map>
 
 #include "securec.h"
 #include "sensors_errors.h"
@@ -32,10 +33,25 @@ constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "MiscdeviceDump" };
 constexpr uint32_t MAX_DUMP_RECORD_SIZE = 30;
 constexpr uint32_t BASE_YEAR = 1900;
 constexpr uint32_t BASE_MON = 1;
-constexpr int32_t INVALID_PID = -1;
-constexpr int32_t INVALID_UID = -1;
 constexpr int32_t MAX_DUMP_PARAMETERS = 32;
+constexpr int32_t CONVERSION_RATE = 1000;
 }  // namespace
+
+static std::map<int32_t, std::string> usageMap_ = {
+    {USAGE_UNKNOWN, "unknown"},
+    {USAGE_ALARM, "alarm"},
+    {USAGE_RING, "ring"},
+    {USAGE_NOTIFICATION, "notification"},
+    {USAGE_COMMUNICATION, "communication"},
+    {USAGE_TOUCH, "touch"},
+    {USAGE_MEDIA, "media"},
+    {USAGE_PHYSICAL_FEEDBACK, "physicalFeedback"},
+    {USAGE_SIMULATE_REALITY, "simulateReality"},
+};
+
+MiscdeviceDump::MiscdeviceDump() {}
+
+MiscdeviceDump::~MiscdeviceDump() {}
 
 void MiscdeviceDump::ParseCommand(int32_t fd, const std::vector<std::string>& args)
 {
@@ -122,17 +138,17 @@ void MiscdeviceDump::DumpMiscdeviceRecord(int32_t fd)
     size_t length = dumpQueue_.size() > MAX_DUMP_RECORD_SIZE ? MAX_DUMP_RECORD_SIZE : dumpQueue_.size();
     for (size_t i = 0; i < length; ++i) {
         auto record = dumpQueue_.front();
-        CHKPV(record);
         dumpQueue_.push(record);
         dumpQueue_.pop();
-        if (record->mode == "time") {
-            dprintf(fd, "startTime:%s | uid:%d | pid:%d | mode:%s | duration:%8u | packageName:%s\n",
-                record->startTime.c_str(), record->uid, record->pid, record->mode.c_str(), record->duration,
-                record->packageName.c_str());
+        VibrateInfo info = record.info;
+        if (info.mode == "time") {
+            dprintf(fd, "startTime:%s | uid:%d | pid:%d | packageName:%s | duration:%d | usage:%s\n",
+                record.startTime.c_str(), info.uid, info.pid, info.packageName.c_str(),
+                info.duration, GetUsageName(info.usage).c_str());
         } else {
-            dprintf(fd, "startTime:%s | uid:%d | pid:%d | mode:%s | effect:%s | packageName:%s\n",
-                record->startTime.c_str(), record->uid, record->pid, record->mode.c_str(), record->effect.c_str(),
-                record->packageName.c_str());
+            dprintf(fd, "startTime:%s | uid:%d | pid:%d | packageName:%s | effect:%s | count:%d | usage:%s\n",
+                record.startTime.c_str(), info.uid, info.pid, info.packageName.c_str(),
+                info.effect.c_str(), info.count, GetUsageName(info.usage).c_str());
         }
     }
 }
@@ -147,10 +163,10 @@ void MiscdeviceDump::DumpCurrentTime(std::string &startTime)
         .append(std::to_string(timeinfo->tm_mon + BASE_MON)).append("-").append(std::to_string(timeinfo->tm_mday))
         .append(" ").append(std::to_string(timeinfo->tm_hour)).append(":").append(std::to_string(timeinfo->tm_min))
         .append(":").append(std::to_string(timeinfo->tm_sec)).append(".")
-        .append(std::to_string(curTime.tv_nsec / (1000 * 1000)));
+        .append(std::to_string(curTime.tv_nsec / (CONVERSION_RATE * CONVERSION_RATE)));
 }
 
-void MiscdeviceDump::UpdateRecordQueue(std::shared_ptr<VibrateRecord> record)
+void MiscdeviceDump::UpdateRecordQueue(const VibrateRecord &record)
 {
     std::lock_guard<std::mutex> queueLock(recordQueueMutex_);
     dumpQueue_.push(record);
@@ -159,39 +175,22 @@ void MiscdeviceDump::UpdateRecordQueue(std::shared_ptr<VibrateRecord> record)
     }
 }
 
-void MiscdeviceDump::SaveVibrator(const std::string &name, int32_t uid, int32_t pid, int32_t timeOut)
+void MiscdeviceDump::SaveVibrateRecord(const VibrateInfo &vibrateInfo)
 {
-    if ((uid == INVALID_UID) || (pid <= INVALID_PID)) {
-        MISC_HILOGE("uid or pid is invalid");
-        return;
-    }
-    auto record = std::make_shared<VibrateRecord>();
-    CHKPV(record);
-    record->uid = uid;
-    record->pid = pid;
-    record->packageName = name;
-    record->duration = timeOut;
-    record->mode = "time";
-    DumpCurrentTime(record->startTime);
+    VibrateRecord record;
+    record.info = vibrateInfo;
+    DumpCurrentTime(record.startTime);
     UpdateRecordQueue(record);
 }
 
-void MiscdeviceDump::SaveVibratorEffect(const std::string &name, int32_t uid, int32_t pid,
-    const std::string &effect)
+std::string MiscdeviceDump::GetUsageName(int32_t usage)
 {
-    if ((uid == INVALID_UID) || (pid <= INVALID_PID)) {
-        MISC_HILOGE("uid or pid is invalid");
-        return;
+    auto it = usageMap_.find(usage);
+    if (it == usageMap_.end()) {
+        MISC_HILOGE("usage: %{public}d is invalid", usage);
+        return {};
     }
-    auto record = std::make_shared<VibrateRecord>();
-    CHKPV(record);
-    record->uid = uid;
-    record->pid = pid;
-    record->packageName = name;
-    record->effect = effect;
-    record->mode = "preset";
-    DumpCurrentTime(record->startTime);
-    UpdateRecordQueue(record);
+    return it->second;
 }
 }  // namespace Sensors
 }  // namespace OHOS
