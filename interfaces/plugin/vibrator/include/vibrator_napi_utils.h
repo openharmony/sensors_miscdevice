@@ -45,7 +45,6 @@ public:
     uint32_t callbackType = 0;
     AsyncCallbackInfo(napi_env env) : env(env) {}
     ~AsyncCallbackInfo();
-private:
 };
 
 bool IsMatchType(const napi_env &env, const napi_value &value, const napi_valuetype &type);

@@ -44,7 +44,7 @@ private:
     sptr<IRemoteObject::DeathRecipient> hdiDeathObserver_;
     void RegisterHdiDeathRecipient();
     void UnregisterHdiDeathRecipient();
-    void reconnect();
+    void Reconnect();
 };
 }  // namespace Sensors
 }  // namespace OHOS
