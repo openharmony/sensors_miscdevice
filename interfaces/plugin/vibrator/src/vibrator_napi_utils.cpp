@@ -162,7 +162,7 @@ napi_value GreateCallbackError(const napi_env &env, const int32_t errCode,
     return result;
 }
 
-void emitSystemCallback(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo)
+void EmitSystemCallback(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo)
 {
     CHKPV(asyncCallbackInfo);
     if (asyncCallbackInfo->error.code == SUCCESS) {
@@ -210,7 +210,7 @@ void EmitAsyncCallbackWork(sptr<AsyncCallbackInfo> asyncCallbackInfo)
              */
             asyncCallbackInfo->DecStrongRef(nullptr);
             if (asyncCallbackInfo->callbackType == TYPE_SYSTEM_VIBRATE) {
-                emitSystemCallback(env, asyncCallbackInfo);
+                EmitSystemCallback(env, asyncCallbackInfo);
                 return;
             }
             CHKPV(asyncCallbackInfo->callback[0]);
@@ -261,7 +261,7 @@ void EmitPromiseWork(sptr<AsyncCallbackInfo> asyncCallbackInfo)
             asyncCallbackInfo->DecStrongRef(nullptr);
             CHKPV(asyncCallbackInfo->deferred);
             if (asyncCallbackInfo->callbackType == TYPE_SYSTEM_VIBRATE) {
-                emitSystemCallback(env, asyncCallbackInfo);
+                EmitSystemCallback(env, asyncCallbackInfo);
                 return;
             }
             napi_value result = nullptr;

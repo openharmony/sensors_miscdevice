@@ -126,15 +126,15 @@ void HdiConnection::ProcessDeathObserver(const wptr<IRemoteObject> &object)
         return;
     }
     hdiService->RemoveDeathRecipient(hdiDeathObserver_);
-    reconnect();
+    Reconnect();
 }
 
-void HdiConnection::reconnect()
+void HdiConnection::Reconnect()
 {
     int32_t ret = ConnectHdi();
     if (ret != ERR_OK) {
         HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
-            HiSysEvent::EventType::FAULT, "PKG_NAME", "reconnect", "ERROR_CODE", ret);
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "Reconnect", "ERROR_CODE", ret);
         MISC_HILOGE("connect hdi fail");
     }
 }
