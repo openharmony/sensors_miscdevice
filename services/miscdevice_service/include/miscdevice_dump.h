@@ -21,35 +21,32 @@
 #include "singleton.h"
 
 #include "nocopyable.h"
+#include "vibrator_infos.h"
 
 namespace OHOS {
 namespace Sensors {
 struct VibrateRecord {
     std::string startTime;
-    int32_t duration = 0;
-    int32_t uid = 0;
-    int32_t pid = 0;
-    std::string mode;
-    std::string effect;
-    std::string packageName;
+    VibrateInfo info;
 };
-class MiscdeviceDump : public Singleton<MiscdeviceDump> {
+
+class MiscdeviceDump {
+    DECLARE_DELAYED_SINGLETON(MiscdeviceDump);
 public:
-    MiscdeviceDump() = default;
-    ~MiscdeviceDump() = default;
+    DISALLOW_COPY_AND_MOVE(MiscdeviceDump);
     void DumpHelp(int32_t fd);
     void DumpMiscdeviceRecord(int32_t fd);
     void ParseCommand(int32_t fd, const std::vector<std::string>& args);
-    void SaveVibrator(const std::string &name, int32_t uid, int32_t pid, int32_t timeOut);
-    void SaveVibratorEffect(const std::string &name, int32_t uid, int32_t pid, const std::string &effect);
+    void SaveVibrateRecord(const VibrateInfo &vibrateInfo);
 
 private:
-    DISALLOW_COPY_AND_MOVE(MiscdeviceDump);
-    std::queue<std::shared_ptr<VibrateRecord>> dumpQueue_;
+    std::queue<VibrateRecord> dumpQueue_;
     std::mutex recordQueueMutex_;
     void DumpCurrentTime(std::string &startTime);
-    void UpdateRecordQueue(std::shared_ptr<VibrateRecord> record);
+    void UpdateRecordQueue(const VibrateRecord &record);
+    std::string GetUsageName(int32_t usage);
 };
+#define DumpHelper DelayedSingleton<MiscdeviceDump>::GetInstance()
 }  // namespace Sensors
 }  // namespace OHOS
 #endif  // MISCDEVICE_DUMP_H

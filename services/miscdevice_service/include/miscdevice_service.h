@@ -83,7 +83,6 @@ private:
     MiscdeviceServiceState state_;
     std::shared_ptr<VibratorThread> vibratorThread_;
     std::mutex vibratorThreadMutex_;
-    MiscdeviceDump &miscdeviceDump_ = MiscdeviceDump::GetInstance();
 };
 }  // namespace Sensors
 }  // namespace OHOS

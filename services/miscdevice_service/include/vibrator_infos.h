@@ -32,10 +32,24 @@ struct VibrateInfo {
     std::string mode;
     std::string packageName;
     int32_t pid = -1;
+    int32_t uid = -1;
     int32_t usage = 0;
     int32_t duration = 0;
     std::string effect;
     int32_t count = 0;
+};
+
+enum VibrateUsage {
+    USAGE_UNKNOWN = 0,
+    USAGE_ALARM = 1,
+    USAGE_RING = 2,
+    USAGE_NOTIFICATION = 3,
+    USAGE_COMMUNICATION = 4,
+    USAGE_TOUCH = 5,
+    USAGE_MEDIA = 6,
+    USAGE_PHYSICAL_FEEDBACK = 7,
+    USAGE_SIMULATE_REALITY = 8,
+    USAGE_MAX = 9,
 };
 }  // namespace Sensors
 }  // namespace OHOS

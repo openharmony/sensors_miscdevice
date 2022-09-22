@@ -145,6 +145,7 @@ int32_t MiscdeviceService::Vibrate(int32_t vibratorId, int32_t timeOut, int32_t 
         .mode = "time",
         .packageName = GetPackageName(GetCallingTokenID()),
         .pid = GetCallingPid(),
+        .uid = GetCallingUid(),
         .usage = usage,
         .duration = timeOut
     };
@@ -154,7 +155,6 @@ int32_t MiscdeviceService::Vibrate(int32_t vibratorId, int32_t timeOut, int32_t 
         return ERROR;
     }
     StartVibrateThread(info);
-    miscdeviceDump_.SaveVibrator(info.packageName, GetCallingUid(), GetCallingPid(), timeOut);
     return NO_ERROR;
 }
 
@@ -184,6 +184,7 @@ int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::str
         .mode = "preset",
         .packageName = GetPackageName(GetCallingTokenID()),
         .pid = GetCallingPid(),
+        .uid = GetCallingUid(),
         .usage = usage,
         .duration = vibratorEffects[effect],
         .effect = effect,
@@ -195,7 +196,6 @@ int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::str
         return ERROR;
     }
     StartVibrateThread(info);
-    miscdeviceDump_.SaveVibratorEffect(info.packageName, GetCallingUid(), GetCallingPid(), effect);
     return NO_ERROR;
 }
 
@@ -209,6 +209,7 @@ void MiscdeviceService::StartVibrateThread(VibrateInfo info)
     }
     vibratorThread_->UpdateVibratorEffect(info);
     vibratorThread_->Start("VibratorThread");
+    DumpHelper->SaveVibrateRecord(info);
 }
 
 int32_t MiscdeviceService::PlayCustomVibratorEffect(int32_t vibratorId, const std::vector<int32_t> &timing,
@@ -318,7 +319,7 @@ int32_t MiscdeviceService::Dump(int32_t fd, const std::vector<std::u16string> &a
     if (args.empty()) {
         MISC_HILOGE("args cannot be empty");
         dprintf(fd, "args cannot be empty\n");
-        miscdeviceDump_.DumpHelp(fd);
+        DumpHelper->DumpHelp(fd);
         return DUMP_PARAM_ERR;
     }
     std::vector<std::string> argList = { "" };
@@ -326,7 +327,7 @@ int32_t MiscdeviceService::Dump(int32_t fd, const std::vector<std::u16string> &a
         [](const std::u16string &arg) {
         return Str16ToStr8(arg);
     });
-    miscdeviceDump_.ParseCommand(fd, argList);
+    DumpHelper->ParseCommand(fd, argList);
     return ERR_OK;
 }
 }  // namespace Sensors
