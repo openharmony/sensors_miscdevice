@@ -93,7 +93,6 @@ void MiscdeviceDump::ParseCommand(int32_t fd, const std::vector<std::string>& ar
         if (strcpy_s(argv[i], args[i].size() + 1, args[i].c_str()) != EOK) {
             MISC_HILOGE("strcpy_s error");
             goto RELEASE_RES;
-            return;
         }
     }
     optind = 1;
