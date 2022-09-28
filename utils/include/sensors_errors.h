@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,6 +23,13 @@
 
 namespace OHOS {
 namespace Sensors {
+// Error code for user
+enum ErrorCode : int32_t {
+    PERMISSION_DENIED = 201, // Use this error code when permission is denied.
+    PARAMETER_ERROR = 401, // Use this error code when the input parameter type or range does not match.
+    DEVICE_OPERATION_FAILED = 14600101 // Use this error code when operating the device fail.
+};
+
 enum {
     MODULE_COMMON = 0x00,
     MODULE_MISCDEVICE_DEVICE = 0x01,
@@ -246,6 +253,30 @@ private:
         if (!(cond)) { \
             MISC_HILOGE("%{public}s, errCode:%{public}d", #errDesc, r); \
             return r; \
+        } \
+    } while (0)
+
+#define CHKCP(cond, errDesc) \
+    do { \
+        if (!(cond)) { \
+            MISC_HILOGE("%{public}s", #errDesc); \
+            return nullptr; \
+        } \
+    } while (0)
+
+#define CHKCF(cond, errDesc) \
+    do { \
+        if (!(cond)) { \
+            MISC_HILOGE("%{public}s", #errDesc); \
+            return false; \
+        } \
+    } while (0)
+
+#define CHKCV(cond, errDesc) \
+    do { \
+        if (!(cond)) { \
+            MISC_HILOGE("%{public}s", #errDesc); \
+            return; \
         } \
     } while (0)
 #endif

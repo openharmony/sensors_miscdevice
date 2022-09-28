@@ -30,6 +30,7 @@ ohos_shared_library("vibrator") {
 
   sources = [
     "./vibrator/src/vibrator_js.cpp",
+    "./vibrator/src/vibrator_napi_error.cpp",
     "./vibrator/src/vibrator_napi_utils.cpp",
   ]
 
