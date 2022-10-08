@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,6 +27,21 @@ static const int32_t DEFAULT_VIBRATOR_ID = 123;
 static int32_t g_loopCount = 1;
 static int32_t g_usage = USAGE_UNKNOWN;
 
+static int32_t NormalizeErrCode(int32_t code)
+{
+    switch (code) {
+        case PERMISSION_DENIED: {
+            return PERMISSION_DENIED;
+        }
+        case PARAMETER_ERROR: {
+            return PARAMETER_ERROR;
+        }
+        default: {
+            return DEVICE_OPERATION_FAILED;
+        }
+    }
+}
+
 bool SetLoopCount(int32_t count)
 {
     if (count <= 0) {
@@ -39,12 +54,12 @@ bool SetLoopCount(int32_t count)
 
 int32_t StartVibrator(const char *effectId)
 {
-    CHKPR(effectId, ERROR);
+    CHKPR(effectId, PARAMETER_ERROR);
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.Vibrate(DEFAULT_VIBRATOR_ID, effectId, g_loopCount, g_usage);
     if (ret != ERR_OK) {
         MISC_HILOGE("vibrator effectId failed, ret: %{public}d", ret);
-        return ERROR;
+        return NormalizeErrCode(ret);
     }
     g_loopCount = 1;
     g_usage = USAGE_UNKNOWN;
@@ -55,13 +70,13 @@ int32_t StartVibratorOnce(int32_t duration)
 {
     if (duration <= 0) {
         MISC_HILOGE("duration is invalid");
-        return ERROR;
+        return PARAMETER_ERROR;
     }
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.Vibrate(DEFAULT_VIBRATOR_ID, duration, g_usage);
     if (ret != ERR_OK) {
         MISC_HILOGE("vibrator duration failed, ret: %{public}d", ret);
-        return ERROR;
+        return NormalizeErrCode(ret);
     }
     g_usage = USAGE_UNKNOWN;
     return SUCCESS;
@@ -69,16 +84,16 @@ int32_t StartVibratorOnce(int32_t duration)
 
 int32_t StopVibrator(const char *mode)
 {
-    CHKPR(mode, ERROR);
+    CHKPR(mode, PARAMETER_ERROR);
     if (strcmp(mode, "time") != 0 && strcmp(mode, "preset") != 0) {
         MISC_HILOGE("mode is invalid, mode is %{public}s", mode);
-        return ERROR;
+        return PARAMETER_ERROR;
     }
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.Stop(DEFAULT_VIBRATOR_ID, mode);
     if (ret != ERR_OK) {
         MISC_HILOGE("client is failed, ret: %{public}d", ret);
-        return ERROR;
+        return NormalizeErrCode(ret);
     }
     return SUCCESS;
 }

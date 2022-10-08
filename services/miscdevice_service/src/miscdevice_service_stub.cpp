@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -83,7 +83,7 @@ int32_t MiscdeviceServiceStub::VibratePb(MessageParcel &data, MessageParcel &rep
         HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
             HiSysEvent::EventType::SECURITY, "PKG_NAME", "VibratePb", "ERROR_CODE", ret);
         MISC_HILOGE("result: %{public}d", ret);
-        return ERR_PERMISSION_DENIED;
+        return PERMISSION_DENIED;
     }
     int32_t vibratorId;
     int32_t duration;
@@ -111,7 +111,7 @@ int32_t MiscdeviceServiceStub::CancelVibratorPb(MessageParcel &data, MessageParc
         HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
             HiSysEvent::EventType::SECURITY, "PKG_NAME", "CancelVibratorPb", "ERROR_CODE", ret);
         MISC_HILOGE("result: %{public}d", ret);
-        return ERR_PERMISSION_DENIED;
+        return PERMISSION_DENIED;
     }
     int32_t vibratorId = data.ReadInt32();
     return CancelVibrator(vibratorId);
@@ -125,7 +125,7 @@ int32_t MiscdeviceServiceStub::PlayVibratorEffectPb(MessageParcel &data, Message
         HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
             HiSysEvent::EventType::SECURITY, "PKG_NAME", "PlayVibratorEffectPb", "ERROR_CODE", ret);
         MISC_HILOGE("result: %{public}d", ret);
-        return ERR_PERMISSION_DENIED;
+        return PERMISSION_DENIED;
     }
     int32_t vibratorId;
     std::string effect;
@@ -147,7 +147,7 @@ int32_t MiscdeviceServiceStub::PlayCustomVibratorEffectPb(MessageParcel &data, M
         HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
             HiSysEvent::EventType::SECURITY, "PKG_NAME", "PlayCustomVibratorEffectPb", "ERROR_CODE", ret);
         MISC_HILOGE("result: %{public}d", ret);
-        return ERR_PERMISSION_DENIED;
+        return PERMISSION_DENIED;
     }
     int32_t vibratorId = data.ReadInt32();
     std::vector<int32_t> timing;
@@ -166,7 +166,7 @@ int32_t MiscdeviceServiceStub::StopVibratorEffectPb(MessageParcel &data, Message
         HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
             HiSysEvent::EventType::SECURITY, "PKG_NAME", "StopVibratorEffectPb", "ERROR_CODE", ret);
         MISC_HILOGE("result: %{public}d", ret);
-        return ERR_PERMISSION_DENIED;
+        return PERMISSION_DENIED;
     }
     int32_t vibratorId = data.ReadInt32();
     std::string effectType = data.ReadString();
@@ -181,7 +181,7 @@ int32_t MiscdeviceServiceStub::SetVibratorParameterPb(MessageParcel &data, Messa
         HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
             HiSysEvent::EventType::SECURITY, "PKG_NAME", "SetVibratorParameterPb", "ERROR_CODE", ret);
         MISC_HILOGE("result: %{public}d", ret);
-        return ERR_PERMISSION_DENIED;
+        return PERMISSION_DENIED;
     }
     int32_t vibratorId = data.ReadInt32();
     std::string cmd = data.ReadString();
