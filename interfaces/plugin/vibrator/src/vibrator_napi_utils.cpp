@@ -194,7 +194,12 @@ void EmitAsyncCallbackWork(sptr<AsyncCallbackInfo> asyncCallbackInfo)
             CHKCV((ret == napi_ok), "napi_get_reference_value fail");
             napi_value result = nullptr;
             if (asyncCallbackInfo->error.code != SUCCESS) {
-                result = CreateBusinessError(env, asyncCallbackInfo->error.code, asyncCallbackInfo->error.message);
+                auto msg = GetNapiError(asyncCallbackInfo->error.code);
+                if (!msg) {
+                    MISC_HILOGE("errCode: %{public}d is invalid", asyncCallbackInfo->error.code);
+                    return;
+                }
+                result = CreateBusinessError(env, asyncCallbackInfo->error.code, msg.value());
                 CHKPV(result);
             } else {
                 CHKCV((napi_get_undefined(env, &result) == napi_ok), "napi_get_undefined fail");
@@ -246,7 +251,12 @@ void EmitPromiseWork(sptr<AsyncCallbackInfo> asyncCallbackInfo)
                 CHKCV((napi_resolve_deferred(env, asyncCallbackInfo->deferred, result) == napi_ok),
                     "napi_resolve_deferred fail");
             } else {
-                result = CreateBusinessError(env, asyncCallbackInfo->error.code, asyncCallbackInfo->error.message);
+                auto msg = GetNapiError(asyncCallbackInfo->error.code);
+                if (!msg) {
+                    MISC_HILOGE("errCode: %{public}d is invalid", asyncCallbackInfo->error.code);
+                    return;
+                }
+                result = CreateBusinessError(env, asyncCallbackInfo->error.code, msg.value());
                 CHKPV(result);
                 CHKCV((napi_reject_deferred(env, asyncCallbackInfo->deferred, result) == napi_ok),
                     "napi_reject_deferred fail");
