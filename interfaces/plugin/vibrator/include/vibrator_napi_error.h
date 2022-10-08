@@ -32,6 +32,7 @@ const std::map<int32_t, std::string> ERROR_MESSAGES = {
 
 napi_value CreateBusinessError(const napi_env &env, const int32_t errCode, const std::string &errMessage);
 void ThrowErr(const napi_env &env, const int32_t errCode,  const std::string &printMsg);
+std::optional<std::string> GetNapiError(int32_t errorCode);
 }  // namespace Sensors
 }  // namespace OHOS
 #endif // VIBRATOR_NAPI_ERROR_H
