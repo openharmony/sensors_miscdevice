@@ -58,7 +58,7 @@ ohos_shared_library("libmiscdevice_service") {
 ohos_prebuilt_etc("vibration_config") {
   source = "config/vibration_policy_config.json"
   install_enable = true
-  install_images = [ "vendor" ]
+  install_images = [ chipset_base_dir ]
   module_install_dir = "etc/vibrator"
   part_name = "miscdevice"
 }
