@@ -27,8 +27,6 @@ namespace {
 constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "CompatibleConnection" };
 std::vector<std::string> vibratorEffect_ = {"haptic.clock.timer"};
 IVibratorHdiConnection::VibratorStopMode vibrateMode_;
-constexpr uint32_t MAX_VIBRATOR_TIME = 1800000;
-constexpr uint32_t MIN_VIBRATOR_TIME = 0;
 }
 uint32_t CompatibleConnection::duration_ = -1;
 std::atomic_bool CompatibleConnection::isStop_ = false;
@@ -42,10 +40,6 @@ int32_t CompatibleConnection::ConnectHdi()
 int32_t CompatibleConnection::StartOnce(uint32_t duration)
 {
     CALL_LOG_ENTER;
-    if (duration > MAX_VIBRATOR_TIME || duration <= MIN_VIBRATOR_TIME) {
-        MISC_HILOGE("duration: %{public}d invalid", duration);
-        return VIBRATOR_ON_ERR;
-    }
     duration_ = duration;
     if (!vibrateThread_.joinable()) {
         std::thread senocdDataThread(CompatibleConnection::VibrateProcess);
