@@ -11,18 +11,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/config/features.gni")
-import("//build/ohos.gni")
-import("//build/test.gni")
-
-group("fuzztest") {
-  testonly = true
-  deps = []
-  deps += [
-    "setloopcount_fuzzer:fuzztest",
-    "setusage_fuzzer:fuzztest",
-    "startvibrator_fuzzer:fuzztest",
-    "startvibratoronce_fuzzer:fuzztest",
-    "stopvibrator_fuzzer:fuzztest",
-  ]
-}
+FUZZ
