@@ -13,27 +13,22 @@
  * limitations under the License.
  */
 
-#include "startvibratoronce_fuzzer.h"
+#include "setloopcount_fuzzer.h"
 
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <string>
 
 #include "vibrator_agent.h"
 
-namespace {
-constexpr int32_t MAX_VIBRATOR_TIME = 1800000;
-constexpr int32_t MIN_VIBRATOR_TIME = 0;
-}  // namespace
-
 namespace OHOS {
-bool StartVibratorOnceFuzzTest(const uint8_t* data, size_t size)
+bool SetLoopCountFuzzTest(const uint8_t* data, size_t size)
 {
     std::string argv(reinterpret_cast<const char *>(data), size);
-    int32_t duration = static_cast<uint32_t>(std::atoi(argv.c_str()));
-    int32_t ret = OHOS::Sensors::StartVibratorOnce(duration);
-    if (((duration <= MIN_VIBRATOR_TIME || duration > MAX_VIBRATOR_TIME) && ret == 0) ||
-        ((duration > MIN_VIBRATOR_TIME && duration <= MAX_VIBRATOR_TIME) && ret != 0)) {
+    int32_t count = static_cast<int32_t>(std::atoi(argv.c_str()));
+    bool ret = OHOS::Sensors::SetLoopCount(count);
+    if ((count <= 0 && ret == true) || ((count > 0 && ret == false))) {
         return false;
     }
     return true;
@@ -42,6 +37,6 @@ bool StartVibratorOnceFuzzTest(const uint8_t* data, size_t size)
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    OHOS::StartVibratorOnceFuzzTest(data, size);
+    OHOS::SetLoopCountFuzzTest(data, size);
     return 0;
 }
