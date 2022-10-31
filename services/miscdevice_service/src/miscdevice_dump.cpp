@@ -115,7 +115,9 @@ void MiscdeviceDump::ParseCommand(int32_t fd, const std::vector<std::string>& ar
     }
     RELEASE_RES:
     for (size_t i = 0; i < args.size(); ++i) {
-        delete[] argv[i];
+        if (argv[i] != nullptr) {
+            delete[] argv[i];
+        }
     }
     delete[] argv;
 }
