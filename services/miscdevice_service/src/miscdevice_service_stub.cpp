@@ -56,7 +56,7 @@ MiscdeviceServiceStub::MiscdeviceServiceStub()
 
 MiscdeviceServiceStub::~MiscdeviceServiceStub()
 {
-    MISC_HILOGI("~MiscdeviceServiceStub begin, xigou %{public}p", this);
+    MISC_HILOGI("~MiscdeviceServiceStub begin, destruct %{public}p", this);
     baseFuncs_.clear();
 }
 

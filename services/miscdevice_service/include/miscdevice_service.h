@@ -79,7 +79,7 @@ private:
     bool lightExist_;
     bool vibratorExist_;
     std::set<LightId> lightSupportId_;
-    std::map<MiscdeviceDeviceId, bool> miscDdeviceIdMap_;
+    std::map<MiscdeviceDeviceId, bool> miscDeviceIdMap_;
     MiscdeviceServiceState state_;
     std::shared_ptr<VibratorThread> vibratorThread_;
     std::mutex vibratorThreadMutex_;
