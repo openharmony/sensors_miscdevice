@@ -53,7 +53,12 @@ bool MiscdeviceServiceProxy::IsAbilityAvailable(MiscdeviceDeviceId groupID)
         MISC_HILOGE("sendRequest failed, ret : %{public}d", ret);
         return false;
     }
-    return reply.ReadBool();
+    bool isAbilityAvailable;
+    if (!reply.ReadBool(isAbilityAvailable)) {
+        MISC_HILOGE("Parcel read failed");
+        return false;
+    }
+    return isAbilityAvailable;
 }
 
 bool MiscdeviceServiceProxy::IsVibratorEffectAvailable(int32_t vibratorId, const std::string &effectType)
@@ -82,7 +87,12 @@ bool MiscdeviceServiceProxy::IsVibratorEffectAvailable(int32_t vibratorId, const
         MISC_HILOGE("SendRequest failed, ret : %{public}d", ret);
         return false;
     }
-    return reply.ReadBool();
+    bool isVibratorEffectAvailable;
+    if (!reply.ReadBool(isVibratorEffectAvailable)) {
+        MISC_HILOGE("Parcel read failed");
+        return false;
+    }
+    return isVibratorEffectAvailable;
 }
 
 std::vector<int32_t> MiscdeviceServiceProxy::GetVibratorIdList()
@@ -107,7 +117,11 @@ std::vector<int32_t> MiscdeviceServiceProxy::GetVibratorIdList()
         MISC_HILOGE("SendRequest failed, ret : %{public}d", ret);
         return idVec;
     }
-    uint32_t setCount = reply.ReadUint32();
+    uint32_t setCount;
+    if (!reply.ReadUint32(setCount)) {
+        MISC_HILOGE("Parcel read failed");
+        return idVec;
+    }
     if (setCount == 0 || setCount > MAX_VIBRATOR_COUNT) {
         MISC_HILOGE("setCount: %{public}d is invalid", setCount);
         return idVec;
@@ -329,7 +343,12 @@ std::string MiscdeviceServiceProxy::GetVibratorParameter(int32_t vibratorId, con
         MISC_HILOGE("ret : %{public}d", ret);
         return "";
     }
-    return reply.ReadString();
+    std::string vibratorParameter;
+    if (!reply.ReadString(vibratorParameter)) {
+        MISC_HILOGE("Parcel read failed");
+        return "";
+    }
+    return vibratorParameter;
 }
 
 std::vector<int32_t> MiscdeviceServiceProxy::GetLightSupportId()
@@ -353,7 +372,11 @@ std::vector<int32_t> MiscdeviceServiceProxy::GetLightSupportId()
             HiSysEvent::EventType::FAULT, "PKG_NAME", "GetLightSupportId", "ERROR_CODE", ret);
         MISC_HILOGE("sendRequest failed, ret : %{public}d", ret);
     }
-    uint32_t setCount = reply.ReadUint32();
+    uint32_t setCount;
+    if (!reply.ReadUint32(setCount)) {
+        MISC_HILOGE("Parcel read failed");
+        return idVec;
+    }
     if (setCount == 0 || setCount > MAX_LIGHT_COUNT) {
         MISC_HILOGE("setCount: %{public}d is invalid", setCount);
         return idVec;
@@ -389,7 +412,12 @@ bool MiscdeviceServiceProxy::IsLightEffectSupport(int32_t lightId, const std::st
         MISC_HILOGE("sendRequest failed, ret : %{public}d", ret);
         return false;
     }
-    return reply.ReadBool();
+    bool isLightEffectSupport;
+    if (!reply.ReadBool(isLightEffectSupport)) {
+        MISC_HILOGE("Parcel read failed");
+        return false;
+    }
+    return isLightEffectSupport;
 }
 
 int32_t MiscdeviceServiceProxy::Light(int32_t id, uint64_t brightness, uint32_t timeOn, uint32_t timeOff)
