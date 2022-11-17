@@ -71,14 +71,14 @@ void MiscdeviceService::OnStart()
         MISC_HILOGE("publish MiscdeviceService failed");
         return;
     }
-    auto ret = miscDdeviceIdMap_.insert(std::make_pair(MiscdeviceDeviceId::LED, lightExist_));
+    auto ret = miscDeviceIdMap_.insert(std::make_pair(MiscdeviceDeviceId::LED, lightExist_));
     if (!ret.second) {
-        MISC_HILOGI("light exist in miscDdeviceIdMap_");
+        MISC_HILOGI("light exist in miscDeviceIdMap_");
         ret.first->second = lightExist_;
     }
-    ret = miscDdeviceIdMap_.insert(std::make_pair(MiscdeviceDeviceId::VIBRATOR, vibratorExist_));
+    ret = miscDeviceIdMap_.insert(std::make_pair(MiscdeviceDeviceId::VIBRATOR, vibratorExist_));
     if (!ret.second) {
-        MISC_HILOGI("vibrator exist in miscDdeviceIdMap_");
+        MISC_HILOGI("vibrator exist in miscDeviceIdMap_");
         ret.first->second = vibratorExist_;
     }
     state_ = MiscdeviceServiceState::STATE_RUNNING;
@@ -110,8 +110,8 @@ void MiscdeviceService::OnStop()
 
 bool MiscdeviceService::IsAbilityAvailable(MiscdeviceDeviceId groupID)
 {
-    auto it = miscDdeviceIdMap_.find(groupID);
-    if (it == miscDdeviceIdMap_.end()) {
+    auto it = miscDeviceIdMap_.find(groupID);
+    if (it == miscDeviceIdMap_.end()) {
         MISC_HILOGE("cannot find groupID : %{public}d", groupID);
         return false;
     }

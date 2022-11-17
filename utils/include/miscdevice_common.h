@@ -21,7 +21,7 @@
 
 namespace OHOS {
 namespace Sensors {
-// These LightId correspand to logical lights
+// These LightId correspond to logical lights
 enum LightId {
     LIGHT_ID_LED = 0,
     LIGHT_ID_KEYBOARD,
