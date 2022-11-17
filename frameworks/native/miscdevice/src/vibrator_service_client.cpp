@@ -68,39 +68,6 @@ int32_t VibratorServiceClient::InitServiceClient()
     return MISC_NATIVE_GET_SERVICE_ERR;
 }
 
-std::vector<int32_t> VibratorServiceClient::GetVibratorIdList()
-{
-    CALL_LOG_ENTER;
-    int32_t ret = InitServiceClient();
-    if (ret != ERR_OK) {
-        MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
-        return {};
-    }
-    if (miscdeviceProxy_ == nullptr) {
-        MISC_HILOGE("miscdeviceProxy_ is null");
-        return {};
-    }
-    StartTrace(HITRACE_TAG_SENSORS, "GetVibratorIdList");
-    std::vector<int32_t> vibratorIdList = miscdeviceProxy_->GetVibratorIdList();
-    FinishTrace(HITRACE_TAG_SENSORS);
-    return vibratorIdList;
-}
-
-bool VibratorServiceClient::IsVibratorEffectSupport(int32_t vibratorId, const std::string &effect)
-{
-    CALL_LOG_ENTER;
-    int32_t ret = InitServiceClient();
-    if (ret != ERR_OK) {
-        MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
-        return false;
-    }
-    CHKPF(miscdeviceProxy_);
-    StartTrace(HITRACE_TAG_SENSORS, "IsVibratorEffectSupport");
-    bool status = miscdeviceProxy_->IsVibratorEffectAvailable(vibratorId, effect);
-    FinishTrace(HITRACE_TAG_SENSORS);
-    return status;
-}
-
 int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, int32_t timeOut, int32_t usage)
 {
     MISC_HILOGD("Vibrate begin, timeOut : %{public}u", timeOut);
@@ -132,22 +99,6 @@ int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, const std::string &ef
     return ret;
 }
 
-int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, std::vector<int32_t> timing, std::vector<int32_t> intensity,
-                                       int32_t periodCount)
-{
-    CALL_LOG_ENTER;
-    int32_t ret = InitServiceClient();
-    if (ret != ERR_OK) {
-        MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
-        return MISC_NATIVE_GET_SERVICE_ERR;
-    }
-    CHKPR(miscdeviceProxy_, ERROR);
-    StartTrace(HITRACE_TAG_SENSORS, "CustomVibrate");
-    ret = miscdeviceProxy_->PlayCustomVibratorEffect(vibratorId, timing, intensity, periodCount);
-    FinishTrace(HITRACE_TAG_SENSORS);
-    return ret;
-}
-
 int32_t VibratorServiceClient::Stop(int32_t vibratorId, const std::string &type)
 {
     MISC_HILOGD("Stop begin, vibratorId : %{public}d, type : %{public}s", vibratorId, type.c_str());
@@ -165,36 +116,6 @@ int32_t VibratorServiceClient::Stop(int32_t vibratorId, const std::string &type)
     }
     FinishTrace(HITRACE_TAG_SENSORS);
     return ret;
-}
-
-int32_t VibratorServiceClient::SetVibratorParameter(int32_t vibratorId, const std::string &cmd)
-{
-    CALL_LOG_ENTER;
-    int32_t ret = InitServiceClient();
-    if (ret != ERR_OK) {
-        MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
-        return MISC_NATIVE_GET_SERVICE_ERR;
-    }
-    CHKPR(miscdeviceProxy_, ERROR);
-    StartTrace(HITRACE_TAG_SENSORS, "SetVibratorParameter");
-    ret = miscdeviceProxy_->SetVibratorParameter(vibratorId, cmd);
-    FinishTrace(HITRACE_TAG_SENSORS);
-    return ret;
-}
-
-std::string VibratorServiceClient::GetVibratorParameter(int32_t vibratorId, const std::string &command)
-{
-    CALL_LOG_ENTER;
-    int32_t ret = InitServiceClient();
-    if (ret != ERR_OK) {
-        MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
-        return "";
-    }
-    CHKPS(miscdeviceProxy_);
-    StartTrace(HITRACE_TAG_SENSORS, "GetVibratorParameter");
-    std::string parameter = miscdeviceProxy_->GetVibratorParameter(vibratorId, command);
-    FinishTrace(HITRACE_TAG_SENSORS);
-    return parameter;
 }
 
 void VibratorServiceClient::ProcessDeathObserver(const wptr<IRemoteObject> &object)
