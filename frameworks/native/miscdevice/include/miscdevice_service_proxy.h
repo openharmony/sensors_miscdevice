@@ -28,12 +28,6 @@ public:
 
     ~MiscdeviceServiceProxy() = default;
 
-    virtual bool IsAbilityAvailable(MiscdeviceDeviceId groupID) override;
-
-    virtual bool IsVibratorEffectAvailable(int32_t vibratorId, const std::string &effectType) override;
-
-    virtual std::vector<int32_t> GetVibratorIdList() override;
-
     virtual int32_t Vibrate(int32_t vibratorId, int32_t timeOut, int32_t usage) override;
 
     virtual int32_t CancelVibrator(int32_t vibratorId) override;
@@ -41,24 +35,7 @@ public:
     virtual int32_t PlayVibratorEffect(int32_t vibratorId, const std::string &effect,
 	                                   int32_t loopCount, int32_t usage) override;
 
-    virtual int32_t PlayCustomVibratorEffect(int32_t vibratorId, const std::vector<int32_t> &timing,
-                                             const std::vector<int32_t> &intensity, int32_t periodCount) override;
-
     virtual int32_t StopVibratorEffect(int32_t vibratorId, const std::string &effect) override;
-
-    virtual int32_t SetVibratorParameter(int32_t vibratorId, const std::string &cmd) override;
-
-    virtual std::string GetVibratorParameter(int32_t vibratorId, const std::string &cmd) override;
-
-    virtual std::vector<int32_t> GetLightSupportId() override;
-
-    virtual bool IsLightEffectSupport(int32_t lightId, const std::string &effectId) override;
-
-    virtual int32_t Light(int32_t lightId, uint64_t brightness, uint32_t timeOn, uint32_t timeOff) override;
-
-    virtual int32_t PlayLightEffect(int32_t lightId, const std::string &type) override;
-
-    virtual int32_t StopLightEffect(int32_t lightId) override;
 
 private:
     DISALLOW_COPY_AND_MOVE(MiscdeviceServiceProxy);
