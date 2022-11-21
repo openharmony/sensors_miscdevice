@@ -25,15 +25,9 @@ namespace OHOS {
 namespace Sensors {
 class VibratorServiceClient : public Singleton<VibratorServiceClient> {
 public:
-    std::vector<int32_t> GetVibratorIdList();
-    bool IsVibratorEffectSupport(int32_t vibratorId, const std::string &effect);
     int32_t Vibrate(int32_t vibratorId, int32_t timeOut, int32_t usage);
     int32_t Vibrate(int32_t vibratorId, const std::string &effect, int32_t loopCount, int32_t usage);
-    int32_t Vibrate(int32_t vibratorId, std::vector<int32_t> timing, std::vector<int32_t> intensity,
-                    int32_t periodCount);
     int32_t Stop(int32_t vibratorId, const std::string &type);
-    int32_t SetVibratorParameter(int32_t vibratorId, const std::string &cmd);
-    std::string GetVibratorParameter(int32_t vibratorId, const std::string &command);
     void ProcessDeathObserver(const wptr<IRemoteObject> &object);
 
 private:

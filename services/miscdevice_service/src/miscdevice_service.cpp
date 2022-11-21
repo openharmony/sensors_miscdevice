@@ -29,7 +29,6 @@ namespace {
 constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "MiscdeviceService" };
 constexpr int32_t MIN_VIBRATOR_TIME = 0;
 constexpr int32_t MAX_VIBRATOR_TIME = 1800000;
-constexpr int32_t DEFAULT_VIBRATOR_ID = 123;
 }  // namespace
 
 REGISTER_SYSTEM_ABILITY_BY_ID(MiscdeviceService, MISCDEVICE_SERVICE_ABILITY_ID, true);
@@ -108,26 +107,6 @@ void MiscdeviceService::OnStop()
     }
 }
 
-bool MiscdeviceService::IsAbilityAvailable(MiscdeviceDeviceId groupID)
-{
-    auto it = miscDdeviceIdMap_.find(groupID);
-    if (it == miscDdeviceIdMap_.end()) {
-        MISC_HILOGE("cannot find groupID : %{public}d", groupID);
-        return false;
-    }
-    return it->second;
-}
-
-bool MiscdeviceService::IsVibratorEffectAvailable(int32_t vibratorId, const std::string &effectType)
-{
-    return true;
-}
-
-std::vector<int32_t> MiscdeviceService::GetVibratorIdList()
-{
-    std::vector<int32_t> vibratorIds = { DEFAULT_VIBRATOR_ID };
-    return vibratorIds;
-}
 
 bool MiscdeviceService::ShouldIgnoreVibrate(const VibrateInfo &info)
 {
@@ -212,16 +191,6 @@ void MiscdeviceService::StartVibrateThread(VibrateInfo info)
     DumpHelper->SaveVibrateRecord(info);
 }
 
-int32_t MiscdeviceService::PlayCustomVibratorEffect(int32_t vibratorId, const std::vector<int32_t> &timing,
-                                                    const std::vector<int32_t> &intensity, int32_t periodCount)
-{
-    if (!MiscdeviceCommon::CheckCustomVibratorEffect(timing, intensity, periodCount)) {
-        MISC_HILOGE("params are invalid");
-        return ERR_INVALID_VALUE;
-    }
-    return NO_ERROR;
-}
-
 int32_t MiscdeviceService::StopVibratorEffect(int32_t vibratorId, const std::string &effect)
 {
     std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
@@ -271,42 +240,6 @@ std::string MiscdeviceService::GetPackageName(AccessTokenID tokenId)
         }
     }
     return packageName;
-}
-
-int32_t MiscdeviceService::SetVibratorParameter(int32_t vibratorId, const std::string &cmd)
-{
-    return 0;
-}
-
-std::string MiscdeviceService::GetVibratorParameter(int32_t vibratorId, const std::string &cmd)
-{
-    return cmd;
-}
-
-std::vector<int32_t> MiscdeviceService::GetLightSupportId()
-{
-    std::vector<int32_t> list;
-    return list;
-}
-
-bool MiscdeviceService::IsLightEffectSupport(int32_t lightId, const std::string &effectId)
-{
-    return false;
-}
-
-int32_t MiscdeviceService::Light(int32_t lightId, uint64_t brightness, uint32_t timeOn, uint32_t timeOff)
-{
-    return 0;
-}
-
-int32_t MiscdeviceService::PlayLightEffect(int32_t lightId, const std::string &type)
-{
-    return 0;
-}
-
-int32_t MiscdeviceService::StopLightEffect(int32_t lightId)
-{
-    return 0;
 }
 
 int32_t MiscdeviceService::Dump(int32_t fd, const std::vector<std::u16string> &args)
