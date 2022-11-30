@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "iremote_broker.h"
+#include "light_agent_type.h"
 #include "miscdevice_common.h"
 
 namespace OHOS {
@@ -41,11 +42,20 @@ public:
 
     virtual int32_t StopVibratorEffect(int32_t vibratorId, const std::string &effect) = 0;
 
+    virtual std::vector<LightInfo> GetLightList() = 0;
+
+    virtual int32_t TurnOn(int32_t lightId, const LightColor &color, const LightAnimation &animation) = 0;
+
+    virtual int32_t TurnOff(int32_t lightId) = 0;
+
     enum {
         VIBRATE,
         CANCEL_VIBRATOR,
         PLAY_VIBRATOR_EFFECT,
-        STOP_VIBRATOR_EFFECT
+        STOP_VIBRATOR_EFFECT,
+        GET_LIGHT_LIST,
+        TURN_ON,
+        TURN_OFF,
     };
 };
 }  // namespace Sensors

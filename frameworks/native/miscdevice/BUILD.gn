@@ -16,6 +16,38 @@ import("//build/ohos.gni")
 SUBSYSTEM_DIR = "//base/sensors"
 
 ##############################################
+ohos_shared_library("liblight_native") {
+  sources = [
+    "src/light_client.cpp",
+    "src/miscdevice_service_proxy.cpp",
+  ]
+
+  include_dirs = [
+    "include",
+    "//commonlibrary/c_utils/base/include",
+    "//utils/system/safwk/native/include",
+    "$SUBSYSTEM_DIR/miscdevice/interfaces/native/light/include",
+    "$SUBSYSTEM_DIR/miscdevice/utils/include",
+    "//utils/jni/jnikit/include",
+  ]
+  cflags = [ "-fstack-protector-all" ]
+  deps = [
+    "$SUBSYSTEM_DIR/miscdevice/interfaces/native/light:light_ndk_header",
+    "$SUBSYSTEM_DIR/miscdevice/utils:libmiscdevice_utils",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hisysevent_native:libhisysevent",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "samgr:samgr_proxy",
+  ]
+  part_name = "miscdevice"
+  subsystem_name = "sensors"
+}
+
+##############################################
 ohos_shared_library("libvibrator_native") {
   sources = [
     "src/miscdevice_service_proxy.cpp",
@@ -26,6 +58,7 @@ ohos_shared_library("libvibrator_native") {
     "include",
     "//commonlibrary/c_utils/base/include",
     "//utils/system/safwk/native/include",
+    "$SUBSYSTEM_DIR/miscdevice/interfaces/native/light/include",
     "$SUBSYSTEM_DIR/miscdevice/utils/include",
     "//utils/jni/jnikit/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
@@ -45,5 +78,8 @@ ohos_shared_library("libvibrator_native") {
 
 ##############################################
 group("miscdevice_native_target") {
-  deps = [ ":libvibrator_native" ]
+  deps = [
+    ":liblight_native",
+    ":libvibrator_native",
+  ]
 }
