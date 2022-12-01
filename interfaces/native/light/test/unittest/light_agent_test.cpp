@@ -83,7 +83,6 @@ bool GetLightColor(LightColor &color, int32_t lightType)
         }
         case LIGHT_TYPE_RGB_COLOR: {
             color.rgbColor = {
-                .brightness = 100,
                 .r = 0Xff,
                 .g = 0Xff,
                 .b = 0Xff
