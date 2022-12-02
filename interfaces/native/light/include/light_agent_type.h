@@ -71,17 +71,17 @@ typedef struct {
 } LightAnimation;
 
 /**
- * @brief Defines the color and brightness of the light.
+ * @brief Defines the color and custom extended information of the light.
  *
- * The parameters include the These parameters include red, green, blue values and brightness values.
+ * The parameters include the These parameters include red, green, blue values and custom extended information.
  *
  * @since 10
  */
 struct RGBColor {
-    uint8_t brightness;    /** Brightness value 0-255. */
-    uint8_t r;    /** Red value range 0-255. */
-    uint8_t g;    /** Green value range 0-255. */
-    uint8_t b;    /** Blue value range 0-255. */
+    uint8_t r;          /** Red value range 0-255. */
+    uint8_t g;          /** Green value range 0-255. */
+    uint8_t b;          /** Blue value range 0-255. */
+    uint8_t reserved;   /** Custom extended information */
 };
 
 /**
