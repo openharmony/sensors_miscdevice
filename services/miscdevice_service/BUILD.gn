@@ -31,6 +31,7 @@ ohos_shared_library("libmiscdevice_service") {
     "//commonlibrary/c_utils/base/include",
     "//utils/system/safwk/native/include",
     "$SUBSYSTEM_DIR/miscdevice/frameworks/native/miscdevice/include",
+    "$SUBSYSTEM_DIR/miscdevice/interfaces/native/light/include",
     "$SUBSYSTEM_DIR/miscdevice/utils/include",
     "hdi_connection/adapter/include",
     "hdi_connection/interface/include",
