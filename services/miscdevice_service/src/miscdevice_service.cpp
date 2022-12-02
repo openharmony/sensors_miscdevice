@@ -220,7 +220,7 @@ int32_t MiscdeviceService::TurnOn(int32_t lightId, const LightColor &color, cons
     return NO_ERROR;
 }
 
-int32_t MiscdeviceService::TurnOff(int32_t lightId) 
+int32_t MiscdeviceService::TurnOff(int32_t lightId)
 {
     return NO_ERROR;
 }
