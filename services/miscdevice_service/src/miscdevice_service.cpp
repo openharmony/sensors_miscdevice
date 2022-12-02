@@ -210,12 +210,12 @@ int32_t MiscdeviceService::StopVibratorEffect(int32_t vibratorId, const std::str
     return NO_ERROR;
 }
 
-std::vector<LightInfo> MiscdeviceService::GetLightList() 
+std::vector<LightInfo> MiscdeviceService::GetLightList()
 {
     return {};
 }
 
-int32_t MiscdeviceService::TurnOn(int32_t lightId, const LightColor &color, const LightAnimation &animation) 
+int32_t MiscdeviceService::TurnOn(int32_t lightId, const LightColor &color, const LightAnimation &animation)
 {
     return NO_ERROR;
 }
