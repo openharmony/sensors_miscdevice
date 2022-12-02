@@ -43,7 +43,7 @@ int32_t GetLightList(LightInfo **lightInfo, int32_t &count);
  * @brief Turns on available lights in the list based on the specified light id.
  *
  * @param lightId Indicates the light id.
- * @param color：Color and brightness corresponding to the light.
+ * @param color：Color corresponding to the light.
  * @param animation Indicates the blinking parameters.
  * @return Returns <b>0</b> if the operation is successful.
  * @return Returns a negative value if the operation fails.
