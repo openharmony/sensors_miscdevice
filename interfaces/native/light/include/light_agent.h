@@ -31,7 +31,7 @@ namespace Sensors {
 /**
  * @brief Obtains information about all the lights in the system.
  *
- * @param lightInfo Indicates the list of the light information. 
+ * @param lightInfo Indicates the list of the light information.
  * @param count Indicates the count of all the lights in the system.
  * @return Returns <b>0</b> if the operation is successful.
  * @return Returns a negative value if the operation fails.
