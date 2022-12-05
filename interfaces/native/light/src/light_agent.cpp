@@ -41,7 +41,7 @@ int32_t GetLightList(LightInfo **lightInfo, int32_t &count)
 int32_t TurnOn(int32_t lightId, const LightColor &color, const LightAnimation &animation)
 {
     if (lightId < 0) {
-        MISC_HILOGE("lightId is error");
+        MISC_HILOGE("lightId is invalid");
         return ERROR;
     }
     auto &client = LightClient::GetInstance();
