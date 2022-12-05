@@ -64,11 +64,11 @@ typedef enum {
  *
  * @since 10
  */
-typedef struct {
+struct LightAnimation {
     int32_t mode = LIGHT_MODE_DEFAULT; /**< Blinking mode. For details, see {@link FlashMode}. */
     int32_t onTime; /**<  Duration (in ms) for which the light is on in a blinking period. */
     int32_t offTime; /**< Duration (in ms) for which the light is off in a blinking period. */
-} LightAnimation;
+};
 
 /**
  * @brief Defines the color and custom extended information of the light.
