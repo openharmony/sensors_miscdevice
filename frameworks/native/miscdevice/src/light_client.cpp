@@ -159,7 +159,6 @@ void LightClient::ProcessDeathObserver(wptr<IRemoteObject> object)
 
 void LightClient::ClearLightInfos()
 {
-    std::lock_guard<std::mutex> lightInfosLock(lightInfosMutex_);
     CHKPV(lightInfos_);
     free(lightInfos_);
     lightInfos_ = nullptr;
