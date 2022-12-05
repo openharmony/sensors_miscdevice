@@ -41,8 +41,8 @@ private:
     std::mutex lightInfosMutex_;
     LightInfo *lightInfos_ {nullptr};
     int32_t lightInfoCount_ {-1};
-    sptr<IRemoteObject::DeathRecipient> serviceDeathObserver_;
-    sptr<IMiscdeviceService> miscdeviceProxy_;
+    sptr<IRemoteObject::DeathRecipient> serviceDeathObserver_ = nullptr;
+    sptr<IMiscdeviceService> miscdeviceProxy_ = nullptr;
     std::vector<LightInfo> lightInfoList_;
     std::mutex clientMutex_;
 };
