@@ -38,7 +38,6 @@ private:
     int32_t InitLightClient();
     bool IsLightAnimationValid(const LightAnimation &animation);
     bool IsLightIdValid(int32_t lightId);
-    std::mutex lightInfosMutex_;
     LightInfo *lightInfos_ {nullptr};
     int32_t lightInfoCount_ {-1};
     sptr<IRemoteObject::DeathRecipient> serviceDeathObserver_ = nullptr;
