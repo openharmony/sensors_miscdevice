@@ -56,6 +56,9 @@ public:
     virtual int32_t PlayVibratorEffect(int32_t vibratorId, const std::string &effect,
                                        int32_t loopCount, int32_t usage) override;
     virtual int32_t StopVibratorEffect(int32_t vibratorId, const std::string &effect) override;
+    virtual std::vector<LightInfo> GetLightList() override;
+    virtual int32_t TurnOn(int32_t lightId, const LightColor &color, const LightAnimation &animation) override;
+    virtual int32_t TurnOff(int32_t lightId) override;
 
 private:
     DISALLOW_COPY_AND_MOVE(MiscdeviceService);
