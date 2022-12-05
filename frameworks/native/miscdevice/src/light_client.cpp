@@ -26,10 +26,9 @@
 
 namespace OHOS {
 namespace Sensors {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "LightClient" };
 
 namespace {
-constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "LightClient" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "LightClient" };
 constexpr int32_t GET_SERVICE_MAX_COUNT = 30;
 constexpr uint32_t MAX_LIGHT_LIST_SIZE = 0X00ff;
 constexpr uint32_t WAIT_MS = 200;
@@ -58,13 +57,13 @@ int32_t LightClient::InitLightClient()
             lightInfoList_ = miscdeviceProxy_->GetLightList();
             return ERR_OK;
         }
-        MISC_HILOGW("get service failed, retry:%{public}d", retry);
+        MISC_HILOGW("Get service failed, retry:%{public}d", retry);
         std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_MS));
         retry++;
     }
     HiSysEvent::Write(HiviewDFX::HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_EXCEPTION",
         HiSysEvent::EventType::FAULT, "PKG_NAME", "InitLightClient", "ERROR_CODE", MISC_NATIVE_GET_SERVICE_ERR);
-    MISC_HILOGE("get service failed");
+    MISC_HILOGE("Get service failed");
     return MISC_NATIVE_GET_SERVICE_ERR;
 }
 
@@ -96,7 +95,7 @@ int32_t LightClient::GetLightList(LightInfo **lightInfo, int32_t &count)
     if (lightInfos_ == nullptr) {
         int32_t ret = ConvertLightInfos();
         if (ret != ERR_OK) {
-            MISC_HILOGE("convert light lists failed");
+            MISC_HILOGE("Convert light lists failed");
             ClearLightInfos();
             return ERROR;
         }
