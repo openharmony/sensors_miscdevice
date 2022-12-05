@@ -176,7 +176,6 @@ int32_t LightClient::ConvertLightInfos()
         MISC_HILOGE("The number of lights exceed the maximum value");
         return ERROR;
     }
-    std::lock_guard<std::mutex> lightInfosLock(lightInfosMutex_);
     lightInfos_ = (LightInfo *)malloc(sizeof(LightInfo) * count);
     CHKPR(lightInfos_, ERROR);
     for (size_t i = 0; i < count; ++i) {
