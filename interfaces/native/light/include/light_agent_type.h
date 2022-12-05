@@ -15,7 +15,9 @@
 
 #ifndef LIGHT_AGENT_TYPE_H
 #define LIGHT_AGENT_TYPE_H
+
 #include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -104,6 +106,7 @@ struct WRGBColor {
  * @since 10
  */
 union LightColor {
+    LightColor() {};
     int32_t singleColor; /** Single color mode. */
     RGBColor rgbColor; /** RGB mode, see {@link RGBColor}. */
     WRGBColor wrgbColor; /** WRGB mode, see {@link WRGBColor}. */

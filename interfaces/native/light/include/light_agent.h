@@ -19,9 +19,12 @@
  * @brief Declares the functions for starting or stopping a light.
  * @since 10
  */
+
 #ifndef LIGHT_AGENT_H
 #define LIGHT_AGENT_H
+
 #include "light_agent_type.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
