@@ -146,7 +146,7 @@ int32_t LightClient::TurnOff(int32_t lightId)
     return miscdeviceProxy_->TurnOff(lightId);
 }
 
-void LightClient::ProcessDeathObserver(const wptr<IRemoteObject> &object)
+void LightClient::ProcessDeathObserver(wptr<IRemoteObject> object)
 {
     CALL_LOG_ENTER;
     (void)object;
