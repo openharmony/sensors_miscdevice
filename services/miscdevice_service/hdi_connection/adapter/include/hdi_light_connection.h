@@ -19,6 +19,7 @@
 #include "death_recipient_template.h"
 #include "i_light_hdi_connection.h"
 #include "v1_0/light_interface_proxy.h"
+
 namespace OHOS {
 namespace Sensors {
 using OHOS::HDI::Light::V1_0::ILightInterface;
