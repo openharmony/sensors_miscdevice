@@ -76,14 +76,13 @@ HWTEST_F(LightAgentTest, StartLightTest_002, TestSize.Level1)
 
 bool GetLightColor(LightColor &color, int32_t lightType)
 {
-    switch(lightType){
+    switch (lightType) {
         case LIGHT_TYPE_SINGLE_COLOR: {
             color.singleColor = 0Xff;
             return true;
         }
         case LIGHT_TYPE_RGB_COLOR: {
             color.rgbColor = {
-                .brightness = 100,
                 .r = 0Xff,
                 .g = 0Xff,
                 .b = 0Xff
