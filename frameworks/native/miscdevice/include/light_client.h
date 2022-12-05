@@ -29,7 +29,7 @@ public:
     int32_t GetLightList(LightInfo **lightInfo, int32_t &count);
     int32_t TurnOn(int32_t lightId, const LightColor &color, const LightAnimation &animation);
     int32_t TurnOff(int32_t lightId);
-    void ProcessDeathObserver(const wptr<IRemoteObject> &object);
+    void ProcessDeathObserver(wptr<IRemoteObject> object);
 
 private:
     bool IsValid(int32_t lightId);
