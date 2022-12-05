@@ -15,12 +15,13 @@
 
 #ifndef HDI_LIGHT_CONNECTION_H
 #define HDI_LIGHT_CONNECTION_H
+
 #include "death_recipient_template.h"
 #include "i_light_hdi_connection.h"
 #include "v1_0/light_interface_proxy.h"
-using OHOS::HDI::Light::V1_0::ILightInterface;
 namespace OHOS {
 namespace Sensors {
+using OHOS::HDI::Light::V1_0::ILightInterface;
 class HdiLightConnection : public ILightHdiConnection {
 public:
     HdiLightConnection() = default;

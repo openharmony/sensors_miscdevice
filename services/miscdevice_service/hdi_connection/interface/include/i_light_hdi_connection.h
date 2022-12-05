@@ -16,9 +16,9 @@
 #ifndef I_LIGHT_HDI_CONNECTION_H
 #define I_LIGHT_HDI_CONNECTION_H
 
-#include <nocopyable.h>
-#include <stdint.h>
+#include <cstdint>
 #include <string>
+#include <nocopyable.h>
 
 #include "light_agent_type.h"
 

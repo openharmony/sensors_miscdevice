@@ -22,9 +22,8 @@
 
 namespace OHOS {
 namespace Sensors {
-using namespace OHOS::HiviewDFX;
 namespace {
-constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "CompatibleLightConnection" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "CompatibleLightConnection" };
 }
 std::vector<LightInfo> lightInfo = {
     {"light_test", 1, 3, 1}
@@ -70,14 +69,8 @@ int32_t CompatibleLightConnection::TurnOff(int32_t lightId)
         MISC_HILOGE("lightId:%{public}d should not be turn off", lightId);
         return LIGHT_END_ERROR;
     }
-    std::vector<int32_t>::iterator iter;
-    for (iter = turnOnLights_.begin(); iter != turnOnLights_.end();) {
-        if (*iter == lightId) {
-            turnOnLights_.erase(iter++);
-            break;
-        }
-        ++iter;
-    }
+    std::vector<int32_t>::iterator iter = std::find(turnOnLights_.begin(), turnOnLights_.end(), lightId);
+    turnOnLights_.erase(iter);
     return ERR_OK;
 }
 

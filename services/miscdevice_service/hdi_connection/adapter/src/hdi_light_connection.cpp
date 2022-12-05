@@ -12,9 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "hdi_light_connection.h"
 
-#include <memory.h>
+#include <memory>
 #include <securec.h>
 #include <thread>
 #include <vector>
@@ -25,9 +26,8 @@
 
 namespace OHOS {
 namespace Sensors {
-using namespace OHOS::HiviewDFX;
 namespace {
-constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "HdiLightConnection" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "HdiLightConnection" };
 constexpr int32_t GET_HDI_SERVICE_COUNT = 10;
 constexpr uint32_t WAIT_MS = 100;
 }
@@ -53,15 +53,18 @@ int32_t HdiLightConnection::GetLightList(std::vector<LightInfo> &lightList) cons
 {
     CALL_LOG_ENTER;
     std::vector<HDI::Light::V1_0::HdfLightInfo> lightInfos;
+    CHKPR(lightInterface_, ERROR);
     int32_t ret = lightInterface_->GetLightInfo(lightInfos);
     if (ret != 0) {
+        MISC_HILOGE("get light info failed");
         return ret;
     }
     for (size_t i = 0; i < lightInfos.size(); ++i) {
         LightInfo light;
         light.lightId = lightInfos[i].lightId;
         light.lightNumber = lightInfos[i].lightNumber;
-        auto ret = memcpy_s(light.lightName, NAME_MAX_LEN, lightInfos[i].lightName.c_str(), lightInfos[i].lightName.length());
+        auto ret = memcpy_s(light.lightName, NAME_MAX_LEN, lightInfos[i].lightName.c_str(),
+                            lightInfos[i].lightName.length());
         if (ret != EOK) {
             MISC_HILOGE("memcpy_s failed, error number: %{public}d", errno);
             return ret;
@@ -87,6 +90,7 @@ int32_t HdiLightConnection::TurnOn(int32_t lightId, const LightColor &color, con
         .lightColor = lightColor,
         .flashEffect = flashEffect
     };
+    CHKPR(lightInterface_, ERROR);
     int32_t ret = lightInterface_->TurnOnLight(lightId, effect);
     if (ret < 0) {
         MISC_HILOGE("TurnOn failed");
@@ -98,6 +102,7 @@ int32_t HdiLightConnection::TurnOn(int32_t lightId, const LightColor &color, con
 int32_t HdiLightConnection::TurnOff(int32_t lightId)
 {
     CALL_LOG_ENTER;
+    CHKPR(lightInterface_, ERROR);
     int32_t ret = lightInterface_->TurnOffLight(lightId);
     if (ret < 0) {
         MISC_HILOGE("TurnOff failed");
@@ -121,7 +126,7 @@ void HdiLightConnection::RegisterHdiDeathRecipient()
     }
     hdiDeathObserver_ = new (std::nothrow) DeathRecipientTemplate(*const_cast<HdiLightConnection *>(this));
     if (hdiDeathObserver_ == nullptr) {
-        MISC_HILOGE("hdiDeathObserver_ cannot be null");
+        MISC_HILOGE("hdiDeathObserver_ is nullptr");
         return;
     }
     OHOS::HDI::hdi_objcast<ILightInterface>(lightInterface_)->AddDeathRecipient(hdiDeathObserver_);
@@ -131,7 +136,7 @@ void HdiLightConnection::UnregisterHdiDeathRecipient()
 {
     CALL_LOG_ENTER;
     if (lightInterface_ == nullptr || hdiDeathObserver_ == nullptr) {
-        MISC_HILOGE("lightInterface_ or hdiDeathObserver_ is null");
+        MISC_HILOGE("lightInterface_ or hdiDeathObserver_ is nullptr");
         return;
     }
     OHOS::HDI::hdi_objcast<ILightInterface>(lightInterface_)->RemoveDeathRecipient(hdiDeathObserver_);
@@ -151,9 +156,8 @@ void HdiLightConnection::ProcessDeathObserver(const wptr<IRemoteObject> &object)
 
 void HdiLightConnection::Reconnect()
 {
-    int32_t ret = ConnectHdi();
-    if (ret != ERR_OK) {
-        MISC_HILOGE("connect hdi fail");
+    if (ConnectHdi() != ERR_OK) {
+        MISC_HILOGE("connect hdi failed");
     }
 }
 }  // namespace Sensors

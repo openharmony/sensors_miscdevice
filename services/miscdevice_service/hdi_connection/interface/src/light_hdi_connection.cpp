@@ -32,7 +32,6 @@ constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "LightHdiConnection" }
 int32_t LightHdiConnection::ConnectHdi()
 {
     iLightHdiConnection_ = std::make_unique<HdiLightConnection>();
-    CHKPR(iLightHdiConnection_, ERROR);
     int32_t ret = iLightHdiConnection_->ConnectHdi();
     if (ret != 0) {
         MISC_HILOGE("hdi direct failed");
@@ -60,10 +59,7 @@ int32_t LightHdiConnection::GetLightList(std::vector<LightInfo>& lightList) cons
 
 int32_t LightHdiConnection::TurnOn(int32_t lightId, const LightColor &color, const LightAnimation &animation)
 {
-    if (iLightHdiConnection_ == nullptr) {
-        MISC_HILOGE("iLightHdiConnection_ is null");
-        return ERROR;
-    }
+    CHKPR(iLightHdiConnection_, ERROR);
     int32_t ret = iLightHdiConnection_->TurnOn(lightId, color, animation);
     if (ret != 0) {
         MISC_HILOGE("TurnOn failed");
@@ -74,6 +70,7 @@ int32_t LightHdiConnection::TurnOn(int32_t lightId, const LightColor &color, con
 
 int32_t LightHdiConnection::TurnOff(int32_t lightId)
 {
+    CHKPR(iLightHdiConnection_, ERROR);
     int32_t ret = iLightHdiConnection_->TurnOff(lightId);
     if (ret != 0) {
         MISC_HILOGE("TurnOff failed");
@@ -84,6 +81,7 @@ int32_t LightHdiConnection::TurnOff(int32_t lightId)
 
 int32_t LightHdiConnection::DestroyHdiConnection()
 {
+    CHKPR(iLightHdiConnection_, ERROR);
     int32_t ret = iLightHdiConnection_->DestroyHdiConnection();
     if (ret != 0) {
         MISC_HILOGE("DestroyHdiConnection failed");

@@ -158,6 +158,7 @@ int32_t MiscdeviceServiceStub::TurnOnPb(MessageParcel &data, MessageParcel &repl
     CHKPR(info, ERROR);
     LightColor lightColor;
     if (memcpy_s(&lightColor, sizeof(LightColor), info, sizeof(LightColor)) != EOK) {
+        MISC_HILOGE("memcpy_s lightColor failed");
         return ERROR;
     }
 
@@ -165,6 +166,7 @@ int32_t MiscdeviceServiceStub::TurnOnPb(MessageParcel &data, MessageParcel &repl
     CHKPR(buf, ERROR);
     LightAnimation lightAnimation;
     if (memcpy_s(&lightAnimation, sizeof(LightAnimation), buf, sizeof(LightAnimation)) != EOK) {
+        MISC_HILOGE("memcpy_s lightAnimation failed");
         return ERROR;
     }
     return TurnOn(lightId, lightColor, lightAnimation);

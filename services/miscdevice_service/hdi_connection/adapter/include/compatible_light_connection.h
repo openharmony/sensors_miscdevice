@@ -15,6 +15,7 @@
 
 #ifndef COMPATIBLE_LIGHT_CONNECTION_H
 #define COMPATIBLE_LIGHT_CONNECTION_H
+
 #include <atomic>
 #include <thread>
 #include <vector>
@@ -25,7 +26,7 @@ namespace Sensors {
 class CompatibleLightConnection : public ILightHdiConnection {
 public:
     CompatibleLightConnection() = default;
-    virtual ~CompatibleLightConnection() {};
+    virtual ~CompatibleLightConnection() = default;
     int32_t ConnectHdi() override;
     int32_t GetLightList(std::vector<LightInfo>& lightList) const override;
     int32_t TurnOn(int32_t lightId, const LightColor &color, const LightAnimation &animation) override;
