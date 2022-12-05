@@ -92,6 +92,7 @@ int32_t LightClient::GetLightList(LightInfo **lightInfo, int32_t &count)
         MISC_HILOGE("InitLightClient failed");
         return ERROR;
     }
+    std::lock_guard<std::mutex> lightInfosLock(lightInfosMutex_);
     if (lightInfos_ == nullptr) {
         int32_t ret = ConvertLightInfos();
         if (ret != ERR_OK) {
@@ -159,6 +160,7 @@ void LightClient::ProcessDeathObserver(const wptr<IRemoteObject> &object)
 
 void LightClient::ClearLightInfos()
 {
+    std::lock_guard<std::mutex> lightInfosLock(lightInfosMutex_);
     CHKPV(lightInfos_);
     free(lightInfos_);
     lightInfos_ = nullptr;
@@ -176,6 +178,7 @@ int32_t LightClient::ConvertLightInfos()
         MISC_HILOGE("The number of lights exceed the maximum value");
         return ERROR;
     }
+    std::lock_guard<std::mutex> lightInfosLock(lightInfosMutex_);
     lightInfos_ = (LightInfo *)malloc(sizeof(LightInfo) * count);
     CHKPR(lightInfos_, ERROR);
     for (size_t i = 0; i < count; ++i) {
