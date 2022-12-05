@@ -177,7 +177,7 @@ HWTEST_F(LightAgentTest, StartLightTest_005, TestSize.Level1)
 
 /**
  * @tc.name: StartLightTest_006
- * @tc.desc: Verify GetLightList
+ * @tc.desc: Verify TurnOn
  * @tc.type: FUNC
  * @tc.require: I63TFA
  */
@@ -200,7 +200,7 @@ HWTEST_F(LightAgentTest, StartLightTest_006, TestSize.Level1)
 
 /**
  * @tc.name: StartLightTest_007
- * @tc.desc: Verify GetLightList
+ * @tc.desc: Verify TurnOn
  * @tc.type: FUNC
  * @tc.require: I63TFA
  */
@@ -223,7 +223,7 @@ HWTEST_F(LightAgentTest, StartLightTest_007, TestSize.Level1)
 
 /**
  * @tc.name: StartLightTest_008
- * @tc.desc: Verify GetLightList
+ * @tc.desc: Verify TurnOn
  * @tc.type: FUNC
  * @tc.require: I63TFA
  */
@@ -246,7 +246,7 @@ HWTEST_F(LightAgentTest, StartLightTest_008, TestSize.Level1)
 
 /**
  * @tc.name: StartLightTest_009
- * @tc.desc: Verify GetLightList
+ * @tc.desc: Verify TurnOff
  * @tc.type: FUNC
  * @tc.require: I63TFA
  */
@@ -259,7 +259,7 @@ HWTEST_F(LightAgentTest, StartLightTest_009, TestSize.Level1)
 
 /**
  * @tc.name: StartLightTest_010
- * @tc.desc: Verify GetLightList
+ * @tc.desc: Verify TurnOff
  * @tc.type: FUNC
  * @tc.require: I63TFA
  */
