@@ -104,6 +104,7 @@ struct WRGBColor {
  * @since 10
  */
 union LightColor {
+    LightColor() {}
     int32_t singleColor; /** Single color mode. */
     RGBColor rgbColor; /** RGB mode, see {@link RGBColor}. */
     WRGBColor wrgbColor; /** WRGB mode, see {@link WRGBColor}. */
