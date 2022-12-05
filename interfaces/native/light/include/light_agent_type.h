@@ -42,9 +42,9 @@ enum LightType {
  */
 typedef struct {
     char lightName[NAME_MAX_LEN]; /**< light name */
-    int32_t lightId = -1; /**< Light id */
-    int32_t lightNumber = 0; /**< Number of physical lights in the logic controller */
-    int32_t lightType = -1; /** Light type. For details, see {@link LightType}. */
+    int32_t lightId; /**< Light id */
+    int32_t lightNumber; /**< Number of physical lights in the logic controller */
+    int32_t lightType; /** Light type. For details, see {@link LightType}. */
 } LightInfo;
 
 /**
@@ -65,9 +65,9 @@ typedef enum {
  * @since 10
  */
 typedef struct {
-    int32_t mode = -1; /**< Blinking mode. For details, see {@link FlashMode}. */
-    int32_t onTime = 0; /**<  Duration (in ms) for which the light is on in a blinking period. */
-    int32_t offTime = 0; /**< Duration (in ms) for which the light is off in a blinking period. */
+    int32_t mode = LIGHT_MODE_DEFAULT; /**< Blinking mode. For details, see {@link FlashMode}. */
+    int32_t onTime; /**<  Duration (in ms) for which the light is on in a blinking period. */
+    int32_t offTime; /**< Duration (in ms) for which the light is off in a blinking period. */
 } LightAnimation;
 
 /**
@@ -104,7 +104,7 @@ struct WRGBColor {
  * @since 10
  */
 union LightColor {
-    int32_t singleColor = -1; /** Single color mode. */
+    int32_t singleColor; /** Single color mode. */
     RGBColor rgbColor; /** RGB mode, see {@link RGBColor}. */
     WRGBColor wrgbColor; /** WRGB mode, see {@link WRGBColor}. */
 };
