@@ -26,7 +26,7 @@
 
 namespace OHOS {
 namespace Sensors {
-using namespace OHOS::HiviewDFX;
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "LightClient" };
 
 namespace {
 constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "LightClient" };
@@ -130,6 +130,7 @@ int32_t LightClient::TurnOn(int32_t lightId, const LightColor &color, const Ligh
         MISC_HILOGE("animation is invalid");
         return PARAMETER_ERROR;
     }
+    CHKPR(miscdeviceProxy_, ERROR);
     return miscdeviceProxy_->TurnOn(lightId, color, animation);
 }
 
@@ -140,6 +141,7 @@ int32_t LightClient::TurnOff(int32_t lightId)
         MISC_HILOGE("lightId is invalid, lightId:%{pubilc}d", lightId);
         return LIGHT_ID_NOT_SUPPORT;
     }
+    CHKPR(miscdeviceProxy_, ERROR);
     return miscdeviceProxy_->TurnOff(lightId);
 }
 
