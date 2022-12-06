@@ -80,10 +80,10 @@ struct LightAnimation {
  * @since 10
  */
 struct RGBColor {
-    uint8_t r = 0;          /** Red value range 0-255. */
-    uint8_t g = 0;          /** Green value range 0-255. */
-    uint8_t b = 0;          /** Blue value range 0-255. */
-    uint8_t reserved = 0;   /** Custom extended information */
+    uint8_t r;          /** Red value range 0-255. */
+    uint8_t g;          /** Green value range 0-255. */
+    uint8_t b;          /** Blue value range 0-255. */
+    uint8_t reserved;   /** Custom extended information */
 };
 
 /**
@@ -94,10 +94,10 @@ struct RGBColor {
  * @since 10
  */
 struct WRGBColor {
-    uint8_t w = 0;    /** White value range 0-255. */
-    uint8_t r = 0;    /** Red value range 0-255. */
-    uint8_t g = 0;    /** Green value range 0-255. */
-    uint8_t b = 0;    /** Blue value range 0-255. */
+    uint8_t w;    /** White value range 0-255. */
+    uint8_t r;    /** Red value range 0-255. */
+    uint8_t g;    /** Green value range 0-255. */
+    uint8_t b;    /** Blue value range 0-255. */
 };
 
 /**
@@ -106,7 +106,6 @@ struct WRGBColor {
  * @since 10
  */
 union LightColor {
-    LightColor() {};
     int32_t singleColor; /** Single color mode. */
     RGBColor rgbColor; /** RGB mode, see {@link RGBColor}. */
     WRGBColor wrgbColor; /** WRGB mode, see {@link WRGBColor}. */

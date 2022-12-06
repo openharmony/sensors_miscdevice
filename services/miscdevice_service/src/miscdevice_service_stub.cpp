@@ -137,12 +137,12 @@ int32_t MiscdeviceServiceStub::GetLightListPb(MessageParcel &data, MessageParcel
     (void)data;
     std::vector<LightInfo> lightInfos(GetLightList());
     size_t lightCount = lightInfos.size();
-    MISC_HILOGE("lightCount:%{public}d", lightCount);
+    MISC_HILOGE("lightCount:%{public}zu", lightCount);
     if (!reply.WriteUint32(lightCount)) {
         MISC_HILOGE("Parcel write failed");
         return WRITE_MSG_ERR;
     }
-    for (int32_t i = 0; i < lightCount; ++i) {
+    for (size_t i = 0; i < lightCount; ++i) {
         if (!reply.WriteBuffer(&lightInfos[i], sizeof(LightInfo))) {
             MISC_HILOGE("WriteBuffer failed");
             return WRITE_MSG_ERR;
