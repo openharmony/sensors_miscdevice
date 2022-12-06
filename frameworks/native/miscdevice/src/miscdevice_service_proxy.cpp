@@ -220,7 +220,7 @@ int32_t MiscdeviceServiceProxy::TurnOn(int32_t lightId, const LightColor &color,
     CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(TURN_ON, data, reply, option);
     if (ret != NO_ERROR) {
-        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "TurnOn", "ERROR_CODE", ret);
         MISC_HILOGE("sendRequest failed, ret:%{public}d", ret);
     }
@@ -244,7 +244,7 @@ int32_t MiscdeviceServiceProxy::TurnOff(int32_t lightId)
     CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(TURN_OFF, data, reply, option);
     if (ret != NO_ERROR) {
-        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "TurnOff", "ERROR_CODE", ret);
         MISC_HILOGE("sendRequest failed, ret:%{public}d", ret);
     }

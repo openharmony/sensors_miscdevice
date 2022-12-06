@@ -61,7 +61,7 @@ int32_t LightClient::InitLightClient()
         std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_MS));
         retry++;
     }
-    HiviewDFX::HiSysEvent::Write(HiviewDFX::HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_EXCEPTION",
+    HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_EXCEPTION",
         HiviewDFX::HiSysEvent::EventType::FAULT, "PKG_NAME", "InitLightClient", "ERROR_CODE", MISC_NATIVE_GET_SERVICE_ERR);
     MISC_HILOGE("Get service failed");
     return MISC_NATIVE_GET_SERVICE_ERR;
