@@ -58,7 +58,7 @@ int32_t MiscdeviceServiceStub::VibratePb(MessageParcel &data, MessageParcel &rep
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
     int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
     if (ret != PERMISSION_GRANTED) {
-        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
             HiSysEvent::EventType::SECURITY, "PKG_NAME", "VibratePb", "ERROR_CODE", ret);
         MISC_HILOGE("result: %{public}d", ret);
         return PERMISSION_DENIED;
@@ -78,7 +78,7 @@ int32_t MiscdeviceServiceStub::CancelVibratorPb(MessageParcel &data, MessageParc
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
     int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
     if (ret != PERMISSION_GRANTED) {
-        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
             HiSysEvent::EventType::SECURITY, "PKG_NAME", "CancelVibratorPb", "ERROR_CODE", ret);
         MISC_HILOGE("result: %{public}d", ret);
         return PERMISSION_DENIED;
@@ -96,7 +96,7 @@ int32_t MiscdeviceServiceStub::PlayVibratorEffectPb(MessageParcel &data, Message
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
     int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
     if (ret != PERMISSION_GRANTED) {
-        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
             HiSysEvent::EventType::SECURITY, "PKG_NAME", "PlayVibratorEffectPb", "ERROR_CODE", ret);
         MISC_HILOGE("result: %{public}d", ret);
         return PERMISSION_DENIED;
@@ -118,7 +118,7 @@ int32_t MiscdeviceServiceStub::StopVibratorEffectPb(MessageParcel &data, Message
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
     int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
     if (ret != PERMISSION_GRANTED) {
-        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
             HiSysEvent::EventType::SECURITY, "PKG_NAME", "StopVibratorEffectPb", "ERROR_CODE", ret);
         MISC_HILOGE("result: %{public}d", ret);
         return PERMISSION_DENIED;

@@ -56,7 +56,7 @@ int32_t MiscdeviceServiceProxy::Vibrate(int32_t vibratorId, int32_t timeOut, int
     CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(VIBRATE, data, reply, option);
     if (ret != NO_ERROR) {
-        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "Vibrate", "ERROR_CODE", ret);
         MISC_HILOGE("sendRequest ret : %{public}d", ret);
     }
@@ -80,7 +80,7 @@ int32_t MiscdeviceServiceProxy::CancelVibrator(int32_t vibratorId)
     CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(CANCEL_VIBRATOR, data, reply, option);
     if (ret != NO_ERROR) {
-        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "CancelVibrator", "ERROR_CODE", ret);
         MISC_HILOGE("ret : %{public}d", ret);
     }
@@ -117,7 +117,7 @@ int32_t MiscdeviceServiceProxy::PlayVibratorEffect(int32_t vibratorId, const std
     CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(PLAY_VIBRATOR_EFFECT, data, reply, option);
     if (ret != NO_ERROR) {
-        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "PlayVibratorEffect", "ERROR_CODE", ret);
         MISC_HILOGE("ret : %{public}d", ret);
     }
@@ -145,7 +145,7 @@ int32_t MiscdeviceServiceProxy::StopVibratorEffect(int32_t vibratorId, const std
     CHKPR(remote, ERROR);
     int32_t ret = remote->SendRequest(STOP_VIBRATOR_EFFECT, data, reply, option);
     if (ret != NO_ERROR) {
-        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "StopVibratorEffect", "ERROR_CODE", ret);
         MISC_HILOGE("ret : %{public}d", ret);
     }
