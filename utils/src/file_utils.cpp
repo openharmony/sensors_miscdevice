@@ -28,6 +28,7 @@ const std::string CONFIG_DIR = "/vendor/etc/vibrator/";
 constexpr int32_t FILE_SIZE_MAX = 0x5000;
 constexpr int32_t READ_DATA_BUFF_SIZE = 256;
 constexpr int32_t INVALID_FILE_SIZE = -1;
+constexpr int32_t FILE_PATH_MAX = 1024;
 }  // namespace
 
 std::string ReadJsonFile(const std::string &filePath)
@@ -117,6 +118,60 @@ std::string ReadFile(const std::string &filePath)
         MISC_HILOGW("Close file failed");
     }
     return dataStr;
+}
+
+std::string GetFileSuffix(const int32_t fd)
+{
+    if (fd < 0) {
+        MISC_HILOGE("fd is invalid, fd:%{public}d", fd);
+        return {};
+    }
+    char buf[FILE_PATH_MAX] = {'\0'};
+    char filePath[FILE_PATH_MAX] = {'\0'};
+    snprintf(buf, sizeof(buf), "/proc/self/fd/%d", fd);
+    if (readlink(buf, filePath, sizeof(filePath) - 1) < 0) {
+        MISC_HILOGE("fd readlink() error");
+        return {};
+    }
+    std::string fileAbsolutePath(filePath);
+    std::string fileSuffix = fileAbsolutePath.substr(fileAbsolutePath.find_last_of('.') + 1);
+    return fileSuffix;
+}
+
+cJSON* GetFdCJson(const int32_t fd)
+{
+    if (fd < 0) {
+        MISC_HILOGE("fd is invalid, fd:%{public}d", fd);
+        return nullptr;
+    }
+    FILE* fp = fdopen(fd,  "r");
+    if (fp == nullptr) {
+        MISC_HILOGE("fdopen() fail");
+        return nullptr;
+    }
+    std::string dataStr;
+    char buf[READ_DATA_BUFF_SIZE] = {};
+    while (fgets(buf, sizeof(buf), fp) != nullptr) {
+        dataStr += buf;
+    }
+    if (fclose(fp) != 0) {
+        MISC_HILOGW("Close file failed");
+    }
+    cJSON* cJson = cJSON_Parse(dataStr.c_str());
+    return cJson;
+}
+
+int32_t GetJsonFileVersion(const int32_t fd)
+{
+    cJSON* cJson = GetFdCJson(fd);
+    CHKPR(cJson, ERROR);
+    cJSON* metadata = cJSON_GetObjectItem(cJson, "Metadata");
+    CHKPR(metadata, ERROR);
+    cJSON *version = cJSON_GetObjectItem(metadata, "Version");
+    CHKPR(version, ERROR);
+    int32_t curVersion = version->valueint;
+    cJSON_Delete(cJson);
+    return curVersion;
 }
 }  // namespace Sensors
 }  // namespace OHOS

@@ -20,7 +20,10 @@
 #include "sensors_errors.h"
 #include "system_ability_definition.h"
 #include "vibration_priority_manager.h"
-#include "v1_0/light_interface_proxy.h"
+
+#include "custom_vibration_matcher.h"
+#include "default_vibrator_decoder_factory.h"
+#include "default_vibrator_decoder.h"
 
 namespace OHOS {
 namespace Sensors {
@@ -67,10 +70,6 @@ void MiscdeviceService::OnStart()
         MISC_HILOGE("Init interface error");
         return;
     }
-    if (!InitLightInterface()) {
-        MISC_HILOGE("InitLightInterface failed");
-        return;
-    }
     if (!SystemAbility::Publish(this)) {
         MISC_HILOGE("publish MiscdeviceService failed");
         return;
@@ -96,27 +95,6 @@ bool MiscdeviceService::InitInterface()
         return false;
     }
     return true;
-}
-
-bool MiscdeviceService::InitLightInterface()
-{
-    auto ret = lightHdiConnection_.ConnectHdi();
-    if (ret != ERR_OK) {
-        MISC_HILOGE("ConnectHdi failed");
-        return false;
-    }
-    return true;
-}
-
-bool MiscdeviceService::IsValid(int32_t lightId)
-{
-    CALL_LOG_ENTER;
-    for (const auto &item : lightInfos_) {
-        if (lightId == item.lightId) {
-            return true;
-        }
-    }
-    return false;
 }
 
 void MiscdeviceService::OnStop()
@@ -236,6 +214,60 @@ int32_t MiscdeviceService::StopVibratorEffect(int32_t vibratorId, const std::str
     return NO_ERROR;
 }
 
+int32_t MiscdeviceService::VibrateFd(int32_t vibratorId, int32_t fd, int32_t usage)
+{
+    if (fd < 0) {
+        MISC_HILOGE("fd is invalid, fd:%{public}d", fd);
+        return ERROR;
+    }
+    std::string fileSuffix = GetFileSuffix(fd);
+    if (fileSuffix.empty()) {
+        MISC_HILOGE("fd file suffix is empty");
+        return ERROR;
+    }
+    if (fileSuffix != "json") {
+        MISC_HILOGE("current file suffix is not supported at this time, suffix:%{public}s", fileSuffix.c_str());
+        return ERROR;
+    }
+    int32_t jsonFileVersion = GetJsonFileVersion(fd);
+    if (jsonFileVersion != 0) {
+        MISC_HILOGE("current json file version is not supported at this time, version:%{public}d", jsonFileVersion);
+        return ERROR;
+    }
+    VibratorDecoderFactory *defaultFactory = new DefaultVibratorDecoderFactory();
+    if (defaultFactory == nullptr) {
+        MISC_HILOGE("new DefaultVibratorDecoderFactory() error");
+        return ERROR;
+    }
+    VibratorDecoder *defaultDecoder = defaultFactory->CreateDecoder();
+    if (defaultDecoder == nullptr) {
+        MISC_HILOGE("new DefaultVibratorDecoder() error");
+        return ERROR;
+    }
+    std::vector<VibrateEvent> vibrateSequence;
+    int32_t ret = defaultDecoder->DecodeEffect(fd, vibrateSequence);
+    if (ret != SUCCESS) {
+        MISC_HILOGE("decoder effect error");
+        return ERROR;
+    }
+    MISC_HILOGD("vibrateSequence size : %{public}d", static_cast<int32_t>(vibrateSequence.size()));
+    delete defaultDecoder;
+    delete defaultFactory;
+
+    if (!CustomVibrationMatcher::ParameterCheck(vibrateSequence)) {
+        MISC_HILOGE("parameter check failed.");
+        return ERROR;
+    }
+    CustomVibrationMatcher matcher(vibrateSequence);
+    std::vector<int32_t> convertSequence = matcher.GetVibrateSequence();
+    int32_t retNum = convertSequence.size();
+    MISC_HILOGI("the count of match result : %{public}d", retNum);
+    for (int32_t i = 0; i < retNum; ++i) {
+        MISC_HILOGI("match result at %{public}d th : %{public}d", i, matchRet[i]);
+    }
+    return NO_ERROR;
+}
+
 std::string MiscdeviceService::GetPackageName(AccessTokenID tokenId)
 {
     std::string packageName;
@@ -266,55 +298,6 @@ std::string MiscdeviceService::GetPackageName(AccessTokenID tokenId)
         }
     }
     return packageName;
-}
-
-std::vector<LightInfo> MiscdeviceService::GetLightList()
-{
-    if (!InitLightList()) {
-        MISC_HILOGE("InitLightList init failed");
-        return lightInfos_;
-    }
-    return lightInfos_;
-}
-
-bool MiscdeviceService::InitLightList()
-{
-    int32_t ret = lightHdiConnection_.GetLightList(lightInfos_);
-    if (ret != ERR_OK) {
-        MISC_HILOGE("InitLightList failed, ret:%{public}d", ret);
-        return false;
-    }
-    return true;
-}
-
-int32_t MiscdeviceService::TurnOn(int32_t lightId, const LightColor &color, const LightAnimation &animation)
-{
-    CALL_LOG_ENTER;
-    if (!IsValid(lightId)) {
-        MISC_HILOGE("lightId is invalid, lightId:%{pubilc}d", lightId);
-        return MISCDEVICE_NATIVE_SAM_ERR;
-    }
-    int32_t ret = lightHdiConnection_.TurnOn(lightId, color, animation);
-    if (ret != ERR_OK) {
-        MISC_HILOGE("TurnOn failed, error:%{public}d", ret);
-        return ERROR;
-    }
-    return ret;
-}
-
-int32_t MiscdeviceService::TurnOff(int32_t lightId)
-{
-    CALL_LOG_ENTER;
-    if (!IsValid(lightId)) {
-        MISC_HILOGE("lightId is invalid, lightId:%{pubilc}d", lightId);
-        return MISCDEVICE_NATIVE_SAM_ERR;
-    }
-    int32_t ret = lightHdiConnection_.TurnOff(lightId);
-    if (ret != ERR_OK) {
-        MISC_HILOGE("TurnOff failed, error:%{public}d", ret);
-        return ERROR;
-    }
-    return ret;
 }
 
 int32_t MiscdeviceService::Dump(int32_t fd, const std::vector<std::u16string> &args)

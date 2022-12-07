@@ -51,6 +51,19 @@ enum VibrateUsage {
     USAGE_SIMULATE_REALITY = 8,
     USAGE_MAX = 9,
 };
+
+enum VibrateTag {
+    CONTINUOUS = 0,
+    TRANSIENT = 1,
+};
+
+struct VibrateEvent {
+    VibrateTag tag;
+    int32_t delayTime;
+    int32_t duration;
+    int32_t intensity;
+    int32_t frequency;
+};
 }  // namespace Sensors
 }  // namespace OHOS
 #endif  // VIBRATOR_INFOS_H

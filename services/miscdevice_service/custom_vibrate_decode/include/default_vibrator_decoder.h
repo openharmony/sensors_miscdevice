@@ -13,28 +13,27 @@
  * limitations under the License.
  */
 
-#ifndef MISCDEVICE_FILE_UTILS_H
-#define MISCDEVICE_FILE_UTILS_H
+#ifndef DEFAULT_VIBRATOR_DECODER_H
+#define DEFAULT_VIBRATOR_DECODER_H
 
 #include <cstdint>
-#include <string>
-#include <stdio.h>
-#include <unistd.h>
+#include <vector>
+#include "vibrator_decoder.h"
 
 #include "cJSON.h"
+#include "file_utils.h"
 
 namespace OHOS {
 namespace Sensors {
-std::string ReadJsonFile(const std::string &filePath);
-std::string ReadFile(const std::string &filePath);
-bool CheckFileDir(const std::string& filePath, const std::string& dir);
-bool CheckFileExtendName(const std::string& filePath, const std::string& checkExtension);
-bool CheckFileSize(const std::string& filePath);
-bool IsFileExists(const std::string& fileName);
-int32_t GetFileSize(const std::string& filePath);
-std::string GetFileSuffix(const int32_t fd);
-cJSON* GetFdCJson(const int32_t fd);
-int32_t GetJsonFileVersion(const int32_t fd);
+class DefaultVibratorDecoder : public VibratorDecoder {
+public:
+    DefaultVibratorDecoder() = default;
+    ~DefaultVibratorDecoder() = default;
+    virtual int32_t DecodeEffect(const int32_t fd, std::vector<VibrateEvent>& vibrateSequence) override;
+private:
+    int32_t ParseSequence(cJSON* cJson, std::vector<VibrateEvent>& vibrateSequence);
+    int32_t ParseEvent(cJSON* event, std::vector<VibrateEvent>& vibrateSequence, int32_t& preStartTime);
+};
 }  // namespace Sensors
 }  // namespace OHOS
-#endif  // MISCDEVICE_FILE_UTILS_H
+#endif  // VIBRATOR_DECODER_H

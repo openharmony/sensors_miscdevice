@@ -99,6 +99,21 @@ int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, const std::string &ef
     return ret;
 }
 
+int32_t VibratorServiceClient::VibrateFd(int32_t vibratorId, int32_t fd, int32_t usage)
+{
+    MISC_HILOGD("Vibrate begin, fd : %{public}d", fd);
+    int32_t ret = InitServiceClient();
+    if (ret != ERR_OK) {
+        MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
+        return MISC_NATIVE_GET_SERVICE_ERR;
+    }
+    CHKPR(miscdeviceProxy_, ERROR);
+    StartTrace(HITRACE_TAG_SENSORS, "VibrateFd");
+    ret = miscdeviceProxy_->VibrateFd(vibratorId, fd, usage);
+    FinishTrace(HITRACE_TAG_SENSORS);
+    return ret;
+}
+
 int32_t VibratorServiceClient::Stop(int32_t vibratorId, const std::string &type)
 {
     MISC_HILOGD("Stop begin, vibratorId : %{public}d, type : %{public}s", vibratorId, type.c_str());
