@@ -43,11 +43,25 @@ int32_t lightType_ = -1;
 
 /**
  * @tc.name: StartLightTest_001
- * @tc.desc: Verify GetLightList
+ * @tc.desc: Verify TurnOff
  * @tc.type: FUNC
  * @tc.require: I63TFA
  */
 HWTEST_F(LightAgentTest, StartLightTest_001, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    int32_t powerLightId = 1;
+    int32_t ret = TurnOff(powerLightId);
+    ASSERT_EQ(ret, 0);
+}
+
+/**
+ * @tc.name: StartLightTest_002
+ * @tc.desc: Verify GetLightList
+ * @tc.type: FUNC
+ * @tc.require: I63TFA
+ */
+HWTEST_F(LightAgentTest, StartLightTest_002, TestSize.Level1)
 {
     CALL_LOG_ENTER;
     int32_t count = -1;
@@ -62,12 +76,12 @@ HWTEST_F(LightAgentTest, StartLightTest_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: StartLightTest_002
+ * @tc.name: StartLightTest_003
  * @tc.desc: Verify GetLightList
  * @tc.type: FUNC
  * @tc.require: I63TFA
  */
-HWTEST_F(LightAgentTest, StartLightTest_002, TestSize.Level1)
+HWTEST_F(LightAgentTest, StartLightTest_003, TestSize.Level1)
 {
     CALL_LOG_ENTER;
     int32_t count = -1;
@@ -107,12 +121,12 @@ bool GetLightColor(LightColor &color, int32_t lightType)
 }
 
 /**
- * @tc.name: StartLightTest_003
+ * @tc.name: StartLightTest_004
  * @tc.desc: Verify TurnOn
  * @tc.type: FUNC
  * @tc.require: I63TFA
  */
-HWTEST_F(LightAgentTest, StartLightTest_003, TestSize.Level1)
+HWTEST_F(LightAgentTest, StartLightTest_004, TestSize.Level1)
 {
     CALL_LOG_ENTER;
     LightColor color;
@@ -131,29 +145,6 @@ HWTEST_F(LightAgentTest, StartLightTest_003, TestSize.Level1)
 }
 
 /**
- * @tc.name: StartLightTest_004
- * @tc.desc: Verify TurnOn
- * @tc.type: FUNC
- * @tc.require: I63TFA
- */
-HWTEST_F(LightAgentTest, StartLightTest_004, TestSize.Level1)
-{
-    CALL_LOG_ENTER;
-    LightColor color;
-    bool ret = GetLightColor(color, lightType_);
-    if (!ret) {
-        ASSERT_EQ(ret, -1);
-    } else {
-        LightAnimation animation;
-        animation.mode = LIGHT_MODE_BUTT;
-        animation.onTime = 50;
-        animation.offTime = 50;
-        int32_t ret = TurnOn(lightId_, color, animation);
-        ASSERT_EQ(ret, -1);
-    }
-}
-
-/**
  * @tc.name: StartLightTest_005
  * @tc.desc: Verify TurnOn
  * @tc.type: FUNC
@@ -168,7 +159,7 @@ HWTEST_F(LightAgentTest, StartLightTest_005, TestSize.Level1)
         ASSERT_EQ(ret, -1);
     } else {
         LightAnimation animation;
-        animation.mode = -1;
+        animation.mode = LIGHT_MODE_BUTT;
         animation.onTime = 50;
         animation.offTime = 50;
         int32_t ret = TurnOn(lightId_, color, animation);
@@ -191,8 +182,8 @@ HWTEST_F(LightAgentTest, StartLightTest_006, TestSize.Level1)
         ASSERT_EQ(ret, -1);
     } else {
         LightAnimation animation;
-        animation.mode = LIGHT_MODE_DEFAULT;
-        animation.onTime = -1;
+        animation.mode = -1;
+        animation.onTime = 50;
         animation.offTime = 50;
         int32_t ret = TurnOn(lightId_, color, animation);
         ASSERT_EQ(ret, -1);
@@ -215,8 +206,8 @@ HWTEST_F(LightAgentTest, StartLightTest_007, TestSize.Level1)
     } else {
         LightAnimation animation;
         animation.mode = LIGHT_MODE_DEFAULT;
-        animation.onTime = 50;
-        animation.offTime = -1;
+        animation.onTime = -1;
+        animation.offTime = 50;
         int32_t ret = TurnOn(lightId_, color, animation);
         ASSERT_EQ(ret, -1);
     }
@@ -238,11 +229,10 @@ HWTEST_F(LightAgentTest, StartLightTest_008, TestSize.Level1)
     } else {
         LightAnimation animation;
         animation.mode = LIGHT_MODE_DEFAULT;
-        animation.onTime = 2;
-        animation.offTime = 2;
+        animation.onTime = 50;
+        animation.offTime = -1;
         int32_t ret = TurnOn(lightId_, color, animation);
-        sleep(5);
-        ASSERT_EQ(ret, 0);
+        ASSERT_EQ(ret, -1);
     }
 }
 
@@ -264,22 +254,33 @@ HWTEST_F(LightAgentTest, StartLightTest_009, TestSize.Level1)
         animation.mode = LIGHT_MODE_DEFAULT;
         animation.onTime = 2;
         animation.offTime = 2;
-        int32_t ret = TurnOn(invalidLightId_, color, animation);
-        ASSERT_EQ(ret, -1);
+        int32_t ret = TurnOn(lightId_, color, animation);
+        sleep(5);
+        ASSERT_EQ(ret, 0);
     }
 }
 
 /**
  * @tc.name: StartLightTest_010
- * @tc.desc: Verify TurnOff
+ * @tc.desc: Verify TurnOn
  * @tc.type: FUNC
  * @tc.require: I63TFA
  */
 HWTEST_F(LightAgentTest, StartLightTest_010, TestSize.Level1)
 {
     CALL_LOG_ENTER;
-    int32_t ret = TurnOff(lightId_);
-    ASSERT_EQ(ret, 0);
+    LightColor color;
+    bool ret = GetLightColor(color, lightType_);
+    if (!ret) {
+        ASSERT_EQ(ret, -1);
+    } else {
+        LightAnimation animation;
+        animation.mode = LIGHT_MODE_DEFAULT;
+        animation.onTime = 2;
+        animation.offTime = 2;
+        int32_t ret = TurnOn(invalidLightId_, color, animation);
+        ASSERT_EQ(ret, -1);
+    }
 }
 
 /**
@@ -289,6 +290,19 @@ HWTEST_F(LightAgentTest, StartLightTest_010, TestSize.Level1)
  * @tc.require: I63TFA
  */
 HWTEST_F(LightAgentTest, StartLightTest_011, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    int32_t ret = TurnOff(lightId_);
+    ASSERT_EQ(ret, 0);
+}
+
+/**
+ * @tc.name: StartLightTest_012
+ * @tc.desc: Verify TurnOff
+ * @tc.type: FUNC
+ * @tc.require: I63TFA
+ */
+HWTEST_F(LightAgentTest, StartLightTest_012, TestSize.Level1)
 {
     CALL_LOG_ENTER;
     int32_t ret = TurnOff(invalidLightId_);
