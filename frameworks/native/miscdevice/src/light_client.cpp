@@ -107,7 +107,7 @@ int32_t LightClient::GetLightList(LightInfo **lightInfo, int32_t &count)
 
 bool LightClient::IsLightAnimationValid(const LightAnimation &animation)
 {
-    if ((animation.mode < 0) || (animation.mode > LIGHT_MODE_BUTT)) {
+    if ((animation.mode < 0) || (animation.mode >= LIGHT_MODE_BUTT)) {
         MISC_HILOGE("animation mode is invalid, mode:%{pubilc}d", animation.mode);
         return false;
     }

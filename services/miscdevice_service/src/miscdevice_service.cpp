@@ -119,6 +119,20 @@ bool MiscdeviceService::IsValid(int32_t lightId)
     return false;
 }
 
+bool MiscdeviceService::IsLightAnimationValid(const LightAnimation &animation)
+{
+    if ((animation.mode < 0) || (animation.mode >= LIGHT_MODE_BUTT)) {
+        MISC_HILOGE("animation mode is invalid, mode:%{pubilc}d", animation.mode);
+        return false;
+    }
+    if ((animation.onTime < 0) || (animation.offTime < 0)) {
+        MISC_HILOGE("animation onTime or offTime is invalid, onTime:%{pubilc}d, offTime:%{pubilc}d",
+            animation.onTime, animation.offTime);
+        return false;
+    }
+    return true;
+}
+
 void MiscdeviceService::OnStop()
 {
     CALL_LOG_ENTER;
@@ -292,6 +306,10 @@ int32_t MiscdeviceService::TurnOn(int32_t lightId, const LightColor &color, cons
     CALL_LOG_ENTER;
     if (!IsValid(lightId)) {
         MISC_HILOGE("lightId is invalid, lightId:%{pubilc}d", lightId);
+        return MISCDEVICE_NATIVE_SAM_ERR;
+    }
+    if (!IsLightAnimationValid(animation)) {
+        MISC_HILOGE("animation is invalid");
         return MISCDEVICE_NATIVE_SAM_ERR;
     }
     int32_t ret = lightHdiConnection_.TurnOn(lightId, color, animation);
