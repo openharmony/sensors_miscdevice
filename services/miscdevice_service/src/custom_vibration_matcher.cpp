@@ -60,7 +60,7 @@ void CustomVibrationMatcher::ProcessContinuousEvent(const VibrateEvent& event)
     float gearScan = (INTENSITY_MAX - INTENSITY_MIN) / CONTINUOUS_GEAR_NUM;
     int32_t gear = -1;
     float dist = INTENSITY_MAX - INTENSITY_MIN;
-    for (size_t i = 1; i <= 8; ++i) {
+    for (size_t i = 1; i <= CONTINUOUS_GEAR_NUM; ++i) {
         if (std::abs(event.intensity - i * gearScan) < dist) {
             gear = i - 1;
             dist = std::abs(event.intensity - i * gearScan);

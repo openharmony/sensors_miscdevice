@@ -15,6 +15,10 @@
 
 #include <gtest/gtest.h>
 #include <thread>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 #include "accesstoken_kit.h"
 #include "nativetoken_kit.h"
@@ -228,6 +232,14 @@ HWTEST_F(VibratorAgentTest, SetUsage_003, TestSize.Level1)
     HiLog::Info(LABEL, "%{public}s begin", __func__);
     bool ret = SetUsage(USAGE_MAX);
     ASSERT_FALSE(ret);
+}
+
+HWTEST_F(VibratorAgentTest, StartVibratorFd_001, TestSize.Level1)
+{
+    HiLog::Info(LABEL, "%{public}s begin", __func__);
+    int32_t fd = open("/vendor/etc/vibrator/test.json", O_RDWR);
+    int32_t ret = StartVibratorFd(fd);
+    ASSERT_EQ(ret, 0);
 }
 }  // namespace Sensors
 }  // namespace OHOS
