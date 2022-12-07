@@ -28,11 +28,11 @@ public:
     explicit CustomVibrationMatcher(const std::vector<VibrateEvent>& vibrateSequence);
     ~CustomVibrationMatcher() = default;
     std::vector<int32_t> GetVibrateSequence() const { return convertSequence_; }
+    static bool ParameterCheck(const std::vector<VibrateEvent>& vibrateSequence);
 private:
     void ProcessContinuousEvent(const VibrateEvent& event);
     void ProcessTransientEvent(const VibrateEvent& event);
     static void Normalize(std::vector<std::vector<float>>& matrix);
-    static bool ParameterCheck(const std::vector<VibrateEvent>& vibrateSequence);
     std::vector<int32_t> convertSequence_;
 };
 }  // namespace Sensors

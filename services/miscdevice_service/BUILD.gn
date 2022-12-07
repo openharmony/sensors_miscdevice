@@ -24,6 +24,7 @@ ohos_shared_library("libmiscdevice_service") {
     "src/miscdevice_service_stub.cpp",
     "src/vibration_priority_manager.cpp",
     "src/vibrator_thread.cpp",
+    "src/custom_vibration_matcher.cpp",
     "custom_vibrate_decode/src/default_vibrator_decoder_factory.cpp",
     "custom_vibrate_decode/src/default_vibrator_decoder.cpp",
   ]

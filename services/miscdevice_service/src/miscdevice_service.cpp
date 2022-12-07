@@ -263,7 +263,7 @@ int32_t MiscdeviceService::VibrateFd(int32_t vibratorId, int32_t fd, int32_t usa
     int32_t retNum = convertSequence.size();
     MISC_HILOGI("the count of match result : %{public}d", retNum);
     for (int32_t i = 0; i < retNum; ++i) {
-        MISC_HILOGI("match result at %{public}d th : %{public}d", i, matchRet[i]);
+        MISC_HILOGI("match result at %{public}d th : %{public}d", i, convertSequence[i]);
     }
     return NO_ERROR;
 }

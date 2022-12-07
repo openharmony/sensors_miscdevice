@@ -33,7 +33,6 @@ constexpr int32_t FREQUENCY_MIN = -100;
 constexpr int32_t FREQUENCY_MAX = 100;
 constexpr int32_t MIN_TIME_SPACE = 20;
 constexpr int32_t MIN_VIBRATE_DURATION = 30;
-onstexpr int32_t TRANSIENT_DURATION = 30;
 constexpr int32_t TRANSIENT_GEAR_NUM = 4;
 constexpr int32_t CONTINUOUS_GEAR_NUM = 8;
 constexpr float INTENSITY_WEIGHT = 0.5;
@@ -74,7 +73,6 @@ void CustomVibrationMatcher::ProcessContinuousEvent(const VibrateEvent& event)
     int32_t matchId = event.duration * 100 + gear;
     convertSequence_.push_back(event.delayTime);
     convertSequence_.push_back(matchId);
-    timePos_ = event.startTime;
 }
 
 void CustomVibrationMatcher::ProcessTransientEvent(const VibrateEvent& event)
@@ -148,7 +146,7 @@ bool CustomVibrationMatcher::ParameterCheck(const std::vector<VibrateEvent>& vib
         }
         if (vibrateSequence[i].duration < MIN_VIBRATE_DURATION || vibrateSequence[i].delayTime <
             vibrateSequence[i].duration + MIN_TIME_SPACE) {
-            MISC_HILOGE("the event of index %{public}d, duration < 30ms or space time < 20ms");
+            MISC_HILOGE("the event of index %{public}d, duration < 30ms or space time < 20ms", i);
             return false;
         }
     }
