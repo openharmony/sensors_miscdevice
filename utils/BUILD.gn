@@ -27,7 +27,7 @@ ohos_shared_library("libmiscdevice_utils") {
     "//third_party/cJSON",
   ]
 
-  deps = [ "//third_party/cJSON:cjson_static" ]
+  deps = [ "//third_party/cJSON:cjson" ]
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
