@@ -82,14 +82,14 @@ int32_t StartVibratorOnce(int32_t duration)
     return SUCCESS;
 }
 
-int32_t StartVibratorFd(int32_t fd)
+int32_t StartCustomVibrate(int32_t fd)
 {
     if (fd < 0) {
         MISC_HILOGE("fd is invalid");
         return PARAMETER_ERROR;
     }
     auto &client = VibratorServiceClient::GetInstance();
-    int32_t ret = client.VibrateFd(DEFAULT_VIBRATOR_ID, fd, g_usage);
+    int32_t ret = client.VibrateCustom(DEFAULT_VIBRATOR_ID, fd, g_usage);
     if (ret != ERR_OK) {
         MISC_HILOGE("vibrator fd failed, ret: %{public}d", ret);
         return NormalizeErrCode(ret);

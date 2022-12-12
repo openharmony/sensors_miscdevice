@@ -91,7 +91,7 @@ int32_t StartVibratorOnce(int32_t duration);
  *
  * @since
  */
-int32_t StartVibratorFd(int32_t fd);
+int32_t StartCustomVibrate(int32_t fd);
 
 /**
  * @brief Sets the number of cycles for vibration.

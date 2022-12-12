@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include "cJSON.h"
+#include "json_parser.h"
 
 namespace OHOS {
 namespace Sensors {
@@ -32,9 +32,9 @@ bool CheckFileExtendName(const std::string& filePath, const std::string& checkEx
 bool CheckFileSize(const std::string& filePath);
 bool IsFileExists(const std::string& fileName);
 int32_t GetFileSize(const std::string& filePath);
-std::string GetFileSuffix(const int32_t fd);
-cJSON* GetFdCJson(const int32_t fd);
-int32_t GetJsonFileVersion(const int32_t fd);
+std::string ReadFd(int32_t fd);
+std::string GetFileSuffix(int32_t fd);
+int32_t GetJsonFileVersion(int32_t fd);
 }  // namespace Sensors
 }  // namespace OHOS
 #endif  // MISCDEVICE_FILE_UTILS_H

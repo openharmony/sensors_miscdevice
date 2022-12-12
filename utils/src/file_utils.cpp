@@ -17,7 +17,7 @@
 #include <cerrno>
 #include <sys/stat.h>
 #include <unistd.h>
-
+#include "securec.h"
 #include "sensors_errors.h"
 
 namespace OHOS {
@@ -120,15 +120,26 @@ std::string ReadFile(const std::string &filePath)
     return dataStr;
 }
 
-std::string GetFileSuffix(const int32_t fd)
+std::string ReadFd(int32_t fd)
 {
-    if (fd < 0) {
-        MISC_HILOGE("fd is invalid, fd:%{public}d", fd);
-        return {};
+    FILE* fp = fdopen(fd,  "r");
+    CHKPS(fp);
+    std::string dataStr;
+    char buf[READ_DATA_BUFF_SIZE] = {};
+    while (fgets(buf, sizeof(buf), fp) != nullptr) {
+        dataStr += buf;
     }
+    if (fclose(fp) != 0) {
+        MISC_HILOGW("Close file failed");
+    }
+    return dataStr;
+}
+
+std::string GetFileSuffix(int32_t fd)
+{
     char buf[FILE_PATH_MAX] = {'\0'};
     char filePath[FILE_PATH_MAX] = {'\0'};
-    snprintf(buf, sizeof(buf), "/proc/self/fd/%d", fd);
+    snprintf_s(buf, sizeof(buf), sizeof(buf) - 1, "/proc/self/fd/%d", fd);
     if (readlink(buf, filePath, sizeof(filePath) - 1) < 0) {
         MISC_HILOGE("fd readlink() error");
         return {};
@@ -138,39 +149,14 @@ std::string GetFileSuffix(const int32_t fd)
     return fileSuffix;
 }
 
-cJSON* GetFdCJson(const int32_t fd)
+int32_t GetJsonFileVersion(int32_t fd)
 {
-    if (fd < 0) {
-        MISC_HILOGE("fd is invalid, fd:%{public}d", fd);
-        return nullptr;
-    }
-    FILE* fp = fdopen(fd,  "r");
-    if (fp == nullptr) {
-        MISC_HILOGE("fdopen() fail");
-        return nullptr;
-    }
-    std::string dataStr;
-    char buf[READ_DATA_BUFF_SIZE] = {};
-    while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        dataStr += buf;
-    }
-    if (fclose(fp) != 0) {
-        MISC_HILOGW("Close file failed");
-    }
-    cJSON* cJson = cJSON_Parse(dataStr.c_str());
-    return cJson;
-}
-
-int32_t GetJsonFileVersion(const int32_t fd)
-{
-    cJSON* cJson = GetFdCJson(fd);
-    CHKPR(cJson, ERROR);
-    cJSON* metadata = cJSON_GetObjectItem(cJson, "Metadata");
+    JsonParser parser(fd);
+    cJSON* metadata = parser.GetObjectItem("Metadata");
     CHKPR(metadata, ERROR);
-    cJSON *version = cJSON_GetObjectItem(metadata, "Version");
+    cJSON* version = parser.GetObjectItem(metadata, "Version");
     CHKPR(version, ERROR);
     int32_t curVersion = version->valueint;
-    cJSON_Delete(cJson);
     return curVersion;
 }
 }  // namespace Sensors

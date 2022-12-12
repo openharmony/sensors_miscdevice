@@ -17,15 +17,16 @@
 #define VIBRATOR_DECODER_FACTORY_H
 
 #include <cstdint>
+#include "refbase.h"
 #include "vibrator_decoder.h"
 
 namespace OHOS {
 namespace Sensors {
-class VibratorDecoderFactory {
+class VibratorDecoderFactory : public RefBase{
 public:
     VibratorDecoderFactory() = default;
     virtual ~VibratorDecoderFactory() = default;
-    virtual VibratorDecoder* CreateDecoder() = 0;
+    virtual VibratorDecoder *CreateDecoder() = 0;
 };
 }  // namespace Sensors
 }  // namespace OHOS

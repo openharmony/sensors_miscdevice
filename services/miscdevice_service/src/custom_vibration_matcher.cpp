@@ -44,9 +44,9 @@ CustomVibrationMatcher::CustomVibrationMatcher(const std::vector<VibrateEvent>& 
 {
     MISC_HILOGD("enter CustomVibrationMatcher");
     for (const auto& event : vibrateSequence) {
-        if (event.tag == CONTINUOUS) {
+        if (event.tag == EVENT_TAG_CONTINUOUS) {
             ProcessContinuousEvent(event);
-        } else if (event.tag == TRANSIENT) {
+        } else if (event.tag == EVENT_TAG_TRANSIENT) {
             ProcessTransientEvent(event);
         } else {
             MISC_HILOGE("The type of event is invalid : %{public}d", event.tag);
@@ -60,7 +60,7 @@ void CustomVibrationMatcher::ProcessContinuousEvent(const VibrateEvent& event)
     float gearScan = (INTENSITY_MAX - INTENSITY_MIN) / CONTINUOUS_GEAR_NUM;
     int32_t gear = -1;
     float dist = INTENSITY_MAX - INTENSITY_MIN;
-    for (size_t i = 1; i <= CONTINUOUS_GEAR_NUM; ++i) {
+    for (size_t i = 1; i <= 8; ++i) {
         if (std::abs(event.intensity - i * gearScan) < dist) {
             gear = i - 1;
             dist = std::abs(event.intensity - i * gearScan);

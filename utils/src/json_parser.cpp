@@ -36,6 +36,16 @@ JsonParser::JsonParser(const std::string &filePath)
     cJson_ = cJSON_Parse(jsonStr.c_str());
 }
 
+JsonParser::JsonParser(int32_t fd)
+{
+    std::string jsonStr = ReadFd(fd);
+    if (jsonStr.empty()) {
+        MISC_HILOGE("Read fd fail");
+        return;
+    }
+    cJson_ = cJSON_Parse(jsonStr.c_str());
+}
+
 JsonParser::~JsonParser()
 {
     if (cJson_ != nullptr) {

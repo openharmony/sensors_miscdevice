@@ -20,22 +20,26 @@ namespace OHOS {
 namespace Sensors {
 using namespace OHOS::HiviewDFX;
 namespace {
+constexpr int32_t INTENSITY_MIN = 0;
+constexpr int32_t INTENSITY_MAX = 100;
+constexpr int32_t FREQUENCY_MIN = -100;
+constexpr int32_t FREQUENCY_MAX = 100;
+constexpr int32_t MIN_VIBRATE_DURATION = 30;
 constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "DefaultVibratorDecoder" };
 } // namespace
 
-int32_t DefaultVibratorDecoder::DecodeEffect(const int32_t fd, std::vector<VibrateEvent>& vibrateSequence)
+int32_t DefaultVibratorDecoder::DecodeEffect(int32_t fd, std::vector<VibrateEvent> &vibrateSequence)
 {
-    cJSON* cJson = GetFdCJson(fd);
-    int32_t ret = ParseSequence(cJson, vibrateSequence);
+    MISC_HILOGD("DefaultVibratorDecoder DecodeEffect() in, fd: %{public}d", fd);
+    JsonParser parser(fd);
+    int32_t ret = ParseSequence(parser, vibrateSequence);
     CHKCR((ret == SUCCESS), ERROR, "parse sequence fail");
-    cJSON_Delete(cJson);
     return SUCCESS;
 }
 
-int32_t DefaultVibratorDecoder::ParseSequence(cJSON* cJson, std::vector<VibrateEvent>& vibrateSequence)
+int32_t DefaultVibratorDecoder::ParseSequence(const JsonParser &parser, std::vector<VibrateEvent> &vibrateSequence)
 {
-    CHKPR(cJson, ERROR);
-    cJSON* sequence = cJSON_GetObjectItem(cJson, "Sequence");
+    cJSON *sequence = parser.GetObjectItem("Sequence");
     CHKPR(sequence, ERROR);
     if (!cJSON_IsArray(sequence)) {
         MISC_HILOGE("The value of sequence is not array");
@@ -45,43 +49,51 @@ int32_t DefaultVibratorDecoder::ParseSequence(cJSON* cJson, std::vector<VibrateE
     int32_t preStartTime = 0;
     for (int32_t i = 0; i < size; i++) {
         cJSON* event = cJSON_GetArrayItem(sequence, i)->child;
-        int32_t ret = ParseEvent(event, vibrateSequence, preStartTime);
+        CHKPR(event, ERROR);
+        int32_t ret = ParseEvent(parser, event, vibrateSequence, preStartTime);
         CHKCR((ret == SUCCESS), ERROR, "parse event fail");
     }
     return SUCCESS;
 }
 
-int32_t DefaultVibratorDecoder::ParseEvent(cJSON* event, std::vector<VibrateEvent>& vibrateSequence,
-                                           int32_t& preStartTime)
+int32_t DefaultVibratorDecoder::ParseEvent(const JsonParser &parser, cJSON *event,
+                                           std::vector<VibrateEvent> &vibrateSequence, int32_t &preStartTime)
 {
-    CHKPR(event, ERROR);
     VibrateEvent vibrateEvent;
-    cJSON* type = cJSON_GetObjectItem(event, "Type");
+    cJSON* type = parser.GetObjectItem(event, "Type");
     CHKPR(type, ERROR);
     std::string curType = type->valuestring;
     if (curType == "continuous") {
-        vibrateEvent.tag = CONTINUOUS;
-        cJSON* duration = cJSON_GetObjectItem(event, "Duration");
+        vibrateEvent.tag = EVENT_TAG_CONTINUOUS;
+        cJSON* duration = parser.GetObjectItem(event, "Duration");
         CHKPR(duration, ERROR);
         vibrateEvent.duration = duration->valueint;
     } else if (curType == "transient") {
-        vibrateEvent.tag = TRANSIENT;
-        vibrateEvent.duration = 30;
+        vibrateEvent.tag = EVENT_TAG_TRANSIENT;
+        vibrateEvent.duration = MIN_VIBRATE_DURATION;
     } else {
         MISC_HILOGE("current event type is not continuous or transient");
         return ERROR;
     }
-    cJSON* startTime = cJSON_GetObjectItem(event, "StartTime");
+    cJSON* startTime = parser.GetObjectItem(event, "StartTime");
     CHKPR(startTime, ERROR);
     int32_t curStartTime = startTime->valueint;
     vibrateEvent.delayTime = curStartTime - preStartTime;
     preStartTime = curStartTime;
-    cJSON* intensity = cJSON_GetObjectItem(event, "Intensity");
+    cJSON* intensity = parser.GetObjectItem(event, "Intensity");
     CHKPR(intensity, ERROR);
     vibrateEvent.intensity = intensity->valueint;
-    cJSON* frequency = cJSON_GetObjectItem(event, "Frequency");
+    if (vibrateEvent.intensity <= INTENSITY_MIN || vibrateEvent.intensity > INTENSITY_MAX) {
+        MISC_HILOGE("the event intensity is not in (0 ~ 100], intensity: %{public}d", vibrateEvent.intensity);
+        return ERROR;
+    }
+    cJSON* frequency = parser.GetObjectItem(event, "Frequency");
     CHKPR(frequency, ERROR);
     vibrateEvent.frequency = frequency->valueint;
+    if (vibrateEvent.frequency < FREQUENCY_MIN || vibrateEvent.frequency > FREQUENCY_MAX) {
+        MISC_HILOGE("the event frequency is not in [-100 ~ 100], frequency: %{public}d", vibrateEvent.frequency);
+        return ERROR;
+    }
     vibrateSequence.push_back(vibrateEvent);
     return SUCCESS;
 }

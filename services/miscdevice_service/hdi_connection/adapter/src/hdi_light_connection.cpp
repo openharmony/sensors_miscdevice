@@ -21,8 +21,8 @@
 #include <vector>
 
 #include "hisysevent.h"
-#include "sensors_errors.h"
 #include "v1_0/light_interface_proxy.h"
+#include "sensors_errors.h"
 
 namespace OHOS {
 namespace Sensors {

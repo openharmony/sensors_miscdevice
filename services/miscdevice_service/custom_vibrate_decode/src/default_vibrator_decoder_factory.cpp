@@ -23,7 +23,7 @@ using namespace OHOS::HiviewDFX;
 namespace {
 constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "DefaultVibratorDecoderFactory" };
 } // namespace
-VibratorDecoder* DefaultVibratorDecoderFactory::CreateDecoder()
+VibratorDecoder *DefaultVibratorDecoderFactory::CreateDecoder()
 {
     MISC_HILOGD("DefaultVibratorDecoderFactory CreateDecoder()");
     return new DefaultVibratorDecoder();

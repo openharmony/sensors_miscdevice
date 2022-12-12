@@ -53,8 +53,8 @@ enum VibrateUsage {
 };
 
 enum VibrateTag {
-    CONTINUOUS = 0,
-    TRANSIENT = 1,
+    EVENT_TAG_CONTINUOUS = 0,
+    EVENT_TAG_TRANSIENT = 1,
 };
 
 struct VibrateEvent {

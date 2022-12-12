@@ -18,15 +18,16 @@
 
 #include <cstdint>
 #include <vector>
+#include "refbase.h"
 #include "vibrator_infos.h"
 
 namespace OHOS {
 namespace Sensors {
-class VibratorDecoder {
+class VibratorDecoder : public RefBase{
 public:
     VibratorDecoder() = default;
     virtual ~VibratorDecoder() = default;
-    virtual int32_t DecodeEffect(const int32_t fd, std::vector<VibrateEvent>& vibrateSequence) = 0;
+    virtual int32_t DecodeEffect(int32_t fd, std::vector<VibrateEvent> &vibrateSequence) = 0;
 };
 }  // namespace Sensors
 }  // namespace OHOS

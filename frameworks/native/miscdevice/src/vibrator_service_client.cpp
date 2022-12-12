@@ -62,7 +62,7 @@ int32_t VibratorServiceClient::InitServiceClient()
         std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_MS));
         retry++;
     }
-    HiSysEvent::Write(HiviewDFX::HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_EXCEPTION",
+    HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_EXCEPTION",
         HiSysEvent::EventType::FAULT, "PKG_NAME", "InitServiceClient", "ERROR_CODE", MISC_NATIVE_GET_SERVICE_ERR);
     MISC_HILOGE("get service failed");
     return MISC_NATIVE_GET_SERVICE_ERR;
@@ -99,17 +99,17 @@ int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, const std::string &ef
     return ret;
 }
 
-int32_t VibratorServiceClient::VibrateFd(int32_t vibratorId, int32_t fd, int32_t usage)
+int32_t VibratorServiceClient::VibrateCustom(int32_t vibratorId, int32_t fd, int32_t usage)
 {
-    MISC_HILOGD("Vibrate begin, fd : %{public}d", fd);
+    MISC_HILOGD("VibrateCustom begin, fd: %{public}d", fd);
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
         MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
     CHKPR(miscdeviceProxy_, ERROR);
-    StartTrace(HITRACE_TAG_SENSORS, "VibrateFd");
-    ret = miscdeviceProxy_->VibrateFd(vibratorId, fd, usage);
+    StartTrace(HITRACE_TAG_SENSORS, "VibrateCustom");
+    ret = miscdeviceProxy_->VibrateCustom(vibratorId, fd, usage);
     FinishTrace(HITRACE_TAG_SENSORS);
     return ret;
 }

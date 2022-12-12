@@ -25,7 +25,7 @@ class DefaultVibratorDecoderFactory : public VibratorDecoderFactory {
 public:
     DefaultVibratorDecoderFactory() = default;
     ~DefaultVibratorDecoderFactory() = default;
-    virtual VibratorDecoder* CreateDecoder() override;
+    virtual VibratorDecoder *CreateDecoder() override;
 };
 }  // namespace Sensors
 }  // namespace OHOS

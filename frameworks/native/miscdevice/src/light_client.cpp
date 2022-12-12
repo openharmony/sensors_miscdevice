@@ -61,7 +61,7 @@ int32_t LightClient::InitLightClient()
         std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_MS));
         retry++;
     }
-    HiviewDFX::HiSysEvent::Write(HiviewDFX::HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_EXCEPTION",
+    HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_EXCEPTION",
         HiviewDFX::HiSysEvent::EventType::FAULT, "PKG_NAME", "InitLightClient", "ERROR_CODE", MISC_NATIVE_GET_SERVICE_ERR);
     MISC_HILOGE("Get service failed");
     return MISC_NATIVE_GET_SERVICE_ERR;
@@ -107,7 +107,7 @@ int32_t LightClient::GetLightList(LightInfo **lightInfo, int32_t &count)
 
 bool LightClient::IsLightAnimationValid(const LightAnimation &animation)
 {
-    if ((animation.mode < 0) || (animation.mode > LIGHT_MODE_BUTT)) {
+    if ((animation.mode < 0) || (animation.mode >= LIGHT_MODE_BUTT)) {
         MISC_HILOGE("animation mode is invalid, mode:%{pubilc}d", animation.mode);
         return false;
     }

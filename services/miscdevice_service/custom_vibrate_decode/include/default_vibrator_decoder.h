@@ -19,9 +19,7 @@
 #include <cstdint>
 #include <vector>
 #include "vibrator_decoder.h"
-
-#include "cJSON.h"
-#include "file_utils.h"
+#include "json_parser.h"
 
 namespace OHOS {
 namespace Sensors {
@@ -29,10 +27,11 @@ class DefaultVibratorDecoder : public VibratorDecoder {
 public:
     DefaultVibratorDecoder() = default;
     ~DefaultVibratorDecoder() = default;
-    virtual int32_t DecodeEffect(const int32_t fd, std::vector<VibrateEvent>& vibrateSequence) override;
+    virtual int32_t DecodeEffect(int32_t fd, std::vector<VibrateEvent> &vibrateSequence) override;
 private:
-    int32_t ParseSequence(cJSON* cJson, std::vector<VibrateEvent>& vibrateSequence);
-    int32_t ParseEvent(cJSON* event, std::vector<VibrateEvent>& vibrateSequence, int32_t& preStartTime);
+    int32_t ParseSequence(const JsonParser &parser, std::vector<VibrateEvent> &vibrateSequence);
+    int32_t ParseEvent(const JsonParser &parser, cJSON *event, std::vector<VibrateEvent> &vibrateSequence,
+                       int32_t &preStartTime);
 };
 }  // namespace Sensors
 }  // namespace OHOS
