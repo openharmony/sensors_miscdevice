@@ -29,10 +29,7 @@ std::map<int32_t, std::vector<int32_t>> TRANSIENT_INFOS = {
 };  // {Num, {intensity, frequency, duration}}
 constexpr int32_t INTENSITY_MIN = 0;
 constexpr int32_t INTENSITY_MAX = 100;
-constexpr int32_t FREQUENCY_MIN = -100;
-constexpr int32_t FREQUENCY_MAX = 100;
 constexpr int32_t MIN_TIME_SPACE = 20;
-constexpr int32_t MIN_VIBRATE_DURATION = 30;
 constexpr int32_t TRANSIENT_GEAR_NUM = 4;
 constexpr int32_t CONTINUOUS_GEAR_NUM = 8;
 constexpr float INTENSITY_WEIGHT = 0.5;
@@ -135,19 +132,9 @@ bool CustomVibrationMatcher::ParameterCheck(const std::vector<VibrateEvent>& vib
         MISC_HILOGE("the vibrateSequence array size is 0");
         return false;
     }
-    for (int32_t i = 0; i < length; ++i) {
-        if (vibrateSequence[i].intensity <= INTENSITY_MIN || vibrateSequence[i].intensity > INTENSITY_MAX) {
-            MISC_HILOGE("the event of index %{public}d intensity is not in (0 ~ 100]", i);
-            return false;
-        }
-        if (vibrateSequence[i].frequency < FREQUENCY_MIN || vibrateSequence[i].frequency > FREQUENCY_MAX) {
-            MISC_HILOGE("the event of index %{public}d frequency is not in [-100 ~ 100]", i);
-            return false;
-        }
-        if (vibrateSequence[i].duration < MIN_VIBRATE_DURATION || vibrateSequence[i].delayTime <
-            vibrateSequence[i].duration + MIN_TIME_SPACE) {
-            MISC_HILOGE("the event of index %{public}d, duration < 30ms or space time < 20ms", i);
-            return false;
+    for (int32_t i = 0; i < length - 1; ++i) {
+        if (vibrateSequence[i + 1].delayTime < vibrateSequence[i].duration + MIN_TIME_SPACE) {
+            MISC_HILOGW("The space time after the %{public}d event should be greater than 20ms", i);
         }
     }
     return true;

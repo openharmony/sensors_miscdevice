@@ -254,6 +254,17 @@ int32_t MiscdeviceService::StopVibratorEffect(int32_t vibratorId, const std::str
     return NO_ERROR;
 }
 
+int32_t GetJsonFileVersion(int32_t fd)
+{
+    JsonParser parser(fd);
+    cJSON* metadata = parser.GetObjectItem("Metadata");
+    CHKPR(metadata, ERROR);
+    cJSON* version = parser.GetObjectItem(metadata, "Version");
+    CHKPR(version, ERROR);
+    int32_t curVersion = version->valueint;
+    return curVersion;
+}
+
 int32_t MiscdeviceService::DecodeCustomEffect(int32_t fd, std::vector<VibrateEvent> &vibrateSequence)
 {
     std::string fileSuffix = GetFileSuffix(fd);

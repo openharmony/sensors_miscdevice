@@ -122,16 +122,20 @@ std::string ReadFile(const std::string &filePath)
 
 std::string ReadFd(int32_t fd)
 {
-    FILE* fp = fdopen(fd,  "r");
+    int32_t dupFd = dup(fd);
+    FILE* fp = fdopen(dupFd, "r");
+    fseek(fp, 0L, SEEK_SET);
     CHKPS(fp);
     std::string dataStr;
     char buf[READ_DATA_BUFF_SIZE] = {};
     while (fgets(buf, sizeof(buf), fp) != nullptr) {
         dataStr += buf;
     }
+    MISC_HILOGI("error : %{public}d", errno);
     if (fclose(fp) != 0) {
         MISC_HILOGW("Close file failed");
     }
+    MISC_HILOGI("error : %{public}d", errno);
     return dataStr;
 }
 
@@ -140,24 +144,15 @@ std::string GetFileSuffix(int32_t fd)
     char buf[FILE_PATH_MAX] = {'\0'};
     char filePath[FILE_PATH_MAX] = {'\0'};
     snprintf_s(buf, sizeof(buf), sizeof(buf) - 1, "/proc/self/fd/%d", fd);
+    MISC_HILOGI("buf : %{public}s", buf);
     if (readlink(buf, filePath, sizeof(filePath) - 1) < 0) {
         MISC_HILOGE("fd readlink() error");
         return {};
     }
     std::string fileAbsolutePath(filePath);
+    MISC_HILOGI("fileAbsolutePath : %{public}s", fileAbsolutePath.c_str());
     std::string fileSuffix = fileAbsolutePath.substr(fileAbsolutePath.find_last_of('.') + 1);
     return fileSuffix;
-}
-
-int32_t GetJsonFileVersion(int32_t fd)
-{
-    JsonParser parser(fd);
-    cJSON* metadata = parser.GetObjectItem("Metadata");
-    CHKPR(metadata, ERROR);
-    cJSON* version = parser.GetObjectItem(metadata, "Version");
-    CHKPR(version, ERROR);
-    int32_t curVersion = version->valueint;
-    return curVersion;
 }
 }  // namespace Sensors
 }  // namespace OHOS

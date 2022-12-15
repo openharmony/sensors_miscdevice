@@ -161,7 +161,10 @@ int32_t MiscdeviceServiceStub::VibrateCustomPb(MessageParcel &data, MessageParce
     }
     int32_t fd = dup(tmpFd);
     MISC_HILOGD("MiscdeviceServiceStub VibrateCustomPb dup fd: %{public}d", fd);
-    return VibrateCustom(vibratorId, fd, usage);
+    ret = VibrateCustom(vibratorId, fd, usage);
+    close(tmpFd);
+    close(fd);
+    return ret;
 }
 
 int32_t MiscdeviceServiceStub::GetLightListPb(MessageParcel &data, MessageParcel &reply)

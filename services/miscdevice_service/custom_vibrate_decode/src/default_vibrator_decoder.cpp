@@ -30,7 +30,6 @@ constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "DefaultVibratorDecode
 
 int32_t DefaultVibratorDecoder::DecodeEffect(int32_t fd, std::vector<VibrateEvent> &vibrateSequence)
 {
-    MISC_HILOGD("DefaultVibratorDecoder DecodeEffect() in, fd: %{public}d", fd);
     JsonParser parser(fd);
     int32_t ret = ParseSequence(parser, vibrateSequence);
     CHKCR((ret == SUCCESS), ERROR, "parse sequence fail");

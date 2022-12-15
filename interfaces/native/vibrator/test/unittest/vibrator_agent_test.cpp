@@ -233,7 +233,7 @@ HWTEST_F(VibratorAgentTest, SetUsage_003, TestSize.Level1)
 HWTEST_F(VibratorAgentTest, StartCustomVibrate_001, TestSize.Level1)
 {
     HiLog::Info(LABEL, "%{public}s begin", __func__);
-    int32_t fd = open("/data/test.json", O_RDWR);
+    int32_t fd = open("/data/test.json", O_RDONLY);
     MISC_HILOGI("test fd: %{public}d", fd);
     int32_t ret = StartCustomVibrate(fd);
     close(fd);

@@ -36,6 +36,7 @@
 #include "vibrator_infos.h"
 #include "vibrator_thread.h"
 #include "file_utils.h"
+#include "json_parser.h"
 
 namespace OHOS {
 namespace Sensors {

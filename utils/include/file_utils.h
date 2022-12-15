@@ -21,8 +21,6 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include "json_parser.h"
-
 namespace OHOS {
 namespace Sensors {
 std::string ReadJsonFile(const std::string &filePath);
@@ -34,7 +32,6 @@ bool IsFileExists(const std::string& fileName);
 int32_t GetFileSize(const std::string& filePath);
 std::string ReadFd(int32_t fd);
 std::string GetFileSuffix(int32_t fd);
-int32_t GetJsonFileVersion(int32_t fd);
 }  // namespace Sensors
 }  // namespace OHOS
 #endif  // MISCDEVICE_FILE_UTILS_H
