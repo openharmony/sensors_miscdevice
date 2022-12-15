@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "iremote_broker.h"
+#include "light_agent_type.h"
 #include "miscdevice_common.h"
 
 namespace OHOS {
@@ -27,25 +28,25 @@ namespace Sensors {
 class IMiscdeviceService : public IRemoteBroker {
 public:
     IMiscdeviceService() = default;
-
     virtual ~IMiscdeviceService() = default;
-
     DECLARE_INTERFACE_DESCRIPTOR(u"IMiscdeviceService");
-
     virtual int32_t Vibrate(int32_t vibratorId, int32_t timeOut, int32_t usage) = 0;
-
     virtual int32_t CancelVibrator(int32_t vibratorId) = 0;
-
     virtual int32_t PlayVibratorEffect(int32_t vibratorId, const std::string &effect,
                                        int32_t loopCount, int32_t usage) = 0;
-
     virtual int32_t StopVibratorEffect(int32_t vibratorId, const std::string &effect) = 0;
+    virtual std::vector<LightInfo> GetLightList() = 0;
+    virtual int32_t TurnOn(int32_t lightId, const LightColor &color, const LightAnimation &animation) = 0;
+    virtual int32_t TurnOff(int32_t lightId) = 0;
 
     enum {
         VIBRATE,
         CANCEL_VIBRATOR,
         PLAY_VIBRATOR_EFFECT,
-        STOP_VIBRATOR_EFFECT
+        STOP_VIBRATOR_EFFECT,
+        GET_LIGHT_LIST,
+        TURN_ON,
+        TURN_OFF,
     };
 };
 }  // namespace Sensors

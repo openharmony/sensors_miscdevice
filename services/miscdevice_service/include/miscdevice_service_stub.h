@@ -51,12 +51,9 @@ private:
     int32_t StopVibratorEffectPb(MessageParcel &data, MessageParcel &reply);
     int32_t SetVibratorParameterPb(MessageParcel &data, MessageParcel &reply);
     int32_t GetVibratorParameterPb(MessageParcel &data, MessageParcel &reply);
-    int32_t GetLightSupportIdPb(MessageParcel &data, MessageParcel &reply);
-    int32_t IsLightEffectSupportPb(MessageParcel &data, MessageParcel &reply);
-    int32_t LightPb(MessageParcel &data, MessageParcel &reply);
-    int32_t PlayLightEffectPb(MessageParcel &data, MessageParcel &reply);
-    int32_t StopLightEffectPb(MessageParcel &data, MessageParcel &reply);
-
+    int32_t GetLightListPb(MessageParcel &data, MessageParcel &reply);
+    int32_t TurnOnPb(MessageParcel &data, MessageParcel &reply);
+    int32_t TurnOffPb(MessageParcel &data, MessageParcel &reply);
     bool CheckVibratePermission();
 
     std::map<uint32_t, MiscBaseFunc> baseFuncs_;
