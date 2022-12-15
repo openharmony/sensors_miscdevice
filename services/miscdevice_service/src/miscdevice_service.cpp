@@ -75,14 +75,14 @@ void MiscdeviceService::OnStart()
         MISC_HILOGE("publish MiscdeviceService failed");
         return;
     }
-    auto ret = miscDeviceIdMap_.insert(std::make_pair(MiscdeviceDeviceId::LED, lightExist_));
+    auto ret = miscDdeviceIdMap_.insert(std::make_pair(MiscdeviceDeviceId::LED, lightExist_));
     if (!ret.second) {
-        MISC_HILOGI("light exist in miscDeviceIdMap_");
+        MISC_HILOGI("light exist in miscDdeviceIdMap_");
         ret.first->second = lightExist_;
     }
-    ret = miscDeviceIdMap_.insert(std::make_pair(MiscdeviceDeviceId::VIBRATOR, vibratorExist_));
+    ret = miscDdeviceIdMap_.insert(std::make_pair(MiscdeviceDeviceId::VIBRATOR, vibratorExist_));
     if (!ret.second) {
-        MISC_HILOGI("vibrator exist in miscDeviceIdMap_");
+        MISC_HILOGI("vibrator exist in miscDdeviceIdMap_");
         ret.first->second = vibratorExist_;
     }
     state_ = MiscdeviceServiceState::STATE_RUNNING;
