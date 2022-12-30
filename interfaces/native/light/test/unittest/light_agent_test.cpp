@@ -43,34 +43,13 @@ int32_t lightType_ = -1;
 
 /**
  * @tc.name: StartLightTest_001
-<<<<<<< HEAD
  * @tc.desc: Verify GetLightList
-=======
- * @tc.desc: Verify TurnOff
->>>>>>> 127ed407ac700cd8e0f28f2eb36f881480736f3d
  * @tc.type: FUNC
  * @tc.require: I63TFA
  */
 HWTEST_F(LightAgentTest, StartLightTest_001, TestSize.Level1)
 {
     CALL_LOG_ENTER;
-<<<<<<< HEAD
-=======
-    int32_t powerLightId = 1;
-    int32_t ret = TurnOff(powerLightId);
-    ASSERT_EQ(ret, 0);
-}
-
-/**
- * @tc.name: StartLightTest_002
- * @tc.desc: Verify GetLightList
- * @tc.type: FUNC
- * @tc.require: I63TFA
- */
-HWTEST_F(LightAgentTest, StartLightTest_002, TestSize.Level1)
-{
-    CALL_LOG_ENTER;
->>>>>>> 127ed407ac700cd8e0f28f2eb36f881480736f3d
     int32_t count = -1;
     int32_t ret = GetLightList(&lightInfo_, count);
     for (int32_t i = 0; i < count; ++i) {
@@ -83,20 +62,12 @@ HWTEST_F(LightAgentTest, StartLightTest_002, TestSize.Level1)
 }
 
 /**
-<<<<<<< HEAD
  * @tc.name: StartLightTest_002
-=======
- * @tc.name: StartLightTest_003
->>>>>>> 127ed407ac700cd8e0f28f2eb36f881480736f3d
  * @tc.desc: Verify GetLightList
  * @tc.type: FUNC
  * @tc.require: I63TFA
  */
-<<<<<<< HEAD
 HWTEST_F(LightAgentTest, StartLightTest_002, TestSize.Level1)
-=======
-HWTEST_F(LightAgentTest, StartLightTest_003, TestSize.Level1)
->>>>>>> 127ed407ac700cd8e0f28f2eb36f881480736f3d
 {
     CALL_LOG_ENTER;
     int32_t count = -1;
@@ -136,20 +107,12 @@ bool GetLightColor(LightColor &color, int32_t lightType)
 }
 
 /**
-<<<<<<< HEAD
  * @tc.name: StartLightTest_003
-=======
- * @tc.name: StartLightTest_004
->>>>>>> 127ed407ac700cd8e0f28f2eb36f881480736f3d
  * @tc.desc: Verify TurnOn
  * @tc.type: FUNC
  * @tc.require: I63TFA
  */
-<<<<<<< HEAD
 HWTEST_F(LightAgentTest, StartLightTest_003, TestSize.Level1)
-=======
-HWTEST_F(LightAgentTest, StartLightTest_004, TestSize.Level1)
->>>>>>> 127ed407ac700cd8e0f28f2eb36f881480736f3d
 {
     CALL_LOG_ENTER;
     int32_t powerLightId = 1;
@@ -170,20 +133,12 @@ HWTEST_F(LightAgentTest, StartLightTest_004, TestSize.Level1)
 }
 
 /**
-<<<<<<< HEAD
  * @tc.name: StartLightTest_004
-=======
- * @tc.name: StartLightTest_005
->>>>>>> 127ed407ac700cd8e0f28f2eb36f881480736f3d
  * @tc.desc: Verify TurnOn
  * @tc.type: FUNC
  * @tc.require: I63TFA
  */
-<<<<<<< HEAD
 HWTEST_F(LightAgentTest, StartLightTest_004, TestSize.Level1)
-=======
-HWTEST_F(LightAgentTest, StartLightTest_005, TestSize.Level1)
->>>>>>> 127ed407ac700cd8e0f28f2eb36f881480736f3d
 {
     CALL_LOG_ENTER;
     LightColor color;
@@ -201,20 +156,12 @@ HWTEST_F(LightAgentTest, StartLightTest_005, TestSize.Level1)
 }
 
 /**
-<<<<<<< HEAD
  * @tc.name: StartLightTest_005
-=======
- * @tc.name: StartLightTest_006
->>>>>>> 127ed407ac700cd8e0f28f2eb36f881480736f3d
  * @tc.desc: Verify TurnOn
  * @tc.type: FUNC
  * @tc.require: I63TFA
  */
-<<<<<<< HEAD
 HWTEST_F(LightAgentTest, StartLightTest_005, TestSize.Level1)
-=======
-HWTEST_F(LightAgentTest, StartLightTest_006, TestSize.Level1)
->>>>>>> 127ed407ac700cd8e0f28f2eb36f881480736f3d
 {
     CALL_LOG_ENTER;
     LightColor color;
@@ -232,20 +179,12 @@ HWTEST_F(LightAgentTest, StartLightTest_006, TestSize.Level1)
 }
 
 /**
-<<<<<<< HEAD
  * @tc.name: StartLightTest_006
-=======
- * @tc.name: StartLightTest_007
->>>>>>> 127ed407ac700cd8e0f28f2eb36f881480736f3d
  * @tc.desc: Verify TurnOn
  * @tc.type: FUNC
  * @tc.require: I63TFA
  */
-<<<<<<< HEAD
 HWTEST_F(LightAgentTest, StartLightTest_006, TestSize.Level1)
-=======
-HWTEST_F(LightAgentTest, StartLightTest_007, TestSize.Level1)
->>>>>>> 127ed407ac700cd8e0f28f2eb36f881480736f3d
 {
     CALL_LOG_ENTER;
     LightColor color;
@@ -263,20 +202,12 @@ HWTEST_F(LightAgentTest, StartLightTest_007, TestSize.Level1)
 }
 
 /**
-<<<<<<< HEAD
  * @tc.name: StartLightTest_007
-=======
- * @tc.name: StartLightTest_008
->>>>>>> 127ed407ac700cd8e0f28f2eb36f881480736f3d
  * @tc.desc: Verify TurnOn
  * @tc.type: FUNC
  * @tc.require: I63TFA
  */
-<<<<<<< HEAD
 HWTEST_F(LightAgentTest, StartLightTest_007, TestSize.Level1)
-=======
-HWTEST_F(LightAgentTest, StartLightTest_008, TestSize.Level1)
->>>>>>> 127ed407ac700cd8e0f28f2eb36f881480736f3d
 {
     CALL_LOG_ENTER;
     LightColor color;
@@ -294,20 +225,12 @@ HWTEST_F(LightAgentTest, StartLightTest_008, TestSize.Level1)
 }
 
 /**
-<<<<<<< HEAD
  * @tc.name: StartLightTest_008
-=======
- * @tc.name: StartLightTest_009
->>>>>>> 127ed407ac700cd8e0f28f2eb36f881480736f3d
  * @tc.desc: Verify TurnOn
  * @tc.type: FUNC
  * @tc.require: I63TFA
  */
-<<<<<<< HEAD
 HWTEST_F(LightAgentTest, StartLightTest_008, TestSize.Level1)
-=======
-HWTEST_F(LightAgentTest, StartLightTest_009, TestSize.Level1)
->>>>>>> 127ed407ac700cd8e0f28f2eb36f881480736f3d
 {
     CALL_LOG_ENTER;
     LightColor color;
@@ -326,20 +249,12 @@ HWTEST_F(LightAgentTest, StartLightTest_009, TestSize.Level1)
 }
 
 /**
-<<<<<<< HEAD
  * @tc.name: StartLightTest_009
-=======
- * @tc.name: StartLightTest_010
->>>>>>> 127ed407ac700cd8e0f28f2eb36f881480736f3d
  * @tc.desc: Verify TurnOn
  * @tc.type: FUNC
  * @tc.require: I63TFA
  */
-<<<<<<< HEAD
 HWTEST_F(LightAgentTest, StartLightTest_009, TestSize.Level1)
-=======
-HWTEST_F(LightAgentTest, StartLightTest_010, TestSize.Level1)
->>>>>>> 127ed407ac700cd8e0f28f2eb36f881480736f3d
 {
     CALL_LOG_ENTER;
     LightColor color;
@@ -357,20 +272,12 @@ HWTEST_F(LightAgentTest, StartLightTest_010, TestSize.Level1)
 }
 
 /**
-<<<<<<< HEAD
  * @tc.name: StartLightTest_010
-=======
- * @tc.name: StartLightTest_011
->>>>>>> 127ed407ac700cd8e0f28f2eb36f881480736f3d
  * @tc.desc: Verify TurnOff
  * @tc.type: FUNC
  * @tc.require: I63TFA
  */
-<<<<<<< HEAD
 HWTEST_F(LightAgentTest, StartLightTest_010, TestSize.Level1)
-=======
-HWTEST_F(LightAgentTest, StartLightTest_011, TestSize.Level1)
->>>>>>> 127ed407ac700cd8e0f28f2eb36f881480736f3d
 {
     CALL_LOG_ENTER;
     int32_t ret = TurnOff(lightId_);
@@ -378,20 +285,12 @@ HWTEST_F(LightAgentTest, StartLightTest_011, TestSize.Level1)
 }
 
 /**
-<<<<<<< HEAD
  * @tc.name: StartLightTest_011
-=======
- * @tc.name: StartLightTest_012
->>>>>>> 127ed407ac700cd8e0f28f2eb36f881480736f3d
  * @tc.desc: Verify TurnOff
  * @tc.type: FUNC
  * @tc.require: I63TFA
  */
-<<<<<<< HEAD
 HWTEST_F(LightAgentTest, StartLightTest_011, TestSize.Level1)
-=======
-HWTEST_F(LightAgentTest, StartLightTest_012, TestSize.Level1)
->>>>>>> 127ed407ac700cd8e0f28f2eb36f881480736f3d
 {
     CALL_LOG_ENTER;
     int32_t ret = TurnOff(invalidLightId_);
