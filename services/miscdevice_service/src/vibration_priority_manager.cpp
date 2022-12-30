@@ -47,7 +47,8 @@ VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &v
 
 bool VibrationPriorityManager::IsCurrentVibrate(std::shared_ptr<VibratorThread> vibratorThread) const
 {
-    return ((vibratorThread != nullptr) && (vibratorThread->IsRunning()));
+    return ((vibratorThread != nullptr) &&
+        ((vibratorThread->IsRunning()) || (VibratorDevice.IsHapticRunning())));
 }
 
 bool VibrationPriorityManager::IsLoopVibrate(const VibrateInfo &vibrateInfo) const

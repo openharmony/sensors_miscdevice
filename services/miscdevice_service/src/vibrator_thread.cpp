@@ -16,7 +16,6 @@
 #include "vibrator_thread.h"
 
 #include "sensors_errors.h"
-#include "vibrator_hdi_connection.h"
 
 namespace OHOS {
 namespace Sensors {

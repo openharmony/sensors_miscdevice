@@ -74,6 +74,22 @@ int32_t HdiConnection::Start(const std::string &effectType)
     return ERR_OK;
 }
 
+int32_t HdiConnection::StartCustom(const std::vector<int32_t> &sequence)
+{
+    if (sequence.empty()) {
+        MISC_HILOGE("sequence is null");
+        return VIBRATOR_ON_ERR;
+    }
+    int32_t ret = vibratorInterface_->StartCustom(sequence);
+    if (ret < 0) {
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "StartCustom", "ERROR_CODE", ret);
+        MISC_HILOGE("StartCustom failed");
+        return ret;
+    }
+    return ERR_OK;
+}
+
 int32_t HdiConnection::Stop(VibratorStopMode mode)
 {
     int32_t ret = vibratorInterface_->Stop(static_cast<OHOS::HDI::Vibrator::V1_1::HdfVibratorMode>(mode));
@@ -84,6 +100,11 @@ int32_t HdiConnection::Stop(VibratorStopMode mode)
         return ret;
     }
     return ERR_OK;
+}
+
+int32_t HdiConnection::IsHapticRunning()
+{
+    return vibratorInterface_->IsHapticRunning();
 }
 
 int32_t HdiConnection::DestroyHdiConnection()

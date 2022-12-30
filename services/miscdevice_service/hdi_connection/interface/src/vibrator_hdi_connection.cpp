@@ -29,11 +29,11 @@ constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "VibratorHdiConnection
 
 int32_t VibratorHdiConnection::ConnectHdi()
 {
-    iVibratorHdiConnection_ = std::make_unique<CompatibleConnection>();
+    iVibratorHdiConnection_ = std::make_unique<HdiConnection>();
     int32_t ret = iVibratorHdiConnection_->ConnectHdi();
     if (ret != 0) {
         MISC_HILOGE("hdi direct failed");
-        iVibratorHdiConnection_ = std::make_unique<HdiConnection>();
+        iVibratorHdiConnection_ = std::make_unique<CompatibleConnection>();
         ret = iVibratorHdiConnection_->ConnectHdi();
     }
     if (ret != 0) {
@@ -67,6 +67,18 @@ int32_t VibratorHdiConnection::Start(const std::string &effectType)
     return ERR_OK;
 }
 
+int32_t VibratorHdiConnection::StartCustom(const std::vector<int32_t> &sequence)
+{
+    StartTrace(HITRACE_TAG_SENSORS, "StartCustom");
+    int32_t ret = iVibratorHdiConnection_->StartCustom(sequence);
+    FinishTrace(HITRACE_TAG_SENSORS);
+    if (ret != 0) {
+        MISC_HILOGE("StartCustom failed");
+        return VIBRATOR_ON_ERR;
+    }
+    return ERR_OK;
+}
+
 int32_t VibratorHdiConnection::Stop(VibratorStopMode mode)
 {
     StartTrace(HITRACE_TAG_SENSORS, "Stop");
@@ -77,6 +89,14 @@ int32_t VibratorHdiConnection::Stop(VibratorStopMode mode)
         return VIBRATOR_OFF_ERR;
     }
     return ERR_OK;
+}
+
+int32_t VibratorHdiConnection::IsHapticRunning()
+{
+    StartTrace(HITRACE_TAG_SENSORS, "IsHapticRunning");
+    int32_t ret = iVibratorHdiConnection_->IsHapticRunning();
+    FinishTrace(HITRACE_TAG_SENSORS);
+    return ret;
 }
 
 int32_t VibratorHdiConnection::DestroyHdiConnection()

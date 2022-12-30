@@ -230,12 +230,17 @@ void MiscdeviceService::StartVibrateThread(VibrateInfo info)
     while (vibratorThread_->IsRunning()) {
         vibratorThread_->NotifyExit();
     }
+    while (vibratorHdiConnection_.IsHapticRunning()) {
+        vibratorHdiConnection_.Stop(IVibratorHdiConnection::VIBRATOR_STOP_MODE_CUSTOM);
+    }
     vibratorThread_->UpdateVibratorEffect(info);
-    vibratorThread_->Start("VibratorThread");
+    if (info.mode != "custom") {
+        vibratorThread_->Start("VibratorThread");
+    }
     DumpHelper->SaveVibrateRecord(info);
 }
 
-int32_t MiscdeviceService::StopVibratorEffect(int32_t vibratorId, const std::string &effect)
+int32_t MiscdeviceService::StopVibratorEffect(int32_t vibratorId, const std::string &mode)
 {
     std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
     if ((vibratorThread_ == nullptr) || (!vibratorThread_->IsRunning())) {
@@ -243,7 +248,7 @@ int32_t MiscdeviceService::StopVibratorEffect(int32_t vibratorId, const std::str
         return ERROR;
     }
     const VibrateInfo info = vibratorThread_->GetCurrentVibrateInfo();
-    if ((info.mode != effect) || (info.pid != GetCallingPid())) {
+    if ((info.mode != mode) || (info.pid != GetCallingPid())) {
         MISC_HILOGE("Stop vibration information mismatch");
         return ERROR;
     }
@@ -307,7 +312,6 @@ int32_t MiscdeviceService::VibrateCustom(int32_t vibratorId, int32_t fd, int32_t
         MISC_HILOGE("decoder custom effect error");
         return ERROR;
     }
-    
     if (!CustomVibrationMatcher::ParameterCheck(vibrateSequence)) {
         MISC_HILOGE("parameter check failed.");
         return ERROR;
@@ -319,7 +323,35 @@ int32_t MiscdeviceService::VibrateCustom(int32_t vibratorId, int32_t fd, int32_t
     for (int32_t i = 0; i < retNum; ++i) {
         MISC_HILOGI("match result at %{public}d th : %{public}d", i, convertSequence[i]);
     }
-    return NO_ERROR;
+    VibrateInfo info = {
+        .mode = "custom",
+        .packageName = GetPackageName(GetCallingTokenID()),
+        .pid = GetCallingPid(),
+        .uid = GetCallingUid(),
+        .usage = usage,
+    };
+    std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
+    if (ShouldIgnoreVibrate(info)) {
+        MISC_HILOGE("Vibration is ignored and high priority is vibrating");
+        return ERROR;
+    }
+    StartVibrateThread(info);
+    return vibratorHdiConnection_.StartCustom(convertSequence);
+}
+
+int32_t MiscdeviceService::StopVibratorCustom(int32_t vibratorId, const std::string &mode)
+{
+    std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
+    if ((vibratorThread_ == nullptr) || (!vibratorHdiConnection_.IsHapticRunning())) {
+        MISC_HILOGE("No vibration, no need to stop");
+        return ERROR;
+    }
+    const VibrateInfo info = vibratorThread_->GetCurrentVibrateInfo();
+    if ((info.mode != mode) || (info.pid != GetCallingPid())) {
+        MISC_HILOGE("Stop vibration information mismatch");
+        return ERROR;
+    }
+    return vibratorHdiConnection_.Stop(IVibratorHdiConnection::VIBRATOR_STOP_MODE_CUSTOM);
 }
 
 std::string MiscdeviceService::GetPackageName(AccessTokenID tokenId)

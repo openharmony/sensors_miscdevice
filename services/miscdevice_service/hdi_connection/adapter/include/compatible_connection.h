@@ -32,7 +32,11 @@ public:
 
     int32_t Start(const std::string &effectType) override;
 
+    int32_t StartCustom(const std::vector<int32_t> &sequence) override;
+
     int32_t Stop(VibratorStopMode mode) override;
+
+    int32_t IsHapticRunning() override;
 
     int32_t DestroyHdiConnection() override;
 
@@ -41,6 +45,7 @@ private:
     std::thread vibrateThread_;
     static void VibrateProcess();
     static uint32_t duration_;
+    static std::vector<int32_t> sequence_;
     static std::atomic_bool isStop_;
 };
 }  // namespace Sensors

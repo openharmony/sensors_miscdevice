@@ -25,6 +25,7 @@ public:
     enum VibratorStopMode {
         VIBRATOR_STOP_MODE_TIME   = 0,    /**< Indicates the one-shot vibration with the given duration. */
         VIBRATOR_STOP_MODE_PRESET = 1,    /**< Indicates the periodic vibration with the preset effect. */
+        VIBRATOR_STOP_MODE_CUSTOM = 2,    /**< Indicates the periodic vibration with the custom effect. */
         VIBRATOR_STOP_MODE_INVALID        /**< Indicates invalid the effect mode. */
     };
 
@@ -38,7 +39,11 @@ public:
 
     virtual int32_t Start(const std::string &effectType) = 0;
 
+    virtual int32_t StartCustom(const std::vector<int32_t> &sequence) = 0;
+
     virtual int32_t Stop(VibratorStopMode mode) = 0;
+
+    virtual int32_t IsHapticRunning() = 0;
 
     virtual int32_t DestroyHdiConnection() = 0;
 

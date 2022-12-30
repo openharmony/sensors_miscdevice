@@ -29,6 +29,7 @@ std::vector<std::string> vibratorEffect_ = {"haptic.clock.timer"};
 IVibratorHdiConnection::VibratorStopMode vibrateMode_;
 }
 uint32_t CompatibleConnection::duration_ = -1;
+std::vector<int32_t> CompatibleConnection::sequence_ = {};
 std::atomic_bool CompatibleConnection::isStop_ = false;
 
 int32_t CompatibleConnection::ConnectHdi()
@@ -66,6 +67,19 @@ int32_t CompatibleConnection::Start(const std::string &effectType)
     return ERR_OK;
 }
 
+int32_t CompatibleConnection::StartCustom(const std::vector<int32_t> &sequence)
+{
+    CALL_LOG_ENTER;
+    sequence_ = sequence;
+    if (!vibrateThread_.joinable()) {
+        std::thread senocdDataThread(CompatibleConnection::VibrateProcess);
+        vibrateThread_ = std::move(senocdDataThread);
+        isStop_ = false;
+    }
+    vibrateMode_ = VIBRATOR_STOP_MODE_CUSTOM;
+    return ERR_OK;
+}
+
 int32_t CompatibleConnection::Stop(VibratorStopMode mode)
 {
     CALL_LOG_ENTER;
@@ -83,6 +97,12 @@ int32_t CompatibleConnection::Stop(VibratorStopMode mode)
         vibrateThread_.join();
     }
     return ERR_OK;
+}
+
+int32_t CompatibleConnection::IsHapticRunning()
+{
+    CALL_LOG_ENTER;
+    return isStop_;
 }
 
 int32_t CompatibleConnection::DestroyHdiConnection()

@@ -28,7 +28,7 @@ public:
     int32_t Vibrate(int32_t vibratorId, int32_t timeOut, int32_t usage);
     int32_t Vibrate(int32_t vibratorId, const std::string &effect, int32_t loopCount, int32_t usage);
     int32_t VibrateCustom(int32_t vibratorId, int32_t fd, int32_t usage);
-    int32_t Stop(int32_t vibratorId, const std::string &type);
+    int32_t Stop(int32_t vibratorId, const std::string &mode);
     void ProcessDeathObserver(const wptr<IRemoteObject> &object);
 
 private:

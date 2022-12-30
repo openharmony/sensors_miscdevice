@@ -101,7 +101,8 @@ int32_t StartCustomVibrate(int32_t fd)
 int32_t StopVibrator(const char *mode)
 {
     CHKPR(mode, PARAMETER_ERROR);
-    if (strcmp(mode, "time") != 0 && strcmp(mode, "preset") != 0) {
+    if (strcmp(mode, "time") != 0 && strcmp(mode, "preset") != 0 &&
+        strcmp(mode, "custom") != 0) {
         MISC_HILOGE("mode is invalid, mode is %{public}s", mode);
         return PARAMETER_ERROR;
     }

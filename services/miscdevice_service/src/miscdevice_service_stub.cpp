@@ -43,6 +43,7 @@ MiscdeviceServiceStub::MiscdeviceServiceStub()
     baseFuncs_[PLAY_VIBRATOR_EFFECT] = &MiscdeviceServiceStub::PlayVibratorEffectPb;
     baseFuncs_[STOP_VIBRATOR_EFFECT] = &MiscdeviceServiceStub::StopVibratorEffectPb;
     baseFuncs_[VIBRATE_CUSTOM] = &MiscdeviceServiceStub::VibrateCustomPb;
+    baseFuncs_[STOP_VIBRATOR_CUSTOM] = &MiscdeviceServiceStub::StopVibratorCustomPb;
     baseFuncs_[GET_LIGHT_LIST] = &MiscdeviceServiceStub::GetLightListPb;
     baseFuncs_[TURN_ON] = &MiscdeviceServiceStub::TurnOnPb;
     baseFuncs_[TURN_OFF] = &MiscdeviceServiceStub::TurnOffPb;
@@ -125,12 +126,12 @@ int32_t MiscdeviceServiceStub::StopVibratorEffectPb(MessageParcel &data, Message
         return PERMISSION_DENIED;
     }
     int32_t vibratorId;
-    std::string effectType;
-    if ((!data.ReadInt32(vibratorId)) || (!data.ReadString(effectType))) {
+    std::string mode;
+    if ((!data.ReadInt32(vibratorId)) || (!data.ReadString(mode))) {
         MISC_HILOGE("Parcel read failed");
         return ERROR;
     }
-    return StopVibratorEffect(vibratorId, effectType);
+    return StopVibratorEffect(vibratorId, mode);
 }
 
 int32_t MiscdeviceServiceStub::VibrateCustomPb(MessageParcel &data, MessageParcel &reply)
@@ -165,6 +166,25 @@ int32_t MiscdeviceServiceStub::VibrateCustomPb(MessageParcel &data, MessageParce
     close(tmpFd);
     close(fd);
     return ret;
+}
+
+int32_t MiscdeviceServiceStub::StopVibratorCustomPb(MessageParcel &data, MessageParcel &reply)
+{
+    PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
+    int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
+    if (ret != PERMISSION_GRANTED) {
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
+            HiSysEvent::EventType::SECURITY, "PKG_NAME", "StopVibratorCustomPb", "ERROR_CODE", ret);
+        MISC_HILOGE("result: %{public}d", ret);
+        return PERMISSION_DENIED;
+    }
+    int32_t vibratorId;
+    std::string mode;
+    if ((!data.ReadInt32(vibratorId)) || (!data.ReadString(mode))) {
+        MISC_HILOGE("Parcel read failed");
+        return ERROR;
+    }
+    return StopVibratorCustom(vibratorId, mode);
 }
 
 int32_t MiscdeviceServiceStub::GetLightListPb(MessageParcel &data, MessageParcel &reply)

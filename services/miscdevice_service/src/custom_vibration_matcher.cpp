@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace Sensors {
 namespace {
-std::map<int32_t, std::vector<int32_t>> TRANSIENT_INFOS = {
+std::map<int32_t, std::vector<int32_t>> TRANSIENT_VIBRATION_INFOS = {
     {40, {77, 77, 11}}, {44, {42, 100, 7}}, {48, {68, 82, 22}},
     {60, {69, 52, 10}}, {64, {46, 67, 10}}, {72, {81, 82, 10}},
     {76, {58, 12, 15}}, {80, {100, 32, 20}}, {84, {85, 52, 28}},
@@ -30,8 +30,8 @@ std::map<int32_t, std::vector<int32_t>> TRANSIENT_INFOS = {
 constexpr int32_t INTENSITY_MIN = 0;
 constexpr int32_t INTENSITY_MAX = 100;
 constexpr int32_t MIN_TIME_SPACE = 20;
-constexpr int32_t TRANSIENT_GEAR_NUM = 4;
-constexpr int32_t CONTINUOUS_GEAR_NUM = 8;
+constexpr int32_t TRANSIENT_GRADE_NUM = 4;
+constexpr int32_t CONTINUOUS_GRADE_NUM = 8;
 constexpr float INTENSITY_WEIGHT = 0.5;
 constexpr float FREQUENCY_WEIGHT = 0.5;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "CustomVibrationMatcher" };
@@ -54,44 +54,44 @@ CustomVibrationMatcher::CustomVibrationMatcher(const std::vector<VibrateEvent>& 
 
 void CustomVibrationMatcher::ProcessContinuousEvent(const VibrateEvent& event)
 {
-    float gearScan = (INTENSITY_MAX - INTENSITY_MIN) / CONTINUOUS_GEAR_NUM;
-    int32_t gear = -1;
-    float dist = INTENSITY_MAX - INTENSITY_MIN;
+    float scale = (INTENSITY_MAX - INTENSITY_MIN) / CONTINUOUS_GRADE_NUM;
+    int32_t grade = -1;
+    float minDistance = INTENSITY_MAX - INTENSITY_MIN;
     for (size_t i = 1; i <= 8; ++i) {
-        if (std::abs(event.intensity - i * gearScan) < dist) {
-            gear = i - 1;
-            dist = std::abs(event.intensity - i * gearScan);
+        if (std::abs(event.intensity - i * scale) < minDistance) {
+            grade = i - 1;
+            minDistance = std::abs(event.intensity - i * scale);
         }
     }
-    if (gear == -1) {
+    if (grade == -1) {
         MISC_HILOGE("Continuous event match failed");
         return;
     }
-    int32_t matchId = event.duration * 100 + gear;
+    int32_t matchId = event.duration * 100 + grade;
     convertSequence_.push_back(event.delayTime);
     convertSequence_.push_back(matchId);
 }
 
 void CustomVibrationMatcher::ProcessTransientEvent(const VibrateEvent& event)
 {
-    std::vector<std::vector<float>> distInfo;
-    for (const auto& transientInfo : TRANSIENT_INFOS) {
+    std::vector<std::vector<float>> distanceInfo;
+    for (const auto& transientInfo : TRANSIENT_VIBRATION_INFOS) {
         int32_t id = transientInfo.first;
         std::vector<int32_t> info = transientInfo.second;
-        float frequencyDist = std::abs(event.frequency - info[1]);
-        for (size_t j = 0; j < TRANSIENT_GEAR_NUM; ++j) {
-            float intensityDist = std::abs(event.intensity - info[0] * (1 - j * 0.25));
-            distInfo.push_back({id + j, intensityDist, frequencyDist});
+        float frequencyDistance = std::abs(event.frequency - info[1]);
+        for (size_t j = 0; j < TRANSIENT_GRADE_NUM; ++j) {
+            float intensityDistance = std::abs(event.intensity - info[0] * (1 - j * 0.25));
+            distanceInfo.push_back({id + j, intensityDistance, frequencyDistance});
         }
     }
-    Normalize(distInfo);
+    Normalize(distanceInfo);
     int32_t matchId = -1;
-    float weightSumMin = 1;
-    for (size_t i = 0; i < distInfo.size(); ++i) {
-        float sum = INTENSITY_WEIGHT * distInfo[i][1] + FREQUENCY_WEIGHT * distInfo[i][2];
-        if (sum < weightSumMin) {
-            matchId = distInfo[i][0];
-            weightSumMin = sum;
+    float minWeightSum = 1;
+    for (size_t i = 0; i < distanceInfo.size(); ++i) {
+        float sum = INTENSITY_WEIGHT * distanceInfo[i][1] + FREQUENCY_WEIGHT * distanceInfo[i][2];
+        if (sum < minWeightSum) {
+            matchId = distanceInfo[i][0];
+            minWeightSum = sum;
         }
     }
     if (matchId == -1) {

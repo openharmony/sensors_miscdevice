@@ -52,6 +52,7 @@ private:
     int32_t SetVibratorParameterPb(MessageParcel &data, MessageParcel &reply);
     int32_t GetVibratorParameterPb(MessageParcel &data, MessageParcel &reply);
     int32_t VibrateCustomPb(MessageParcel &data, MessageParcel &reply);
+    int32_t StopVibratorCustomPb(MessageParcel &data, MessageParcel &reply);
     int32_t GetLightListPb(MessageParcel &data, MessageParcel &reply);
     int32_t TurnOnPb(MessageParcel &data, MessageParcel &reply);
     int32_t TurnOffPb(MessageParcel &data, MessageParcel &reply);
