@@ -40,42 +40,17 @@ enum VibrateStatus {
     IGNORE_UNKNOWN = 7,
 };
 
-struct PriorityItem {
-    std::vector<std::string> byPassUsages;
-    std::vector<std::string> byPassPkgs;
-    std::vector<std::string> filterUsages;
-    std::vector<std::string> filterPkgs;
-};
-
-struct SpecialForeground {
-    PriorityItem calling;
-    PriorityItem camera;
-};
-
-struct PriorityConfig {
-    std::vector<std::string> privilegePkgs;
-    PriorityItem globalSettings;
-    PriorityItem lowPowerMode;
-    SpecialForeground specialForeground;
-};
-
 class VibrationPriorityManager {
     DECLARE_DELAYED_SINGLETON(VibrationPriorityManager);
 public:
     DISALLOW_COPY_AND_MOVE(VibrationPriorityManager);
     VibrateStatus ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo,
         std::shared_ptr<VibratorThread> vibratorThread);
-    int32_t LoadPriorityConfig(const std::string &configPath, PriorityConfig &config);
 
 private:
-    bool IsPrivilegeApp(const std::string &name) const;
     bool IsCurrentVibrate(std::shared_ptr<VibratorThread> vibratorThread) const;
     bool IsLoopVibrate(const VibrateInfo &vibrateInfo) const;
     VibrateStatus ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo, VibrateInfo currentVibrateInfo) const;
-    void CopyPriorityConfig(PriorityConfig config);
-    int32_t ParserPriorityItem(const JsonParser &parser, cJSON *json, const std::string &key,
-        PriorityItem &item);
-    PriorityConfig priorityConfig_;
 };
 #define PriorityManager DelayedSingleton<VibrationPriorityManager>::GetInstance()
 }  // namespace Sensors

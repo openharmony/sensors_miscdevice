@@ -152,6 +152,8 @@ HWTEST_F(LightAgentTest, StartLightTest_004, TestSize.Level1)
 >>>>>>> 127ed407ac700cd8e0f28f2eb36f881480736f3d
 {
     CALL_LOG_ENTER;
+    int32_t powerLightId = 1;
+    TurnOff(powerLightId);
     LightColor color;
     bool ret = GetLightColor(color, lightType_);
     if (!ret) {
