@@ -20,6 +20,7 @@
 #include "sensors_errors.h"
 #include "system_ability_definition.h"
 #include "vibration_priority_manager.h"
+#include "v1_0/light_interface_proxy.h"
 
 namespace OHOS {
 namespace Sensors {
@@ -66,6 +67,10 @@ void MiscdeviceService::OnStart()
         MISC_HILOGE("Init interface error");
         return;
     }
+    if (!InitLightInterface()) {
+        MISC_HILOGE("InitLightInterface failed");
+        return;
+    }
     if (!SystemAbility::Publish(this)) {
         MISC_HILOGE("publish MiscdeviceService failed");
         return;
@@ -88,6 +93,41 @@ bool MiscdeviceService::InitInterface()
     auto ret = vibratorHdiConnection_.ConnectHdi();
     if (ret != ERR_OK) {
         MISC_HILOGE("InitVibratorServiceImpl failed");
+        return false;
+    }
+    return true;
+}
+
+bool MiscdeviceService::InitLightInterface()
+{
+    auto ret = lightHdiConnection_.ConnectHdi();
+    if (ret != ERR_OK) {
+        MISC_HILOGE("ConnectHdi failed");
+        return false;
+    }
+    return true;
+}
+
+bool MiscdeviceService::IsValid(int32_t lightId)
+{
+    CALL_LOG_ENTER;
+    for (const auto &item : lightInfos_) {
+        if (lightId == item.lightId) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool MiscdeviceService::IsLightAnimationValid(const LightAnimation &animation)
+{
+    if ((animation.mode < 0) || (animation.mode >= LIGHT_MODE_BUTT)) {
+        MISC_HILOGE("animation mode is invalid, mode:%{pubilc}d", animation.mode);
+        return false;
+    }
+    if ((animation.onTime < 0) || (animation.offTime < 0)) {
+        MISC_HILOGE("animation onTime or offTime is invalid, onTime:%{pubilc}d, offTime:%{pubilc}d",
+            animation.onTime, animation.offTime);
         return false;
     }
     return true;
@@ -240,6 +280,59 @@ std::string MiscdeviceService::GetPackageName(AccessTokenID tokenId)
         }
     }
     return packageName;
+}
+
+std::vector<LightInfo> MiscdeviceService::GetLightList()
+{
+    if (!InitLightList()) {
+        MISC_HILOGE("InitLightList init failed");
+        return lightInfos_;
+    }
+    return lightInfos_;
+}
+
+bool MiscdeviceService::InitLightList()
+{
+    int32_t ret = lightHdiConnection_.GetLightList(lightInfos_);
+    if (ret != ERR_OK) {
+        MISC_HILOGE("InitLightList failed, ret:%{public}d", ret);
+        return false;
+    }
+    return true;
+}
+
+int32_t MiscdeviceService::TurnOn(int32_t lightId, const LightColor &color, const LightAnimation &animation)
+{
+    CALL_LOG_ENTER;
+    if (!IsValid(lightId)) {
+        MISC_HILOGE("lightId is invalid, lightId:%{pubilc}d", lightId);
+        return MISCDEVICE_NATIVE_SAM_ERR;
+    }
+    if (!IsLightAnimationValid(animation)) {
+        MISC_HILOGE("animation is invalid");
+        return MISCDEVICE_NATIVE_SAM_ERR;
+    }
+    int32_t ret = lightHdiConnection_.TurnOn(lightId, color, animation);
+    if (ret != ERR_OK) {
+        MISC_HILOGE("TurnOn failed, error:%{public}d", ret);
+        return ERROR;
+    }
+    return ret;
+}
+
+int32_t MiscdeviceService::TurnOff(int32_t lightId)
+{
+    CALL_LOG_ENTER;
+    if (!IsValid(lightId)) {
+        MISC_HILOGE("lightId is invalid, lightId:%{pubilc}d", lightId);
+        return MISCDEVICE_NATIVE_SAM_ERR;
+    }
+    int32_t ret = lightHdiConnection_.TurnOff(lightId);
+    if (ret != ERR_OK) {
+        MISC_HILOGE("TurnOff failed, error:%{public}d", ret);
+        return ERROR;
+    }
+    return ret;
 }
 
 int32_t MiscdeviceService::Dump(int32_t fd, const std::vector<std::u16string> &args)

@@ -21,6 +21,7 @@
 #include "hisysevent.h"
 #include "ipc_skeleton.h"
 #include "message_parcel.h"
+#include "securec.h"
 
 #include "permission_util.h"
 #include "sensors_errors.h"
@@ -41,6 +42,9 @@ MiscdeviceServiceStub::MiscdeviceServiceStub()
     baseFuncs_[CANCEL_VIBRATOR] = &MiscdeviceServiceStub::CancelVibratorPb;
     baseFuncs_[PLAY_VIBRATOR_EFFECT] = &MiscdeviceServiceStub::PlayVibratorEffectPb;
     baseFuncs_[STOP_VIBRATOR_EFFECT] = &MiscdeviceServiceStub::StopVibratorEffectPb;
+    baseFuncs_[GET_LIGHT_LIST] = &MiscdeviceServiceStub::GetLightListPb;
+    baseFuncs_[TURN_ON] = &MiscdeviceServiceStub::TurnOnPb;
+    baseFuncs_[TURN_OFF] = &MiscdeviceServiceStub::TurnOffPb;
 }
 
 MiscdeviceServiceStub::~MiscdeviceServiceStub()
@@ -118,6 +122,52 @@ int32_t MiscdeviceServiceStub::StopVibratorEffectPb(MessageParcel &data, Message
     int32_t vibratorId = data.ReadInt32();
     std::string effectType = data.ReadString();
     return StopVibratorEffect(vibratorId, effectType);
+}
+
+int32_t MiscdeviceServiceStub::GetLightListPb(MessageParcel &data, MessageParcel &reply)
+{
+    (void)data;
+    std::vector<LightInfo> lightInfos(GetLightList());
+    size_t lightCount = lightInfos.size();
+    MISC_HILOGE("lightCount:%{public}zu", lightCount);
+    if (!reply.WriteUint32(lightCount)) {
+        MISC_HILOGE("Parcel write failed");
+        return WRITE_MSG_ERR;
+    }
+    for (size_t i = 0; i < lightCount; ++i) {
+        if (!reply.WriteBuffer(&lightInfos[i], sizeof(LightInfo))) {
+            MISC_HILOGE("WriteBuffer failed");
+            return WRITE_MSG_ERR;
+        }
+    }
+    return NO_ERROR;
+}
+
+int32_t MiscdeviceServiceStub::TurnOnPb(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t lightId = data.ReadInt32();
+    const unsigned char *info = data.ReadBuffer(sizeof(LightColor));
+    CHKPR(info, ERROR);
+    LightColor lightColor;
+    if (memcpy_s(&lightColor, sizeof(LightColor), info, sizeof(LightColor)) != EOK) {
+        MISC_HILOGE("memcpy_s lightColor failed");
+        return ERROR;
+    }
+
+    const unsigned char *buf = data.ReadBuffer(sizeof(LightAnimation));
+    CHKPR(buf, ERROR);
+    LightAnimation lightAnimation;
+    if (memcpy_s(&lightAnimation, sizeof(LightAnimation), buf, sizeof(LightAnimation)) != EOK) {
+        MISC_HILOGE("memcpy_s lightAnimation failed");
+        return ERROR;
+    }
+    return TurnOn(lightId, lightColor, lightAnimation);
+}
+
+int32_t MiscdeviceServiceStub::TurnOffPb(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t lightId = data.ReadInt32();
+    return TurnOff(lightId);
 }
 
 int32_t MiscdeviceServiceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
