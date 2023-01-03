@@ -54,7 +54,7 @@ bool VibratorThread::Run()
             VibratorDevice.Stop(IVibratorHdiConnection::VIBRATOR_STOP_MODE_PRESET);
             std::unique_lock<std::mutex> readyLck(readyMutex_);
             if (ready_) {
-                MISC_HILOGI("Stop effect %{public}s failed, pid: %{public}d", effect.c_str(), currentVibration_.pid);
+                MISC_HILOGI("Stop effect %{public}s, pid: %{public}d", effect.c_str(), currentVibration_.pid);
                 SetReadyStatus(false);
                 break;
             }
