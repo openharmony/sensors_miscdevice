@@ -29,7 +29,6 @@ std::map<int32_t, std::vector<int32_t>> TRANSIENT_VIBRATION_INFOS = {
 };  // {Num, {intensity, frequency, duration}}
 constexpr int32_t INTENSITY_MIN = 0;
 constexpr int32_t INTENSITY_MAX = 100;
-constexpr int32_t MIN_TIME_SPACE = 20;
 constexpr int32_t TRANSIENT_GRADE_NUM = 4;
 constexpr int32_t CONTINUOUS_GRADE_NUM = 8;
 constexpr float INTENSITY_WEIGHT = 0.5;
@@ -68,7 +67,9 @@ void CustomVibrationMatcher::ProcessContinuousEvent(const VibrateEvent& event)
         return;
     }
     int32_t matchId = event.duration * 100 + grade;
-    convertSequence_.push_back(event.delayTime);
+    int32_t delayTime = event.startTime - curPos_;
+    curPos_ = event.startTime;
+    convertSequence_.push_back(delayTime);
     convertSequence_.push_back(matchId);
 }
 
@@ -98,7 +99,9 @@ void CustomVibrationMatcher::ProcessTransientEvent(const VibrateEvent& event)
         MISC_HILOGE("Transient event match failed");
         return;
     }
-    convertSequence_.push_back(event.delayTime);
+    int32_t delayTime = event.startTime - curPos_;
+    curPos_ = event.startTime;
+    convertSequence_.push_back(delayTime);
     convertSequence_.push_back(matchId);
 }
 
@@ -123,21 +126,6 @@ void CustomVibrationMatcher::Normalize(std::vector<std::vector<float>>& matrix)
             }
         }
     }
-}
-
-bool CustomVibrationMatcher::ParameterCheck(const std::vector<VibrateEvent>& vibrateSequence)
-{
-    int32_t length = vibrateSequence.size();
-    if (length == 0) {
-        MISC_HILOGE("the vibrateSequence array size is 0");
-        return false;
-    }
-    for (int32_t i = 0; i < length - 1; ++i) {
-        if (vibrateSequence[i + 1].delayTime < vibrateSequence[i].duration + MIN_TIME_SPACE) {
-            MISC_HILOGW("The space time after the %{public}d event should be greater than 20ms", i);
-        }
-    }
-    return true;
 }
 }  // namespace Sensors
 }  // namespace OHOS

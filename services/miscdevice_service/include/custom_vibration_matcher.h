@@ -34,6 +34,7 @@ private:
     void ProcessTransientEvent(const VibrateEvent& event);
     static void Normalize(std::vector<std::vector<float>>& matrix);
     std::vector<int32_t> convertSequence_;
+    int32_t curPos_ = 0;
 };
 }  // namespace Sensors
 }  // namespace OHOS

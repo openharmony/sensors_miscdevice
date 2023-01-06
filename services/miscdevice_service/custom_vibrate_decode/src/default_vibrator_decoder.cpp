@@ -20,9 +20,11 @@ namespace OHOS {
 namespace Sensors {
 using namespace OHOS::HiviewDFX;
 namespace {
+constexpr int32_t DURATION_MIN = 10;
+constexpr int32_t DURATION_MAX = 1600;
 constexpr int32_t INTENSITY_MIN = 0;
 constexpr int32_t INTENSITY_MAX = 100;
-constexpr int32_t FREQUENCY_MIN = -100;
+constexpr int32_t FREQUENCY_MIN = 0;
 constexpr int32_t FREQUENCY_MAX = 100;
 constexpr int32_t MIN_VIBRATE_DURATION = 30;
 constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "DefaultVibratorDecoder" };
@@ -45,18 +47,17 @@ int32_t DefaultVibratorDecoder::ParseSequence(const JsonParser &parser, std::vec
         return ERROR;
     }
     int32_t size = cJSON_GetArraySize(sequence);
-    int32_t preStartTime = 0;
     for (int32_t i = 0; i < size; i++) {
         cJSON* event = cJSON_GetArrayItem(sequence, i)->child;
         CHKPR(event, ERROR);
-        int32_t ret = ParseEvent(parser, event, vibrateSequence, preStartTime);
+        int32_t ret = ParseEvent(parser, event, vibrateSequence);
         CHKCR((ret == SUCCESS), ERROR, "parse event fail");
     }
     return SUCCESS;
 }
 
 int32_t DefaultVibratorDecoder::ParseEvent(const JsonParser &parser, cJSON *event,
-                                           std::vector<VibrateEvent> &vibrateSequence, int32_t &preStartTime)
+                                           std::vector<VibrateEvent> &vibrateSequence)
 {
     VibrateEvent vibrateEvent;
     cJSON* type = parser.GetObjectItem(event, "Type");
@@ -76,26 +77,31 @@ int32_t DefaultVibratorDecoder::ParseEvent(const JsonParser &parser, cJSON *even
     }
     cJSON* startTime = parser.GetObjectItem(event, "StartTime");
     CHKPR(startTime, ERROR);
-    int32_t curStartTime = startTime->valueint;
-    vibrateEvent.delayTime = curStartTime - preStartTime;
-    preStartTime = curStartTime;
+    vibrateEvent.startTime = startTime->valueint;
     cJSON* intensity = parser.GetObjectItem(event, "Intensity");
     CHKPR(intensity, ERROR);
     vibrateEvent.intensity = intensity->valueint;
-    if (vibrateEvent.intensity <= INTENSITY_MIN || vibrateEvent.intensity > INTENSITY_MAX) {
-        MISC_HILOGE("the event intensity is not in (0 ~ 100], intensity: %{public}d", vibrateEvent.intensity);
-        return ERROR;
-    }
     cJSON* frequency = parser.GetObjectItem(event, "Frequency");
     CHKPR(frequency, ERROR);
     vibrateEvent.frequency = frequency->valueint;
-    if (vibrateEvent.frequency < FREQUENCY_MIN || vibrateEvent.frequency > FREQUENCY_MAX) {
-        MISC_HILOGE("the event frequency is not in [-100 ~ 100], frequency: %{public}d", vibrateEvent.frequency);
+    if (vibrateEvent.startTime < 0) {
+        MISC_HILOGE("the event startTime is less than 0, startTime: %{public}d", vibrateEvent.startTime);
+        return ERROR;
+    }
+    if (vibrateEvent.duration <= DURATION_MIN || vibrateEvent.duration >= DURATION_MAX) {
+        MISC_HILOGE("the event duration is not in (10, 1600), duration: %{public}d", vibrateEvent.duration);
+        return ERROR;
+    }
+    if (vibrateEvent.intensity <= INTENSITY_MIN || vibrateEvent.intensity > INTENSITY_MAX) {
+        MISC_HILOGE("the event intensity is not in (0, 100], intensity: %{public}d", vibrateEvent.intensity);
+        return ERROR;
+    }
+    if (vibrateEvent.frequency <= FREQUENCY_MIN || vibrateEvent.frequency > FREQUENCY_MAX) {
+        MISC_HILOGE("the event frequency is not in (0, 100], frequency: %{public}d", vibrateEvent.frequency);
         return ERROR;
     }
     vibrateSequence.push_back(vibrateEvent);
     return SUCCESS;
 }
-
 }  // namespace Sensors
 }  // namespace OHOS

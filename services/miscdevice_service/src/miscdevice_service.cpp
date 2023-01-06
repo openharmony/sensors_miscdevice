@@ -15,6 +15,7 @@
 
 #include "miscdevice_service.h"
 
+#include <algorithm>
 #include <string_ex.h>
 
 #include "sensors_errors.h"
@@ -312,10 +313,7 @@ int32_t MiscdeviceService::VibrateCustom(int32_t vibratorId, int32_t fd, int32_t
         MISC_HILOGE("decoder custom effect error");
         return ERROR;
     }
-    if (!CustomVibrationMatcher::ParameterCheck(vibrateSequence)) {
-        MISC_HILOGE("parameter check failed.");
-        return ERROR;
-    }
+    std::sort(vibrateSequence.begin(), vibrateSequence.end());
     CustomVibrationMatcher matcher(vibrateSequence);
     std::vector<int32_t> convertSequence = matcher.GetVibrateSequence();
     int32_t retNum = convertSequence.size();
