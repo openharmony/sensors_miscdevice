@@ -50,6 +50,11 @@ int32_t CompatibleLightConnection::TurnOn(int32_t lightId,  const LightColor &co
         MISC_HILOGE("not support TurnOn lightId:%{public}d", lightId);
         return LIGHT_ID_NOT_SUPPORT;
     }
+    if ((animation.mode == LIGHT_MODE_BLINK || animation.mode == LIGHT_MODE_GRADIENT) &&
+        (animation.onTime <= 0 || animation.offTime <= 0)) {
+        MISC_HILOGE("animation parameter error");
+        return LIGHT_ERR;
+    }
     if (std::find(turnOnLights_.begin(), turnOnLights_.end(), lightId) != turnOnLights_.end()) {
         MISC_HILOGI("lightId:%{public}d has been turnOn", lightId);
         return ERR_OK;
