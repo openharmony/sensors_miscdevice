@@ -27,19 +27,19 @@ std::map<int32_t, std::vector<int32_t>> TRANSIENT_VIBRATION_INFOS = {
     {76, {58, 12, 15}}, {80, {100, 32, 20}}, {84, {85, 52, 28}},
     {92, {50, 12, 19}}, {96, {18, 7, 10}}
 };  // {Num, {intensity, frequency, duration}}
-constexpr int32_t INTENSITY_MIN = 0;
 constexpr int32_t INTENSITY_MAX = 100;
 constexpr int32_t TRANSIENT_GRADE_NUM = 4;
 constexpr int32_t CONTINUOUS_GRADE_NUM = 8;
+constexpr float CONTINUOUS_GRADE_SCALE = 100. / 8;
 constexpr float INTENSITY_WEIGHT = 0.5;
 constexpr float FREQUENCY_WEIGHT = 0.5;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "CustomVibrationMatcher" };
 }  // namespace
 
-CustomVibrationMatcher::CustomVibrationMatcher(const std::vector<VibrateEvent>& vibrateSequence)
+CustomVibrationMatcher::CustomVibrationMatcher(const std::vector<VibrateEvent> &vibrateSequence)
 {
     MISC_HILOGD("enter CustomVibrationMatcher");
-    for (const auto& event : vibrateSequence) {
+    for (const auto &event : vibrateSequence) {
         if (event.tag == EVENT_TAG_CONTINUOUS) {
             ProcessContinuousEvent(event);
         } else if (event.tag == EVENT_TAG_TRANSIENT) {
@@ -51,19 +51,16 @@ CustomVibrationMatcher::CustomVibrationMatcher(const std::vector<VibrateEvent>& 
     }
 }
 
-void CustomVibrationMatcher::ProcessContinuousEvent(const VibrateEvent& event)
+void CustomVibrationMatcher::ProcessContinuousEvent(const VibrateEvent &event)
 {
-    float scale = (INTENSITY_MAX - INTENSITY_MIN) / CONTINUOUS_GRADE_NUM;
     int32_t grade = -1;
-    float minDistance = INTENSITY_MAX - INTENSITY_MIN;
-    for (size_t i = 1; i <= 8; ++i) {
-        if (std::abs(event.intensity - i * scale) < minDistance) {
-            grade = i - 1;
-            minDistance = std::abs(event.intensity - i * scale);
-        }
+    if (event.intensity == INTENSITY_MAX) {
+        grade = CONTINUOUS_GRADE_NUM - 1;
+    } else {
+        grade = round(event.intensity / CONTINUOUS_GRADE_SCALE + 0.5) - 1;
     }
-    if (grade == -1) {
-        MISC_HILOGE("Continuous event match failed");
+    if (grade < 0 || grade >= CONTINUOUS_GRADE_NUM) {
+        MISC_HILOGE("Continuous event match failed, startTime : %{public}d", event.startTime);
         return;
     }
     int32_t matchId = event.duration * 100 + grade;
@@ -73,59 +70,31 @@ void CustomVibrationMatcher::ProcessContinuousEvent(const VibrateEvent& event)
     convertSequence_.push_back(matchId);
 }
 
-void CustomVibrationMatcher::ProcessTransientEvent(const VibrateEvent& event)
+void CustomVibrationMatcher::ProcessTransientEvent(const VibrateEvent &event)
 {
-    std::vector<std::vector<float>> distanceInfo;
-    for (const auto& transientInfo : TRANSIENT_VIBRATION_INFOS) {
+    int32_t matchId = -1;
+    float minWeightSum = 100;
+    for (auto &transientInfo : TRANSIENT_VIBRATION_INFOS) {
         int32_t id = transientInfo.first;
-        std::vector<int32_t> info = transientInfo.second;
+        std::vector<int32_t> &info = transientInfo.second;
         float frequencyDistance = std::abs(event.frequency - info[1]);
         for (size_t j = 0; j < TRANSIENT_GRADE_NUM; ++j) {
             float intensityDistance = std::abs(event.intensity - info[0] * (1 - j * 0.25));
-            distanceInfo.push_back({id + j, intensityDistance, frequencyDistance});
-        }
-    }
-    Normalize(distanceInfo);
-    int32_t matchId = -1;
-    float minWeightSum = 1;
-    for (size_t i = 0; i < distanceInfo.size(); ++i) {
-        float sum = INTENSITY_WEIGHT * distanceInfo[i][1] + FREQUENCY_WEIGHT * distanceInfo[i][2];
-        if (sum < minWeightSum) {
-            matchId = distanceInfo[i][0];
-            minWeightSum = sum;
+            float weightSum = INTENSITY_WEIGHT * intensityDistance + FREQUENCY_WEIGHT * frequencyDistance;
+            if (weightSum < minWeightSum) {
+                minWeightSum = weightSum;
+                matchId = id + j;
+            }
         }
     }
     if (matchId == -1) {
-        MISC_HILOGE("Transient event match failed");
+        MISC_HILOGE("Transient event match failed, startTime : %{public}d", event.startTime);
         return;
     }
     int32_t delayTime = event.startTime - curPos_;
     curPos_ = event.startTime;
     convertSequence_.push_back(delayTime);
     convertSequence_.push_back(matchId);
-}
-
-void CustomVibrationMatcher::Normalize(std::vector<std::vector<float>>& matrix)
-{
-    int32_t rowNum = matrix.size();
-    int32_t colNum = matrix[0].size();
-    std::vector<float> mins(matrix[0]);
-    std::vector<float> maxs(matrix[0]);
-    for (int32_t i = 0; i < rowNum; ++i) {
-        for (int32_t j = 1; j < colNum; ++j) {
-            mins[j] = std::min(mins[j], matrix[i][j]);
-            maxs[j] = std::max(maxs[j], matrix[i][j]);
-        }
-    }
-    for (int32_t i = 0; i < rowNum; ++i) {
-        for (int32_t j = 1; j < colNum; ++j) {
-            if (maxs[j] - mins[j] != 0) {
-                matrix[i][j] = (matrix[i][j] - mins[j]) / (maxs[j] - mins[j]);
-            } else {
-                matrix[i][j] = 0;
-            }
-        }
-    }
 }
 }  // namespace Sensors
 }  // namespace OHOS

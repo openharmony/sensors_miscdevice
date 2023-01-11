@@ -260,9 +260,8 @@ int32_t MiscdeviceService::StopVibratorEffect(int32_t vibratorId, const std::str
     return NO_ERROR;
 }
 
-int32_t GetJsonFileVersion(int32_t fd)
+int32_t GetJsonFileVersion(const JsonParser &parser)
 {
-    JsonParser parser(fd);
     cJSON* metadata = parser.GetObjectItem("Metadata");
     CHKPR(metadata, ERROR);
     cJSON* version = parser.GetObjectItem(metadata, "Version");
@@ -282,7 +281,8 @@ int32_t MiscdeviceService::DecodeCustomEffect(int32_t fd, std::vector<VibrateEve
         MISC_HILOGE("current file suffix is not supported at this time, suffix:%{public}s", fileSuffix.c_str());
         return ERROR;
     }
-    int32_t jsonFileVersion = GetJsonFileVersion(fd);
+    JsonParser parser(fd);
+    int32_t jsonFileVersion = GetJsonFileVersion(parser);
     if (jsonFileVersion != 0) {
         MISC_HILOGE("current json file version is not supported at this time, version:%{public}d", jsonFileVersion);
         return ERROR;
@@ -291,7 +291,7 @@ int32_t MiscdeviceService::DecodeCustomEffect(int32_t fd, std::vector<VibrateEve
     CHKPR(defaultFactory, ERROR);
     sptr<VibratorDecoder> defaultDecoder = defaultFactory->CreateDecoder();
     CHKPR(defaultDecoder, ERROR);
-    int32_t ret = defaultDecoder->DecodeEffect(fd, vibrateSequence);
+    int32_t ret = defaultDecoder->DecodeEffect(parser, vibrateSequence);
     if (ret != SUCCESS) {
         MISC_HILOGE("decoder effect error");
         return ERROR;

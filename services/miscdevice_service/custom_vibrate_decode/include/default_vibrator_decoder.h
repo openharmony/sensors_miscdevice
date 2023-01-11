@@ -27,7 +27,7 @@ class DefaultVibratorDecoder : public VibratorDecoder {
 public:
     DefaultVibratorDecoder() = default;
     ~DefaultVibratorDecoder() = default;
-    virtual int32_t DecodeEffect(int32_t fd, std::vector<VibrateEvent> &vibrateSequence) override;
+    virtual int32_t DecodeEffect(const JsonParser &parser, std::vector<VibrateEvent> &vibrateSequence) override;
 private:
     int32_t ParseSequence(const JsonParser &parser, std::vector<VibrateEvent> &vibrateSequence);
     int32_t ParseEvent(const JsonParser &parser, cJSON *event, std::vector<VibrateEvent> &vibrateSequence);

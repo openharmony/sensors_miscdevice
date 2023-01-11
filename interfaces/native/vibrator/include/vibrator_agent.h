@@ -84,12 +84,13 @@ int32_t StartVibrator(const char *effectId);
 int32_t StartVibratorOnce(int32_t duration);
 
 /**
- * @brief
+ * @brief Control this vibrator to perform the vibration customized with the vibration configuration file.
  *
- * @param fd
- * @return
+ * @param fd represents the descriptor of the open vibration configuration file.
+ * @return Returns <b>0</b> if the vibrator vibrates as expected; returns <b>-1</b> otherwise, for example, the
+ * parameters of the vibration configuration file is invalid.
  *
- * @since
+ * @since 9
  */
 int32_t StartCustomVibrate(int32_t fd);
 
@@ -103,8 +104,9 @@ bool SetLoopCount(int32_t count);
 /**
  * @brief Stops the vibration of this vibrator.
  *
- * @param mode Indicates the mode of the vibration to stop. The values can be <b>time</b> and <b>preset</b>,
- * respectively representing a one-shot vibration effect and a preset vibration effect.
+ * @param mode Indicates the mode of the vibration to stop. The values can be <b>time</b>, <b>preset</b> and
+ * <b>custom</b>, respectively representing a one-shot vibration mode, a preset vibration mode and a custom
+ * vibration mode.
  * @return Returns <b>0</b> if the vibration is stopped as expected; returns <b>-1</b> otherwise.
  * @since 6
  */

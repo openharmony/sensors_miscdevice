@@ -28,11 +28,9 @@ public:
     explicit CustomVibrationMatcher(const std::vector<VibrateEvent>& vibrateSequence);
     ~CustomVibrationMatcher() = default;
     std::vector<int32_t> GetVibrateSequence() const { return convertSequence_; }
-    static bool ParameterCheck(const std::vector<VibrateEvent>& vibrateSequence);
 private:
     void ProcessContinuousEvent(const VibrateEvent& event);
     void ProcessTransientEvent(const VibrateEvent& event);
-    static void Normalize(std::vector<std::vector<float>>& matrix);
     std::vector<int32_t> convertSequence_;
     int32_t curPos_ = 0;
 };

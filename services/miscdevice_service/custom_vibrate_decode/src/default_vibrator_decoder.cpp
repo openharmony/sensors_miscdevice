@@ -30,9 +30,8 @@ constexpr int32_t MIN_VIBRATE_DURATION = 30;
 constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "DefaultVibratorDecoder" };
 } // namespace
 
-int32_t DefaultVibratorDecoder::DecodeEffect(int32_t fd, std::vector<VibrateEvent> &vibrateSequence)
+int32_t DefaultVibratorDecoder::DecodeEffect(const JsonParser &parser, std::vector<VibrateEvent> &vibrateSequence)
 {
-    JsonParser parser(fd);
     int32_t ret = ParseSequence(parser, vibrateSequence);
     CHKCR((ret == SUCCESS), ERROR, "parse sequence fail");
     return SUCCESS;
