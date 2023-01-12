@@ -99,6 +99,7 @@ int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, const std::string &ef
     return ret;
 }
 
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 int32_t VibratorServiceClient::VibrateCustom(int32_t vibratorId, int32_t fd, int32_t usage)
 {
     MISC_HILOGD("VibrateCustom begin, fd: %{public}d", fd);
@@ -113,6 +114,7 @@ int32_t VibratorServiceClient::VibrateCustom(int32_t vibratorId, int32_t fd, int
     FinishTrace(HITRACE_TAG_SENSORS);
     return ret;
 }
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
 int32_t VibratorServiceClient::Stop(int32_t vibratorId, const std::string &mode)
 {
@@ -128,8 +130,10 @@ int32_t VibratorServiceClient::Stop(int32_t vibratorId, const std::string &mode)
         ret = miscdeviceProxy_->CancelVibrator(vibratorId);
     } else if (mode == "preset") {
         ret = miscdeviceProxy_->StopVibratorEffect(vibratorId, mode);
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     } else {
         ret = miscdeviceProxy_->StopVibratorCustom(vibratorId, mode);
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     }
     FinishTrace(HITRACE_TAG_SENSORS);
     return ret;

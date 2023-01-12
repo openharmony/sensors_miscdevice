@@ -82,6 +82,7 @@ int32_t StartVibratorOnce(int32_t duration)
     return SUCCESS;
 }
 
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 int32_t StartCustomVibrate(int32_t fd)
 {
     if (fd < 0) {
@@ -97,6 +98,7 @@ int32_t StartCustomVibrate(int32_t fd)
     g_usage = USAGE_UNKNOWN;
     return SUCCESS;
 }
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
 int32_t StopVibrator(const char *mode)
 {

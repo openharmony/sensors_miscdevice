@@ -47,8 +47,12 @@ VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &v
 
 bool VibrationPriorityManager::IsCurrentVibrate(std::shared_ptr<VibratorThread> vibratorThread) const
 {
+#if defined(OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM)
     return ((vibratorThread != nullptr) &&
         ((vibratorThread->IsRunning()) || (VibratorDevice.IsHapticRunning())));
+#else
+    return ((vibratorThread != nullptr) && (vibratorThread->IsRunning()));
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 }
 
 bool VibrationPriorityManager::IsLoopVibrate(const VibrateInfo &vibrateInfo) const

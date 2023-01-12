@@ -32,11 +32,13 @@ public:
 
     int32_t Start(const std::string &effectType) override;
 
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     int32_t StartCustom(const std::vector<int32_t> &sequence) override;
 
-    int32_t Stop(VibratorStopMode mode) override;
-
     int32_t IsHapticRunning() override;
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+
+    int32_t Stop(VibratorStopMode mode) override;
 
     int32_t DestroyHdiConnection() override;
 
@@ -45,7 +47,9 @@ private:
     std::thread vibrateThread_;
     static void VibrateProcess();
     static uint32_t duration_;
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     static std::vector<int32_t> sequence_;
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     static std::atomic_bool isStop_;
 };
 }  // namespace Sensors

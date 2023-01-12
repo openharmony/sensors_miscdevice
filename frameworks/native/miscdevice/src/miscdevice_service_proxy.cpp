@@ -152,6 +152,7 @@ int32_t MiscdeviceServiceProxy::StopVibratorEffect(int32_t vibratorId, const std
     return ret;
 }
 
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 int32_t MiscdeviceServiceProxy::VibrateCustom(int32_t vibratorId, int32_t fd, int32_t usage)
 {
     MessageParcel data;
@@ -212,6 +213,7 @@ int32_t MiscdeviceServiceProxy::StopVibratorCustom(int32_t vibratorId, const std
     }
     return ret;
 }
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
 std::vector<LightInfo> MiscdeviceServiceProxy::GetLightList()
 {

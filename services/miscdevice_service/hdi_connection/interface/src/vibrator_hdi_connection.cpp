@@ -67,6 +67,7 @@ int32_t VibratorHdiConnection::Start(const std::string &effectType)
     return ERR_OK;
 }
 
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 int32_t VibratorHdiConnection::StartCustom(const std::vector<int32_t> &sequence)
 {
     StartTrace(HITRACE_TAG_SENSORS, "StartCustom");
@@ -79,6 +80,15 @@ int32_t VibratorHdiConnection::StartCustom(const std::vector<int32_t> &sequence)
     return ERR_OK;
 }
 
+int32_t VibratorHdiConnection::IsHapticRunning()
+{
+    StartTrace(HITRACE_TAG_SENSORS, "IsHapticRunning");
+    int32_t ret = iVibratorHdiConnection_->IsHapticRunning();
+    FinishTrace(HITRACE_TAG_SENSORS);
+    return ret;
+}
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+
 int32_t VibratorHdiConnection::Stop(VibratorStopMode mode)
 {
     StartTrace(HITRACE_TAG_SENSORS, "Stop");
@@ -89,14 +99,6 @@ int32_t VibratorHdiConnection::Stop(VibratorStopMode mode)
         return VIBRATOR_OFF_ERR;
     }
     return ERR_OK;
-}
-
-int32_t VibratorHdiConnection::IsHapticRunning()
-{
-    StartTrace(HITRACE_TAG_SENSORS, "IsHapticRunning");
-    int32_t ret = iVibratorHdiConnection_->IsHapticRunning();
-    FinishTrace(HITRACE_TAG_SENSORS);
-    return ret;
 }
 
 int32_t VibratorHdiConnection::DestroyHdiConnection()

@@ -29,7 +29,9 @@ std::vector<std::string> vibratorEffect_ = {"haptic.clock.timer"};
 IVibratorHdiConnection::VibratorStopMode vibrateMode_;
 }
 uint32_t CompatibleConnection::duration_ = -1;
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 std::vector<int32_t> CompatibleConnection::sequence_ = {};
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 std::atomic_bool CompatibleConnection::isStop_ = false;
 
 int32_t CompatibleConnection::ConnectHdi()
@@ -67,6 +69,7 @@ int32_t CompatibleConnection::Start(const std::string &effectType)
     return ERR_OK;
 }
 
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 int32_t CompatibleConnection::StartCustom(const std::vector<int32_t> &sequence)
 {
     CALL_LOG_ENTER;
@@ -79,6 +82,13 @@ int32_t CompatibleConnection::StartCustom(const std::vector<int32_t> &sequence)
     vibrateMode_ = VIBRATOR_STOP_MODE_CUSTOM;
     return ERR_OK;
 }
+
+int32_t CompatibleConnection::IsHapticRunning()
+{
+    CALL_LOG_ENTER;
+    return isStop_;
+}
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
 int32_t CompatibleConnection::Stop(VibratorStopMode mode)
 {
@@ -97,12 +107,6 @@ int32_t CompatibleConnection::Stop(VibratorStopMode mode)
         vibrateThread_.join();
     }
     return ERR_OK;
-}
-
-int32_t CompatibleConnection::IsHapticRunning()
-{
-    CALL_LOG_ENTER;
-    return isStop_;
 }
 
 int32_t CompatibleConnection::DestroyHdiConnection()

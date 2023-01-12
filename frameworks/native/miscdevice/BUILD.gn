@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//base/sensors/miscdevice/miscdevice_vibrator_custom.gni")
 
 SUBSYSTEM_DIR = "//base/sensors"
 
@@ -43,6 +44,11 @@ ohos_shared_library("liblight_native") {
     "ipc:ipc_core",
     "samgr:samgr_proxy",
   ]
+
+  if (miscdevice_feature_vibrator_custom) {
+    defines = [ "OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM" ]
+  }
+
   part_name = "miscdevice"
   subsystem_name = "sensors"
 }
@@ -72,6 +78,11 @@ ohos_shared_library("libvibrator_native") {
     "ipc:ipc_core",
     "samgr:samgr_proxy",
   ]
+
+  if (miscdevice_feature_vibrator_custom) {
+    defines = [ "OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM" ]
+  }
+
   part_name = "miscdevice"
   subsystem_name = "sensors"
 }

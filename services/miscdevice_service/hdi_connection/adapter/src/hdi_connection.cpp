@@ -74,6 +74,7 @@ int32_t HdiConnection::Start(const std::string &effectType)
     return ERR_OK;
 }
 
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 int32_t HdiConnection::StartCustom(const std::vector<int32_t> &sequence)
 {
     if (sequence.empty()) {
@@ -90,6 +91,12 @@ int32_t HdiConnection::StartCustom(const std::vector<int32_t> &sequence)
     return ERR_OK;
 }
 
+int32_t HdiConnection::IsHapticRunning()
+{
+    return vibratorInterface_->IsHapticRunning();
+}
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+
 int32_t HdiConnection::Stop(VibratorStopMode mode)
 {
     int32_t ret = vibratorInterface_->Stop(static_cast<OHOS::HDI::Vibrator::V1_1::HdfVibratorMode>(mode));
@@ -100,11 +107,6 @@ int32_t HdiConnection::Stop(VibratorStopMode mode)
         return ret;
     }
     return ERR_OK;
-}
-
-int32_t HdiConnection::IsHapticRunning()
-{
-    return vibratorInterface_->IsHapticRunning();
 }
 
 int32_t HdiConnection::DestroyHdiConnection()

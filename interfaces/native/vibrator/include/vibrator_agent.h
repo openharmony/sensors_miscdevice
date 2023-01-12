@@ -52,12 +52,14 @@ const char *VIBRATOR_STOP_MODE_TIME = "time";
  */
 const char *VIBRATOR_STOP_MODE_PRESET = "preset";
 
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 /**
  * @brief Indicates the mode of stopping a custom vibration effect.
  *
  * @since 6
  */
 const char *VIBRATOR_STOP_MODE_CUSTOM = "custom";
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
 /**
  * @brief Controls this vibrator to perform a vibration with a preset vibration effect.
@@ -83,6 +85,7 @@ int32_t StartVibrator(const char *effectId);
  */
 int32_t StartVibratorOnce(int32_t duration);
 
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 /**
  * @brief Control this vibrator to perform the vibration customized with the vibration configuration file.
  *
@@ -93,6 +96,7 @@ int32_t StartVibratorOnce(int32_t duration);
  * @since 9
  */
 int32_t StartCustomVibrate(int32_t fd);
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
 /**
  * @brief Sets the number of cycles for vibration.

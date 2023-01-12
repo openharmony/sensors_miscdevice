@@ -23,9 +23,11 @@
 #include "vibration_priority_manager.h"
 #include "v1_0/light_interface_proxy.h"
 
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 #include "custom_vibration_matcher.h"
 #include "default_vibrator_decoder_factory.h"
 #include "default_vibrator_decoder.h"
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
 namespace OHOS {
 namespace Sensors {
@@ -231,13 +233,13 @@ void MiscdeviceService::StartVibrateThread(VibrateInfo info)
     while (vibratorThread_->IsRunning()) {
         vibratorThread_->NotifyExit();
     }
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     while (vibratorHdiConnection_.IsHapticRunning()) {
         vibratorHdiConnection_.Stop(IVibratorHdiConnection::VIBRATOR_STOP_MODE_CUSTOM);
     }
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     vibratorThread_->UpdateVibratorEffect(info);
-    if (info.mode != "custom") {
-        vibratorThread_->Start("VibratorThread");
-    }
+    vibratorThread_->Start("VibratorThread");
     DumpHelper->SaveVibrateRecord(info);
 }
 
@@ -260,6 +262,7 @@ int32_t MiscdeviceService::StopVibratorEffect(int32_t vibratorId, const std::str
     return NO_ERROR;
 }
 
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 int32_t GetJsonFileVersion(const JsonParser &parser)
 {
     cJSON* metadata = parser.GetObjectItem("Metadata");
@@ -351,6 +354,7 @@ int32_t MiscdeviceService::StopVibratorCustom(int32_t vibratorId, const std::str
     }
     return vibratorHdiConnection_.Stop(IVibratorHdiConnection::VIBRATOR_STOP_MODE_CUSTOM);
 }
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
 std::string MiscdeviceService::GetPackageName(AccessTokenID tokenId)
 {

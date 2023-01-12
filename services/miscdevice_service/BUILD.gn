@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//base/sensors/miscdevice/miscdevice_vibrator_custom.gni")
 
 SUBSYSTEM_DIR = "//base/sensors"
 ohos_shared_library("libmiscdevice_service") {
@@ -27,9 +28,6 @@ ohos_shared_library("libmiscdevice_service") {
     "src/miscdevice_service_stub.cpp",
     "src/vibration_priority_manager.cpp",
     "src/vibrator_thread.cpp",
-    "src/custom_vibration_matcher.cpp",
-    "custom_vibrate_decode/src/default_vibrator_decoder_factory.cpp",
-    "custom_vibrate_decode/src/default_vibrator_decoder.cpp",
   ]
 
   include_dirs = [
@@ -42,7 +40,6 @@ ohos_shared_library("libmiscdevice_service") {
     "hdi_connection/adapter/include",
     "hdi_connection/interface/include",
     "//third_party/cJSON",
-    "custom_vibrate_decode/include",
   ]
 
   cflags = [ "-Wno-error=inconsistent-missing-override" ]
@@ -59,6 +56,16 @@ ohos_shared_library("libmiscdevice_service") {
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
   ]
+
+  if (miscdevice_feature_vibrator_custom) {
+    sources += [
+      "custom_vibrate_decode/src/custom_vibration_matcher.cpp",
+      "custom_vibrate_decode/src/default_vibrator_decoder_factory.cpp",
+      "custom_vibrate_decode/src/default_vibrator_decoder.cpp",
+    ]
+    include_dirs += [ "custom_vibrate_decode/include" ]
+    defines = [ "OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM" ]
+  }
 
   part_name = "miscdevice"
   subsystem_name = "sensors"
