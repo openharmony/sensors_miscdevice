@@ -12,12 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "compatible_connection.h"
-
 #include <ctime>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
+#include "compatible_connection.h"
 #include "sensors_errors.h"
 
 namespace OHOS {
@@ -25,13 +25,13 @@ namespace Sensors {
 using namespace OHOS::HiviewDFX;
 namespace {
 constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "CompatibleConnection" };
-std::vector<std::string> vibratorEffect_ = {"haptic.clock.timer"};
-IVibratorHdiConnection::VibratorStopMode vibrateMode_;
+std::unordered_map<std::string, int32_t> vibratorEffect_ = {
+    {"haptic.clock.timer", 2000},
+    {"haptic.default.effect", 804}
+};
+HdfVibratorMode vibrateMode_;
 }
 uint32_t CompatibleConnection::duration_ = -1;
-#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-std::vector<int32_t> CompatibleConnection::sequence_ = {};
-#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 std::atomic_bool CompatibleConnection::isStop_ = false;
 
 int32_t CompatibleConnection::ConnectHdi()
@@ -49,51 +49,82 @@ int32_t CompatibleConnection::StartOnce(uint32_t duration)
         vibrateThread_ = std::move(senocdDataThread);
         isStop_ = false;
     }
-    vibrateMode_ = VIBRATOR_STOP_MODE_TIME;
+    vibrateMode_ = HDF_VIBRATOR_MODE_ONCE;
     return ERR_OK;
 }
 
 int32_t CompatibleConnection::Start(const std::string &effectType)
 {
     CALL_LOG_ENTER;
-    if (std::find(vibratorEffect_.begin(), vibratorEffect_.end(), effectType) == vibratorEffect_.end()) {
+    if (vibratorEffect_.find(effectType) == vibratorEffect_.end()) {
         MISC_HILOGE("Not support %{public}s type", effectType.c_str());
         return VIBRATOR_ON_ERR;
     }
+    duration_ = vibratorEffect_[effectType];
     if (!vibrateThread_.joinable()) {
         std::thread senocdDataThread(CompatibleConnection::VibrateProcess);
         vibrateThread_ = std::move(senocdDataThread);
         isStop_ = false;
     }
-    vibrateMode_ = VIBRATOR_STOP_MODE_PRESET;
+    vibrateMode_ = HDF_VIBRATOR_MODE_PRESET;
     return ERR_OK;
 }
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-int32_t CompatibleConnection::StartCustom(const std::vector<int32_t> &sequence)
+int32_t CompatibleConnection::EnableCompositeEffect(const HdfCompositeEffect &vibratorCompositeEffect)
 {
     CALL_LOG_ENTER;
-    sequence_ = sequence;
+    if (vibratorCompositeEffect.compositeEffects.empty()) {
+        MISC_HILOGE("compositeEffects is null");
+        return VIBRATOR_ON_ERR;
+    }
+    int32_t duration = 0;
+    auto type = vibratorCompositeEffect.type;
+    auto& compositeEffects = vibratorCompositeEffect.compositeEffects;
+    int32_t size = compositeEffects.size();
+    for (int32_t i = 0; i < size; ++i) {
+        if (type == HDF_EFFECT_TYPE_TIME) {
+            duration += compositeEffects.TimeEffect.delay;
+        } else if (type == HDF_EFFECT_TYPE_PRIMITIVE) {
+            duration += compositeEffects.PrimitiveEffect.delay;
+        }
+    }
+    duration_ = duration;
     if (!vibrateThread_.joinable()) {
         std::thread senocdDataThread(CompatibleConnection::VibrateProcess);
         vibrateThread_ = std::move(senocdDataThread);
         isStop_ = false;
     }
-    vibrateMode_ = VIBRATOR_STOP_MODE_CUSTOM;
+    vibrateMode_ = HDF_VIBRATOR_MODE_PRESET;
     return ERR_OK;
 }
 
-int32_t CompatibleConnection::IsHapticRunning()
+int32_t CompatibleConnection::IsVibratorRunning(bool &state)
 {
     CALL_LOG_ENTER;
-    return isStop_;
+    state = (!isStop_);
+    return ERR_OK;
+}
+
+int32_t CompatibleConnection::GetEffectInfo(const std::string &effect, HdfEffectInfo &effectInfo)
+{
+    CALL_LOG_ENTER;
+    if (vibratorEffect_.find(effect) == vibratorEffect_.end()) {
+        MISC_HILOGD("Not support effect : %{public}s", effect.c_str());
+        effectInfo.isSupportEffect = false;
+        effectInfo.duration = 0;
+    } else {
+        effectInfo.isSupportEffect = true;
+        effectInfo.duration = vibratorEffect_[effect];
+    }
+    return ERR_OK;
 }
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
-int32_t CompatibleConnection::Stop(VibratorStopMode mode)
+int32_t CompatibleConnection::Stop(HdfVibratorMode mode)
 {
     CALL_LOG_ENTER;
-    if (mode < 0 || mode >= VIBRATOR_STOP_MODE_INVALID) {
+    if (mode < 0 || mode >= HDF_VIBRATOR_MODE_BUTT) {
         MISC_HILOGE("mode: %{public}d invalid", mode);
         return VIBRATOR_OFF_ERR;
     }
@@ -125,6 +156,7 @@ void CompatibleConnection::VibrateProcess()
             break;
         }
     }
+    isStop_ = true;
     return;
 }
 }  // namespace Sensors

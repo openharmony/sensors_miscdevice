@@ -34,12 +34,14 @@ public:
     int32_t Start(const std::string &effectType) override;
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    int32_t StartCustom(const std::vector<int32_t> &sequence) override;
+    int32_t EnableCompositeEffect(const HdfCompositeEffect &vibratorCompositeEffect) override;
 
-    int32_t IsHapticRunning() override;
+    int32_t IsVibratorRunning(bool &state) override;
+
+    int32_t GetEffectInfo(const std::string &effect, HdfEffectInfo &effectInfo) override;
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
-    int32_t Stop(VibratorStopMode mode) override;
+    int32_t Stop(HdfVibratorMode mode) override;
 
     int32_t DestroyHdiConnection() override;
 

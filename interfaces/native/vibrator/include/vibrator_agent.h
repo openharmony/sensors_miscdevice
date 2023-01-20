@@ -56,7 +56,7 @@ const char *VIBRATOR_STOP_MODE_PRESET = "preset";
 /**
  * @brief Indicates the mode of stopping a custom vibration effect.
  *
- * @since 6
+ * @since 10
  */
 const char *VIBRATOR_STOP_MODE_CUSTOM = "custom";
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
@@ -93,9 +93,9 @@ int32_t StartVibratorOnce(int32_t duration);
  * @return Returns <b>0</b> if the vibrator vibrates as expected; returns <b>-1</b> otherwise, for example, the
  * parameters of the vibration configuration file is invalid.
  *
- * @since 9
+ * @since 10
  */
-int32_t StartCustomVibrate(int32_t fd);
+int32_t StartVibratorCustom(int32_t fd);
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
 /**

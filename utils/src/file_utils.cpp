@@ -71,6 +71,16 @@ int32_t GetFileSize(const std::string& filePath)
     return statbuf.st_size;
 }
 
+int32_t GetFileSize(int32_t fd)
+{
+    struct stat statbuf = {0};
+    if (fstat(fd, &statbuf) != 0) {
+        MISC_HILOGE("Get file size error");
+        return INVALID_FILE_SIZE;
+    }
+    return statbuf.st_size;
+}
+
 bool CheckFileDir(const std::string& filePath, const std::string& dir)
 {
     if (filePath.compare(0, CONFIG_DIR.size(), CONFIG_DIR) != 0) {

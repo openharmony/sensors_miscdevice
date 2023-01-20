@@ -75,31 +75,50 @@ int32_t HdiConnection::Start(const std::string &effectType)
 }
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-int32_t HdiConnection::StartCustom(const std::vector<int32_t> &sequence)
+int32_t HdiConnection::EnableCompositeEffect(const HdfCompositeEffect &vibratorCompositeEffect)
 {
-    if (sequence.empty()) {
-        MISC_HILOGE("sequence is null");
+    if (vibratorCompositeEffect.compositeEffects.empty()) {
+        MISC_HILOGE("compositeEffects is null");
         return VIBRATOR_ON_ERR;
     }
-    int32_t ret = vibratorInterface_->StartCustom(sequence);
+    int32_t ret = vibratorInterface_->EnableCompositeEffect(vibratorCompositeEffect);
     if (ret < 0) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
-            HiSysEvent::EventType::FAULT, "PKG_NAME", "StartCustom", "ERROR_CODE", ret);
-        MISC_HILOGE("StartCustom failed");
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "EnableCompositeEffect", "ERROR_CODE", ret);
+        MISC_HILOGE("EnableCompositeEffect failed");
         return ret;
     }
     return ERR_OK;
 }
 
-int32_t HdiConnection::IsHapticRunning()
+int32_t HdiConnection::IsVibratorRunning(bool &state)
 {
-    return vibratorInterface_->IsHapticRunning();
+    int32_t ret = vibratorInterface_->IsVibratorRunning(state);
+    if (ret < 0) {
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "IsVibratorRunning", "ERROR_CODE", ret);
+        MISC_HILOGE("IsVibratorRunning failed");
+        return ret;
+    }
+    return ERR_OK;
+}
+
+int32_t HdiConnection::GetEffectInfo(const std::string &effect, HdfEffectInfo &effectInfo)
+{
+    int32_t ret = vibratorInterface_->GetEffectInfo(effect, effectInfo);
+    if (ret < 0) {
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "GetEffectInfo", "ERROR_CODE", ret);
+        MISC_HILOGE("GetEffectInfo failed");
+        return ret;
+    }
+    return ERR_OK;
 }
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
-int32_t HdiConnection::Stop(VibratorStopMode mode)
+int32_t HdiConnection::Stop(HdfVibratorMode mode)
 {
-    int32_t ret = vibratorInterface_->Stop(static_cast<OHOS::HDI::Vibrator::V1_1::HdfVibratorMode>(mode));
+    int32_t ret = vibratorInterface_->Stop(mode);
     if (ret < 0) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "Stop", "ERROR_CODE", ret);

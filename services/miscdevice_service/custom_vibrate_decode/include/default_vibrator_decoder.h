@@ -27,10 +27,10 @@ class DefaultVibratorDecoder : public VibratorDecoder {
 public:
     DefaultVibratorDecoder() = default;
     ~DefaultVibratorDecoder() = default;
-    virtual int32_t DecodeEffect(const JsonParser &parser, std::vector<VibrateEvent> &vibrateSequence) override;
+    virtual int32_t DecodeEffect(const JsonParser &parser, std::set<VibrateEvent> &vibrateSet) override;
 private:
-    int32_t ParseSequence(const JsonParser &parser, std::vector<VibrateEvent> &vibrateSequence);
-    int32_t ParseEvent(const JsonParser &parser, cJSON *event, std::vector<VibrateEvent> &vibrateSequence);
+    int32_t ParseSequence(const JsonParser &parser, std::set<VibrateEvent> &vibrateSet);
+    int32_t ParseEvent(const JsonParser &parser, cJSON *event, std::set<VibrateEvent> &vibrateSet);
 };
 }  // namespace Sensors
 }  // namespace OHOS

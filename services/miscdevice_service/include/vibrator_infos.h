@@ -21,13 +21,6 @@
 
 namespace OHOS {
 namespace Sensors {
-namespace {
-std::unordered_map<std::string, int32_t> vibratorEffects = {
-    {"haptic.clock.timer", 2000},
-    {"haptic.default.effect", 804}
-};
-} // namespace
-
 struct VibrateInfo {
     std::string mode;
     std::string packageName;

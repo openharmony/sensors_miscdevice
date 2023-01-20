@@ -20,24 +20,27 @@ namespace OHOS {
 namespace Sensors {
 using namespace OHOS::HiviewDFX;
 namespace {
-constexpr int32_t DURATION_MIN = 10;
-constexpr int32_t DURATION_MAX = 1600;
+constexpr int32_t STARTTMIE_MIN = 0;
+constexpr int32_t STARTTMIE_MAX = 1800000;
+constexpr int32_t CONTINUOUS_VIBRATION_DURATION_MIN = 10;
+constexpr int32_t CONTINUOUS_VIBRATION_DURATION_MAX = 1600;
+constexpr int32_t TRANSIENT_VIBRATION_DURATION = 30;
 constexpr int32_t INTENSITY_MIN = 0;
 constexpr int32_t INTENSITY_MAX = 100;
 constexpr int32_t FREQUENCY_MIN = 0;
 constexpr int32_t FREQUENCY_MAX = 100;
-constexpr int32_t MIN_VIBRATE_DURATION = 30;
+constexpr int32_t EVENT_NUM_MAX = 128;
 constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "DefaultVibratorDecoder" };
 } // namespace
 
-int32_t DefaultVibratorDecoder::DecodeEffect(const JsonParser &parser, std::vector<VibrateEvent> &vibrateSequence)
+int32_t DefaultVibratorDecoder::DecodeEffect(const JsonParser &parser, std::set<VibrateEvent> &vibrateSet)
 {
-    int32_t ret = ParseSequence(parser, vibrateSequence);
+    int32_t ret = ParseSequence(parser, vibrateSet);
     CHKCR((ret == SUCCESS), ERROR, "parse sequence fail");
     return SUCCESS;
 }
 
-int32_t DefaultVibratorDecoder::ParseSequence(const JsonParser &parser, std::vector<VibrateEvent> &vibrateSequence)
+int32_t DefaultVibratorDecoder::ParseSequence(const JsonParser &parser, std::set<VibrateEvent> &vibrateSet)
 {
     cJSON *sequence = parser.GetObjectItem("Sequence");
     CHKPR(sequence, ERROR);
@@ -46,17 +49,43 @@ int32_t DefaultVibratorDecoder::ParseSequence(const JsonParser &parser, std::vec
         return ERROR;
     }
     int32_t size = cJSON_GetArraySize(sequence);
+    if (size > EVENT_NUM_MAX) {
+        MISC_HILOGE("The size of sequence exceeds 128, size : %{public}d", size);
+        return ERROR;
+    }
     for (int32_t i = 0; i < size; i++) {
         cJSON* event = cJSON_GetArrayItem(sequence, i)->child;
         CHKPR(event, ERROR);
-        int32_t ret = ParseEvent(parser, event, vibrateSequence);
+        int32_t ret = ParseEvent(parser, event, vibrateSet);
         CHKCR((ret == SUCCESS), ERROR, "parse event fail");
     }
     return SUCCESS;
 }
 
+bool CheckParameters(const VibrateEvent &vibrateEvent, const std::set<VibrateEvent> &vibrateSet)
+{
+    if (vibrateEvent.startTime < STARTTMIE_MIN || vibrateEvent.startTime > STARTTMIE_MAX) {
+        MISC_HILOGE("the event startTime is not in [0, 1800 000], startTime: %{public}d", vibrateEvent.startTime);
+        return false;
+    }
+    if (vibrateEvent.duration <= CONTINUOUS_VIBRATION_DURATION_MIN ||
+        vibrateEvent.duration >= CONTINUOUS_VIBRATION_DURATION_MAX) {
+        MISC_HILOGE("the event duration is not in (10, 1600), duration: %{public}d", vibrateEvent.duration);
+        return false;
+    }
+    if (vibrateEvent.intensity <= INTENSITY_MIN || vibrateEvent.intensity > INTENSITY_MAX) {
+        MISC_HILOGE("the event intensity is not in (0, 100], intensity: %{public}d", vibrateEvent.intensity);
+        return false;
+    }
+    if (vibrateEvent.frequency <= FREQUENCY_MIN || vibrateEvent.frequency > FREQUENCY_MAX) {
+        MISC_HILOGE("the event frequency is not in (0, 100], frequency: %{public}d", vibrateEvent.frequency);
+        return false;
+    }
+    return true;
+}
+
 int32_t DefaultVibratorDecoder::ParseEvent(const JsonParser &parser, cJSON *event,
-                                           std::vector<VibrateEvent> &vibrateSequence)
+                                           std::set<VibrateEvent> &vibrateSet)
 {
     VibrateEvent vibrateEvent;
     cJSON* type = parser.GetObjectItem(event, "Type");
@@ -69,7 +98,7 @@ int32_t DefaultVibratorDecoder::ParseEvent(const JsonParser &parser, cJSON *even
         vibrateEvent.duration = duration->valueint;
     } else if (curType == "transient") {
         vibrateEvent.tag = EVENT_TAG_TRANSIENT;
-        vibrateEvent.duration = MIN_VIBRATE_DURATION;
+        vibrateEvent.duration = TRANSIENT_VIBRATION_DURATION;
     } else {
         MISC_HILOGE("current event type is not continuous or transient");
         return ERROR;
@@ -83,23 +112,11 @@ int32_t DefaultVibratorDecoder::ParseEvent(const JsonParser &parser, cJSON *even
     cJSON* frequency = parser.GetObjectItem(event, "Frequency");
     CHKPR(frequency, ERROR);
     vibrateEvent.frequency = frequency->valueint;
-    if (vibrateEvent.startTime < 0) {
-        MISC_HILOGE("the event startTime is less than 0, startTime: %{public}d", vibrateEvent.startTime);
+    if (!CheckParameters(vibrateEvent, vibrateSet)) {
+        MISC_HILOGE("Parameter check of vibration event failed, startTime : %{public}d.", vibrateEvent.startTime);
         return ERROR;
     }
-    if (vibrateEvent.duration <= DURATION_MIN || vibrateEvent.duration >= DURATION_MAX) {
-        MISC_HILOGE("the event duration is not in (10, 1600), duration: %{public}d", vibrateEvent.duration);
-        return ERROR;
-    }
-    if (vibrateEvent.intensity <= INTENSITY_MIN || vibrateEvent.intensity > INTENSITY_MAX) {
-        MISC_HILOGE("the event intensity is not in (0, 100], intensity: %{public}d", vibrateEvent.intensity);
-        return ERROR;
-    }
-    if (vibrateEvent.frequency <= FREQUENCY_MIN || vibrateEvent.frequency > FREQUENCY_MAX) {
-        MISC_HILOGE("the event frequency is not in (0, 100], frequency: %{public}d", vibrateEvent.frequency);
-        return ERROR;
-    }
-    vibrateSequence.push_back(vibrateEvent);
+    vibrateSet.insert(vibrateEvent);
     return SUCCESS;
 }
 }  // namespace Sensors

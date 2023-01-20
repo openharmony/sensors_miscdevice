@@ -45,7 +45,7 @@ MiscdeviceServiceStub::MiscdeviceServiceStub()
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     baseFuncs_[VIBRATE_CUSTOM] = &MiscdeviceServiceStub::VibrateCustomPb;
     baseFuncs_[STOP_VIBRATOR_CUSTOM] = &MiscdeviceServiceStub::StopVibratorCustomPb;
-#endif
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     baseFuncs_[GET_LIGHT_LIST] = &MiscdeviceServiceStub::GetLightListPb;
     baseFuncs_[TURN_ON] = &MiscdeviceServiceStub::TurnOnPb;
     baseFuncs_[TURN_OFF] = &MiscdeviceServiceStub::TurnOffPb;
@@ -158,15 +158,14 @@ int32_t MiscdeviceServiceStub::VibrateCustomPb(MessageParcel &data, MessageParce
         return ERROR;
     }
     MISC_HILOGD("MiscdeviceServiceStub VibrateCustomPb ReadFileDescriptor tmpFd: %{public}d", tmpFd);
+    int32_t fd = dup(tmpFd);
+    MISC_HILOGD("MiscdeviceServiceStub VibrateCustomPb dup fd: %{public}d", fd);
     int32_t usage;
     if (!data.ReadInt32(usage)) {
         MISC_HILOGE("Parcel ReadInt32 failed");
         return ERROR;
     }
-    int32_t fd = dup(tmpFd);
-    MISC_HILOGD("MiscdeviceServiceStub VibrateCustomPb dup fd: %{public}d", fd);
     ret = VibrateCustom(vibratorId, fd, usage);
-    close(tmpFd);
     close(fd);
     return ret;
 }

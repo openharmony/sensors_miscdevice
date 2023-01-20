@@ -17,7 +17,7 @@
 #define VIBRATOR_DECODER_H
 
 #include <cstdint>
-#include <vector>
+#include <set>
 #include "json_parser.h"
 #include "refbase.h"
 #include "vibrator_infos.h"
@@ -28,7 +28,7 @@ class VibratorDecoder : public RefBase{
 public:
     VibratorDecoder() = default;
     virtual ~VibratorDecoder() = default;
-    virtual int32_t DecodeEffect(const JsonParser &parser, std::vector<VibrateEvent> &vibrateSequence) = 0;
+    virtual int32_t DecodeEffect(const JsonParser &parser, std::set<VibrateEvent> &vibrateSet) = 0;
 };
 }  // namespace Sensors
 }  // namespace OHOS

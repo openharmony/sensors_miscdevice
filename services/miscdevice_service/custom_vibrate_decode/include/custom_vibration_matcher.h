@@ -18,21 +18,23 @@
 
 #include <string>
 #include <vector>
+#include <set>
 
+#include "i_vibrator_hdi_connection.h"
 #include "vibrator_infos.h"
 
 namespace OHOS {
 namespace Sensors {
 class CustomVibrationMatcher {
 public:
-    explicit CustomVibrationMatcher(const std::vector<VibrateEvent>& vibrateSequence);
+    CustomVibrationMatcher() = default;
     ~CustomVibrationMatcher() = default;
-    std::vector<int32_t> GetVibrateSequence() const { return convertSequence_; }
+    int32_t TransformEffect(const std::set<VibrateEvent> &vibrateSet, std::vector<CompositeEffect> &compositeEffects);
 private:
-    void ProcessContinuousEvent(const VibrateEvent& event);
-    void ProcessTransientEvent(const VibrateEvent& event);
-    std::vector<int32_t> convertSequence_;
-    int32_t curPos_ = 0;
+    void ProcessContinuousEvent(const VibrateEvent &event, int32_t &preStartTime, int32_t &preDuration,
+        std::vector<CompositeEffect> &compositeEffects);
+    void ProcessTransientEvent(const VibrateEvent &event, int32_t &preStartTime, int32_t &preDuration,
+        std::vector<CompositeEffect> &compositeEffects);
 };
 }  // namespace Sensors
 }  // namespace OHOS

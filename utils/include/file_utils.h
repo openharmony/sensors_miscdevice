@@ -30,6 +30,7 @@ bool CheckFileExtendName(const std::string& filePath, const std::string& checkEx
 bool CheckFileSize(const std::string& filePath);
 bool IsFileExists(const std::string& fileName);
 int32_t GetFileSize(const std::string& filePath);
+int32_t GetFileSize(int32_t fd);
 std::string ReadFd(int32_t fd);
 std::string GetFileSuffix(int32_t fd);
 }  // namespace Sensors

@@ -79,7 +79,7 @@ private:
     bool ShouldIgnoreVibrate(const VibrateInfo &info);
     bool InitLightList();
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    int32_t DecodeCustomEffect(int32_t fd, std::vector<VibrateEvent> &vibrateSequence);
+    int32_t DecodeCustomEffect(int32_t fd, std::set<VibrateEvent> &vibrateSequence);
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     VibratorHdiConnection &vibratorHdiConnection_ = VibratorHdiConnection::GetInstance();
     LightHdiConnection &lightHdiConnection_ = LightHdiConnection::GetInstance();

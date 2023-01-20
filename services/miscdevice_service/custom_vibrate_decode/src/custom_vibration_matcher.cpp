@@ -33,25 +33,37 @@ constexpr int32_t CONTINUOUS_GRADE_NUM = 8;
 constexpr float CONTINUOUS_GRADE_SCALE = 100. / 8;
 constexpr float INTENSITY_WEIGHT = 0.5;
 constexpr float FREQUENCY_WEIGHT = 0.5;
+constexpr float WEIGHT_SUM_INIT = 100;
+constexpr int32_t STOP_WAVEFORM = 0;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "CustomVibrationMatcher" };
 }  // namespace
 
-CustomVibrationMatcher::CustomVibrationMatcher(const std::vector<VibrateEvent> &vibrateSequence)
+int32_t CustomVibrationMatcher::TransformEffect(const std::set<VibrateEvent> &vibrateSet,
+    std::vector<CompositeEffect> &compositeEffects)
 {
-    MISC_HILOGD("enter CustomVibrationMatcher");
-    for (const auto &event : vibrateSequence) {
+    CALL_LOG_ENTER;
+    int32_t preStartTime = 0;
+    int32_t preDuration = -1;
+    for (const auto &event : vibrateSet) {
+        if (preDuration != -1 && event.startTime < preStartTime + preDuration) {
+            MISC_HILOGE("Vibration events overlap");
+            return ERROR;
+        }
         if (event.tag == EVENT_TAG_CONTINUOUS) {
-            ProcessContinuousEvent(event);
+            ProcessContinuousEvent(event, preStartTime, preDuration, compositeEffects);
         } else if (event.tag == EVENT_TAG_TRANSIENT) {
-            ProcessTransientEvent(event);
-        } else {
-            MISC_HILOGE("The type of event is invalid : %{public}d", event.tag);
-            return;
+            ProcessTransientEvent(event, preStartTime, preDuration, compositeEffects);
         }
     }
+    PrimitiveEffect primitiveEffect;
+    primitiveEffect.delay = preDuration;
+    primitiveEffect.effectId = STOP_WAVEFORM;
+    compositeEffects.push_back(primitiveEffect);
+    return SUCCESS;
 }
 
-void CustomVibrationMatcher::ProcessContinuousEvent(const VibrateEvent &event)
+void CustomVibrationMatcher::ProcessContinuousEvent(const VibrateEvent &event, int32_t &preStartTime,
+    int32_t &preDuration, std::vector<CompositeEffect> &compositeEffects)
 {
     int32_t grade = -1;
     if (event.intensity == INTENSITY_MAX) {
@@ -59,21 +71,19 @@ void CustomVibrationMatcher::ProcessContinuousEvent(const VibrateEvent &event)
     } else {
         grade = round(event.intensity / CONTINUOUS_GRADE_SCALE + 0.5) - 1;
     }
-    if (grade < 0 || grade >= CONTINUOUS_GRADE_NUM) {
-        MISC_HILOGE("Continuous event match failed, startTime : %{public}d", event.startTime);
-        return;
-    }
-    int32_t matchId = event.duration * 100 + grade;
-    int32_t delayTime = event.startTime - curPos_;
-    curPos_ = event.startTime;
-    convertSequence_.push_back(delayTime);
-    convertSequence_.push_back(matchId);
+    PrimitiveEffect primitiveEffect;
+    primitiveEffect.delay = event.startTime - preStartTime;
+    primitiveEffect.effectId = event.duration * 100 + grade;
+    compositeEffects.push_back(primitiveEffect);
+    preStartTime = event.startTime;
+    preDuration = event.duration;
 }
 
-void CustomVibrationMatcher::ProcessTransientEvent(const VibrateEvent &event)
+void CustomVibrationMatcher::ProcessTransientEvent(const VibrateEvent &event, int32_t &preStartTime,
+    int32_t &preDuration, std::vector<CompositeEffect> &compositeEffects)
 {
     int32_t matchId = -1;
-    float minWeightSum = 100;
+    float minWeightSum = WEIGHT_SUM_INIT;
     for (auto &transientInfo : TRANSIENT_VIBRATION_INFOS) {
         int32_t id = transientInfo.first;
         std::vector<int32_t> &info = transientInfo.second;
@@ -87,14 +97,12 @@ void CustomVibrationMatcher::ProcessTransientEvent(const VibrateEvent &event)
             }
         }
     }
-    if (matchId == -1) {
-        MISC_HILOGE("Transient event match failed, startTime : %{public}d", event.startTime);
-        return;
-    }
-    int32_t delayTime = event.startTime - curPos_;
-    curPos_ = event.startTime;
-    convertSequence_.push_back(delayTime);
-    convertSequence_.push_back(matchId);
+    PrimitiveEffect primitiveEffect;
+    primitiveEffect.delay = event.startTime - preStartTime;
+    primitiveEffect.effectId = matchId;
+    compositeEffects.push_back(primitiveEffect);
+    preStartTime = event.startTime;
+    preDuration = event.duration;
 }
 }  // namespace Sensors
 }  // namespace OHOS

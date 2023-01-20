@@ -25,7 +25,7 @@ constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "DefaultVibratorDecode
 } // namespace
 VibratorDecoder *DefaultVibratorDecoderFactory::CreateDecoder()
 {
-    MISC_HILOGD("DefaultVibratorDecoderFactory CreateDecoder()");
+    CALL_LOG_ENTER;
     return new DefaultVibratorDecoder();
 }
 }  // namespace Sensors
