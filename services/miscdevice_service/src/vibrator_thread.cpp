@@ -16,7 +16,6 @@
 #include "vibrator_thread.h"
 
 #include "sensors_errors.h"
-#include "vibrator_hdi_connection.h"
 
 namespace OHOS {
 namespace Sensors {
@@ -28,7 +27,7 @@ bool VibratorThread::Run()
 {
     VibrateInfo info = GetCurrentVibrateInfo();
     std::unique_lock<std::mutex> vibrateLck(vibrateMutex_);
-    if (currentVibration_.mode == "time") {
+    if (info.mode == "time") {
         int32_t ret = VibratorDevice.StartOnce(static_cast<uint32_t>(info.duration));
         if (ret != SUCCESS) {
             MISC_HILOGE("StartOnce fail, duration: %{public}d, pid: %{public}d",
@@ -36,12 +35,12 @@ bool VibratorThread::Run()
             return false;
         }
         cv_.wait_for(vibrateLck, std::chrono::milliseconds(info.duration));
-        VibratorDevice.Stop(IVibratorHdiConnection::VIBRATOR_STOP_MODE_TIME);
+        VibratorDevice.Stop(HDF_VIBRATOR_MODE_ONCE);
         std::unique_lock<std::mutex> readyLck(readyMutex_);
         if (ready_) {
-            MISC_HILOGI("Stop duration: %{public}d, pid: %{public}d",
-                info.duration, info.pid);
+            MISC_HILOGI("Stop duration: %{public}d, pid: %{public}d", info.duration, info.pid);
             SetReadyStatus(false);
+            return false;
         }
     } else if (info.mode == "preset") {
         for (int32_t i = 0; i < info.count; ++i) {
@@ -52,12 +51,12 @@ bool VibratorThread::Run()
                 return false;
             }
             cv_.wait_for(vibrateLck, std::chrono::milliseconds(info.duration));
-            VibratorDevice.Stop(IVibratorHdiConnection::VIBRATOR_STOP_MODE_PRESET);
+            VibratorDevice.Stop(HDF_VIBRATOR_MODE_PRESET);
             std::unique_lock<std::mutex> readyLck(readyMutex_);
             if (ready_) {
-                MISC_HILOGI("Stop effect %{public}s failed, pid: %{public}d", effect.c_str(), currentVibration_.pid);
+                MISC_HILOGI("Stop effect %{public}s, pid: %{public}d", effect.c_str(), currentVibration_.pid);
                 SetReadyStatus(false);
-                break;
+                return false;
             }
         }
     }

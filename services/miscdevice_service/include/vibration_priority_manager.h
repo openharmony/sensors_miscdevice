@@ -44,8 +44,7 @@ class VibrationPriorityManager {
     DECLARE_DELAYED_SINGLETON(VibrationPriorityManager);
 public:
     DISALLOW_COPY_AND_MOVE(VibrationPriorityManager);
-    VibrateStatus ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo,
-        std::shared_ptr<VibratorThread> vibratorThread);
+    VibrateStatus ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo, std::shared_ptr<VibratorThread> vibratorThread);
 
 private:
     bool IsCurrentVibrate(std::shared_ptr<VibratorThread> vibratorThread) const;

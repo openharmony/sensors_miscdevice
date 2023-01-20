@@ -15,19 +15,32 @@
 
 #ifndef I_VIBRATOR_HDI_CONNECTION_H
 #define I_VIBRATOR_HDI_CONNECTION_H
+
 #include <nocopyable.h>
 #include <stdint.h>
 #include <string>
+
+#include "v1_1/vibrator_types.h"
+
 namespace OHOS {
 namespace Sensors {
+using OHOS::HDI::Vibrator::V1_1::HdfVibratorMode;
+using OHOS::HDI::Vibrator::V1_1::HDF_VIBRATOR_MODE_ONCE;
+using OHOS::HDI::Vibrator::V1_1::HDF_VIBRATOR_MODE_PRESET;
+using OHOS::HDI::Vibrator::V1_1::HDF_VIBRATOR_MODE_BUTT;
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+using OHOS::HDI::Vibrator::V1_1::HdfEffectType;
+using OHOS::HDI::Vibrator::V1_1::HDF_EFFECT_TYPE_TIME;
+using OHOS::HDI::Vibrator::V1_1::HDF_EFFECT_TYPE_PRIMITIVE;
+using OHOS::HDI::Vibrator::V1_1::HDF_EFFECT_TYPE_BUTT;
+using OHOS::HDI::Vibrator::V1_1::TimeEffect;
+using OHOS::HDI::Vibrator::V1_1::PrimitiveEffect;
+using OHOS::HDI::Vibrator::V1_1::CompositeEffect;
+using OHOS::HDI::Vibrator::V1_1::HdfCompositeEffect;
+using OHOS::HDI::Vibrator::V1_1::HdfEffectInfo;
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 class IVibratorHdiConnection {
 public:
-    enum VibratorStopMode {
-        VIBRATOR_STOP_MODE_TIME   = 0,    /**< Indicates the one-shot vibration with the given duration. */
-        VIBRATOR_STOP_MODE_PRESET = 1,    /**< Indicates the periodic vibration with the preset effect. */
-        VIBRATOR_STOP_MODE_INVALID        /**< Indicates invalid the effect mode. */
-    };
-
     IVibratorHdiConnection() = default;
 
     virtual ~IVibratorHdiConnection() = default;
@@ -38,7 +51,15 @@ public:
 
     virtual int32_t Start(const std::string &effectType) = 0;
 
-    virtual int32_t Stop(VibratorStopMode mode) = 0;
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+    virtual int32_t EnableCompositeEffect(const HdfCompositeEffect &vibratorCompositeEffect) = 0;
+
+    virtual int32_t IsVibratorRunning(bool &state) = 0;
+
+    virtual int32_t GetEffectInfo(const std::string &effect, HdfEffectInfo &effectInfo) = 0;
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+
+    virtual int32_t Stop(HdfVibratorMode mode) = 0;
 
     virtual int32_t DestroyHdiConnection() = 0;
 

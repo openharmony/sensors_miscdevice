@@ -21,13 +21,6 @@
 
 namespace OHOS {
 namespace Sensors {
-namespace {
-std::unordered_map<std::string, int32_t> vibratorEffects = {
-    {"haptic.clock.timer", 2000},
-    {"haptic.default.effect", 804}
-};
-} // namespace
-
 struct VibrateInfo {
     std::string mode;
     std::string packageName;
@@ -51,6 +44,26 @@ enum VibrateUsage {
     USAGE_SIMULATE_REALITY = 8,
     USAGE_MAX = 9,
 };
+
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+enum VibrateTag {
+    EVENT_TAG_CONTINUOUS = 0,
+    EVENT_TAG_TRANSIENT = 1,
+};
+
+struct VibrateEvent {
+    bool operator<(const VibrateEvent& rhs) const
+    {
+        return startTime < rhs.startTime; 
+    }
+
+    VibrateTag tag;
+    int32_t startTime;
+    int32_t duration;
+    int32_t intensity;
+    int32_t frequency;
+};
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 }  // namespace Sensors
 }  // namespace OHOS
 #endif  // VIBRATOR_INFOS_H

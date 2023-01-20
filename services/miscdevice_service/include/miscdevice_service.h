@@ -35,6 +35,9 @@
 #include "vibrator_hdi_connection.h"
 #include "vibrator_infos.h"
 #include "vibrator_thread.h"
+#include "file_utils.h"
+#include "json_parser.h"
+
 namespace OHOS {
 namespace Sensors {
 using namespace Security::AccessToken;
@@ -58,7 +61,11 @@ public:
     virtual int32_t CancelVibrator(int32_t vibratorId) override;
     virtual int32_t PlayVibratorEffect(int32_t vibratorId, const std::string &effect,
                                        int32_t loopCount, int32_t usage) override;
-    virtual int32_t StopVibratorEffect(int32_t vibratorId, const std::string &effect) override;
+    virtual int32_t StopVibratorEffect(int32_t vibratorId, const std::string &mode) override;
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+    virtual int32_t VibrateCustom(int32_t vibratorId, int32_t fd, int32_t usage) override;
+    virtual int32_t StopVibratorCustom(int32_t vibratorId, const std::string &mode) override;
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     virtual std::vector<LightInfo> GetLightList() override;
     virtual int32_t TurnOn(int32_t lightId, const LightColor &color, const LightAnimation &animation) override;
     virtual int32_t TurnOff(int32_t lightId) override;
@@ -71,6 +78,9 @@ private:
     void StartVibrateThread(VibrateInfo info);
     bool ShouldIgnoreVibrate(const VibrateInfo &info);
     bool InitLightList();
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+    int32_t DecodeCustomEffect(int32_t fd, std::set<VibrateEvent> &vibrateSequence);
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     VibratorHdiConnection &vibratorHdiConnection_ = VibratorHdiConnection::GetInstance();
     LightHdiConnection &lightHdiConnection_ = LightHdiConnection::GetInstance();
     bool lightExist_;
