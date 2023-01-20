@@ -84,9 +84,9 @@ int32_t CompatibleConnection::EnableCompositeEffect(const HdfCompositeEffect &vi
     int32_t size = compositeEffects.size();
     for (int32_t i = 0; i < size; ++i) {
         if (type == HDF_EFFECT_TYPE_TIME) {
-            duration += compositeEffects.TimeEffect.delay;
+            duration += compositeEffects[i].timeEffect.delay;
         } else if (type == HDF_EFFECT_TYPE_PRIMITIVE) {
-            duration += compositeEffects.PrimitiveEffect.delay;
+            duration += compositeEffects[i].primitiveEffect.delay;
         }
     }
     duration_ = duration;

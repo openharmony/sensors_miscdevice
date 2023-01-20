@@ -58,7 +58,9 @@ int32_t CustomVibrationMatcher::TransformEffect(const std::set<VibrateEvent> &vi
     PrimitiveEffect primitiveEffect;
     primitiveEffect.delay = preDuration;
     primitiveEffect.effectId = STOP_WAVEFORM;
-    compositeEffects.push_back(primitiveEffect);
+    CompositeEffect compositeEffect;
+    compositeEffect.primitiveEffect = primitiveEffect;
+    compositeEffects.push_back(compositeEffect);
     return SUCCESS;
 }
 
@@ -74,7 +76,9 @@ void CustomVibrationMatcher::ProcessContinuousEvent(const VibrateEvent &event, i
     PrimitiveEffect primitiveEffect;
     primitiveEffect.delay = event.startTime - preStartTime;
     primitiveEffect.effectId = event.duration * 100 + grade;
-    compositeEffects.push_back(primitiveEffect);
+    CompositeEffect compositeEffect;
+    compositeEffect.primitiveEffect = primitiveEffect;
+    compositeEffects.push_back(compositeEffect);
     preStartTime = event.startTime;
     preDuration = event.duration;
 }
@@ -100,7 +104,9 @@ void CustomVibrationMatcher::ProcessTransientEvent(const VibrateEvent &event, in
     PrimitiveEffect primitiveEffect;
     primitiveEffect.delay = event.startTime - preStartTime;
     primitiveEffect.effectId = matchId;
-    compositeEffects.push_back(primitiveEffect);
+    CompositeEffect compositeEffect;
+    compositeEffect.primitiveEffect = primitiveEffect;
+    compositeEffects.push_back(compositeEffect);
     preStartTime = event.startTime;
     preDuration = event.duration;
 }

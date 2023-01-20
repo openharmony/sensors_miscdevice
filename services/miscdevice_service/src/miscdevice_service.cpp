@@ -308,7 +308,7 @@ int32_t CheckMetadata(const JsonParser &parser)
     CHKPR(version, ERROR);
     double versionValue = version->valuedouble;
     if (formatValue != "OpenHarmony") {
-        MISC_HILOGE("current json file format is not supported at this time, author:%{public}s", formatValue.c_str());
+        MISC_HILOGE("current json file format is not supported at this time, format:%{public}s", formatValue.c_str());
         return ERROR;
     }
     if (versionValue != 1.0) {
@@ -367,7 +367,7 @@ int32_t MiscdeviceService::VibrateCustom(int32_t vibratorId, int32_t fd, int32_t
         return ERROR;
     }
     HdfCompositeEffect vibratorCompositeEffect;
-    vibratorCompositeEffect.type = COMPOSITE_EFFECT_TYPE_PRIMITIVE;
+    vibratorCompositeEffect.type = HDF_EFFECT_TYPE_PRIMITIVE;
     CustomVibrationMatcher matcher;
     ret = matcher.TransformEffect(vibrateSet, vibratorCompositeEffect.compositeEffects);
     if (ret != SUCCESS) {
