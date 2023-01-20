@@ -17,7 +17,7 @@
 #include <cerrno>
 #include <sys/stat.h>
 #include <unistd.h>
-
+#include "securec.h"
 #include "sensors_errors.h"
 
 namespace OHOS {
@@ -28,6 +28,7 @@ const std::string CONFIG_DIR = "/vendor/etc/vibrator/";
 constexpr int32_t FILE_SIZE_MAX = 0x5000;
 constexpr int32_t READ_DATA_BUFF_SIZE = 256;
 constexpr int32_t INVALID_FILE_SIZE = -1;
+constexpr int32_t FILE_PATH_MAX = 1024;
 }  // namespace
 
 std::string ReadJsonFile(const std::string &filePath)
@@ -64,6 +65,16 @@ int32_t GetFileSize(const std::string& filePath)
 {
     struct stat statbuf = {0};
     if (stat(filePath.c_str(), &statbuf) != 0) {
+        MISC_HILOGE("Get file size error");
+        return INVALID_FILE_SIZE;
+    }
+    return statbuf.st_size;
+}
+
+int32_t GetFileSize(int32_t fd)
+{
+    struct stat statbuf = {0};
+    if (fstat(fd, &statbuf) != 0) {
         MISC_HILOGE("Get file size error");
         return INVALID_FILE_SIZE;
     }
@@ -117,6 +128,41 @@ std::string ReadFile(const std::string &filePath)
         MISC_HILOGW("Close file failed");
     }
     return dataStr;
+}
+
+std::string ReadFd(int32_t fd)
+{
+    int32_t dupFd = dup(fd);
+    FILE* fp = fdopen(dupFd, "r");
+    fseek(fp, 0L, SEEK_SET);
+    CHKPS(fp);
+    std::string dataStr;
+    char buf[READ_DATA_BUFF_SIZE] = {};
+    while (fgets(buf, sizeof(buf), fp) != nullptr) {
+        dataStr += buf;
+    }
+    MISC_HILOGI("error : %{public}d", errno);
+    if (fclose(fp) != 0) {
+        MISC_HILOGW("Close file failed");
+    }
+    MISC_HILOGI("error : %{public}d", errno);
+    return dataStr;
+}
+
+std::string GetFileSuffix(int32_t fd)
+{
+    char buf[FILE_PATH_MAX] = {'\0'};
+    char filePath[FILE_PATH_MAX] = {'\0'};
+    snprintf_s(buf, sizeof(buf), sizeof(buf) - 1, "/proc/self/fd/%d", fd);
+    MISC_HILOGI("buf : %{public}s", buf);
+    if (readlink(buf, filePath, sizeof(filePath) - 1) < 0) {
+        MISC_HILOGE("fd readlink() error");
+        return {};
+    }
+    std::string fileAbsolutePath(filePath);
+    MISC_HILOGI("fileAbsolutePath : %{public}s", fileAbsolutePath.c_str());
+    std::string fileSuffix = fileAbsolutePath.substr(fileAbsolutePath.find_last_of('.') + 1);
+    return fileSuffix;
 }
 }  // namespace Sensors
 }  // namespace OHOS

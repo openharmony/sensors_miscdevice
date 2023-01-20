@@ -82,13 +82,39 @@ int32_t StartVibratorOnce(int32_t duration)
     return SUCCESS;
 }
 
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+int32_t StartVibratorCustom(int32_t fd)
+{
+    if (fd < 0) {
+        MISC_HILOGE("fd is invalid");
+        return PARAMETER_ERROR;
+    }
+    auto &client = VibratorServiceClient::GetInstance();
+    int32_t ret = client.VibrateCustom(DEFAULT_VIBRATOR_ID, fd, g_usage);
+    if (ret != ERR_OK) {
+        MISC_HILOGE("vibrator fd failed, ret: %{public}d", ret);
+        return NormalizeErrCode(ret);
+    }
+    g_usage = USAGE_UNKNOWN;
+    return SUCCESS;
+}
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+
 int32_t StopVibrator(const char *mode)
 {
     CHKPR(mode, PARAMETER_ERROR);
+#if defined(OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM)
+    if (strcmp(mode, "time") != 0 && strcmp(mode, "preset") != 0 &&
+        strcmp(mode, "custom") != 0) {
+        MISC_HILOGE("mode is invalid, mode is %{public}s", mode);
+        return PARAMETER_ERROR;
+    }
+#else
     if (strcmp(mode, "time") != 0 && strcmp(mode, "preset") != 0) {
         MISC_HILOGE("mode is invalid, mode is %{public}s", mode);
         return PARAMETER_ERROR;
     }
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.Stop(DEFAULT_VIBRATOR_ID, mode);
     if (ret != ERR_OK) {

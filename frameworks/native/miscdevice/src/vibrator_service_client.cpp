@@ -99,9 +99,26 @@ int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, const std::string &ef
     return ret;
 }
 
-int32_t VibratorServiceClient::Stop(int32_t vibratorId, const std::string &type)
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+int32_t VibratorServiceClient::VibrateCustom(int32_t vibratorId, int32_t fd, int32_t usage)
 {
-    MISC_HILOGD("Stop begin, vibratorId : %{public}d, type : %{public}s", vibratorId, type.c_str());
+    MISC_HILOGD("VibrateCustom begin, fd: %{public}d", fd);
+    int32_t ret = InitServiceClient();
+    if (ret != ERR_OK) {
+        MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
+        return MISC_NATIVE_GET_SERVICE_ERR;
+    }
+    CHKPR(miscdeviceProxy_, ERROR);
+    StartTrace(HITRACE_TAG_SENSORS, "VibrateCustom");
+    ret = miscdeviceProxy_->VibrateCustom(vibratorId, fd, usage);
+    FinishTrace(HITRACE_TAG_SENSORS);
+    return ret;
+}
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+
+int32_t VibratorServiceClient::Stop(int32_t vibratorId, const std::string &mode)
+{
+    MISC_HILOGD("Stop begin, vibratorId : %{public}d, mode : %{public}s", vibratorId, mode.c_str());
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
         MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
@@ -109,10 +126,14 @@ int32_t VibratorServiceClient::Stop(int32_t vibratorId, const std::string &type)
     }
     CHKPR(miscdeviceProxy_, ERROR);
     StartTrace(HITRACE_TAG_SENSORS, "Stop");
-    if (type == "time") {
+    if (mode == "time") {
         ret = miscdeviceProxy_->CancelVibrator(vibratorId);
+    } else if (mode == "preset") {
+        ret = miscdeviceProxy_->StopVibratorEffect(vibratorId, mode);
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     } else {
-        ret = miscdeviceProxy_->StopVibratorEffect(vibratorId, type);
+        ret = miscdeviceProxy_->StopVibratorCustom(vibratorId, mode);
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     }
     FinishTrace(HITRACE_TAG_SENSORS);
     return ret;

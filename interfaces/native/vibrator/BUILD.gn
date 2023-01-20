@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//base/sensors/miscdevice/miscdevice_vibrator_custom.gni")
 
 SUBSYSTEM_DIR = "//base/sensors/miscdevice"
 ohos_ndk_library("libvibrator_ndk") {
@@ -44,6 +45,10 @@ ohos_shared_library("vibrator_interface_native") {
     "//base/sensors/miscdevice/interfaces/native/light/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
   ]
+
+  if (miscdevice_feature_vibrator_custom) {
+    defines = [ "OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM" ]
+  }
 
   cflags = [ "-Wno-error=inconsistent-missing-override" ]
 
