@@ -1,0 +1,67 @@
+{
+    "Metadata": {
+        "Create": "2023-01-09",
+        "Description": "a haptic testcase",
+        "Format": "OpenHarmony",
+        "Version": 1.0
+    },
+    "Sequence": [
+        {
+            "Event": {
+                "Type": "transient",
+                "StartTime": 0,
+                "Intensity": 100,
+                "Frequency": 31
+            }
+        },
+        {
+            "Event": {
+                "Type": "continuous",
+                "StartTime": 40,
+                "Duration": 54,
+                "Intensity": 38,
+                "Frequency": 30
+            }
+        },
+        {
+            "Event": {
+                "Type": "transient",
+                "StartTime": 103,
+                "Intensity": 79,
+                "Frequency": 69
+            }
+        },
+        {
+            "Event": {
+                "Type": "transient",
+                "StartTime": 180,
+                "Intensity": 53,
+                "Frequency": 82
+            }
+        },
+        {
+            "Event": {
+                "Type": "transient",
+                "StartTime": 239,
+                "Intensity": 51,
+                "Frequency": 82
+            }
+        },
+        {
+            "Event": {
+                "Type": "transient",
+                "StartTime": 319,
+                "Intensity": 37,
+                "Frequency": 74
+            }
+        },
+        {
+            "Event": {
+                "Type": "transient",
+                "StartTime": 350,
+                "Intensity": 24,
+                "Frequency": 44
+            }
+        }
+    ]
+}

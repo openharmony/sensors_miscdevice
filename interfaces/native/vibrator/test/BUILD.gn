@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/test.gni")
+import("//base/sensors/miscdevice/miscdevice_vibrator_custom.gni")
 
 SUBSYSTEM_DIR = "//base/sensors"
 module_output_path = "sensors/miscdevice/interfaces"
@@ -42,6 +43,11 @@ ohos_unittest("VibratorAgentTest") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
   ]
+
+  if (miscdevice_feature_vibrator_custom) {
+    defines = [ "OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM" ]
+    resource_config_file = "//base/sensors/miscdevice/interfaces/native/vibrator/test/unittest/resource/ohos_test.xml"
+  }
 }
 
 ###########################end###########################

@@ -1,0 +1,18 @@
+{
+    "Metadata": {
+        "Create": "2023-01-09",
+        "Description": "a haptic testcase",
+        "Format": "OpenHarmony",
+        "Version": 1.0
+    },
+    "Sequence": [
+        {
+            "Event": {
+                "Type": "other",
+                "StartTime": 0,
+                "Intensity": 100,
+                "Frequency": 50
+            }
+        }
+    ]
+}
