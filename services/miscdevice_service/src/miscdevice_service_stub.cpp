@@ -43,7 +43,7 @@ MiscdeviceServiceStub::MiscdeviceServiceStub()
     baseFuncs_[PLAY_VIBRATOR_EFFECT] = &MiscdeviceServiceStub::PlayVibratorEffectPb;
     baseFuncs_[STOP_VIBRATOR_EFFECT] = &MiscdeviceServiceStub::StopVibratorEffectPb;
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    baseFuncs_[VIBRATE_CUSTOM] = &MiscdeviceServiceStub::VibrateCustomPb;
+    baseFuncs_[PLAY_VIBRATOR_CUSTOM] = &MiscdeviceServiceStub::PlayVibratorCustomPb;
     baseFuncs_[STOP_VIBRATOR_CUSTOM] = &MiscdeviceServiceStub::StopVibratorCustomPb;
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     baseFuncs_[GET_LIGHT_LIST] = &MiscdeviceServiceStub::GetLightListPb;
@@ -137,13 +137,13 @@ int32_t MiscdeviceServiceStub::StopVibratorEffectPb(MessageParcel &data, Message
 }
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-int32_t MiscdeviceServiceStub::VibrateCustomPb(MessageParcel &data, MessageParcel &reply)
+int32_t MiscdeviceServiceStub::PlayVibratorCustomPb(MessageParcel &data, MessageParcel &reply)
 {
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
     int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
     if (ret != PERMISSION_GRANTED) {
         HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
-            HiSysEvent::EventType::SECURITY, "PKG_NAME", "VibrateCustomPb", "ERROR_CODE", ret);
+            HiSysEvent::EventType::SECURITY, "PKG_NAME", "PlayVibratorCustomPb", "ERROR_CODE", ret);
         MISC_HILOGE("result: %{public}d", ret);
         return PERMISSION_DENIED;
     }
@@ -157,15 +157,15 @@ int32_t MiscdeviceServiceStub::VibrateCustomPb(MessageParcel &data, MessageParce
         MISC_HILOGE("Parcel ReadFileDescriptor failed");
         return ERROR;
     }
-    MISC_HILOGD("MiscdeviceServiceStub VibrateCustomPb ReadFileDescriptor tmpFd: %{public}d", tmpFd);
-    int32_t fd = dup(tmpFd);
-    MISC_HILOGD("MiscdeviceServiceStub VibrateCustomPb dup fd: %{public}d", fd);
+    MISC_HILOGD("MiscdeviceServiceStub PlayVibratorCustomPb ReadFileDescriptor tmpFd: %{public}d", tmpFd);
     int32_t usage;
     if (!data.ReadInt32(usage)) {
         MISC_HILOGE("Parcel ReadInt32 failed");
         return ERROR;
     }
-    ret = VibrateCustom(vibratorId, fd, usage);
+    int32_t fd = dup(tmpFd);
+    MISC_HILOGD("MiscdeviceServiceStub PlayVibratorCustomPb dup fd: %{public}d", fd);
+    ret = PlayVibratorCustom(vibratorId, fd, usage);
     close(fd);
     return ret;
 }

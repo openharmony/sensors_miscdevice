@@ -18,13 +18,15 @@
 
 #include <cstdint>
 #include <set>
-#include "json_parser.h"
+
 #include "refbase.h"
+
+#include "json_parser.h"
 #include "vibrator_infos.h"
 
 namespace OHOS {
 namespace Sensors {
-class VibratorDecoder : public RefBase{
+class VibratorDecoder {
 public:
     VibratorDecoder() = default;
     virtual ~VibratorDecoder() = default;

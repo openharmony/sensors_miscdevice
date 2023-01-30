@@ -12,12 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include "compatible_connection.h"
 #include <ctime>
 #include <string>
-#include <vector>
 #include <unordered_map>
-
-#include "compatible_connection.h"
+#include <vector>
 #include "sensors_errors.h"
 
 namespace OHOS {
@@ -57,7 +56,7 @@ int32_t CompatibleConnection::Start(const std::string &effectType)
 {
     CALL_LOG_ENTER;
     if (vibratorEffect_.find(effectType) == vibratorEffect_.end()) {
-        MISC_HILOGE("Not support %{public}s type", effectType.c_str());
+        MISC_HILOGE("Do not support effectType: %{public}s", effectType.c_str());
         return VIBRATOR_ON_ERR;
     }
     duration_ = vibratorEffect_[effectType];
@@ -75,21 +74,19 @@ int32_t CompatibleConnection::EnableCompositeEffect(const HdfCompositeEffect &vi
 {
     CALL_LOG_ENTER;
     if (vibratorCompositeEffect.compositeEffects.empty()) {
-        MISC_HILOGE("compositeEffects is null");
+        MISC_HILOGE("compositeEffects is empty");
         return VIBRATOR_ON_ERR;
     }
-    int32_t duration = 0;
-    auto type = vibratorCompositeEffect.type;
+    duration_ = 0;
     auto& compositeEffects = vibratorCompositeEffect.compositeEffects;
-    int32_t size = compositeEffects.size();
-    for (int32_t i = 0; i < size; ++i) {
-        if (type == HDF_EFFECT_TYPE_TIME) {
-            duration += compositeEffects[i].timeEffect.delay;
-        } else if (type == HDF_EFFECT_TYPE_PRIMITIVE) {
-            duration += compositeEffects[i].primitiveEffect.delay;
+    size_t size = compositeEffects.size();
+    for (size_t i = 0; i < size; ++i) {
+        if (vibratorCompositeEffect.type == HDF_EFFECT_TYPE_TIME) {
+            duration_ += compositeEffects[i].timeEffect.delay;
+        } else if (vibratorCompositeEffect.type == HDF_EFFECT_TYPE_PRIMITIVE) {
+            duration_ += compositeEffects[i].primitiveEffect.delay;
         }
     }
-    duration_ = duration;
     if (!vibrateThread_.joinable()) {
         std::thread senocdDataThread(CompatibleConnection::VibrateProcess);
         vibrateThread_ = std::move(senocdDataThread);
@@ -99,24 +96,23 @@ int32_t CompatibleConnection::EnableCompositeEffect(const HdfCompositeEffect &vi
     return ERR_OK;
 }
 
-int32_t CompatibleConnection::IsVibratorRunning(bool &state)
+bool CompatibleConnection::IsVibratorRunning()
 {
     CALL_LOG_ENTER;
-    state = (!isStop_);
-    return ERR_OK;
+    return (!isStop_);
 }
 
 int32_t CompatibleConnection::GetEffectInfo(const std::string &effect, HdfEffectInfo &effectInfo)
 {
     CALL_LOG_ENTER;
     if (vibratorEffect_.find(effect) == vibratorEffect_.end()) {
-        MISC_HILOGD("Not support effect : %{public}s", effect.c_str());
+        MISC_HILOGI("Not support effect: %{public}s", effect.c_str());
         effectInfo.isSupportEffect = false;
         effectInfo.duration = 0;
-    } else {
-        effectInfo.isSupportEffect = true;
-        effectInfo.duration = vibratorEffect_[effect];
+        return ERR_OK;
     }
+    effectInfo.isSupportEffect = true;
+    effectInfo.duration = vibratorEffect_[effect];
     return ERR_OK;
 }
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM

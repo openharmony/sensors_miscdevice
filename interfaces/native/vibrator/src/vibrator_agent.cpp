@@ -82,9 +82,9 @@ int32_t StartVibratorOnce(int32_t duration)
     return SUCCESS;
 }
 
-#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 int32_t StartVibratorCustom(int32_t fd)
 {
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     if (fd < 0) {
         MISC_HILOGE("fd is invalid");
         return PARAMETER_ERROR;
@@ -97,8 +97,11 @@ int32_t StartVibratorCustom(int32_t fd)
     }
     g_usage = USAGE_UNKNOWN;
     return SUCCESS;
-}
+#else
+    MISC_HILOGW("The device does not support this operation.");
+    return DEVICE_OPERATION_FAILED;
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+}
 
 int32_t StopVibrator(const char *mode)
 {
@@ -106,12 +109,12 @@ int32_t StopVibrator(const char *mode)
 #if defined(OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM)
     if (strcmp(mode, "time") != 0 && strcmp(mode, "preset") != 0 &&
         strcmp(mode, "custom") != 0) {
-        MISC_HILOGE("mode is invalid, mode is %{public}s", mode);
+        MISC_HILOGE("input invalid, mode is %{public}s", mode);
         return PARAMETER_ERROR;
     }
 #else
     if (strcmp(mode, "time") != 0 && strcmp(mode, "preset") != 0) {
-        MISC_HILOGE("mode is invalid, mode is %{public}s", mode);
+        MISC_HILOGE("input invalid, mode is %{public}s", mode);
         return PARAMETER_ERROR;
     }
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM

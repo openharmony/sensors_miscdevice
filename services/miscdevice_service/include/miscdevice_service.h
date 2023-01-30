@@ -27,6 +27,8 @@
 #include "system_ability.h"
 #include "thread_ex.h"
 
+#include "file_utils.h"
+#include "json_parser.h"
 #include "light_hdi_connection.h"
 #include "miscdevice_common.h"
 #include "miscdevice_dump.h"
@@ -35,8 +37,6 @@
 #include "vibrator_hdi_connection.h"
 #include "vibrator_infos.h"
 #include "vibrator_thread.h"
-#include "file_utils.h"
-#include "json_parser.h"
 
 namespace OHOS {
 namespace Sensors {
@@ -63,7 +63,7 @@ public:
                                        int32_t loopCount, int32_t usage) override;
     virtual int32_t StopVibratorEffect(int32_t vibratorId, const std::string &mode) override;
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    virtual int32_t VibrateCustom(int32_t vibratorId, int32_t fd, int32_t usage) override;
+    virtual int32_t PlayVibratorCustom(int32_t vibratorId, int32_t fd, int32_t usage) override;
     virtual int32_t StopVibratorCustom(int32_t vibratorId, const std::string &mode) override;
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     virtual std::vector<LightInfo> GetLightList() override;

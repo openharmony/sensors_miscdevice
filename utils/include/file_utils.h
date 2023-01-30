@@ -17,8 +17,8 @@
 #define MISCDEVICE_FILE_UTILS_H
 
 #include <cstdint>
+#include <cstdio>
 #include <string>
-#include <stdio.h>
 #include <unistd.h>
 
 namespace OHOS {

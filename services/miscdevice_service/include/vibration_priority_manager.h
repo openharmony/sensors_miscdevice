@@ -23,9 +23,9 @@
 
 #include "singleton.h"
 
+#include "json_parser.h"
 #include "vibrator_infos.h"
 #include "vibrator_thread.h"
-#include "json_parser.h"
 
 namespace OHOS {
 namespace Sensors {

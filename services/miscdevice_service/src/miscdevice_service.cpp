@@ -25,8 +25,8 @@
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 #include "custom_vibration_matcher.h"
-#include "default_vibrator_decoder_factory.h"
 #include "default_vibrator_decoder.h"
+#include "default_vibrator_decoder_factory.h"
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
 namespace OHOS {
@@ -44,6 +44,10 @@ constexpr int32_t MAX_VIBRATOR_TIME = 1800000;
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 constexpr int32_t MAX_JSON_FILE_SIZE = 64000;
+constexpr double MIN_JSON_VERSION = 1.0;
+std::unordered_map<std::string, double> supportFormat = {
+    {"OpenHarmony", 1.0}
+};
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 }  // namespace
 
@@ -209,6 +213,10 @@ int32_t MiscdeviceService::CancelVibrator(int32_t vibratorId)
 int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::string &effect,
     int32_t count, int32_t usage)
 {
+    if ((count < 1) || (usage >= USAGE_MAX) || (usage < 0)) {
+        MISC_HILOGE("Invalid parameter");
+        return PARAMETER_ERROR;
+    }
 #if defined(OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM)
     HdfEffectInfo effectInfo;
     int32_t ret = vibratorHdiConnection_.GetEffectInfo(effect, effectInfo);
@@ -216,8 +224,8 @@ int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::str
         MISC_HILOGE("GetEffectInfo fail");
         return ERROR;
     }
-    if ((effectInfo.isSupportEffect != true) || (count < 1) || (usage >= USAGE_MAX) || (usage < 0)) {
-        MISC_HILOGE("Invalid parameter");
+    if (!effectInfo.isSupportEffect) {
+        MISC_HILOGE("Effect not supported");
         return PARAMETER_ERROR;
     }
     VibrateInfo info = {
@@ -231,9 +239,8 @@ int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::str
         .count = count
     };
 #else
-    if ((vibratorEffects.find(effect) == vibratorEffects.end()) || (count < 1) || (usage >= USAGE_MAX)
-        || (usage < 0)) {
-        MISC_HILOGE("Invalid parameter");
+    if (vibratorEffects.find(effect) == vibratorEffects.end()) {
+        MISC_HILOGE("Effect not supported");
         return PARAMETER_ERROR;
     }
     VibrateInfo info = {
@@ -265,11 +272,8 @@ void MiscdeviceService::StartVibrateThread(VibrateInfo info)
         vibratorThread_->NotifyExit();
     }
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    bool state = false;
-    vibratorHdiConnection_.IsVibratorRunning(state);
-    while (state == true) {
+    while (vibratorHdiConnection_.IsVibratorRunning()) {
         vibratorHdiConnection_.Stop(HDF_VIBRATOR_MODE_PRESET);
-        vibratorHdiConnection_.IsVibratorRunning(state);
     }
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     vibratorThread_->UpdateVibratorEffect(info);
@@ -307,12 +311,12 @@ int32_t CheckMetadata(const JsonParser &parser)
     cJSON* version = parser.GetObjectItem(metadata, "Version");
     CHKPR(version, ERROR);
     double versionValue = version->valuedouble;
-    if (formatValue != "OpenHarmony") {
-        MISC_HILOGE("current json file format is not supported at this time, format:%{public}s", formatValue.c_str());
+    if (supportFormat.find(formatValue) == supportFormat.end()) {
+        MISC_HILOGE("json file format is not supported, format: %{public}s", formatValue.c_str());
         return ERROR;
     }
-    if (versionValue != 1.0) {
-        MISC_HILOGE("current json file version is not supported at this time, version:%{public}f", versionValue);
+    if (versionValue < MIN_JSON_VERSION || versionValue > supportFormat[formatValue]) {
+        MISC_HILOGE("json file version is not supported, version: %{public}f", versionValue);
         return ERROR;
     }
     return SUCCESS;
@@ -332,29 +336,29 @@ int32_t MiscdeviceService::DecodeCustomEffect(int32_t fd, std::set<VibrateEvent>
     JsonParser parser(fd);
     int32_t ret = CheckMetadata(parser);
     if (ret != SUCCESS) {
-        MISC_HILOGE("The author or versin of json file is invalid");
+        MISC_HILOGE("Metadata verification failed");
         return ERROR;
     }
-    sptr<VibratorDecoderFactory> defaultFactory = new (std::nothrow) DefaultVibratorDecoderFactory();
+    std::unique_ptr<VibratorDecoderFactory> defaultFactory(new (std::nothrow) DefaultVibratorDecoderFactory());
     CHKPR(defaultFactory, ERROR);
-    sptr<VibratorDecoder> defaultDecoder = defaultFactory->CreateDecoder();
+    std::unique_ptr<VibratorDecoder> defaultDecoder(defaultFactory->CreateDecoder());
     CHKPR(defaultDecoder, ERROR);
     ret = defaultDecoder->DecodeEffect(parser, vibrateSet);
     if (ret != SUCCESS) {
         MISC_HILOGE("decoder effect error");
         return ERROR;
     }
-    MISC_HILOGD("vibrateSet size : %{public}d", static_cast<int32_t>(vibrateSet.size()));
+    MISC_HILOGD("vibrateSet size: %{public}d", static_cast<int32_t>(vibrateSet.size()));
     return NO_ERROR;
 }
 
-int32_t MiscdeviceService::VibrateCustom(int32_t vibratorId, int32_t fd, int32_t usage)
+int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, int32_t fd, int32_t usage)
 {
     if (fd < 0) {
         MISC_HILOGE("fd is invalid, fd:%{public}d", fd);
         return ERROR;
     }
-    MISC_HILOGD("MiscdeviceService VibrateCustom() fd: %{public}d", fd);
+    MISC_HILOGD("PlayVibratorCustom fd: %{public}d", fd);
     int32_t fileSize = GetFileSize(fd);
     if (fileSize <= 0 || fileSize > MAX_JSON_FILE_SIZE) {
         MISC_HILOGE("json file size is invalid, size:%{public}d", fileSize);
@@ -371,15 +375,15 @@ int32_t MiscdeviceService::VibrateCustom(int32_t vibratorId, int32_t fd, int32_t
     CustomVibrationMatcher matcher;
     ret = matcher.TransformEffect(vibrateSet, vibratorCompositeEffect.compositeEffects);
     if (ret != SUCCESS) {
-        MISC_HILOGE("convert custom effect error");
+        MISC_HILOGE("transform custom effect error");
         return ERROR;
     }
     auto& compositeEffects = vibratorCompositeEffect.compositeEffects;
-    int32_t compositeEffectsSize = compositeEffects.size();
-    MISC_HILOGI("the count of match result : %{public}d", compositeEffectsSize);
-    for (int32_t i = 0; i < compositeEffectsSize; ++i) {
-        MISC_HILOGI("match result at %{public}d th, delay : %{public}d, effectId : %{public}d", i,
-        compositeEffects[i].primitiveEffect.delay, compositeEffects[i].primitiveEffect.effectId);
+    size_t size = compositeEffects.size();
+    MISC_HILOGD("the count of match result : %{public}d", compositeEffectsSize);
+    for (size_t i = 0; i < size; ++i) {
+        MISC_HILOGD("match result at %{public}d th, delay : %{public}d, effectId : %{public}d",
+        i, compositeEffects[i].primitiveEffect.delay, compositeEffects[i].primitiveEffect.effectId);
     }
     VibrateInfo info = {
         .mode = "custom",
@@ -400,9 +404,7 @@ int32_t MiscdeviceService::VibrateCustom(int32_t vibratorId, int32_t fd, int32_t
 int32_t MiscdeviceService::StopVibratorCustom(int32_t vibratorId, const std::string &mode)
 {
     std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
-    bool state;
-    vibratorHdiConnection_.IsVibratorRunning(state);
-    if ((vibratorThread_ == nullptr) || (state == false)) {
+    if ((vibratorThread_ == nullptr) || (!vibratorHdiConnection_.IsVibratorRunning())) {
         MISC_HILOGE("No vibration, no need to stop");
         return ERROR;
     }

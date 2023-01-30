@@ -23,25 +23,16 @@ namespace Sensors {
 class CompatibleConnection : public IVibratorHdiConnection {
 public:
     CompatibleConnection() = default;
-
     virtual ~CompatibleConnection() {};
-
     int32_t ConnectHdi() override;
-
     int32_t StartOnce(uint32_t duration) override;
-
     int32_t Start(const std::string &effectType) override;
-
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     int32_t EnableCompositeEffect(const HdfCompositeEffect &vibratorCompositeEffect) override;
-
-    int32_t IsVibratorRunning(bool &state) override;
-
+    bool IsVibratorRunning() override;
     int32_t GetEffectInfo(const std::string &effect, HdfEffectInfo &effectInfo) override;
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-
     int32_t Stop(HdfVibratorMode mode) override;
-
     int32_t DestroyHdiConnection() override;
 
 private:
