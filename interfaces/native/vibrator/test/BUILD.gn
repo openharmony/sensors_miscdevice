@@ -42,6 +42,7 @@ ohos_unittest("VibratorAgentTest") {
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "init:libbegetutil",
   ]
 
   if (miscdevice_feature_vibrator_custom) {

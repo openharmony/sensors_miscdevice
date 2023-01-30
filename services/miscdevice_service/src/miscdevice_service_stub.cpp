@@ -152,19 +152,18 @@ int32_t MiscdeviceServiceStub::PlayVibratorCustomPb(MessageParcel &data, Message
         MISC_HILOGE("Parcel ReadInt32 failed");
         return ERROR;
     }
-    int32_t tmpFd = data.ReadFileDescriptor();
-    if (tmpFd < 0) {
+    int32_t fd = data.ReadFileDescriptor();
+    if (fd < 0) {
         MISC_HILOGE("Parcel ReadFileDescriptor failed");
         return ERROR;
     }
-    MISC_HILOGD("MiscdeviceServiceStub PlayVibratorCustomPb ReadFileDescriptor tmpFd: %{public}d", tmpFd);
+    MISC_HILOGD("ReadFileDescriptor fd: %{public}d", fd);
     int32_t usage;
     if (!data.ReadInt32(usage)) {
         MISC_HILOGE("Parcel ReadInt32 failed");
+        close(fd);
         return ERROR;
     }
-    int32_t fd = dup(tmpFd);
-    MISC_HILOGD("MiscdeviceServiceStub PlayVibratorCustomPb dup fd: %{public}d", fd);
     ret = PlayVibratorCustom(vibratorId, fd, usage);
     close(fd);
     return ret;

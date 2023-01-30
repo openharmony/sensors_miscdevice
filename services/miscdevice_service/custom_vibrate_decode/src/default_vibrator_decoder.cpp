@@ -44,17 +44,17 @@ int32_t DefaultVibratorDecoder::ParseSequence(const JsonParser &parser, std::set
 {
     cJSON *sequence = parser.GetObjectItem("Sequence");
     CHKPR(sequence, ERROR);
-    if (!cJSON_IsArray(sequence)) {
+    if (!parser.IsArray(sequence)) {
         MISC_HILOGE("The value of sequence is not array");
         return ERROR;
     }
-    int32_t size = cJSON_GetArraySize(sequence);
+    int32_t size = parser.GetArraySize(sequence);
     if (size > EVENT_NUM_MAX) {
         MISC_HILOGE("The size of sequence exceeds 128, size: %{public}d", size);
         return ERROR;
     }
     for (int32_t i = 0; i < size; i++) {
-        cJSON* item = cJSON_GetArrayItem(sequence, i);
+        cJSON* item = parser.GetArrayItem(sequence, i);
         CHKPR(item, ERROR);
         cJSON* event = item->child;
         CHKPR(event, ERROR);

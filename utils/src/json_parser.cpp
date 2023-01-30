@@ -95,5 +95,20 @@ int32_t JsonParser::ParseJsonArray(const std::string& key, std::vector<std::stri
 {
     return ParseJsonArray(cJson_, key, vals);
 }
+
+bool JsonParser::IsArray(cJSON *json) const
+{
+    return cJSON_IsArray(json);
+}
+
+int32_t JsonParser::GetArraySize(cJSON *json) const
+{
+    return cJSON_GetArraySize(json);
+}
+
+cJSON* JsonParser::GetArrayItem(cJSON *json, int32_t index) const
+{
+    return cJSON_GetArrayItem(json, index);
+}
 }  // namespace Sensors
 }  // namespace OHOS

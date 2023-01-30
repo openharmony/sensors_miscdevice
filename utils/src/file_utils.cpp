@@ -159,7 +159,7 @@ std::string GetFileSuffix(int32_t fd)
 {
     char buf[FILE_PATH_MAX] = { '\0' };
     char filePath[FILE_PATH_MAX] = { '\0' };
-    if (snprintf_s(buf, sizeof(buf), sizeof(buf) - 1, "/proc/self/fd/%d", fd) != EOK) {
+    if (snprintf_s(buf, sizeof(buf), sizeof(buf) - 1, "/proc/self/fd/%d", fd) < 0) {
         MISC_HILOGE("snprintf_s failed, errno:%{public}d", errno);
         return {};
     }

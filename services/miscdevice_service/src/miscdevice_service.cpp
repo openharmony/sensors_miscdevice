@@ -24,6 +24,7 @@
 #include "v1_0/light_interface_proxy.h"
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+#include "parameters.h"
 #include "custom_vibration_matcher.h"
 #include "default_vibrator_decoder.h"
 #include "default_vibrator_decoder_factory.h"
@@ -45,6 +46,7 @@ constexpr int32_t MAX_VIBRATOR_TIME = 1800000;
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 constexpr int32_t MAX_JSON_FILE_SIZE = 64000;
 constexpr double MIN_JSON_VERSION = 1.0;
+const std::string PHONE_TYPE = "phone";
 std::unordered_map<std::string, double> supportFormat = {
     {"OpenHarmony", 1.0}
 };
@@ -354,11 +356,14 @@ int32_t MiscdeviceService::DecodeCustomEffect(int32_t fd, std::set<VibrateEvent>
 
 int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, int32_t fd, int32_t usage)
 {
+    if (OHOS::system::GetDeviceType() != PHONE_TYPE) {
+        MISC_HILOGE("The device does not support this operation");
+        return ERROR;
+    }
     if (fd < 0) {
         MISC_HILOGE("fd is invalid, fd:%{public}d", fd);
         return ERROR;
     }
-    MISC_HILOGD("PlayVibratorCustom fd: %{public}d", fd);
     int32_t fileSize = GetFileSize(fd);
     if (fileSize <= 0 || fileSize > MAX_JSON_FILE_SIZE) {
         MISC_HILOGE("json file size is invalid, size:%{public}d", fileSize);
@@ -380,9 +385,9 @@ int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, int32_t fd, in
     }
     auto& compositeEffects = vibratorCompositeEffect.compositeEffects;
     size_t size = compositeEffects.size();
-    MISC_HILOGD("the count of match result : %{public}d", compositeEffectsSize);
+    MISC_HILOGD("the count of match result : %{public}zu", size);
     for (size_t i = 0; i < size; ++i) {
-        MISC_HILOGD("match result at %{public}d th, delay : %{public}d, effectId : %{public}d",
+        MISC_HILOGD("match result at %{public}zu th, delay : %{public}d, effectId : %{public}d",
         i, compositeEffects[i].primitiveEffect.delay, compositeEffects[i].primitiveEffect.effectId);
     }
     VibrateInfo info = {
@@ -403,6 +408,10 @@ int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, int32_t fd, in
 
 int32_t MiscdeviceService::StopVibratorCustom(int32_t vibratorId, const std::string &mode)
 {
+    if (OHOS::system::GetDeviceType() != PHONE_TYPE) {
+        MISC_HILOGE("The device does not support this operation");
+        return ERROR;
+    }
     std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
     if ((vibratorThread_ == nullptr) || (!vibratorHdiConnection_.IsVibratorRunning())) {
         MISC_HILOGE("No vibration, no need to stop");
