@@ -16,12 +16,14 @@
 #include "vibrator_service_client.h"
 
 #include <thread>
-#include "death_recipient_template.h"
+
 #include "hisysevent.h"
 #include "hitrace_meter.h"
 #include "iservice_registry.h"
-#include "sensors_errors.h"
 #include "system_ability_definition.h"
+
+#include "death_recipient_template.h"
+#include "sensors_errors.h"
 
 namespace OHOS {
 namespace Sensors {
@@ -105,12 +107,12 @@ int32_t VibratorServiceClient::VibrateCustom(int32_t vibratorId, int32_t fd, int
     MISC_HILOGD("VibrateCustom begin, fd: %{public}d", fd);
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
-        MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
+        MISC_HILOGE("InitServiceClient failed, ret: %{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
     CHKPR(miscdeviceProxy_, ERROR);
     StartTrace(HITRACE_TAG_SENSORS, "VibrateCustom");
-    ret = miscdeviceProxy_->VibrateCustom(vibratorId, fd, usage);
+    ret = miscdeviceProxy_->PlayVibratorCustom(vibratorId, fd, usage);
     FinishTrace(HITRACE_TAG_SENSORS);
     return ret;
 }
@@ -118,10 +120,10 @@ int32_t VibratorServiceClient::VibrateCustom(int32_t vibratorId, int32_t fd, int
 
 int32_t VibratorServiceClient::Stop(int32_t vibratorId, const std::string &mode)
 {
-    MISC_HILOGD("Stop begin, vibratorId : %{public}d, mode : %{public}s", vibratorId, mode.c_str());
+    MISC_HILOGD("Stop begin, vibratorId: %{public}d, mode: %{public}s", vibratorId, mode.c_str());
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
-        MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
+        MISC_HILOGE("InitServiceClient failed, ret: %{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
     CHKPR(miscdeviceProxy_, ERROR);

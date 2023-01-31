@@ -33,6 +33,9 @@ public:
     int32_t ParseJsonArray(const std::string& key, std::vector<std::string>& vals) const;
     cJSON* GetObjectItem(cJSON *json, const std::string& key) const;
     cJSON* GetObjectItem(const std::string& key) const;
+    bool IsArray(cJSON *json) const;
+    int32_t GetArraySize(cJSON *json) const;
+    cJSON* GetArrayItem(cJSON *json, int32_t index) const;
 
 private:
     cJSON* cJson_ = nullptr;

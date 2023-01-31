@@ -36,7 +36,7 @@ public:
                                        int32_t loopCount, int32_t usage) = 0;
     virtual int32_t StopVibratorEffect(int32_t vibratorId, const std::string &mode) = 0;
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    virtual int32_t VibrateCustom(int32_t vibratorId, int32_t fd, int32_t usage) = 0;
+    virtual int32_t PlayVibratorCustom(int32_t vibratorId, int32_t fd, int32_t usage) = 0;
     virtual int32_t StopVibratorCustom(int32_t vibratorId, const std::string &mode) = 0;
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     virtual std::vector<LightInfo> GetLightList() = 0;
@@ -49,7 +49,7 @@ public:
         PLAY_VIBRATOR_EFFECT,
         STOP_VIBRATOR_EFFECT,
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-        VIBRATE_CUSTOM,
+        PLAY_VIBRATOR_CUSTOM,
         STOP_VIBRATOR_CUSTOM,
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
         GET_LIGHT_LIST,

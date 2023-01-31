@@ -31,9 +31,7 @@ using ServicePb = std::function<int32_t(uint32_t code, MessageParcel &, MessageP
 class MiscdeviceServiceStub : public IRemoteStub<IMiscdeviceService> {
 public:
     MiscdeviceServiceStub();
-
     virtual ~MiscdeviceServiceStub();
-
     virtual int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
                                     MessageOption &option) override;
 
@@ -51,6 +49,10 @@ private:
     int32_t StopVibratorEffectPb(MessageParcel &data, MessageParcel &reply);
     int32_t SetVibratorParameterPb(MessageParcel &data, MessageParcel &reply);
     int32_t GetVibratorParameterPb(MessageParcel &data, MessageParcel &reply);
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+    int32_t PlayVibratorCustomPb(MessageParcel &data, MessageParcel &reply);
+    int32_t StopVibratorCustomPb(MessageParcel &data, MessageParcel &reply);
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     int32_t GetLightListPb(MessageParcel &data, MessageParcel &reply);
     int32_t TurnOnPb(MessageParcel &data, MessageParcel &reply);
     int32_t TurnOffPb(MessageParcel &data, MessageParcel &reply);

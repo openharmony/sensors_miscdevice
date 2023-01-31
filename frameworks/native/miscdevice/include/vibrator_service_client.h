@@ -17,9 +17,11 @@
 #define VIBRATOR_SERVICE_CLIENT_H
 
 #include <mutex>
+
 #include "iremote_object.h"
-#include "miscdevice_service_proxy.h"
 #include "singleton.h"
+
+#include "miscdevice_service_proxy.h"
 
 namespace OHOS {
 namespace Sensors {

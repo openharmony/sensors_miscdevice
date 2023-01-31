@@ -16,9 +16,10 @@
 #ifndef MISCDEVICE_SERVICE_PROXY_H
 #define MISCDEVICE_SERVICE_PROXY_H
 
-#include "i_miscdevice_service.h"
 #include "iremote_proxy.h"
 #include "nocopyable.h"
+
+#include "i_miscdevice_service.h"
 
 namespace OHOS {
 namespace Sensors {
@@ -32,7 +33,7 @@ public:
 	                                   int32_t loopCount, int32_t usage) override;
     virtual int32_t StopVibratorEffect(int32_t vibratorId, const std::string &mode) override;
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    virtual int32_t VibrateCustom(int32_t vibratorId, int32_t fd, int32_t usage) override;
+    virtual int32_t PlayVibratorCustom(int32_t vibratorId, int32_t fd, int32_t usage) override;
     virtual int32_t StopVibratorCustom(int32_t vibratorId, const std::string &mode) override;
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     virtual std::vector<LightInfo> GetLightList() override;
