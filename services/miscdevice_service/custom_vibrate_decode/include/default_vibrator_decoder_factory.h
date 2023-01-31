@@ -16,8 +16,9 @@
 #ifndef DEFAULT_VIBRATOR_DECODER_FACTORY_H
 #define DEFAULT_VIBRATOR_DECODER_FACTORY_H
 
-#include "vibrator_decoder_factory.h"
 #include <cstdint>
+
+#include "vibrator_decoder_factory.h"
 
 namespace OHOS {
 namespace Sensors {
@@ -25,7 +26,7 @@ class DefaultVibratorDecoderFactory : public VibratorDecoderFactory {
 public:
     DefaultVibratorDecoderFactory() = default;
     ~DefaultVibratorDecoderFactory() = default;
-    virtual VibratorDecoder *CreateDecoder() override;
+    VibratorDecoder *CreateDecoder() override;
 };
 }  // namespace Sensors
 }  // namespace OHOS

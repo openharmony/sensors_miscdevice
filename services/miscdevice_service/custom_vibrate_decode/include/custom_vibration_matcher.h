@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,9 +16,9 @@
 #ifndef CUSTOM_VIBRATION_MATCHER_H
 #define CUSTOM_VIBRATION_MATCHER_H
 
+#include <set>
 #include <string>
 #include <vector>
-#include <set>
 
 #include "i_vibrator_hdi_connection.h"
 #include "vibrator_infos.h"
@@ -30,6 +30,7 @@ public:
     CustomVibrationMatcher() = default;
     ~CustomVibrationMatcher() = default;
     int32_t TransformEffect(const std::set<VibrateEvent> &vibrateSet, std::vector<CompositeEffect> &compositeEffects);
+
 private:
     void ProcessContinuousEvent(const VibrateEvent &event, int32_t &preStartTime, int32_t &preDuration,
         std::vector<CompositeEffect> &compositeEffects);

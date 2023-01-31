@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace Sensors {
-class VibratorDecoderFactory : public RefBase{
+class VibratorDecoderFactory {
 public:
     VibratorDecoderFactory() = default;
     virtual ~VibratorDecoderFactory() = default;
