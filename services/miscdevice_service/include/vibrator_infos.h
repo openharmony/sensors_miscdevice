@@ -58,10 +58,10 @@ struct VibrateEvent {
     }
 
     VibrateTag tag;
-    int32_t startTime;
-    int32_t duration;
-    int32_t intensity;
-    int32_t frequency;
+    int32_t startTime = 0;
+    int32_t duration = 0;
+    int32_t intensity = 0;
+    int32_t frequency = 0;
 };
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 }  // namespace Sensors

@@ -42,25 +42,16 @@ using OHOS::HDI::Vibrator::V1_1::HdfEffectInfo;
 class IVibratorHdiConnection {
 public:
     IVibratorHdiConnection() = default;
-
     virtual ~IVibratorHdiConnection() = default;
-
     virtual int32_t ConnectHdi() = 0;
-
     virtual int32_t StartOnce(uint32_t duration) = 0;
-
     virtual int32_t Start(const std::string &effectType) = 0;
-
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     virtual int32_t EnableCompositeEffect(const HdfCompositeEffect &vibratorCompositeEffect) = 0;
-
-    virtual int32_t IsVibratorRunning(bool &state) = 0;
-
+    virtual bool IsVibratorRunning() = 0;
     virtual int32_t GetEffectInfo(const std::string &effect, HdfEffectInfo &effectInfo) = 0;
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-
     virtual int32_t Stop(HdfVibratorMode mode) = 0;
-
     virtual int32_t DestroyHdiConnection() = 0;
 
 private:

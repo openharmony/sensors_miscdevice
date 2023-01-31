@@ -31,12 +31,12 @@ int32_t VibratorHdiConnection::ConnectHdi()
 {
     iVibratorHdiConnection_ = std::make_unique<HdiConnection>();
     int32_t ret = iVibratorHdiConnection_->ConnectHdi();
-    if (ret != 0) {
+    if (ret != ERR_OK) {
         MISC_HILOGE("hdi direct failed");
         iVibratorHdiConnection_ = std::make_unique<CompatibleConnection>();
         ret = iVibratorHdiConnection_->ConnectHdi();
     }
-    if (ret != 0) {
+    if (ret != ERR_OK) {
         MISC_HILOGE("hdi connection failed");
         return VIBRATOR_HDF_CONNECT_ERR;
     }
@@ -80,16 +80,9 @@ int32_t VibratorHdiConnection::EnableCompositeEffect(const HdfCompositeEffect &v
     return ERR_OK;
 }
 
-int32_t VibratorHdiConnection::IsVibratorRunning(bool &state)
+bool VibratorHdiConnection::IsVibratorRunning()
 {
-    StartTrace(HITRACE_TAG_SENSORS, "IsHapticRunning");
-    int32_t ret = iVibratorHdiConnection_->IsVibratorRunning(state);
-    FinishTrace(HITRACE_TAG_SENSORS);
-    if (ret != 0) {
-        MISC_HILOGE("IsHapticRunning failed");
-        return ERROR;
-    }
-    return ERR_OK;
+    return iVibratorHdiConnection_->IsVibratorRunning();
 }
 
 int32_t VibratorHdiConnection::GetEffectInfo(const std::string &effect, HdfEffectInfo &effectInfo)

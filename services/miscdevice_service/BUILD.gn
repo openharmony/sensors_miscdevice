@@ -65,6 +65,9 @@ ohos_shared_library("libmiscdevice_service") {
     ]
     include_dirs += [ "custom_vibrate_decode/include" ]
     defines = [ "OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM" ]
+    external_deps += [
+      "init:libbegetutil",
+    ]
   }
 
   part_name = "miscdevice"

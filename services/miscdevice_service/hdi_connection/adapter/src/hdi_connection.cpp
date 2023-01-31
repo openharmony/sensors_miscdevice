@@ -12,9 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <thread>
 #include "hdi_connection.h"
+
+#include <thread>
+
 #include "hisysevent.h"
+
 #include "sensors_errors.h"
 
 namespace OHOS {
@@ -78,7 +81,7 @@ int32_t HdiConnection::Start(const std::string &effectType)
 int32_t HdiConnection::EnableCompositeEffect(const HdfCompositeEffect &vibratorCompositeEffect)
 {
     if (vibratorCompositeEffect.compositeEffects.empty()) {
-        MISC_HILOGE("compositeEffects is null");
+        MISC_HILOGE("compositeEffects is empty");
         return VIBRATOR_ON_ERR;
     }
     int32_t ret = vibratorInterface_->EnableCompositeEffect(vibratorCompositeEffect);
@@ -91,16 +94,11 @@ int32_t HdiConnection::EnableCompositeEffect(const HdfCompositeEffect &vibratorC
     return ERR_OK;
 }
 
-int32_t HdiConnection::IsVibratorRunning(bool &state)
+bool HdiConnection::IsVibratorRunning()
 {
-    int32_t ret = vibratorInterface_->IsVibratorRunning(state);
-    if (ret < 0) {
-        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
-            HiSysEvent::EventType::FAULT, "PKG_NAME", "IsVibratorRunning", "ERROR_CODE", ret);
-        MISC_HILOGE("IsVibratorRunning failed");
-        return ret;
-    }
-    return ERR_OK;
+    bool state;
+    vibratorInterface_->IsVibratorRunning(state);
+    return state;
 }
 
 int32_t HdiConnection::GetEffectInfo(const std::string &effect, HdfEffectInfo &effectInfo)
