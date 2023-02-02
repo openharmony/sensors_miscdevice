@@ -31,8 +31,14 @@ public:
     int32_t DecodeEffect(const JsonParser &parser, std::set<VibrateEvent> &vibrateSet) override;
 
 private:
-    int32_t ParseSequence(const JsonParser &parser, std::set<VibrateEvent> &vibrateSet);
+    int32_t CheckMetadata(const JsonParser &parser);
+    int32_t ParseChannel(const JsonParser &parser, std::set<VibrateEvent> &vibrateSet);
+    int32_t ParseChannelParameters(const JsonParser &parser, cJSON *channelParameters);
+    int32_t ParsePattern(const JsonParser &parser, cJSON *pattern, std::set<VibrateEvent> &vibrateSet);
     int32_t ParseEvent(const JsonParser &parser, cJSON *event, std::set<VibrateEvent> &vibrateSet);
+    bool CheckParameters(const VibrateEvent &vibrateEvent);
+    int32_t channelNumber_ = 0;
+    double version_ = 0;
 };
 }  // namespace Sensors
 }  // namespace OHOS
