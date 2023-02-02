@@ -1,18 +1,28 @@
 {
-    "Metadata": {
-        "Create": "2023-01-09",
-        "Description": "a haptic testcase",
-        "Version": 1.0
+    "MetaData": {
+        "Create": "2023-02-01",
+        "Description": "a json file format demo",
+        "Version": 1.0,
+        "ChannelNumber": 1
     },
-    "Sequence": [
+    "Channels": [
         {
-            "Event": {
-                "Type": "continuous",
-                "StartTime": 50,
-                "Duration": 75,
-                "Intensity": 0,
-                "Frequency": 50
-            }
+            "Parameters": {
+                "Index": 1
+            },
+            "Pattern": [
+                {
+                    "Event": {
+                        "Type": "continuous",
+                        "StartTime": 50,
+                        "Duration": 75,
+                        "Parameters": {
+                            "Intensity": -1,
+                            "Frequency": 200
+                        }
+                    }
+                }
+            ]
         }
     ]
 }

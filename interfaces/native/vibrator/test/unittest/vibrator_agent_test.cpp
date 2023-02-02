@@ -583,18 +583,14 @@ HWTEST_F(VibratorAgentTest, StartVibratorCustom_021, TestSize.Level1)
     }
 }
 
-HWTEST_F(VibratorAgentTest, StopVibratorCustom_001, TestSize.Level1)
+HWTEST_F(VibratorAgentTest, StopVibratorAll_001, TestSize.Level1)
 {
     HiLog::Info(LABEL, "%{public}s begin", __func__);
-    if (deviceType_ == PHONE_TYPE) {
-        int32_t ret = StopVibrator("custom");
-        ASSERT_NE(ret, 0);
-    } else {
-        ASSERT_EQ(0, 0);
-    }
+    int32_t ret = StopVibratorAll();
+    ASSERT_NE(ret, 0);
 }
 
-HWTEST_F(VibratorAgentTest, StopVibratorCustom_002, TestSize.Level1)
+HWTEST_F(VibratorAgentTest, StopVibratorAll_002, TestSize.Level1)
 {
     HiLog::Info(LABEL, "%{public}s begin", __func__);
     if (deviceType_ == PHONE_TYPE) {
@@ -603,11 +599,34 @@ HWTEST_F(VibratorAgentTest, StopVibratorCustom_002, TestSize.Level1)
         int32_t ret = StartVibratorCustom(fd);
         close(fd);
         ASSERT_EQ(ret, 0);
-        ret = StopVibrator("custom");
+        ret = StopVibratorAll();
         ASSERT_EQ(ret, 0);
     } else {
         ASSERT_EQ(0, 0);
     }
+}
+
+HWTEST_F(VibratorAgentTest, StopVibratorAll_003, TestSize.Level1)
+{
+    HiLog::Info(LABEL, "%{public}s begin", __func__);
+    int32_t ret = StartVibratorOnce(500);
+    ASSERT_EQ(ret, 0);
+    ret = StopVibratorAll();
+    ASSERT_EQ(ret, 0);
+}
+
+HWTEST_F(VibratorAgentTest, StopVibratorAll_004, TestSize.Level1)
+{
+    HiLog::Info(LABEL, "%{public}s begin", __func__);
+    int ret = 0;
+    if (deviceType_ == TABLET_TYPE) {
+        ret = StartVibrator("haptic.common.click");
+    } else {
+        ret = StartVibrator("haptic.clock.timer");
+    }
+    ASSERT_EQ(ret, 0);
+    ret = StopVibratorAll();
+    ASSERT_EQ(ret, 0);
 }
 }  // namespace Sensors
 }  // namespace OHOS
