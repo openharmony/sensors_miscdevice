@@ -45,11 +45,8 @@ constexpr int32_t MAX_VIBRATOR_TIME = 1800000;
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 constexpr int32_t MAX_JSON_FILE_SIZE = 64000;
-constexpr double MIN_JSON_VERSION = 1.0;
+constexpr double SUPPORT_JSON_VERSION = 1.0;
 const std::string PHONE_TYPE = "phone";
-std::unordered_map<std::string, double> supportFormat = {
-    {"OpenHarmony", 1.0}
-};
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 }  // namespace
 
@@ -198,13 +195,24 @@ int32_t MiscdeviceService::Vibrate(int32_t vibratorId, int32_t timeOut, int32_t 
     return NO_ERROR;
 }
 
-int32_t MiscdeviceService::CancelVibrator(int32_t vibratorId)
+int32_t MiscdeviceService::StopVibrator(int32_t vibratorId)
 {
     std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+    if ((vibratorThread_ == nullptr) || (!vibratorThread_->IsRunning() &&
+        !vibratorHdiConnection_.IsVibratorRunning())) {
+        MISC_HILOGE("No vibration, no need to stop");
+        return ERROR;
+    }
+    while (vibratorHdiConnection_.IsVibratorRunning()) {
+        vibratorHdiConnection_.Stop(HDF_VIBRATOR_MODE_PRESET);
+    }
+#else
     if ((vibratorThread_ == nullptr) || (!vibratorThread_->IsRunning())) {
         MISC_HILOGE("No vibration, no need to stop");
         return ERROR;
     }
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     while (vibratorThread_->IsRunning()) {
         MISC_HILOGD("Notify the vibratorThread, vibratorId : %{public}d", vibratorId);
         vibratorThread_->NotifyExit();
@@ -283,7 +291,7 @@ void MiscdeviceService::StartVibrateThread(VibrateInfo info)
     DumpHelper->SaveVibrateRecord(info);
 }
 
-int32_t MiscdeviceService::StopVibratorEffect(int32_t vibratorId, const std::string &mode)
+int32_t MiscdeviceService::StopVibratorByMode(int32_t vibratorId, const std::string &mode)
 {
     std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
     if ((vibratorThread_ == nullptr) || (!vibratorThread_->IsRunning())) {
@@ -307,17 +315,10 @@ int32_t CheckMetadata(const JsonParser &parser)
 {
     cJSON* metadata = parser.GetObjectItem("Metadata");
     CHKPR(metadata, ERROR);
-    cJSON* format = parser.GetObjectItem(metadata, "Format");
-    CHKPR(format, ERROR);
-    std::string formatValue = format->valuestring;
     cJSON* version = parser.GetObjectItem(metadata, "Version");
     CHKPR(version, ERROR);
     double versionValue = version->valuedouble;
-    if (supportFormat.find(formatValue) == supportFormat.end()) {
-        MISC_HILOGE("json file format is not supported, format: %{public}s", formatValue.c_str());
-        return ERROR;
-    }
-    if (versionValue < MIN_JSON_VERSION || versionValue > supportFormat[formatValue]) {
+    if (versionValue != SUPPORT_JSON_VERSION) {
         MISC_HILOGE("json file version is not supported, version: %{public}f", versionValue);
         return ERROR;
     }
@@ -358,7 +359,7 @@ int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, int32_t fd, in
 {
     if (OHOS::system::GetDeviceType() != PHONE_TYPE) {
         MISC_HILOGE("The device does not support this operation");
-        return ERROR;
+        return IS_NOT_SUPPORTED;
     }
     if (fd < 0) {
         MISC_HILOGE("fd is invalid, fd:%{public}d", fd);
@@ -404,25 +405,6 @@ int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, int32_t fd, in
     }
     StartVibrateThread(info);
     return vibratorHdiConnection_.EnableCompositeEffect(vibratorCompositeEffect);
-}
-
-int32_t MiscdeviceService::StopVibratorCustom(int32_t vibratorId, const std::string &mode)
-{
-    if (OHOS::system::GetDeviceType() != PHONE_TYPE) {
-        MISC_HILOGE("The device does not support this operation");
-        return ERROR;
-    }
-    std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
-    if ((vibratorThread_ == nullptr) || (!vibratorHdiConnection_.IsVibratorRunning())) {
-        MISC_HILOGE("No vibration, no need to stop");
-        return ERROR;
-    }
-    const VibrateInfo info = vibratorThread_->GetCurrentVibrateInfo();
-    if ((info.mode != mode) || (info.pid != GetCallingPid())) {
-        MISC_HILOGE("Stop vibration information mismatch");
-        return ERROR;
-    }
-    return vibratorHdiConnection_.Stop(HDF_VIBRATOR_MODE_PRESET);
 }
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
