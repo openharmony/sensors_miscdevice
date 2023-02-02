@@ -45,7 +45,6 @@ constexpr int32_t MAX_VIBRATOR_TIME = 1800000;
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 constexpr int32_t MAX_JSON_FILE_SIZE = 64000;
-constexpr double SUPPORT_JSON_VERSION = 1.0;
 const std::string PHONE_TYPE = "phone";
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 }  // namespace
@@ -311,20 +310,6 @@ int32_t MiscdeviceService::StopVibratorByMode(int32_t vibratorId, const std::str
 }
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-int32_t CheckMetadata(const JsonParser &parser)
-{
-    cJSON* metadata = parser.GetObjectItem("Metadata");
-    CHKPR(metadata, ERROR);
-    cJSON* version = parser.GetObjectItem(metadata, "Version");
-    CHKPR(version, ERROR);
-    double versionValue = version->valuedouble;
-    if (versionValue != SUPPORT_JSON_VERSION) {
-        MISC_HILOGE("json file version is not supported, version: %{public}f", versionValue);
-        return ERROR;
-    }
-    return SUCCESS;
-}
-
 int32_t MiscdeviceService::DecodeCustomEffect(int32_t fd, std::set<VibrateEvent> &vibrateSet)
 {
     std::string fileSuffix = GetFileSuffix(fd);
@@ -336,17 +321,12 @@ int32_t MiscdeviceService::DecodeCustomEffect(int32_t fd, std::set<VibrateEvent>
         MISC_HILOGE("current file suffix is not supported at this time, suffix:%{public}s", fileSuffix.c_str());
         return ERROR;
     }
-    JsonParser parser(fd);
-    int32_t ret = CheckMetadata(parser);
-    if (ret != SUCCESS) {
-        MISC_HILOGE("Metadata verification failed");
-        return ERROR;
-    }
     std::unique_ptr<VibratorDecoderFactory> defaultFactory(new (std::nothrow) DefaultVibratorDecoderFactory());
     CHKPR(defaultFactory, ERROR);
     std::unique_ptr<VibratorDecoder> defaultDecoder(defaultFactory->CreateDecoder());
     CHKPR(defaultDecoder, ERROR);
-    ret = defaultDecoder->DecodeEffect(parser, vibrateSet);
+    JsonParser parser(fd);
+    int32_t ret = defaultDecoder->DecodeEffect(parser, vibrateSet);
     if (ret != SUCCESS) {
         MISC_HILOGE("decoder effect error");
         return ERROR;
