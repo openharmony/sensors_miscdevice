@@ -2,7 +2,6 @@
     "Metadata": {
         "Create": "2023-01-09",
         "Description": "a haptic testcase",
-        "Format": "OpenHarmony",
         "Version": 1.0
     },
     "Sequence": [

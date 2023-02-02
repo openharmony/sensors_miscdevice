@@ -53,13 +53,6 @@ const char *VIBRATOR_STOP_MODE_TIME = "time";
 const char *VIBRATOR_STOP_MODE_PRESET = "preset";
 
 /**
- * @brief Indicates the mode of stopping a custom vibration effect.
- *
- * @since 10
- */
-const char *VIBRATOR_STOP_MODE_CUSTOM = "custom";
-
-/**
  * @brief Controls this vibrator to perform a vibration with a preset vibration effect.
  *
  * @param effectId Indicates the preset vibration effect, which is described in {@link vibrator_agent_type.h}, for
@@ -102,7 +95,7 @@ int32_t StartVibratorCustom(int32_t fd);
 bool SetLoopCount(int32_t count);
 
 /**
- * @brief Stops the vibration of this vibrator.
+ * @brief Stops the vibration of this vibrator by mode.
  *
  * @param mode Indicates the mode of the vibration to stop. The values can be <b>time</b>, <b>preset</b> and
  * <b>custom</b>, respectively representing a one-shot vibration mode, a preset vibration mode and a custom
@@ -111,6 +104,13 @@ bool SetLoopCount(int32_t count);
  * @since 6
  */
 int32_t StopVibrator(const char *mode);
+
+/**
+ * @brief Stops all vibration of this vibrator.
+ * @return Returns <b>0</b> if the vibration is stopped as expected; returns <b>-1</b> otherwise.
+ * @since 10
+ */
+int32_t StopVibratorAll();
 
 /**
  * @brief Set the usage of vibration.

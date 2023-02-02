@@ -63,7 +63,7 @@ int32_t MiscdeviceServiceProxy::Vibrate(int32_t vibratorId, int32_t timeOut, int
     return ret;
 }
 
-int32_t MiscdeviceServiceProxy::CancelVibrator(int32_t vibratorId)
+int32_t MiscdeviceServiceProxy::StopVibrator(int32_t vibratorId)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(MiscdeviceServiceProxy::GetDescriptor())) {
@@ -78,10 +78,10 @@ int32_t MiscdeviceServiceProxy::CancelVibrator(int32_t vibratorId)
     CHKPR(remote, ERROR);
     MessageParcel reply;
     MessageOption option;
-    int32_t ret = remote->SendRequest(CANCEL_VIBRATOR, data, reply, option);
+    int32_t ret = remote->SendRequest(STOP_VIBRATOR, data, reply, option);
     if (ret != NO_ERROR) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
-            HiSysEvent::EventType::FAULT, "PKG_NAME", "CancelVibrator", "ERROR_CODE", ret);
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "StopVibrator", "ERROR_CODE", ret);
         MISC_HILOGE("ret: %{public}d", ret);
     }
     return ret;
@@ -124,7 +124,7 @@ int32_t MiscdeviceServiceProxy::PlayVibratorEffect(int32_t vibratorId, const std
     return ret;
 }
 
-int32_t MiscdeviceServiceProxy::StopVibratorEffect(int32_t vibratorId, const std::string &mode)
+int32_t MiscdeviceServiceProxy::StopVibratorByMode(int32_t vibratorId, const std::string &mode)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(MiscdeviceServiceProxy::GetDescriptor())) {
@@ -143,10 +143,10 @@ int32_t MiscdeviceServiceProxy::StopVibratorEffect(int32_t vibratorId, const std
     CHKPR(remote, ERROR);
     MessageParcel reply;
     MessageOption option;
-    int32_t ret = remote->SendRequest(STOP_VIBRATOR_EFFECT, data, reply, option);
+    int32_t ret = remote->SendRequest(STOP_VIBRATOR_BY_MODE, data, reply, option);
     if (ret != NO_ERROR) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
-            HiSysEvent::EventType::FAULT, "PKG_NAME", "StopVibratorEffect", "ERROR_CODE", ret);
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "StopVibratorByMode", "ERROR_CODE", ret);
         MISC_HILOGE("ret: %{public}d", ret);
     }
     return ret;
@@ -182,34 +182,6 @@ int32_t MiscdeviceServiceProxy::PlayVibratorCustom(int32_t vibratorId, int32_t f
         HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "PlayVibratorCustom", "ERROR_CODE", ret);
         MISC_HILOGE("sendRequest ret: %{public}d", ret);
-    }
-    return ret;
-}
-
-int32_t MiscdeviceServiceProxy::StopVibratorCustom(int32_t vibratorId, const std::string &mode)
-{
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(MiscdeviceServiceProxy::GetDescriptor())) {
-        MISC_HILOGE("write descriptor failed");
-        return WRITE_MSG_ERR;
-    }
-    if (!data.WriteInt32(vibratorId)) {
-        MISC_HILOGE("WriteInt32 vibratorId failed");
-        return WRITE_MSG_ERR;
-    }
-    if (!data.WriteString(mode)) {
-        MISC_HILOGE("WriteString mode failed");
-        return WRITE_MSG_ERR;
-    }
-    sptr<IRemoteObject> remote = Remote();
-    CHKPR(remote, ERROR);
-    MessageParcel reply;
-    MessageOption option;
-    int32_t ret = remote->SendRequest(STOP_VIBRATOR_CUSTOM, data, reply, option);
-    if (ret != NO_ERROR) {
-        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
-            HiSysEvent::EventType::FAULT, "PKG_NAME", "StopVibratorCustom", "ERROR_CODE", ret);
-        MISC_HILOGE("ret: %{public}d", ret);
     }
     return ret;
 }

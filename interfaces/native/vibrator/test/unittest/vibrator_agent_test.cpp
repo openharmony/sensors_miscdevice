@@ -241,7 +241,6 @@ HWTEST_F(VibratorAgentTest, SetUsage_003, TestSize.Level1)
     ASSERT_FALSE(ret);
 }
 
-#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 HWTEST_F(VibratorAgentTest, StartVibratorCustom_001, TestSize.Level1)
 {
     HiLog::Info(LABEL, "%{public}s begin", __func__);
@@ -610,6 +609,5 @@ HWTEST_F(VibratorAgentTest, StopVibratorCustom_002, TestSize.Level1)
         ASSERT_EQ(0, 0);
     }
 }
-#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 }  // namespace Sensors
 }  // namespace OHOS
