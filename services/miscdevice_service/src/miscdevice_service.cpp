@@ -250,18 +250,6 @@ int32_t MiscdeviceService::StopVibratorEffect(int32_t vibratorId, const std::str
     return NO_ERROR;
 }
 
-#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, int32_t fd, int32_t usage)
-{
-    return NO_ERROR;
-}
-
-int32_t MiscdeviceService::StopVibratorCustom(int32_t vibratorId, const std::string &mode)
-{
-    return NO_ERROR;
-}
-#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-
 std::string MiscdeviceService::GetPackageName(AccessTokenID tokenId)
 {
     std::string packageName;

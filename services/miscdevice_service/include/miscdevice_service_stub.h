@@ -43,16 +43,15 @@ private:
     int32_t IsVibratorEffectAvailablePb(MessageParcel &data, MessageParcel &reply);
     int32_t GetVibratorIdListPb(MessageParcel &data, MessageParcel &reply);
     int32_t VibratePb(MessageParcel &data, MessageParcel &reply);
-    int32_t CancelVibratorPb(MessageParcel &data, MessageParcel &reply);
     int32_t PlayVibratorEffectPb(MessageParcel &data, MessageParcel &reply);
     int32_t PlayCustomVibratorEffectPb(MessageParcel &data, MessageParcel &reply);
-    int32_t StopVibratorEffectPb(MessageParcel &data, MessageParcel &reply);
     int32_t SetVibratorParameterPb(MessageParcel &data, MessageParcel &reply);
     int32_t GetVibratorParameterPb(MessageParcel &data, MessageParcel &reply);
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     int32_t PlayVibratorCustomPb(MessageParcel &data, MessageParcel &reply);
-    int32_t StopVibratorCustomPb(MessageParcel &data, MessageParcel &reply);
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+    int32_t StopVibratorPb(MessageParcel &data, MessageParcel &reply);
+    int32_t StopVibratorByModePb(MessageParcel &data, MessageParcel &reply);
     int32_t GetLightListPb(MessageParcel &data, MessageParcel &reply);
     int32_t TurnOnPb(MessageParcel &data, MessageParcel &reply);
     int32_t TurnOffPb(MessageParcel &data, MessageParcel &reply);

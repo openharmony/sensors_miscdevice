@@ -33,6 +33,7 @@ public:
     int32_t VibrateCustom(int32_t vibratorId, int32_t fd, int32_t usage);
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     int32_t Stop(int32_t vibratorId, const std::string &mode);
+    int32_t Stop(int32_t vibratorId);
     void ProcessDeathObserver(const wptr<IRemoteObject> &object);
 
 private:
