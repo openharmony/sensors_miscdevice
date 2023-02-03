@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -140,10 +140,9 @@ std::string ReadFd(int32_t fd)
         MISC_HILOGE("fd is invalid, fd:%{public}d", fd);
         return "";
     }
-    int32_t dupFd = dup(fd);
-    FILE* fp = fdopen(dupFd, "r");
-    fseek(fp, 0L, SEEK_SET);
+    FILE* fp = fdopen(fd, "r");
     CHKPS(fp);
+    fseek(fp, 0L, SEEK_SET);
     std::string dataStr;
     char buf[READ_DATA_BUFF_SIZE] = { '\0' };
     while (fgets(buf, sizeof(buf), fp) != nullptr) {
@@ -163,13 +162,13 @@ std::string GetFileSuffix(int32_t fd)
         MISC_HILOGE("snprintf_s failed, errno:%{public}d", errno);
         return {};
     }
-    MISC_HILOGI("buf : %{public}s", buf);
+    MISC_HILOGD("buf:%{public}s", buf);
     if (readlink(buf, filePath, sizeof(filePath) - 1) < 0) {
         MISC_HILOGE("readlink failed");
         return {};
     }
     std::string fileAbsolutePath(filePath);
-    MISC_HILOGI("fileAbsolutePath : %{public}s", fileAbsolutePath.c_str());
+    MISC_HILOGD("fileAbsolutePath:%{public}s", fileAbsolutePath.c_str());
     return fileAbsolutePath.substr(fileAbsolutePath.find_last_of('.') + 1);
 }
 }  // namespace Sensors

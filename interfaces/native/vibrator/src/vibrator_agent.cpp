@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,6 +40,7 @@ static int32_t NormalizeErrCode(int32_t code)
             return IS_NOT_SUPPORTED;
         }
         default: {
+            MISC_HILOGW("operating the device fail");
             return DEVICE_OPERATION_FAILED;
         }
     }
@@ -61,7 +62,7 @@ int32_t StartVibrator(const char *effectId)
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.Vibrate(DEFAULT_VIBRATOR_ID, effectId, g_loopCount, g_usage);
     if (ret != ERR_OK) {
-        MISC_HILOGE("vibrator effectId failed, ret: %{public}d", ret);
+        MISC_HILOGE("vibrator effectId failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
     g_loopCount = 1;
@@ -78,7 +79,7 @@ int32_t StartVibratorOnce(int32_t duration)
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.Vibrate(DEFAULT_VIBRATOR_ID, duration, g_usage);
     if (ret != ERR_OK) {
-        MISC_HILOGE("vibrator duration failed, ret: %{public}d", ret);
+        MISC_HILOGE("vibrator duration failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
     g_usage = USAGE_UNKNOWN;
@@ -95,13 +96,13 @@ int32_t StartVibratorCustom(int32_t fd)
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.VibrateCustom(DEFAULT_VIBRATOR_ID, fd, g_usage);
     if (ret != ERR_OK) {
-        MISC_HILOGE("vibrator fd failed, ret: %{public}d", ret);
+        MISC_HILOGE("vibrator fd failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
     g_usage = USAGE_UNKNOWN;
     return SUCCESS;
 #else
-    MISC_HILOGE("The device does not support this operation.");
+    MISC_HILOGE("The device does not support this operation");
     return IS_NOT_SUPPORTED;
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 }
@@ -110,13 +111,13 @@ int32_t StopVibrator(const char *mode)
 {
     CHKPR(mode, PARAMETER_ERROR);
     if (strcmp(mode, "time") != 0 && strcmp(mode, "preset") != 0) {
-        MISC_HILOGE("input invalid, mode is %{public}s", mode);
+        MISC_HILOGE("input parameter, mode is %{public}s", mode);
         return PARAMETER_ERROR;
     }
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.Stop(DEFAULT_VIBRATOR_ID, mode);
     if (ret != ERR_OK) {
-        MISC_HILOGE("client is failed, ret: %{public}d", ret);
+        MISC_HILOGE("client is failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
     return SUCCESS;
@@ -127,7 +128,7 @@ int32_t StopVibratorAll()
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.Stop(DEFAULT_VIBRATOR_ID);
     if (ret != ERR_OK) {
-        MISC_HILOGE("client is failed, ret: %{public}d", ret);
+        MISC_HILOGE("client is failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
     return SUCCESS;

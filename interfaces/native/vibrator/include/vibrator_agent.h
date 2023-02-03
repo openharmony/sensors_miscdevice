@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -77,11 +77,10 @@ int32_t StartVibrator(const char *effectId);
 int32_t StartVibratorOnce(int32_t duration);
 
 /**
- * @brief Control this vibrator to perform the vibration customized with the vibration configuration file.
+ * @brief 控制马达播放自定义振动配置文件中编排的振动.
  *
- * @param fd represents the descriptor of the open vibration configuration file.
- * @return Returns <b>0</b> if the vibrator vibrates as expected; returns <b>-1</b> otherwise, for example, the
- * parameters of the vibration configuration file is invalid.
+ * @param fd 表示打开自定义振动配置文件获得的描述符.
+ * @return 振动成功返回0，如果振动失败返回非0值，比如振动配置文件参数设置错误等.
  *
  * @since 10
  */
@@ -95,19 +94,18 @@ int32_t StartVibratorCustom(int32_t fd);
 bool SetLoopCount(int32_t count);
 
 /**
- * @brief Stops the vibration of this vibrator by mode.
+ * @brief 根据传入的模式停止马达振动.
  *
- * @param mode Indicates the mode of the vibration to stop. The values can be <b>time</b>, <b>preset</b> and
- * <b>custom</b>, respectively representing a one-shot vibration mode, a preset vibration mode and a custom
- * vibration mode.
+ * @param mode Indicates the mode of the vibration to stop. The values can be <b>time</b> and <b>preset</b>,
+ * respectively representing a one-shot vibration mode and a preset vibration mode.
  * @return Returns <b>0</b> if the vibration is stopped as expected; returns <b>-1</b> otherwise.
  * @since 6
  */
 int32_t StopVibrator(const char *mode);
 
 /**
- * @brief Stops all vibration of this vibrator.
- * @return Returns <b>0</b> if the vibration is stopped as expected; returns <b>-1</b> otherwise.
+ * @brief 停止当前马达振动.
+ * @return 停止成功返回0，如果失败返回非0值.
  * @since 10
  */
 int32_t StopVibratorAll();

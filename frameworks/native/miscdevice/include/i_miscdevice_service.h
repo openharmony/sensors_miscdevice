@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,7 +37,7 @@ public:
     virtual int32_t PlayVibratorCustom(int32_t vibratorId, int32_t fd, int32_t usage) = 0;
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     virtual int32_t StopVibrator(int32_t vibratorId) = 0;
-    virtual int32_t StopVibratorByMode(int32_t vibratorId, const std::string &mode) = 0;
+    virtual int32_t StopVibrator(int32_t vibratorId, const std::string &mode) = 0;
     virtual std::vector<LightInfo> GetLightList() = 0;
     virtual int32_t TurnOn(int32_t lightId, const LightColor &color, const LightAnimation &animation) = 0;
     virtual int32_t TurnOff(int32_t lightId) = 0;
@@ -48,7 +48,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
         PLAY_VIBRATOR_CUSTOM,
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-        STOP_VIBRATOR,
+        STOP_VIBRATOR_ALL,
         STOP_VIBRATOR_BY_MODE,
         GET_LIGHT_LIST,
         TURN_ON,
