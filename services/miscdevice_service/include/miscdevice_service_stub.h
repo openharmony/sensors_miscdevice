@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -50,7 +50,7 @@ private:
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     int32_t PlayVibratorCustomPb(MessageParcel &data, MessageParcel &reply);
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    int32_t StopVibratorPb(MessageParcel &data, MessageParcel &reply);
+    int32_t StopVibratorAllPb(MessageParcel &data, MessageParcel &reply);
     int32_t StopVibratorByModePb(MessageParcel &data, MessageParcel &reply);
     int32_t GetLightListPb(MessageParcel &data, MessageParcel &reply);
     int32_t TurnOnPb(MessageParcel &data, MessageParcel &reply);

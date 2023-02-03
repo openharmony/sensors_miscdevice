@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -78,11 +78,11 @@ int32_t MiscdeviceServiceProxy::StopVibrator(int32_t vibratorId)
     CHKPR(remote, ERROR);
     MessageParcel reply;
     MessageOption option;
-    int32_t ret = remote->SendRequest(STOP_VIBRATOR, data, reply, option);
+    int32_t ret = remote->SendRequest(STOP_VIBRATOR_ALL, data, reply, option);
     if (ret != NO_ERROR) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "StopVibrator", "ERROR_CODE", ret);
-        MISC_HILOGE("ret: %{public}d", ret);
+        MISC_HILOGE("ret:%{public}d", ret);
     }
     return ret;
 }
@@ -124,7 +124,7 @@ int32_t MiscdeviceServiceProxy::PlayVibratorEffect(int32_t vibratorId, const std
     return ret;
 }
 
-int32_t MiscdeviceServiceProxy::StopVibratorByMode(int32_t vibratorId, const std::string &mode)
+int32_t MiscdeviceServiceProxy::StopVibrator(int32_t vibratorId, const std::string &mode)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(MiscdeviceServiceProxy::GetDescriptor())) {
@@ -146,8 +146,8 @@ int32_t MiscdeviceServiceProxy::StopVibratorByMode(int32_t vibratorId, const std
     int32_t ret = remote->SendRequest(STOP_VIBRATOR_BY_MODE, data, reply, option);
     if (ret != NO_ERROR) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
-            HiSysEvent::EventType::FAULT, "PKG_NAME", "StopVibratorByMode", "ERROR_CODE", ret);
-        MISC_HILOGE("ret: %{public}d", ret);
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "StopVibrator", "ERROR_CODE", ret);
+        MISC_HILOGE("ret:%{public}d", ret);
     }
     return ret;
 }
@@ -155,6 +155,7 @@ int32_t MiscdeviceServiceProxy::StopVibratorByMode(int32_t vibratorId, const std
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 int32_t MiscdeviceServiceProxy::PlayVibratorCustom(int32_t vibratorId, int32_t fd, int32_t usage)
 {
+    MISC_HILOGD("writeFileDescriptor fd:%{public}d, usage:%{public}d", fd, usage);
     MessageParcel data;
     if (!data.WriteInterfaceToken(MiscdeviceServiceProxy::GetDescriptor())) {
         MISC_HILOGE("write descriptor failed");
@@ -164,15 +165,14 @@ int32_t MiscdeviceServiceProxy::PlayVibratorCustom(int32_t vibratorId, int32_t f
         MISC_HILOGE("WriteInt32 vibratorId failed");
         return WRITE_MSG_ERR;
     }
-    if (!data.WriteFileDescriptor(fd)) {
-        MISC_HILOGE("WriteFileDescriptor fd failed");
-        return WRITE_MSG_ERR;
-    }
     if (!data.WriteInt32(usage)) {
         MISC_HILOGE("WriteUint32 usage failed");
         return WRITE_MSG_ERR;
     }
-    MISC_HILOGD("WriteFileDescriptor fd: %{public}d", fd);
+    if (!data.WriteFileDescriptor(fd)) {
+        MISC_HILOGE("WriteFileDescriptor fd failed");
+        return WRITE_MSG_ERR;
+    }
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, ERROR);
     MessageParcel reply;
@@ -181,7 +181,7 @@ int32_t MiscdeviceServiceProxy::PlayVibratorCustom(int32_t vibratorId, int32_t f
     if (ret != NO_ERROR) {
         HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "PlayVibratorCustom", "ERROR_CODE", ret);
-        MISC_HILOGE("sendRequest ret: %{public}d", ret);
+        MISC_HILOGE("sendRequest ret:%{public}d", ret);
     }
     return ret;
 }

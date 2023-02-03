@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -91,7 +91,7 @@ void VibratorAgentTest::SetUpTestCase()
     ASSERT_NE(0, tokenID_);
     ASSERT_EQ(0, SetSelfTokenID(tokenID_));
     deviceType_ = OHOS::system::GetDeviceType();
-    MISC_HILOGI("deviceType: %{public}s", deviceType_.c_str());
+    MISC_HILOGI("deviceType:%{public}s", deviceType_.c_str());
 }
 
 void VibratorAgentTest::TearDownTestCase()
@@ -246,7 +246,7 @@ HWTEST_F(VibratorAgentTest, StartVibratorCustom_001, TestSize.Level1)
     HiLog::Info(LABEL, "%{public}s begin", __func__);
     if (deviceType_ == PHONE_TYPE) {
         int32_t fd = open("/data/test/vibrator/coin_drop.json", O_RDONLY);
-        MISC_HILOGD("test fd: %{public}d", fd);
+        MISC_HILOGD("test fd:%{public}d", fd);
         int32_t ret = StartVibratorCustom(fd);
         close(fd);
         ASSERT_EQ(ret, 0);
@@ -261,7 +261,7 @@ HWTEST_F(VibratorAgentTest, StartVibratorCustom_002, TestSize.Level1)
     HiLog::Info(LABEL, "%{public}s begin", __func__);
     if (deviceType_ == PHONE_TYPE) {
         int32_t fd = open("/data/test/vibrator/on_carpet.json", O_RDONLY);
-        MISC_HILOGD("test fd: %{public}d", fd);
+        MISC_HILOGD("test fd:%{public}d", fd);
         int32_t ret = StartVibratorCustom(fd);
         close(fd);
         ASSERT_EQ(ret, 0);
@@ -280,7 +280,7 @@ HWTEST_F(VibratorAgentTest, StartVibratorCustom_003, TestSize.Level1)
         ret = StartVibrator("haptic.clock.timer");
         ASSERT_EQ(ret, 0);
         int32_t fd = open("/data/test/vibrator/on_carpet.json", O_RDONLY);
-        MISC_HILOGD("test fd: %{public}d", fd);
+        MISC_HILOGD("test fd:%{public}d", fd);
         ret = StartVibratorCustom(fd);
         close(fd);
         ASSERT_NE(ret, 0);
@@ -299,7 +299,7 @@ HWTEST_F(VibratorAgentTest, StartVibratorCustom_004, TestSize.Level1)
         ret = StartVibrator("haptic.clock.timer");
         ASSERT_EQ(ret, 0);
         int32_t fd = open("/data/test/vibrator/on_carpet.json", O_RDONLY);
-        MISC_HILOGD("test fd: %{public}d", fd);
+        MISC_HILOGD("test fd:%{public}d", fd);
         ret = StartVibratorCustom(fd);
         close(fd);
         ASSERT_NE(ret, 0);
@@ -318,7 +318,7 @@ HWTEST_F(VibratorAgentTest, StartVibratorCustom_005, TestSize.Level1)
         ret = StartVibrator("haptic.clock.timer");
         ASSERT_EQ(ret, 0);
         int32_t fd = open("/data/test/vibrator/on_carpet.json", O_RDONLY);
-        MISC_HILOGD("test fd: %{public}d", fd);
+        MISC_HILOGD("test fd:%{public}d", fd);
         ret = StartVibratorCustom(fd);
         close(fd);
         ASSERT_EQ(ret, 0);
@@ -335,7 +335,7 @@ HWTEST_F(VibratorAgentTest, StartVibratorCustom_006, TestSize.Level1)
         int32_t ret = SetUsage(USAGE_ALARM);
         ASSERT_TRUE(ret);
         int32_t fd = open("/data/test/vibrator/on_carpet.json", O_RDONLY);
-        MISC_HILOGD("test fd: %{public}d", fd);
+        MISC_HILOGD("test fd:%{public}d", fd);
         ret = StartVibratorCustom(fd);
         close(fd);
         ASSERT_EQ(ret, 0);
@@ -354,7 +354,7 @@ HWTEST_F(VibratorAgentTest, StartVibratorCustom_007, TestSize.Level1)
         int32_t ret = SetUsage(USAGE_UNKNOWN);
         ASSERT_TRUE(ret);
         int32_t fd = open("/data/test/vibrator/on_carpet.json", O_RDONLY);
-        MISC_HILOGD("test fd: %{public}d", fd);
+        MISC_HILOGD("test fd:%{public}d", fd);
         ret = StartVibratorCustom(fd);
         close(fd);
         ASSERT_EQ(ret, 0);
@@ -375,7 +375,7 @@ HWTEST_F(VibratorAgentTest, StartVibratorCustom_008, TestSize.Level1)
         ret = StartVibratorOnce(500);
         ASSERT_EQ(ret, 0);
         int32_t fd = open("/data/test/vibrator/on_carpet.json", O_RDONLY);
-        MISC_HILOGD("test fd: %{public}d", fd);
+        MISC_HILOGD("test fd:%{public}d", fd);
         ret = StartVibratorCustom(fd);
         close(fd);
         ASSERT_NE(ret, 0);
@@ -394,7 +394,7 @@ HWTEST_F(VibratorAgentTest, StartVibratorCustom_009, TestSize.Level1)
         ret = StartVibratorOnce(500);
         ASSERT_EQ(ret, 0);
         int32_t fd = open("/data/test/vibrator/on_carpet.json", O_RDONLY);
-        MISC_HILOGD("test fd: %{public}d", fd);
+        MISC_HILOGD("test fd:%{public}d", fd);
         ret = StartVibratorCustom(fd);
         close(fd);
         ASSERT_EQ(ret, 0);
@@ -411,7 +411,7 @@ HWTEST_F(VibratorAgentTest, StartVibratorCustom_010, TestSize.Level1)
         int32_t ret = SetUsage(USAGE_ALARM);
         ASSERT_TRUE(ret);
         int32_t fd = open("/data/test/vibrator/on_carpet.json", O_RDONLY);
-        MISC_HILOGD("test fd: %{public}d", fd);
+        MISC_HILOGD("test fd:%{public}d", fd);
         ret = StartVibratorCustom(fd);
         close(fd);
         ASSERT_EQ(ret, 0);
@@ -430,7 +430,7 @@ HWTEST_F(VibratorAgentTest, StartVibratorCustom_011, TestSize.Level1)
         int32_t ret = SetUsage(USAGE_UNKNOWN);
         ASSERT_TRUE(ret);
         int32_t fd = open("/data/test/vibrator/on_carpet.json", O_RDONLY);
-        MISC_HILOGD("test fd: %{public}d", fd);
+        MISC_HILOGD("test fd:%{public}d", fd);
         ret = StartVibratorCustom(fd);
         close(fd);
         ASSERT_EQ(ret, 0);
@@ -447,7 +447,7 @@ HWTEST_F(VibratorAgentTest, StartVibratorCustom_012, TestSize.Level1)
     HiLog::Info(LABEL, "%{public}s begin", __func__);
     if (deviceType_ == PHONE_TYPE) {
         int32_t fd = open("/data/test/vibrator/test_128_event.json", O_RDONLY);
-        MISC_HILOGD("test fd: %{public}d", fd);
+        MISC_HILOGD("test fd:%{public}d", fd);
         int32_t ret = StartVibratorCustom(fd);
         close(fd);
         ASSERT_EQ(ret, 0);
@@ -462,7 +462,7 @@ HWTEST_F(VibratorAgentTest, StartVibratorCustom_013, TestSize.Level1)
     HiLog::Info(LABEL, "%{public}s begin", __func__);
     if (deviceType_ == PHONE_TYPE) {
         int32_t fd = open("/data/test/vibrator/test_invalid_type.json", O_RDONLY);
-        MISC_HILOGD("test fd: %{public}d", fd);
+        MISC_HILOGD("test fd:%{public}d", fd);
         int32_t ret = StartVibratorCustom(fd);
         close(fd);
         ASSERT_NE(ret, 0);
@@ -476,7 +476,7 @@ HWTEST_F(VibratorAgentTest, StartVibratorCustom_014, TestSize.Level1)
     HiLog::Info(LABEL, "%{public}s begin", __func__);
     if (deviceType_ == PHONE_TYPE) {
         int32_t fd = open("/data/test/vibrator/test_invalid_startTime.json", O_RDONLY);
-        MISC_HILOGD("test fd: %{public}d", fd);
+        MISC_HILOGD("test fd:%{public}d", fd);
         int32_t ret = StartVibratorCustom(fd);
         close(fd);
         ASSERT_NE(ret, 0);
@@ -490,7 +490,7 @@ HWTEST_F(VibratorAgentTest, StartVibratorCustom_015, TestSize.Level1)
     HiLog::Info(LABEL, "%{public}s begin", __func__);
     if (deviceType_ == PHONE_TYPE) {
         int32_t fd = open("/data/test/vibrator/test_invalid_duration.json", O_RDONLY);
-        MISC_HILOGD("test fd: %{public}d", fd);
+        MISC_HILOGD("test fd:%{public}d", fd);
         int32_t ret = StartVibratorCustom(fd);
         close(fd);
         ASSERT_NE(ret, 0);
@@ -504,7 +504,7 @@ HWTEST_F(VibratorAgentTest, StartVibratorCustom_016, TestSize.Level1)
     HiLog::Info(LABEL, "%{public}s begin", __func__);
     if (deviceType_ == PHONE_TYPE) {
         int32_t fd = open("/data/test/vibrator/test_invalid_intensity.json", O_RDONLY);
-        MISC_HILOGD("test fd: %{public}d", fd);
+        MISC_HILOGD("test fd:%{public}d", fd);
         int32_t ret = StartVibratorCustom(fd);
         close(fd);
         ASSERT_NE(ret, 0);
@@ -518,7 +518,7 @@ HWTEST_F(VibratorAgentTest, StartVibratorCustom_017, TestSize.Level1)
     HiLog::Info(LABEL, "%{public}s begin", __func__);
     if (deviceType_ == PHONE_TYPE) {
         int32_t fd = open("/data/test/vibrator/test_invalid_frequency.json", O_RDONLY);
-        MISC_HILOGD("test fd: %{public}d", fd);
+        MISC_HILOGD("test fd:%{public}d", fd);
         int32_t ret = StartVibratorCustom(fd);
         close(fd);
         ASSERT_NE(ret, 0);
@@ -532,7 +532,7 @@ HWTEST_F(VibratorAgentTest, StartVibratorCustom_018, TestSize.Level1)
     HiLog::Info(LABEL, "%{public}s begin", __func__);
     if (deviceType_ == PHONE_TYPE) {
         int32_t fd = open("/data/test/vibrator/test_129_event.json", O_RDONLY);
-        MISC_HILOGD("test fd: %{public}d", fd);
+        MISC_HILOGD("test fd:%{public}d", fd);
         int32_t ret = StartVibratorCustom(fd);
         close(fd);
         ASSERT_NE(ret, 0);
@@ -546,7 +546,7 @@ HWTEST_F(VibratorAgentTest, StartVibratorCustom_019, TestSize.Level1)
     HiLog::Info(LABEL, "%{public}s begin", __func__);
     if (deviceType_ == PHONE_TYPE) {
         int32_t fd = open("/data/test/vibrator/test_big_file_size.json", O_RDONLY);
-        MISC_HILOGD("test fd: %{public}d", fd);
+        MISC_HILOGD("test fd:%{public}d", fd);
         int32_t ret = StartVibratorCustom(fd);
         close(fd);
         ASSERT_NE(ret, 0);
@@ -560,7 +560,7 @@ HWTEST_F(VibratorAgentTest, StartVibratorCustom_020, TestSize.Level1)
     HiLog::Info(LABEL, "%{public}s begin", __func__);
     if (deviceType_ == PHONE_TYPE) {
         int32_t fd = open("/data/test/vibrator/test_event_overlap_1.json", O_RDONLY);
-        MISC_HILOGD("test fd: %{public}d", fd);
+        MISC_HILOGD("test fd:%{public}d", fd);
         int32_t ret = StartVibratorCustom(fd);
         close(fd);
         ASSERT_NE(ret, 0);
@@ -574,7 +574,7 @@ HWTEST_F(VibratorAgentTest, StartVibratorCustom_021, TestSize.Level1)
     HiLog::Info(LABEL, "%{public}s begin", __func__);
     if (deviceType_ == PHONE_TYPE) {
         int32_t fd = open("/data/test/vibrator/test_event_overlap_2.json", O_RDONLY);
-        MISC_HILOGD("test fd: %{public}d", fd);
+        MISC_HILOGD("test fd:%{public}d", fd);
         int32_t ret = StartVibratorCustom(fd);
         close(fd);
         ASSERT_NE(ret, 0);
@@ -595,7 +595,7 @@ HWTEST_F(VibratorAgentTest, StopVibratorAll_002, TestSize.Level1)
     HiLog::Info(LABEL, "%{public}s begin", __func__);
     if (deviceType_ == PHONE_TYPE) {
         int32_t fd = open("/data/test/vibrator/coin_drop.json", O_RDONLY);
-        MISC_HILOGD("test fd: %{public}d", fd);
+        MISC_HILOGD("test fd:%{public}d", fd);
         int32_t ret = StartVibratorCustom(fd);
         close(fd);
         ASSERT_EQ(ret, 0);

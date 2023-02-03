@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -104,10 +104,10 @@ int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, const std::string &ef
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 int32_t VibratorServiceClient::VibrateCustom(int32_t vibratorId, int32_t fd, int32_t usage)
 {
-    MISC_HILOGD("VibrateCustom begin, fd: %{public}d", fd);
+    MISC_HILOGD("VibrateCustom begin, fd:%{public}d", fd);
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
-        MISC_HILOGE("InitServiceClient failed, ret: %{public}d", ret);
+        MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
     CHKPR(miscdeviceProxy_, ERROR);
@@ -120,25 +120,25 @@ int32_t VibratorServiceClient::VibrateCustom(int32_t vibratorId, int32_t fd, int
 
 int32_t VibratorServiceClient::Stop(int32_t vibratorId, const std::string &mode)
 {
-    MISC_HILOGD("Stop begin, vibratorId: %{public}d, mode: %{public}s", vibratorId, mode.c_str());
+    MISC_HILOGD("Stop begin, vibratorId:%{public}d, mode:%{public}s", vibratorId, mode.c_str());
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
-        MISC_HILOGE("InitServiceClient failed, ret: %{public}d", ret);
+        MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
     CHKPR(miscdeviceProxy_, ERROR);
     StartTrace(HITRACE_TAG_SENSORS, "Stop");
-    ret = miscdeviceProxy_->StopVibratorByMode(vibratorId, mode);
+    ret = miscdeviceProxy_->StopVibrator(vibratorId, mode);
     FinishTrace(HITRACE_TAG_SENSORS);
     return ret;
 }
 
 int32_t VibratorServiceClient::Stop(int32_t vibratorId)
 {
-    MISC_HILOGD("Stop begin, vibratorId: %{public}d", vibratorId);
+    MISC_HILOGD("Stop begin, vibratorId:%{public}d", vibratorId);
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
-        MISC_HILOGE("InitServiceClient failed, ret: %{public}d", ret);
+        MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
     CHKPR(miscdeviceProxy_, ERROR);
@@ -155,7 +155,7 @@ void VibratorServiceClient::ProcessDeathObserver(const wptr<IRemoteObject> &obje
     miscdeviceProxy_ = nullptr;
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
-        MISC_HILOGE("InitServiceClient failed, ret : %{public}d", ret);
+        MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
         return;
     }
 }
