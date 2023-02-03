@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -213,7 +213,7 @@ int32_t MiscdeviceService::StopVibrator(int32_t vibratorId)
     }
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     while (vibratorThread_->IsRunning()) {
-        MISC_HILOGD("Notify the vibratorThread, vibratorId : %{public}d", vibratorId);
+        MISC_HILOGD("Notify the vibratorThread, vibratorId:%{public}d", vibratorId);
         vibratorThread_->NotifyExit();
     }
     return NO_ERROR;
@@ -290,7 +290,7 @@ void MiscdeviceService::StartVibrateThread(VibrateInfo info)
     DumpHelper->SaveVibrateRecord(info);
 }
 
-int32_t MiscdeviceService::StopVibratorByMode(int32_t vibratorId, const std::string &mode)
+int32_t MiscdeviceService::StopVibrator(int32_t vibratorId, const std::string &mode)
 {
     std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
     if ((vibratorThread_ == nullptr) || (!vibratorThread_->IsRunning())) {
@@ -303,7 +303,7 @@ int32_t MiscdeviceService::StopVibratorByMode(int32_t vibratorId, const std::str
         return ERROR;
     }
     while (vibratorThread_->IsRunning()) {
-        MISC_HILOGD("notify the vibratorThread, vibratorId : %{public}d", vibratorId);
+        MISC_HILOGD("notify the vibratorThread, vibratorId:%{public}d", vibratorId);
         vibratorThread_->NotifyExit();
     }
     return NO_ERROR;
@@ -331,7 +331,7 @@ int32_t MiscdeviceService::DecodeCustomEffect(int32_t fd, std::set<VibrateEvent>
         MISC_HILOGE("decoder effect error");
         return ERROR;
     }
-    MISC_HILOGD("vibrateSet size: %{public}d", static_cast<int32_t>(vibrateSet.size()));
+    MISC_HILOGD("vibrateSet size:%{public}d", static_cast<int32_t>(vibrateSet.size()));
     return NO_ERROR;
 }
 
@@ -341,9 +341,9 @@ int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, int32_t fd, in
         MISC_HILOGE("The device does not support this operation");
         return IS_NOT_SUPPORTED;
     }
-    if (fd < 0) {
-        MISC_HILOGE("fd is invalid, fd:%{public}d", fd);
-        return ERROR;
+    if ((fd < 0) || (usage >= USAGE_MAX) || (usage < 0)) {
+        MISC_HILOGE("Invalid parameter");
+        return PARAMETER_ERROR;
     }
     int32_t fileSize = GetFileSize(fd);
     if (fileSize <= 0 || fileSize > MAX_JSON_FILE_SIZE) {
@@ -366,9 +366,9 @@ int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, int32_t fd, in
     }
     auto& compositeEffects = vibratorCompositeEffect.compositeEffects;
     size_t size = compositeEffects.size();
-    MISC_HILOGD("the count of match result : %{public}zu", size);
+    MISC_HILOGD("the count of match result:%{public}zu", size);
     for (size_t i = 0; i < size; ++i) {
-        MISC_HILOGD("match result at %{public}zu th, delay : %{public}d, effectId : %{public}d",
+        MISC_HILOGD("match result at %{public}zu th, delay:%{public}d, effectId:%{public}d",
         i, compositeEffects[i].primitiveEffect.delay, compositeEffects[i].primitiveEffect.effectId);
     }
     VibrateInfo info = {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -56,7 +56,7 @@ int32_t CompatibleConnection::Start(const std::string &effectType)
 {
     CALL_LOG_ENTER;
     if (vibratorEffect_.find(effectType) == vibratorEffect_.end()) {
-        MISC_HILOGE("Do not support effectType: %{public}s", effectType.c_str());
+        MISC_HILOGE("Do not support effectType:%{public}s", effectType.c_str());
         return VIBRATOR_ON_ERR;
     }
     duration_ = vibratorEffect_[effectType];
@@ -106,7 +106,7 @@ int32_t CompatibleConnection::GetEffectInfo(const std::string &effect, HdfEffect
 {
     CALL_LOG_ENTER;
     if (vibratorEffect_.find(effect) == vibratorEffect_.end()) {
-        MISC_HILOGI("Not support effect: %{public}s", effect.c_str());
+        MISC_HILOGI("Not support effect:%{public}s", effect.c_str());
         effectInfo.isSupportEffect = false;
         effectInfo.duration = 0;
         return ERR_OK;
@@ -121,7 +121,7 @@ int32_t CompatibleConnection::Stop(HdfVibratorMode mode)
 {
     CALL_LOG_ENTER;
     if (mode < 0 || mode >= HDF_VIBRATOR_MODE_BUTT) {
-        MISC_HILOGE("mode: %{public}d invalid", mode);
+        MISC_HILOGE("mode:%{public}d invalid", mode);
         return VIBRATOR_OFF_ERR;
     }
     if (vibrateMode_ != mode) {
