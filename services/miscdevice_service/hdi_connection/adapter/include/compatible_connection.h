@@ -15,9 +15,12 @@
 
 #ifndef DIRECT_CONNECTION_H
 #define DIRECT_CONNECTION_H
+
 #include <atomic>
 #include <thread>
+
 #include "i_vibrator_hdi_connection.h"
+
 namespace OHOS {
 namespace Sensors {
 class CompatibleConnection : public IVibratorHdiConnection {

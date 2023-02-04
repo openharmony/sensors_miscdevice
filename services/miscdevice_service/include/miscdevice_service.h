@@ -24,6 +24,7 @@
 #include <vector>
 
 #include "accesstoken_kit.h"
+#include "nocopyable.h"
 #include "system_ability.h"
 #include "thread_ex.h"
 
@@ -33,7 +34,6 @@
 #include "miscdevice_common.h"
 #include "miscdevice_dump.h"
 #include "miscdevice_service_stub.h"
-#include "nocopyable.h"
 #include "vibrator_hdi_connection.h"
 #include "vibrator_infos.h"
 #include "vibrator_thread.h"

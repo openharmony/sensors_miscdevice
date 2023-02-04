@@ -16,8 +16,9 @@
 #ifndef VIBRATOR_HDI_CONNECTION_H
 #define VIBRATOR_HDI_CONNECTION_H
 
-#include "i_vibrator_hdi_connection.h"
 #include "singleton.h"
+
+#include "i_vibrator_hdi_connection.h"
 
 namespace OHOS {
 namespace Sensors {

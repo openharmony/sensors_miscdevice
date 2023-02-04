@@ -13,10 +13,12 @@
  * limitations under the License.
  */
 #include "compatible_connection.h"
+
 #include <ctime>
 #include <string>
 #include <unordered_map>
 #include <vector>
+
 #include "sensors_errors.h"
 
 namespace OHOS {
