@@ -14,6 +14,7 @@
  */
 
 #include "default_vibrator_decoder.h"
+
 #include "sensors_errors.h"
 
 namespace OHOS {

@@ -19,8 +19,6 @@
 #include <cstdint>
 #include <set>
 
-#include "refbase.h"
-
 #include "json_parser.h"
 #include "vibrator_infos.h"
 
