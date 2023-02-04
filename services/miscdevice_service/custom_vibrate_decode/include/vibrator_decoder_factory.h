@@ -17,7 +17,7 @@
 #define VIBRATOR_DECODER_FACTORY_H
 
 #include <cstdint>
-#include "refbase.h"
+
 #include "vibrator_decoder.h"
 
 namespace OHOS {

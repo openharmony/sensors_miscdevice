@@ -14,9 +14,10 @@
  */
 #include "vibrator_hdi_connection.h"
 
+#include "hitrace_meter.h"
+
 #include "compatible_connection.h"
 #include "hdi_connection.h"
-#include "hitrace_meter.h"
 #include "sensors_errors.h"
 
 namespace OHOS {

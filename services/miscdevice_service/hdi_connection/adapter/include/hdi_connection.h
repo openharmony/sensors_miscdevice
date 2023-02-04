@@ -16,10 +16,10 @@
 #ifndef HDI_CONNECTION_H
 #define HDI_CONNECTION_H
 
+#include "v1_1/vibrator_interface_proxy.h"
+
 #include "death_recipient_template.h"
 #include "i_vibrator_hdi_connection.h"
-
-#include "v1_1/vibrator_interface_proxy.h"
 
 using OHOS::HDI::Vibrator::V1_1::IVibratorInterface;
 namespace OHOS {

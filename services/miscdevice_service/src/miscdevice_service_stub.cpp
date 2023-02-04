@@ -38,16 +38,16 @@ const std::string VIBRATE_PERMISSION = "ohos.permission.VIBRATE";
 MiscdeviceServiceStub::MiscdeviceServiceStub()
 {
     MISC_HILOGI("MiscdeviceServiceStub begin,  %{public}p", this);
-    baseFuncs_[VIBRATE] = &MiscdeviceServiceStub::VibratePb;
-    baseFuncs_[PLAY_VIBRATOR_EFFECT] = &MiscdeviceServiceStub::PlayVibratorEffectPb;
+    baseFuncs_[VIBRATE] = &MiscdeviceServiceStub::VibrateStub;
+    baseFuncs_[PLAY_VIBRATOR_EFFECT] = &MiscdeviceServiceStub::PlayVibratorEffectStub;
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    baseFuncs_[PLAY_VIBRATOR_CUSTOM] = &MiscdeviceServiceStub::PlayVibratorCustomPb;
+    baseFuncs_[PLAY_VIBRATOR_CUSTOM] = &MiscdeviceServiceStub::PlayVibratorCustomStub;
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    baseFuncs_[STOP_VIBRATOR_ALL] = &MiscdeviceServiceStub::StopVibratorAllPb;
-    baseFuncs_[STOP_VIBRATOR_BY_MODE] = &MiscdeviceServiceStub::StopVibratorByModePb;
-    baseFuncs_[GET_LIGHT_LIST] = &MiscdeviceServiceStub::GetLightListPb;
-    baseFuncs_[TURN_ON] = &MiscdeviceServiceStub::TurnOnPb;
-    baseFuncs_[TURN_OFF] = &MiscdeviceServiceStub::TurnOffPb;
+    baseFuncs_[STOP_VIBRATOR_ALL] = &MiscdeviceServiceStub::StopVibratorAllStub;
+    baseFuncs_[STOP_VIBRATOR_BY_MODE] = &MiscdeviceServiceStub::StopVibratorByModeStub;
+    baseFuncs_[GET_LIGHT_LIST] = &MiscdeviceServiceStub::GetLightListStub;
+    baseFuncs_[TURN_ON] = &MiscdeviceServiceStub::TurnOnStub;
+    baseFuncs_[TURN_OFF] = &MiscdeviceServiceStub::TurnOffStub;
 }
 
 MiscdeviceServiceStub::~MiscdeviceServiceStub()
@@ -56,13 +56,13 @@ MiscdeviceServiceStub::~MiscdeviceServiceStub()
     baseFuncs_.clear();
 }
 
-int32_t MiscdeviceServiceStub::VibratePb(MessageParcel &data, MessageParcel &reply)
+int32_t MiscdeviceServiceStub::VibrateStub(MessageParcel &data, MessageParcel &reply)
 {
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
     int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
     if (ret != PERMISSION_GRANTED) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
-            HiSysEvent::EventType::SECURITY, "PKG_NAME", "VibratePb", "ERROR_CODE", ret);
+            HiSysEvent::EventType::SECURITY, "PKG_NAME", "VibrateStub", "ERROR_CODE", ret);
         MISC_HILOGE("result: %{public}d", ret);
         return PERMISSION_DENIED;
     }
@@ -76,13 +76,13 @@ int32_t MiscdeviceServiceStub::VibratePb(MessageParcel &data, MessageParcel &rep
     return Vibrate(vibratorId, duration, usage);
 }
 
-int32_t MiscdeviceServiceStub::StopVibratorAllPb(MessageParcel &data, MessageParcel &reply)
+int32_t MiscdeviceServiceStub::StopVibratorAllStub(MessageParcel &data, MessageParcel &reply)
 {
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
     int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
     if (ret != PERMISSION_GRANTED) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
-            HiSysEvent::EventType::SECURITY, "PKG_NAME", "StopVibratorPb", "ERROR_CODE", ret);
+            HiSysEvent::EventType::SECURITY, "PKG_NAME", "StopVibratorStub", "ERROR_CODE", ret);
         MISC_HILOGE("result:%{public}d", ret);
         return PERMISSION_DENIED;
     }
@@ -94,13 +94,13 @@ int32_t MiscdeviceServiceStub::StopVibratorAllPb(MessageParcel &data, MessagePar
     return StopVibrator(vibratorId);
 }
 
-int32_t MiscdeviceServiceStub::PlayVibratorEffectPb(MessageParcel &data, MessageParcel &reply)
+int32_t MiscdeviceServiceStub::PlayVibratorEffectStub(MessageParcel &data, MessageParcel &reply)
 {
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
     int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
     if (ret != PERMISSION_GRANTED) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
-            HiSysEvent::EventType::SECURITY, "PKG_NAME", "PlayVibratorEffectPb", "ERROR_CODE", ret);
+            HiSysEvent::EventType::SECURITY, "PKG_NAME", "PlayVibratorEffectStub", "ERROR_CODE", ret);
         MISC_HILOGE("result:%{public}d", ret);
         return PERMISSION_DENIED;
     }
@@ -116,13 +116,13 @@ int32_t MiscdeviceServiceStub::PlayVibratorEffectPb(MessageParcel &data, Message
     return PlayVibratorEffect(vibratorId, effect, count, usage);
 }
 
-int32_t MiscdeviceServiceStub::StopVibratorByModePb(MessageParcel &data, MessageParcel &reply)
+int32_t MiscdeviceServiceStub::StopVibratorByModeStub(MessageParcel &data, MessageParcel &reply)
 {
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
     int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
     if (ret != PERMISSION_GRANTED) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
-            HiSysEvent::EventType::SECURITY, "PKG_NAME", "StopVibratorByModePb", "ERROR_CODE", ret);
+            HiSysEvent::EventType::SECURITY, "PKG_NAME", "StopVibratorByModeStub", "ERROR_CODE", ret);
         MISC_HILOGE("result:%{public}d", ret);
         return PERMISSION_DENIED;
     }
@@ -136,13 +136,13 @@ int32_t MiscdeviceServiceStub::StopVibratorByModePb(MessageParcel &data, Message
 }
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-int32_t MiscdeviceServiceStub::PlayVibratorCustomPb(MessageParcel &data, MessageParcel &reply)
+int32_t MiscdeviceServiceStub::PlayVibratorCustomStub(MessageParcel &data, MessageParcel &reply)
 {
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
     int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
     if (ret != PERMISSION_GRANTED) {
         HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
-            HiSysEvent::EventType::SECURITY, "PKG_NAME", "PlayVibratorCustomPb", "ERROR_CODE", ret);
+            HiSysEvent::EventType::SECURITY, "PKG_NAME", "PlayVibratorCustomStub", "ERROR_CODE", ret);
         MISC_HILOGE("result:%{public}d", ret);
         return PERMISSION_DENIED;
     }
@@ -161,14 +161,13 @@ int32_t MiscdeviceServiceStub::PlayVibratorCustomPb(MessageParcel &data, Message
         MISC_HILOGE("Parcel ReadFileDescriptor failed");
         return ERROR;
     }
-    MISC_HILOGD("ReadFileDescriptor fd:%{public}d", fd);
     ret = PlayVibratorCustom(vibratorId, fd, usage);
     close(fd);
     return ret;
 }
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
-int32_t MiscdeviceServiceStub::GetLightListPb(MessageParcel &data, MessageParcel &reply)
+int32_t MiscdeviceServiceStub::GetLightListStub(MessageParcel &data, MessageParcel &reply)
 {
     (void)data;
     std::vector<LightInfo> lightInfos(GetLightList());
@@ -187,7 +186,7 @@ int32_t MiscdeviceServiceStub::GetLightListPb(MessageParcel &data, MessageParcel
     return NO_ERROR;
 }
 
-int32_t MiscdeviceServiceStub::TurnOnPb(MessageParcel &data, MessageParcel &reply)
+int32_t MiscdeviceServiceStub::TurnOnStub(MessageParcel &data, MessageParcel &reply)
 {
     int32_t lightId = data.ReadInt32();
     const unsigned char *info = data.ReadBuffer(sizeof(LightColor));
@@ -208,7 +207,7 @@ int32_t MiscdeviceServiceStub::TurnOnPb(MessageParcel &data, MessageParcel &repl
     return TurnOn(lightId, lightColor, lightAnimation);
 }
 
-int32_t MiscdeviceServiceStub::TurnOffPb(MessageParcel &data, MessageParcel &reply)
+int32_t MiscdeviceServiceStub::TurnOffStub(MessageParcel &data, MessageParcel &reply)
 {
     int32_t lightId = data.ReadInt32();
     return TurnOff(lightId);

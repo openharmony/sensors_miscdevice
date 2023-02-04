@@ -15,9 +15,12 @@
 #include "file_utils.h"
 
 #include <cerrno>
+
 #include <sys/stat.h>
 #include <unistd.h>
+
 #include "securec.h"
+
 #include "sensors_errors.h"
 
 namespace OHOS {

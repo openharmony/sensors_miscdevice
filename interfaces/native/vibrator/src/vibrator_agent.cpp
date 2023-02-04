@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "vibrator_agent.h"
+
 #include "sensors_errors.h"
 #include "vibrator_service_client.h"
 
@@ -117,7 +118,7 @@ int32_t StopVibrator(const char *mode)
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.Stop(DEFAULT_VIBRATOR_ID, mode);
     if (ret != ERR_OK) {
-        MISC_HILOGE("client is failed, ret:%{public}d", ret);
+        MISC_HILOGE("stop vibrator failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
     return SUCCESS;
@@ -128,7 +129,7 @@ int32_t StopVibratorAll()
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.Stop(DEFAULT_VIBRATOR_ID);
     if (ret != ERR_OK) {
-        MISC_HILOGE("client is failed, ret:%{public}d", ret);
+        MISC_HILOGE("stop vibrator failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
     return SUCCESS;

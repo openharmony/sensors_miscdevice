@@ -77,10 +77,10 @@ int32_t StartVibrator(const char *effectId);
 int32_t StartVibratorOnce(int32_t duration);
 
 /**
- * @brief 控制马达播放自定义振动配置文件中编排的振动.
+ * @brief 播放自定义振动序列.
  *
- * @param fd 表示打开自定义振动配置文件获得的描述符.
- * @return 振动成功返回0，如果振动失败返回非0值，比如振动配置文件参数设置错误等.
+ * @param fd 自定义振动序列的文件句柄.
+ * @return 返回0表示成功，否则表示失败.
  *
  * @since 10
  */
@@ -105,7 +105,7 @@ int32_t StopVibrator(const char *mode);
 
 /**
  * @brief 停止当前马达振动.
- * @return 停止成功返回0，如果失败返回非0值.
+ * @return 返回0表示成功，否则表示失败.
  * @since 10
  */
 int32_t StopVibratorAll();

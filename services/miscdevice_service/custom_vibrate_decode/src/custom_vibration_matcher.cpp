@@ -12,10 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include "custom_vibration_matcher.h"
+
 #include <cmath>
 #include <map>
 
-#include "custom_vibration_matcher.h"
 #include "sensors_errors.h"
 
 namespace OHOS {
@@ -43,9 +45,9 @@ int32_t CustomVibrationMatcher::TransformEffect(const std::set<VibrateEvent> &vi
 {
     CALL_LOG_ENTER;
     int32_t preStartTime = 0;
-    int32_t preDuration = -1;
+    int32_t preDuration = 0;
     for (const auto &event : vibrateSet) {
-        if ((preDuration != -1) && (event.startTime < preStartTime + preDuration)) {
+        if ((preDuration != 0) && (event.startTime < preStartTime + preDuration)) {
             MISC_HILOGE("Vibration events overlap");
             return ERROR;
         }
@@ -86,7 +88,7 @@ void CustomVibrationMatcher::ProcessContinuousEvent(const VibrateEvent &event, i
 void CustomVibrationMatcher::ProcessTransientEvent(const VibrateEvent &event, int32_t &preStartTime,
     int32_t &preDuration, std::vector<CompositeEffect> &compositeEffects)
 {
-    int32_t matchId = -1;
+    int32_t matchId = 0;
     float minWeightSum = WEIGHT_SUM_INIT;
     for (auto &transientInfo : TRANSIENT_VIBRATION_INFOS) {
         int32_t id = transientInfo.first;
