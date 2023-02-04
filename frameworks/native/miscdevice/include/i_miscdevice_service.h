@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "iremote_broker.h"
+
 #include "light_agent_type.h"
 #include "miscdevice_common.h"
 

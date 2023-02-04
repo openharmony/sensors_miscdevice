@@ -16,9 +16,10 @@
 #ifndef SENSORS_ERRORS_H
 #define SENSORS_ERRORS_H
 
+#include <errors.h>
+
 #include "hilog/log.h"
 
-#include <errors.h>
 #include "miscdevice_log.h"
 
 namespace OHOS {

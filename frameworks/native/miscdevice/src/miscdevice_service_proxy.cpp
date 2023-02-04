@@ -17,6 +17,7 @@
 
 #include "hisysevent.h"
 #include "securec.h"
+
 #include "sensors_errors.h"
 
 namespace OHOS {
