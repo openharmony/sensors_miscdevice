@@ -17,4 +17,5 @@ declare_args() {
   miscdevice_feature_vibrator_custom = false
 }
 
-print("miscdevice_feature_vibrator_custom = ${miscdevice_feature_vibrator_custom}")
+print(
+    "miscdevice_feature_vibrator_custom = ${miscdevice_feature_vibrator_custom}")

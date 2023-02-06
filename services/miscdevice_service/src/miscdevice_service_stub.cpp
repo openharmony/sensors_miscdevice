@@ -143,7 +143,7 @@ int32_t MiscdeviceServiceStub::PlayVibratorCustomStub(MessageParcel &data, Messa
     if (ret != PERMISSION_GRANTED) {
         HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
             HiSysEvent::EventType::SECURITY, "PKG_NAME", "PlayVibratorCustomStub", "ERROR_CODE", ret);
-        MISC_HILOGE("result:%{public}d", ret);
+        MISC_HILOGE("CheckVibratePermission failed, ret:%{public}d", ret);
         return PERMISSION_DENIED;
     }
     int32_t vibratorId;
@@ -163,6 +163,10 @@ int32_t MiscdeviceServiceStub::PlayVibratorCustomStub(MessageParcel &data, Messa
     }
     ret = PlayVibratorCustom(vibratorId, fd, usage);
     close(fd);
+    if (ret != ERR_OK) {
+        MISC_HILOGE("PlayVibratorCustom failed, ret:%{public}d", ret);
+        return ret;
+    }
     return ret;
 }
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
