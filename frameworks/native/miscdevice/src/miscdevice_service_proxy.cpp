@@ -59,7 +59,7 @@ int32_t MiscdeviceServiceProxy::Vibrate(int32_t vibratorId, int32_t timeOut, int
     if (ret != NO_ERROR) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "Vibrate", "ERROR_CODE", ret);
-        MISC_HILOGE("sendRequest ret: %{public}d", ret);
+        MISC_HILOGE("SendRequest failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -83,7 +83,7 @@ int32_t MiscdeviceServiceProxy::StopVibrator(int32_t vibratorId)
     if (ret != NO_ERROR) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "StopVibrator", "ERROR_CODE", ret);
-        MISC_HILOGE("ret:%{public}d", ret);
+        MISC_HILOGE("SendRequest failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -120,7 +120,7 @@ int32_t MiscdeviceServiceProxy::PlayVibratorEffect(int32_t vibratorId, const std
     if (ret != NO_ERROR) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "PlayVibratorEffect", "ERROR_CODE", ret);
-        MISC_HILOGE("ret: %{public}d", ret);
+        MISC_HILOGE("SendRequest failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -148,7 +148,7 @@ int32_t MiscdeviceServiceProxy::StopVibrator(int32_t vibratorId, const std::stri
     if (ret != NO_ERROR) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "StopVibrator", "ERROR_CODE", ret);
-        MISC_HILOGE("ret:%{public}d", ret);
+        MISC_HILOGE("SendRequest failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -182,7 +182,7 @@ int32_t MiscdeviceServiceProxy::PlayVibratorCustom(int32_t vibratorId, int32_t f
     if (ret != NO_ERROR) {
         HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "PlayVibratorCustom", "ERROR_CODE", ret);
-        MISC_HILOGE("sendRequest ret:%{public}d", ret);
+        MISC_HILOGE("SendRequest failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -198,14 +198,14 @@ std::vector<LightInfo> MiscdeviceServiceProxy::GetLightList()
     }
     sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {
-        MISC_HILOGE("remote is null");
+        MISC_HILOGE("remote is nullptr");
         return lightInfos;
     }
     MessageParcel reply;
     MessageOption option;
     int32_t ret = remote->SendRequest(GET_LIGHT_LIST, data, reply, option);
     if (ret != NO_ERROR) {
-        MISC_HILOGE("failed, ret:%{public}d", ret);
+        MISC_HILOGE("SendRequest failed, ret:%{public}d", ret);
         return lightInfos;
     }
     uint32_t lightCount = 0;
@@ -259,7 +259,7 @@ int32_t MiscdeviceServiceProxy::TurnOn(int32_t lightId, const LightColor &color,
     if (ret != NO_ERROR) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "TurnOn", "ERROR_CODE", ret);
-        MISC_HILOGE("sendRequest failed, ret:%{public}d", ret);
+        MISC_HILOGE("SendRequest failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -283,7 +283,7 @@ int32_t MiscdeviceServiceProxy::TurnOff(int32_t lightId)
     if (ret != NO_ERROR) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "TurnOff", "ERROR_CODE", ret);
-        MISC_HILOGE("sendRequest failed, ret:%{public}d", ret);
+        MISC_HILOGE("SendRequest failed, ret:%{public}d", ret);
     }
     return ret;
 }
