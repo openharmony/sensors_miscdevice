@@ -66,7 +66,7 @@ std::string ReadJsonFile(const std::string &filePath)
 
 int32_t GetFileSize(const std::string& filePath)
 {
-    struct stat statbuf = {0};
+    struct stat statbuf = { 0 };
     if (stat(filePath.c_str(), &statbuf) != 0) {
         MISC_HILOGE("Get file size error");
         return INVALID_FILE_SIZE;
@@ -80,7 +80,7 @@ int32_t GetFileSize(int32_t fd)
         MISC_HILOGE("fd is invalid, fd:%{public}d", fd);
         return INVALID_FILE_SIZE;
     }
-    struct stat statbuf = {0};
+    struct stat statbuf = { 0 };
     if (fstat(fd, &statbuf) != 0) {
         MISC_HILOGE("fstat error, errno:%{public}d", errno);
         return INVALID_FILE_SIZE;
