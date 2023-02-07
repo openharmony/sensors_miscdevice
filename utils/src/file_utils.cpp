@@ -160,14 +160,13 @@ std::string ReadFd(int32_t fd)
 std::string GetFileSuffix(int32_t fd)
 {
     char buf[FILE_PATH_MAX] = { '\0' };
-    char filePath[FILE_PATH_MAX] = { '\0' };
     if (snprintf_s(buf, sizeof(buf), sizeof(buf) - 1, "/proc/self/fd/%d", fd) < 0) {
         MISC_HILOGE("snprintf_s failed, errno:%{public}d", errno);
         return {};
     }
-    MISC_HILOGD("buf:%{public}s", buf);
+    char filePath[FILE_PATH_MAX] = { '\0' };
     if (readlink(buf, filePath, sizeof(filePath) - 1) < 0) {
-        MISC_HILOGE("readlink failed");
+        MISC_HILOGE("readlink failed, buf:%{public}s", buf);
         return {};
     }
     std::string fileAbsolutePath(filePath);
