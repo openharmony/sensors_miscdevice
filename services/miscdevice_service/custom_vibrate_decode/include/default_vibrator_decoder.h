@@ -38,7 +38,7 @@ private:
     int32_t ParseEvent(const JsonParser &parser, cJSON *event, std::set<VibrateEvent> &vibrateSet);
     bool CheckParameters(const VibrateEvent &vibrateEvent);
     int32_t channelNumber_ = 0;
-    double version_ = 0;
+    double version_ = 0.0;
 };
 }  // namespace Sensors
 }  // namespace OHOS
