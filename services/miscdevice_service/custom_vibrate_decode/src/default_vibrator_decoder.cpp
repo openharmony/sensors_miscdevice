@@ -127,7 +127,7 @@ int32_t DefaultVibratorDecoder::ParsePattern(const JsonParser &parser, cJSON *pa
 }
 
 int32_t DefaultVibratorDecoder::ParseEvent(const JsonParser &parser, cJSON *event,
-                                           std::set<VibrateEvent> &vibrateSet)
+    std::set<VibrateEvent> &vibrateSet)
 {
     VibrateEvent vibrateEvent;
     cJSON* type = parser.GetObjectItem(event, "Type");
@@ -162,7 +162,7 @@ int32_t DefaultVibratorDecoder::ParseEvent(const JsonParser &parser, cJSON *even
     }
     auto ret = vibrateSet.insert(vibrateEvent);
     if (!ret.second) {
-        MISC_HILOGE("Vibration event repeated insertion, startTime:%{public}d", vibrateEvent.startTime);
+        MISC_HILOGE("Vibration event is duplicated, startTime:%{public}d", vibrateEvent.startTime);
         return ERROR;
     }
     return SUCCESS;
@@ -183,7 +183,7 @@ bool DefaultVibratorDecoder::CheckParameters(const VibrateEvent &vibrateEvent)
         MISC_HILOGE("the event intensity is out of range, intensity:%{public}d", vibrateEvent.intensity);
         return false;
     }
-    if (vibrateEvent.frequency <= FREQUENCY_MIN || vibrateEvent.frequency > FREQUENCY_MAX) {
+    if (vibrateEvent.frequency < FREQUENCY_MIN || vibrateEvent.frequency > FREQUENCY_MAX) {
         MISC_HILOGE("the event frequency is out of range, frequency:%{public}d", vibrateEvent.frequency);
         return false;
     }
