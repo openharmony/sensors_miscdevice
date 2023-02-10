@@ -16,8 +16,6 @@
 #ifndef VIBRATOR_DECODER_FACTORY_H
 #define VIBRATOR_DECODER_FACTORY_H
 
-#include <cstdint>
-
 #include "vibrator_decoder.h"
 
 namespace OHOS {

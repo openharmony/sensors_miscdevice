@@ -16,7 +16,6 @@
 #ifndef VIBRATOR_DECODER_H
 #define VIBRATOR_DECODER_H
 
-#include <cstdint>
 #include <set>
 
 #include "json_parser.h"
