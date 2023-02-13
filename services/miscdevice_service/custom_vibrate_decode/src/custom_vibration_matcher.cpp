@@ -37,6 +37,8 @@ constexpr float INTENSITY_WEIGHT = 0.5;
 constexpr float FREQUENCY_WEIGHT = 0.5;
 constexpr float WEIGHT_SUM_INIT = 100;
 constexpr int32_t STOP_WAVEFORM = 0;
+constexpr int32_t EFFECT_ID_BOUNDARY = 1000;
+constexpr int32_t DURATION_MAX = 1600;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "CustomVibrationMatcher" };
 }  // namespace
 
@@ -74,6 +76,17 @@ void CustomVibrationMatcher::ProcessContinuousEvent(const VibrateEvent &event, i
         grade = CONTINUOUS_GRADE_NUM - 1;
     } else {
         grade = round(event.intensity / CONTINUOUS_GRADE_SCALE + 0.5) - 1;
+    }
+    if ((!compositeEffects.empty()) && (event.startTime == preStartTime + preDuration)) {
+        auto& prePrimitiveEffect = compositeEffects.back().primitiveEffect;
+        int32_t preEffectId = prePrimitiveEffect.effectId;
+        int32_t preGrade = preEffectId % 100;
+        int32_t mergeDuration = preDuration + event.duration;
+        if (preEffectId > EFFECT_ID_BOUNDARY && preGrade == grade && mergeDuration < DURATION_MAX) {
+            prePrimitiveEffect.effectId = mergeDuration * 100 + grade;
+            preDuration = mergeDuration;
+            return;
+        }
     }
     PrimitiveEffect primitiveEffect;
     primitiveEffect.delay = event.startTime - preStartTime;
