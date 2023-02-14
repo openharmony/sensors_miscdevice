@@ -54,6 +54,8 @@ struct VibrateInfo {
     std::string effectId;
     int32_t count = 0;
     int32_t fd = 0;
+    int64_t offset = 0;
+    int64_t length = 0;
 };
 
 static napi_value VibrateTime(napi_env env, napi_value args[], size_t argc)
@@ -167,6 +169,8 @@ bool ParseParameter(napi_env env, napi_value args[], size_t argc, VibrateInfo &i
         CHKCF(GetPropertyString(env, args[0], "effectId", info.effectId), "Get vibrate effectId fail");
     } else if (info.type == "custom") {
         CHKCF(GetPropertyInt32(env, args[0], "fd", info.fd), "Get vibrate fd fail");
+        CHKCF(GetPropertyInt64(env, args[0], "offset", info.offset), "Get vibrate offset fail");
+        CHKCF(GetPropertyInt64(env, args[0], "length", info.length), "Get vibrate length fail");
     }
     CHKCF(GetPropertyString(env, args[1], "usage", info.usage), "Get vibrate usage fail");
     return true;
@@ -198,7 +202,7 @@ int32_t StartVibrate(const VibrateInfo &info)
         }
         return StartVibrator(info.effectId.c_str());
     } else if (info.type == "custom") {
-        return PlayVibratorCustom(info.fd);
+        return PlayVibratorCustom(info.fd, info.offset, info.length);
     }
     return StartVibratorOnce(info.duration);
 }

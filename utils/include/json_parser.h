@@ -22,12 +22,14 @@
 
 #include "cJSON.h"
 
+#include "raw_file_descriptor.h"
+
 namespace OHOS {
 namespace Sensors {
 class JsonParser {
 public:
     explicit JsonParser(const std::string &filePath);
-    explicit JsonParser(int32_t fd);
+    explicit JsonParser(const RawFileDescriptor &rawFd);
     ~JsonParser();
     int32_t ParseJsonArray(cJSON *json, const std::string& key, std::vector<std::string>& vals) const;
     int32_t ParseJsonArray(const std::string& key, std::vector<std::string>& vals) const;

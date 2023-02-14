@@ -74,14 +74,14 @@ int32_t GetFileSize(const std::string& filePath)
     return statbuf.st_size;
 }
 
-int32_t GetFileSize(int32_t fd)
+int64_t GetFileSize(int32_t fd)
 {
     if (fd < 0) {
         MISC_HILOGE("fd is invalid, fd:%{public}d", fd);
         return INVALID_FILE_SIZE;
     }
-    struct stat statbuf = { 0 };
-    if (fstat(fd, &statbuf) != 0) {
+    struct stat64 statbuf = { 0 };
+    if (fstat64(fd, &statbuf) != 0) {
         MISC_HILOGE("fstat error, errno:%{public}d", errno);
         return INVALID_FILE_SIZE;
     }
@@ -137,19 +137,32 @@ std::string ReadFile(const std::string &filePath)
     return dataStr;
 }
 
-std::string ReadFd(int32_t fd)
+std::string ReadFd(const RawFileDescriptor &rawFd)
 {
-    if (fd < 0) {
-        MISC_HILOGE("fd is invalid, fd:%{public}d", fd);
+    if (rawFd.fd_ < 0) {
+        MISC_HILOGE("fd is invalid, fd:%{public}d", rawFd.fd_);
         return "";
     }
-    FILE* fp = fdopen(fd, "r");
+    int64_t fdSize = GetFileSize(rawFd.fd_);
+    if (rawFd.offset_ < 0 || rawFd.offset_ > fdSize) {
+        MISC_HILOGE("offset is invalid, offset:%{public}ld", rawFd.offset_);
+        return "";
+    }
+    if (rawFd.length_ <= 0 || rawFd.length_ > fdSize - rawFd.offset_) {
+        MISC_HILOGE("length is invalid, length:%{public}ld", rawFd.length_);
+        return "";
+    }
+    FILE* fp = fdopen(rawFd.fd_, "r");
     CHKPS(fp);
-    fseek(fp, 0L, SEEK_SET);
+    fseek(fp, rawFd.offset_, SEEK_SET);
     std::string dataStr;
     char buf[READ_DATA_BUFF_SIZE] = { '\0' };
     while (fgets(buf, sizeof(buf), fp) != nullptr) {
         dataStr += buf;
+        int64_t location = ftell(fp);
+        if (location >= rawFd.offset_ + rawFd.length_) {
+            break;
+        }
     }
     if (fclose(fp) != 0) {
         MISC_HILOGW("Close file failed, errno:%{public}d", errno);

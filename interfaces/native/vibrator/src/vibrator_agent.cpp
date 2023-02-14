@@ -87,15 +87,17 @@ int32_t StartVibratorOnce(int32_t duration)
     return SUCCESS;
 }
 
-int32_t PlayVibratorCustom(int32_t fd)
+int32_t PlayVibratorCustom(int32_t fd, int64_t offset, int64_t length)
 {
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    if (fd < 0) {
-        MISC_HILOGE("fd is invalid");
+    if (fd < 0 || offset < 0 || length <= 0) {
+        MISC_HILOGE("input parameter invalid, fd:%{public}d, offset:%{public}ld, length:%{public}ld",
+            fd, offset, length);
         return PARAMETER_ERROR;
     }
     auto &client = VibratorServiceClient::GetInstance();
-    int32_t ret = client.PlayVibratorCustom(DEFAULT_VIBRATOR_ID, fd, g_usage);
+    RawFileDescriptor rawFd(fd, offset, length);
+    int32_t ret = client.PlayVibratorCustom(DEFAULT_VIBRATOR_ID, rawFd, g_usage);
     if (ret != ERR_OK) {
         MISC_HILOGE("PlayVibratorCustom failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);

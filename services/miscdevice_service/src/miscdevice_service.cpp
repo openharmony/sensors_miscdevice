@@ -310,22 +310,13 @@ int32_t MiscdeviceService::StopVibrator(int32_t vibratorId, const std::string &m
 }
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-int32_t MiscdeviceService::DecodeCustomEffect(int32_t fd, std::set<VibrateEvent> &vibrateSet)
+int32_t MiscdeviceService::DecodeCustomEffect(const RawFileDescriptor &rawFd, std::set<VibrateEvent> &vibrateSet)
 {
-    std::string fileSuffix = GetFileSuffix(fd);
-    if (fileSuffix.empty()) {
-        MISC_HILOGE("fd file suffix is empty");
-        return ERROR;
-    }
-    if (fileSuffix != "json") {
-        MISC_HILOGE("current file suffix is not supported at this time, suffix:%{public}s", fileSuffix.c_str());
-        return ERROR;
-    }
     std::unique_ptr<VibratorDecoderFactory> defaultFactory(new (std::nothrow) DefaultVibratorDecoderFactory());
     CHKPR(defaultFactory, ERROR);
     std::unique_ptr<VibratorDecoder> defaultDecoder(defaultFactory->CreateDecoder());
     CHKPR(defaultDecoder, ERROR);
-    JsonParser parser(fd);
+    JsonParser parser(rawFd);
     int32_t ret = defaultDecoder->DecodeEffect(parser, vibrateSet);
     if (ret != SUCCESS) {
         MISC_HILOGE("decoder effect error");
@@ -335,23 +326,23 @@ int32_t MiscdeviceService::DecodeCustomEffect(int32_t fd, std::set<VibrateEvent>
     return NO_ERROR;
 }
 
-int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, int32_t fd, int32_t usage)
+int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, const RawFileDescriptor &rawFd, int32_t usage)
 {
     if (OHOS::system::GetDeviceType() != PHONE_TYPE) {
-        MISC_HILOGE("The device does not support this operation");
+        MISC_HILOGE("the device does not support this operation");
         return IS_NOT_SUPPORTED;
     }
-    if ((fd < 0) || (usage >= USAGE_MAX) || (usage < 0)) {
-        MISC_HILOGE("Invalid parameter");
+    if ((usage >= USAGE_MAX) || (usage < 0)) {
+        MISC_HILOGE("invalid parameter, usage:%{public}d", usage);
         return PARAMETER_ERROR;
     }
-    int32_t fileSize = GetFileSize(fd);
-    if (fileSize <= 0 || fileSize > MAX_JSON_FILE_SIZE) {
-        MISC_HILOGE("json file size is invalid, size:%{public}d", fileSize);
-        return ERROR;
+    if ((rawFd.fd_ < 0) || (rawFd.offset_ < 0) || (rawFd.length_ <= 0) || (rawFd.length_ > MAX_JSON_FILE_SIZE)) {
+        MISC_HILOGE("invalid file descriptor, fd:%{public}d, offset:%{public}ld, length:%{public}ld",
+            rawFd.fd_, rawFd.offset_, rawFd.length_);
+        return PARAMETER_ERROR;
     }
     std::set<VibrateEvent> vibrateSet;
-    int32_t ret = DecodeCustomEffect(fd, vibrateSet);
+    int32_t ret = DecodeCustomEffect(rawFd, vibrateSet);
     if (ret != SUCCESS) {
         MISC_HILOGE("decoder custom effect error");
         return ERROR;

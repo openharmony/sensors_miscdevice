@@ -84,7 +84,7 @@ int32_t StartVibratorOnce(int32_t duration);
  *
  * @since 10
  */
-int32_t PlayVibratorCustom(int32_t fd);
+int32_t PlayVibratorCustom(int32_t fd, int64_t offset, int64_t length);
 
 /**
  * @brief Sets the number of cycles for vibration.
