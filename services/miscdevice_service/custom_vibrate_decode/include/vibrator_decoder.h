@@ -13,30 +13,22 @@
  * limitations under the License.
  */
 
-#ifndef CUSTOM_VIBRATION_MATCHER_H
-#define CUSTOM_VIBRATION_MATCHER_H
+#ifndef VIBRATOR_DECODER_H
+#define VIBRATOR_DECODER_H
 
 #include <set>
-#include <string>
-#include <vector>
 
-#include "i_vibrator_hdi_connection.h"
+#include "json_parser.h"
 #include "vibrator_infos.h"
 
 namespace OHOS {
 namespace Sensors {
-class CustomVibrationMatcher {
+class VibratorDecoder {
 public:
-    CustomVibrationMatcher() = default;
-    ~CustomVibrationMatcher() = default;
-    int32_t TransformEffect(const std::set<VibrateEvent> &vibrateSet, std::vector<CompositeEffect> &compositeEffects);
-
-private:
-    void ProcessContinuousEvent(const VibrateEvent &event, int32_t &preStartTime, int32_t &preDuration,
-        std::vector<CompositeEffect> &compositeEffects);
-    void ProcessTransientEvent(const VibrateEvent &event, int32_t &preStartTime, int32_t &preDuration,
-        std::vector<CompositeEffect> &compositeEffects);
+    VibratorDecoder() = default;
+    virtual ~VibratorDecoder() = default;
+    virtual int32_t DecodeEffect(const JsonParser &parser, std::set<VibrateEvent> &vibrateSet) = 0;
 };
 }  // namespace Sensors
 }  // namespace OHOS
-#endif // CUSTOM_VIBRATION_MATCHER_H
+#endif  // VIBRATOR_DECODER_H
