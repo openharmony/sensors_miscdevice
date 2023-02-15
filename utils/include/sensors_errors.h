@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,9 +16,10 @@
 #ifndef SENSORS_ERRORS_H
 #define SENSORS_ERRORS_H
 
+#include <errors.h>
+
 #include "hilog/log.h"
 
-#include <errors.h>
 #include "miscdevice_log.h"
 
 namespace OHOS {
@@ -27,7 +28,8 @@ namespace Sensors {
 enum ErrorCode : int32_t {
     PERMISSION_DENIED = 201, // Use this error code when permission is denied.
     PARAMETER_ERROR = 401, // Use this error code when the input parameter type or range does not match.
-    DEVICE_OPERATION_FAILED = 14600101 // Use this error code when operating the device fail.
+    DEVICE_OPERATION_FAILED = 14600101, // Use this error code when operating the device fail.
+    IS_NOT_SUPPORTED = 14600102 // Use this error code when operating is not supported.
 };
 
 enum {
