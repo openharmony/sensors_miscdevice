@@ -112,7 +112,7 @@ int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, const std::string &ef
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 int32_t VibratorServiceClient::PlayVibratorCustom(int32_t vibratorId, const RawFileDescriptor &rawFd, int32_t usage)
 {
-    MISC_HILOGD("PlayVibratorCustom begin, fd:%{public}d, offset:%{public}ld, length:%{public}ld",
+    MISC_HILOGD("PlayVibratorCustom begin, fd:%{public}d, offset:%{public}lld, length:%{public}lld",
         rawFd.fd_, rawFd.offset_, rawFd.length_);
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {

@@ -166,15 +166,15 @@ int32_t MiscdeviceServiceProxy::PlayVibratorCustom(int32_t vibratorId, const Raw
         return WRITE_MSG_ERR;
     }
     if (!data.WriteInt32(usage)) {
-        MISC_HILOGE("WriteUint32 usage failed");
+        MISC_HILOGE("Writeint32 usage failed");
         return WRITE_MSG_ERR;
     }
     if (!data.WriteInt64(rawFd.offset_)) {
-        MISC_HILOGE("WriteUint64 offset failed");
+        MISC_HILOGE("Writeint64 offset failed");
         return WRITE_MSG_ERR;
     }
     if (!data.WriteInt64(rawFd.length_)) {
-        MISC_HILOGE("WriteUint32 length failed");
+        MISC_HILOGE("Writeint64 length failed");
         return WRITE_MSG_ERR;
     }
     if (!data.WriteFileDescriptor(rawFd.fd_)) {

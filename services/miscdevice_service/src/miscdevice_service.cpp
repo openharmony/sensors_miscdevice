@@ -298,7 +298,7 @@ int32_t MiscdeviceService::StopVibrator(int32_t vibratorId, const std::string &m
         return ERROR;
     }
     const VibrateInfo info = vibratorThread_->GetCurrentVibrateInfo();
-    if ((info.mode != mode) || (info.pid != GetCallingPid())) {
+    if (info.mode != mode) {
         MISC_HILOGE("Stop vibration information mismatch");
         return ERROR;
     }
@@ -337,7 +337,7 @@ int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, const RawFileD
         return PARAMETER_ERROR;
     }
     if ((rawFd.fd_ < 0) || (rawFd.offset_ < 0) || (rawFd.length_ <= 0) || (rawFd.length_ > MAX_JSON_FILE_SIZE)) {
-        MISC_HILOGE("invalid file descriptor, fd:%{public}d, offset:%{public}ld, length:%{public}ld",
+        MISC_HILOGE("invalid file descriptor, fd:%{public}d, offset:%{public}lld, length:%{public}lld",
             rawFd.fd_, rawFd.offset_, rawFd.length_);
         return PARAMETER_ERROR;
     }
