@@ -110,9 +110,10 @@ int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, const std::string &ef
 }
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-int32_t VibratorServiceClient::PlayVibratorCustom(int32_t vibratorId, int32_t fd, int32_t usage)
+int32_t VibratorServiceClient::PlayVibratorCustom(int32_t vibratorId, const RawFileDescriptor &rawFd, int32_t usage)
 {
-    MISC_HILOGD("PlayVibratorCustom begin, fd:%{public}d", fd);
+    MISC_HILOGD("PlayVibratorCustom begin, fd:%{public}d, offset:%{public}ld, length:%{public}ld",
+        rawFd.fd_, rawFd.offset_, rawFd.length_);
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
@@ -120,7 +121,7 @@ int32_t VibratorServiceClient::PlayVibratorCustom(int32_t vibratorId, int32_t fd
     }
     CHKPR(miscdeviceProxy_, ERROR);
     StartTrace(HITRACE_TAG_SENSORS, "PlayVibratorCustom");
-    ret = miscdeviceProxy_->PlayVibratorCustom(vibratorId, fd, usage);
+    ret = miscdeviceProxy_->PlayVibratorCustom(vibratorId, rawFd, usage);
     FinishTrace(HITRACE_TAG_SENSORS);
     if (ret != ERR_OK) {
         MISC_HILOGE("PlayVibratorCustom failed, ret:%{public}d", ret);

@@ -154,9 +154,8 @@ int32_t MiscdeviceServiceProxy::StopVibrator(int32_t vibratorId, const std::stri
 }
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-int32_t MiscdeviceServiceProxy::PlayVibratorCustom(int32_t vibratorId, int32_t fd, int32_t usage)
+int32_t MiscdeviceServiceProxy::PlayVibratorCustom(int32_t vibratorId, const RawFileDescriptor &rawFd, int32_t usage)
 {
-    MISC_HILOGD("writeFileDescriptor fd:%{public}d, usage:%{public}d", fd, usage);
     MessageParcel data;
     if (!data.WriteInterfaceToken(MiscdeviceServiceProxy::GetDescriptor())) {
         MISC_HILOGE("write descriptor failed");
@@ -170,7 +169,15 @@ int32_t MiscdeviceServiceProxy::PlayVibratorCustom(int32_t vibratorId, int32_t f
         MISC_HILOGE("WriteUint32 usage failed");
         return WRITE_MSG_ERR;
     }
-    if (!data.WriteFileDescriptor(fd)) {
+    if (!data.WriteInt64(rawFd.offset_)) {
+        MISC_HILOGE("WriteUint64 offset failed");
+        return WRITE_MSG_ERR;
+    }
+    if (!data.WriteInt64(rawFd.length_)) {
+        MISC_HILOGE("WriteUint32 length failed");
+        return WRITE_MSG_ERR;
+    }
+    if (!data.WriteFileDescriptor(rawFd.fd_)) {
         MISC_HILOGE("WriteFileDescriptor fd failed");
         return WRITE_MSG_ERR;
     }

@@ -154,13 +154,22 @@ int32_t MiscdeviceServiceStub::PlayVibratorCustomStub(MessageParcel &data, Messa
         MISC_HILOGE("Parcel read usage failed");
         return ERROR;
     }
-    int32_t fd = data.ReadFileDescriptor();
-    if (fd < 0) {
+    RawFileDescriptor rawFd;
+    if (!data.ReadInt64(rawFd.offset_)) {
+        MISC_HILOGE("Parcel read offset failed");
+        return ERROR;
+    }
+    if (!data.ReadInt64(rawFd.length_)) {
+        MISC_HILOGE("Parcel read length failed");
+        return ERROR;
+    }
+    rawFd.fd_ = data.ReadFileDescriptor();
+    if (rawFd.fd_ < 0) {
         MISC_HILOGE("Parcel ReadFileDescriptor failed");
         return ERROR;
     }
-    ret = PlayVibratorCustom(vibratorId, fd, usage);
-    close(fd);
+    ret = PlayVibratorCustom(vibratorId, rawFd, usage);
+    close(rawFd.fd_);
     if (ret != ERR_OK) {
         MISC_HILOGE("PlayVibratorCustom failed, ret:%{public}d", ret);
         return ret;

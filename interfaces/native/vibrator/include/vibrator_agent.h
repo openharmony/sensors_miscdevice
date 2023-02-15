@@ -77,14 +77,14 @@ int32_t StartVibrator(const char *effectId);
 int32_t StartVibratorOnce(int32_t duration);
 
 /**
- * @brief 播放自定义振动序列.
+ * @brief Play a custom vibration sequence.
  *
- * @param fd 自定义振动序列的文件句柄.
- * @return 返回0表示成功，否则表示失败.
+ * @param fd File handle for custom vibration sequence.
+ * @return Returning 0 means success, otherwise it means failure.
  *
  * @since 10
  */
-int32_t PlayVibratorCustom(int32_t fd);
+int32_t PlayVibratorCustom(int32_t fd, int64_t offset, int64_t length);
 
 /**
  * @brief Sets the number of cycles for vibration.
@@ -94,7 +94,7 @@ int32_t PlayVibratorCustom(int32_t fd);
 bool SetLoopCount(int32_t count);
 
 /**
- * @brief 根据传入的模式停止马达振动.
+ * @brief Stop the motor vibration according to the input mode.
  *
  * @param mode Indicates the mode of the vibration to stop. The values can be <b>time</b> and <b>preset</b>,
  * respectively representing a one-shot vibration mode and a preset vibration mode.
@@ -104,8 +104,8 @@ bool SetLoopCount(int32_t count);
 int32_t StopVibrator(const char *mode);
 
 /**
- * @brief 停止当前马达振动.
- * @return 返回0表示成功，否则表示失败.
+ * @brief Stop the current motor vibration.
+ * @return Returning 0 means success, otherwise it means failure.
  * @since 10
  */
 int32_t StopVibratorAll();

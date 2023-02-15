@@ -23,6 +23,7 @@
 
 #include "light_agent_type.h"
 #include "miscdevice_common.h"
+#include "raw_file_descriptor.h"
 
 namespace OHOS {
 namespace Sensors {
@@ -35,7 +36,7 @@ public:
     virtual int32_t PlayVibratorEffect(int32_t vibratorId, const std::string &effect,
                                        int32_t loopCount, int32_t usage) = 0;
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    virtual int32_t PlayVibratorCustom(int32_t vibratorId, int32_t fd, int32_t usage) = 0;
+    virtual int32_t PlayVibratorCustom(int32_t vibratorId, const RawFileDescriptor &rawFd, int32_t usage) = 0;
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     virtual int32_t StopVibrator(int32_t vibratorId) = 0;
     virtual int32_t StopVibrator(int32_t vibratorId, const std::string &mode) = 0;
