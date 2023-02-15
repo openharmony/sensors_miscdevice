@@ -21,12 +21,9 @@
 namespace OHOS {
 namespace Sensors {
 struct RawFileDescriptor {
-    RawFileDescriptor() = default;
-    RawFileDescriptor(int32_t fd, int64_t offset, int64_t length)
-        : fd_(fd), offset_(offset), length_(length) {}
-    int32_t fd_ = 0;
-    int64_t offset_ = 0;
-    int64_t length_ = -1;
+    int32_t fd = 0;
+    int64_t offset = 0;
+    int64_t length = -1;
 };
 }  // namespace Sensors
 }  // namespace OHOS
