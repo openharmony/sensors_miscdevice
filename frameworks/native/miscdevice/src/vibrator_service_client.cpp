@@ -113,7 +113,7 @@ int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, const std::string &ef
 int32_t VibratorServiceClient::PlayVibratorCustom(int32_t vibratorId, const RawFileDescriptor &rawFd, int32_t usage)
 {
     MISC_HILOGD("PlayVibratorCustom begin, fd:%{public}d, offset:%{public}lld, length:%{public}lld",
-        rawFd.fd, rawFd.offset, rawFd.length);
+        rawFd.fd, static_cast<long long>(rawFd.offset), static_cast<long long>(rawFd.length));
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
