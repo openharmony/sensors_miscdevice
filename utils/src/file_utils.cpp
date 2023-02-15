@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,11 +15,8 @@
 #include "file_utils.h"
 
 #include <cerrno>
-
 #include <sys/stat.h>
 #include <unistd.h>
-
-#include "securec.h"
 
 #include "sensors_errors.h"
 
@@ -31,7 +28,6 @@ const std::string CONFIG_DIR = "/vendor/etc/vibrator/";
 constexpr int32_t FILE_SIZE_MAX = 0x5000;
 constexpr int32_t READ_DATA_BUFF_SIZE = 256;
 constexpr int32_t INVALID_FILE_SIZE = -1;
-constexpr int32_t FILE_PATH_MAX = 1024;
 }  // namespace
 
 std::string ReadJsonFile(const std::string &filePath)
@@ -66,23 +62,9 @@ std::string ReadJsonFile(const std::string &filePath)
 
 int32_t GetFileSize(const std::string& filePath)
 {
-    struct stat statbuf = { 0 };
+    struct stat statbuf = {0};
     if (stat(filePath.c_str(), &statbuf) != 0) {
         MISC_HILOGE("Get file size error");
-        return INVALID_FILE_SIZE;
-    }
-    return statbuf.st_size;
-}
-
-int64_t GetFileSize(int32_t fd)
-{
-    if (fd < 0) {
-        MISC_HILOGE("fd is invalid, fd:%{public}d", fd);
-        return INVALID_FILE_SIZE;
-    }
-    struct stat64 statbuf = { 0 };
-    if (fstat64(fd, &statbuf) != 0) {
-        MISC_HILOGE("fstat error, errno:%{public}d", errno);
         return INVALID_FILE_SIZE;
     }
     return statbuf.st_size;
@@ -127,7 +109,7 @@ std::string ReadFile(const std::string &filePath)
     FILE* fp = fopen(filePath.c_str(), "r");
     CHKPS(fp);
     std::string dataStr;
-    char buf[READ_DATA_BUFF_SIZE] = { '\0' };
+    char buf[READ_DATA_BUFF_SIZE] = {};
     while (fgets(buf, sizeof(buf), fp) != nullptr) {
         dataStr += buf;
     }
@@ -135,56 +117,6 @@ std::string ReadFile(const std::string &filePath)
         MISC_HILOGW("Close file failed");
     }
     return dataStr;
-}
-
-std::string ReadFd(const RawFileDescriptor &rawFd)
-{
-    if (rawFd.fd_ < 0) {
-        MISC_HILOGE("fd is invalid, fd:%{public}d", rawFd.fd_);
-        return "";
-    }
-    int64_t fdSize = GetFileSize(rawFd.fd_);
-    if (rawFd.offset_ < 0 || rawFd.offset_ > fdSize) {
-        MISC_HILOGE("offset is invalid, offset:%{public}ld", rawFd.offset_);
-        return "";
-    }
-    if (rawFd.length_ <= 0 || rawFd.length_ > fdSize - rawFd.offset_) {
-        MISC_HILOGE("length is invalid, length:%{public}ld", rawFd.length_);
-        return "";
-    }
-    FILE* fp = fdopen(rawFd.fd_, "r");
-    CHKPS(fp);
-    fseek(fp, rawFd.offset_, SEEK_SET);
-    std::string dataStr;
-    char buf[READ_DATA_BUFF_SIZE] = { '\0' };
-    while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        dataStr += buf;
-        int64_t location = ftell(fp);
-        if (location >= rawFd.offset_ + rawFd.length_) {
-            break;
-        }
-    }
-    if (fclose(fp) != 0) {
-        MISC_HILOGW("Close file failed, errno:%{public}d", errno);
-    }
-    return dataStr;
-}
-
-std::string GetFileSuffix(int32_t fd)
-{
-    char buf[FILE_PATH_MAX] = { '\0' };
-    if (snprintf_s(buf, sizeof(buf), sizeof(buf) - 1, "/proc/self/fd/%d", fd) < 0) {
-        MISC_HILOGE("snprintf_s failed, errno:%{public}d", errno);
-        return {};
-    }
-    char filePath[FILE_PATH_MAX] = { '\0' };
-    if (readlink(buf, filePath, sizeof(filePath) - 1) < 0) {
-        MISC_HILOGE("readlink failed, buf:%{public}s", buf);
-        return {};
-    }
-    std::string fileAbsolutePath(filePath);
-    MISC_HILOGD("fileAbsolutePath:%{public}s", fileAbsolutePath.c_str());
-    return fileAbsolutePath.substr(fileAbsolutePath.find_last_of('.') + 1);
 }
 }  // namespace Sensors
 }  // namespace OHOS
