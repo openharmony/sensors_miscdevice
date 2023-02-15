@@ -19,8 +19,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "securec.h"
-
 #include "sensors_errors.h"
 
 namespace OHOS {
@@ -139,47 +137,47 @@ std::string ReadFile(const std::string &filePath)
 
 std::string ReadFd(const RawFileDescriptor &rawFd)
 {
-    if (rawFd.fd_ < 0) {
-        MISC_HILOGE("fd is invalid, fd:%{public}d", rawFd.fd_);
-        return "";
+    if (rawFd.fd < 0) {
+        MISC_HILOGE("fd is invalid, fd:%{public}d", rawFd.fd);
+        return {};
     }
-    int64_t fdSize = GetFileSize(rawFd.fd_);
-    if (rawFd.offset_ < 0 || rawFd.offset_ > fdSize) {
-        MISC_HILOGE("offset is invalid, offset:%{public}lld", rawFd.offset_);
-        return "";
+    int64_t fdSize = GetFileSize(rawFd.fd);
+    if (rawFd.offset < 0 || rawFd.offset > fdSize) {
+        MISC_HILOGE("offset is invalid, offset:%{public}lld", rawFd.offset);
+        return {};
     }
-    if (rawFd.length_ <= 0 || rawFd.length_ > fdSize - rawFd.offset_) {
-        MISC_HILOGE("length is invalid, length:%{public}lld", rawFd.length_);
-        return "";
+    if (rawFd.length <= 0 || rawFd.length > fdSize - rawFd.offset) {
+        MISC_HILOGE("length is invalid, length:%{public}lld", rawFd.length);
+        return {};
     }
-    FILE* fp = fdopen(rawFd.fd_, "r");
+    FILE* fp = fdopen(rawFd.fd, "r");
     CHKPS(fp);
-    fseek(fp, rawFd.offset_, SEEK_SET);
+    if (fseek(fp, rawFd.offset, SEEK_SET) != 0) {
+        MISC_HILOGE("fseek failed, errno:%{public}d", errno);
+        return {};
+    }
     std::string dataStr;
     char buf[READ_DATA_BUFF_SIZE] = { '\0' };
     while (fgets(buf, sizeof(buf), fp) != nullptr) {
         dataStr += buf;
         int64_t location = ftell(fp);
-        if (location >= rawFd.offset_ + rawFd.length_) {
+        if (location - rawFd.offset >= rawFd.length) {
             break;
         }
     }
     if (fclose(fp) != 0) {
-        MISC_HILOGW("Close file failed, errno:%{public}d", errno);
+        MISC_HILOGW("close file failed, errno:%{public}d", errno);
     }
     return dataStr;
 }
 
 std::string GetFileSuffix(int32_t fd)
 {
-    char buf[FILE_PATH_MAX] = { '\0' };
-    if (snprintf_s(buf, sizeof(buf), sizeof(buf) - 1, "/proc/self/fd/%d", fd) < 0) {
-        MISC_HILOGE("snprintf_s failed, errno:%{public}d", errno);
-        return {};
-    }
-    char filePath[FILE_PATH_MAX] = { '\0' };
-    if (readlink(buf, filePath, sizeof(filePath) - 1) < 0) {
-        MISC_HILOGE("readlink failed, buf:%{public}s", buf);
+    std::string fdPath = "/proc/self/fd/" + std::to_string(fd);
+    char filePath[FILE_PATH_MAX + 1] = { '\0' };
+    ssize_t ret = readlink(fdPath.c_str(), filePath, FILE_PATH_MAX);
+    if (ret < 0 || ret > FILE_PATH_MAX) {
+        MISC_HILOGE("readlink failed, errno:%{public}d", errno);
         return {};
     }
     std::string fileAbsolutePath(filePath);

@@ -96,7 +96,11 @@ int32_t PlayVibratorCustom(int32_t fd, int64_t offset, int64_t length)
         return PARAMETER_ERROR;
     }
     auto &client = VibratorServiceClient::GetInstance();
-    RawFileDescriptor rawFd(fd, offset, length);
+    RawFileDescriptor rawFd = {
+        .fd = fd,
+        .offset = offset,
+        .length = length
+    };
     int32_t ret = client.PlayVibratorCustom(DEFAULT_VIBRATOR_ID, rawFd, g_usage);
     if (ret != ERR_OK) {
         MISC_HILOGE("PlayVibratorCustom failed, ret:%{public}d", ret);

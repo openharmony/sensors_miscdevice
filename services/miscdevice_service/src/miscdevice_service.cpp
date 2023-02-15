@@ -336,9 +336,9 @@ int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, const RawFileD
         MISC_HILOGE("invalid parameter, usage:%{public}d", usage);
         return PARAMETER_ERROR;
     }
-    if ((rawFd.fd_ < 0) || (rawFd.offset_ < 0) || (rawFd.length_ <= 0) || (rawFd.length_ > MAX_JSON_FILE_SIZE)) {
+    if ((rawFd.fd < 0) || (rawFd.offset < 0) || (rawFd.length <= 0) || (rawFd.length > MAX_JSON_FILE_SIZE)) {
         MISC_HILOGE("invalid file descriptor, fd:%{public}d, offset:%{public}lld, length:%{public}lld",
-            rawFd.fd_, rawFd.offset_, rawFd.length_);
+            rawFd.fd, rawFd.offset, rawFd.length);
         return PARAMETER_ERROR;
     }
     std::set<VibrateEvent> vibrateSet;
