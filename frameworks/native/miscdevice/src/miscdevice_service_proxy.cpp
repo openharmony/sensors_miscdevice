@@ -187,7 +187,7 @@ int32_t MiscdeviceServiceProxy::PlayVibratorCustom(int32_t vibratorId, const Raw
     MessageOption option;
     int32_t ret = remote->SendRequest(PLAY_VIBRATOR_CUSTOM, data, reply, option);
     if (ret != NO_ERROR) {
-        HiSysEvent::Write(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "PlayVibratorCustom", "ERROR_CODE", ret);
         MISC_HILOGE("SendRequest failed, ret:%{public}d", ret);
     }
