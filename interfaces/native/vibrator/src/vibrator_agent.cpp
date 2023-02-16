@@ -14,6 +14,8 @@
  */
 #include "vibrator_agent.h"
 
+#include "parameters.h"
+
 #include "sensors_errors.h"
 #include "vibrator_service_client.h"
 
@@ -27,6 +29,7 @@ static const HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "VibratorNDK" };
 static const int32_t DEFAULT_VIBRATOR_ID = 123;
 static int32_t g_loopCount = 1;
 static int32_t g_usage = USAGE_UNKNOWN;
+const std::string PHONE_TYPE = "phone";
 
 static int32_t NormalizeErrCode(int32_t code)
 {
@@ -87,12 +90,17 @@ int32_t StartVibratorOnce(int32_t duration)
     return SUCCESS;
 }
 
+bool IsSupportVibratorCustom()
+{
+    return (OHOS::system::GetDeviceType() == PHONE_TYPE);
+}
+
 int32_t PlayVibratorCustom(int32_t fd, int64_t offset, int64_t length)
 {
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     if (fd < 0 || offset < 0 || length <= 0) {
         MISC_HILOGE("input parameter invalid, fd:%{public}d, offset:%{public}lld, length:%{public}lld",
-            fd, offset, length);
+            fd, static_cast<long long>(offset), static_cast<long long>(length));
         return PARAMETER_ERROR;
     }
     auto &client = VibratorServiceClient::GetInstance();
