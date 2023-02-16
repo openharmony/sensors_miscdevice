@@ -37,7 +37,6 @@ const std::string VIBRATE_PERMISSION = "ohos.permission.VIBRATE";
 
 MiscdeviceServiceStub::MiscdeviceServiceStub()
 {
-    MISC_HILOGI("MiscdeviceServiceStub begin,  %{public}p", this);
     baseFuncs_[VIBRATE] = &MiscdeviceServiceStub::VibratePb;
     baseFuncs_[CANCEL_VIBRATOR] = &MiscdeviceServiceStub::CancelVibratorPb;
     baseFuncs_[PLAY_VIBRATOR_EFFECT] = &MiscdeviceServiceStub::PlayVibratorEffectPb;
@@ -49,7 +48,6 @@ MiscdeviceServiceStub::MiscdeviceServiceStub()
 
 MiscdeviceServiceStub::~MiscdeviceServiceStub()
 {
-    MISC_HILOGI("~MiscdeviceServiceStub begin, destruct %{public}p", this);
     baseFuncs_.clear();
 }
 

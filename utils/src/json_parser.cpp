@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,6 +31,16 @@ JsonParser::JsonParser(const std::string &filePath)
     std::string jsonStr = ReadJsonFile(filePath);
     if (jsonStr.empty()) {
         MISC_HILOGE("Read json file fail");
+        return;
+    }
+    cJson_ = cJSON_Parse(jsonStr.c_str());
+}
+
+JsonParser::JsonParser(const RawFileDescriptor &rawFd)
+{
+    std::string jsonStr = ReadFd(rawFd);
+    if (jsonStr.empty()) {
+        MISC_HILOGE("Read fd fail");
         return;
     }
     cJson_ = cJSON_Parse(jsonStr.c_str());
@@ -84,6 +94,21 @@ int32_t JsonParser::ParseJsonArray(cJSON *json, const std::string& key,
 int32_t JsonParser::ParseJsonArray(const std::string& key, std::vector<std::string>& vals) const
 {
     return ParseJsonArray(cJson_, key, vals);
+}
+
+bool JsonParser::IsArray(cJSON *json) const
+{
+    return cJSON_IsArray(json);
+}
+
+int32_t JsonParser::GetArraySize(cJSON *json) const
+{
+    return cJSON_GetArraySize(json);
+}
+
+cJSON* JsonParser::GetArrayItem(cJSON *json, int32_t index) const
+{
+    return cJSON_GetArrayItem(json, index);
 }
 }  // namespace Sensors
 }  // namespace OHOS
