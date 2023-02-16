@@ -338,7 +338,7 @@ int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, const RawFileD
     }
     if ((rawFd.fd < 0) || (rawFd.offset < 0) || (rawFd.length <= 0) || (rawFd.length > MAX_JSON_FILE_SIZE)) {
         MISC_HILOGE("invalid file descriptor, fd:%{public}d, offset:%{public}lld, length:%{public}lld",
-            rawFd.fd, rawFd.offset, rawFd.length);
+            rawFd.fd, static_cast<long long>(rawFd.offset), static_cast<long long>(rawFd.length));
         return PARAMETER_ERROR;
     }
     std::set<VibrateEvent> vibrateSet;
