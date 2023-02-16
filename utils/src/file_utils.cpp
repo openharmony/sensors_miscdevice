@@ -186,7 +186,7 @@ std::string GetFileSuffix(int32_t fd)
         MISC_HILOGE("file suffix is invalid, fileAbsolutePath:%{public}s", fileAbsolutePath.c_str());
         return {};
     }
-    return fileAbsolutePath.substr(pos);
+    return fileAbsolutePath.substr(pos + 1);
 }
 }  // namespace Sensors
 }  // namespace OHOS
