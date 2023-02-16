@@ -143,11 +143,11 @@ std::string ReadFd(const RawFileDescriptor &rawFd)
     }
     int64_t fdSize = GetFileSize(rawFd.fd);
     if (rawFd.offset < 0 || rawFd.offset > fdSize) {
-        MISC_HILOGE("offset is invalid, offset:%{public}lld", rawFd.offset);
+        MISC_HILOGE("offset is invalid, offset:%{public}lld", static_cast<long long>(rawFd.offset));
         return {};
     }
     if (rawFd.length <= 0 || rawFd.length > fdSize - rawFd.offset) {
-        MISC_HILOGE("length is invalid, length:%{public}lld", rawFd.length);
+        MISC_HILOGE("length is invalid, length:%{public}lld", static_cast<long long>(rawFd.length));
         return {};
     }
     FILE* fp = fdopen(rawFd.fd, "r");
@@ -181,8 +181,12 @@ std::string GetFileSuffix(int32_t fd)
         return {};
     }
     std::string fileAbsolutePath(filePath);
-    MISC_HILOGD("fileAbsolutePath:%{public}s", fileAbsolutePath.c_str());
-    return fileAbsolutePath.substr(fileAbsolutePath.find_last_of('.') + 1);
+    size_t pos = fileAbsolutePath.find_last_of('.');
+    if (pos == std::string::npos) {
+        MISC_HILOGE("file suffix is invalid, fileAbsolutePath:%{public}s", fileAbsolutePath.c_str());
+        return {};
+    }
+    return fileAbsolutePath.substr(pos + 1);
 }
 }  // namespace Sensors
 }  // namespace OHOS
