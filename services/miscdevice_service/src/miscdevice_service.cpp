@@ -177,7 +177,7 @@ int32_t MiscdeviceService::Vibrate(int32_t vibratorId, int32_t timeOut, int32_t 
     return NO_ERROR;
 }
 
-int32_t MiscdeviceService::CancelVibrator(int32_t vibratorId)
+int32_t MiscdeviceService::StopVibrator(int32_t vibratorId)
 {
     std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
     if ((vibratorThread_ == nullptr) || (!vibratorThread_->IsRunning())) {
@@ -231,7 +231,7 @@ void MiscdeviceService::StartVibrateThread(VibrateInfo info)
     DumpHelper->SaveVibrateRecord(info);
 }
 
-int32_t MiscdeviceService::StopVibratorEffect(int32_t vibratorId, const std::string &effect)
+int32_t MiscdeviceService::StopVibrator(int32_t vibratorId, const std::string &effect)
 {
     std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
     if ((vibratorThread_ == nullptr) || (!vibratorThread_->IsRunning())) {
@@ -249,6 +249,13 @@ int32_t MiscdeviceService::StopVibratorEffect(int32_t vibratorId, const std::str
     }
     return NO_ERROR;
 }
+
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, const RawFileDescriptor &rawFd, int32_t usage)
+{
+    return NO_ERROR;
+}
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
 std::string MiscdeviceService::GetPackageName(AccessTokenID tokenId)
 {
