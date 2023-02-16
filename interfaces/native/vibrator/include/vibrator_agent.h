@@ -77,10 +77,19 @@ int32_t StartVibrator(const char *effectId);
 int32_t StartVibratorOnce(int32_t duration);
 
 /**
+ * @brief Query whether the device supports customized vibration.
+ *
+ * @return Returning true indicates support; otherwise, it indicates no support.
+ *
+ * @since 10
+ */
+bool IsSupportVibratorCustom();
+
+/**
  * @brief Play a custom vibration sequence.
  *
- * @param fd File handle for custom vibration sequence.
- * @return Returning 0 means success, otherwise it means failure.
+ * @param fd Indicates the file handle for custom vibration sequence.
+ * @return Returning 0 indicates success; otherwise, it indicates failure.
  *
  * @since 10
  */
@@ -105,7 +114,7 @@ int32_t StopVibrator(const char *mode);
 
 /**
  * @brief Stop the current motor vibration.
- * @return Returning 0 means success, otherwise it means failure.
+ * @return Returning 0 indicates success; otherwise, it indicates failure.
  * @since 10
  */
 int32_t StopVibratorAll();
