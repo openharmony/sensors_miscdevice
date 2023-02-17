@@ -61,8 +61,8 @@ ohos_shared_library("vibrator_interface_native") {
   external_deps = [
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
     "init:libbegetutil",
+    "ipc:ipc_core",
   ]
 
   public_configs = [ ":vibrator_config" ]

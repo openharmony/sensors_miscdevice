@@ -77,7 +77,7 @@ int32_t StartVibrator(const char *effectId);
 int32_t StartVibratorOnce(int32_t duration);
 
 /**
- * @brief Query whether the device supports customized vibration.
+ * @brief Query whether the device supports custom vibration.
  *
  * @return Returning true indicates support; otherwise, it indicates no support.
  *

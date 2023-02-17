@@ -109,7 +109,7 @@ int32_t MiscdeviceServiceProxy::PlayVibratorEffect(int32_t vibratorId, const std
         return WRITE_MSG_ERR;
     }
     if (!data.WriteInt32(usage)) {
-        MISC_HILOGE("WriteUint32 usage failed");
+        MISC_HILOGE("Writeint32 usage failed");
         return WRITE_MSG_ERR;
     }
     sptr<IRemoteObject> remote = Remote();
