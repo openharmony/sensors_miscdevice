@@ -89,6 +89,8 @@ bool IsSupportVibratorCustom();
  * @brief Play a custom vibration sequence.
  *
  * @param fd Indicates the file handle for custom vibration sequence.
+ * @param offset Indicates the starting address (in bytes) of the custom vibration sequence.
+ * @param length Indicates the total length (in bytes) of the custom vibration sequence.
  * @return Returning 0 indicates success; otherwise, it indicates failure.
  *
  * @since 10
