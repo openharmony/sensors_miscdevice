@@ -68,6 +68,7 @@ ohos_shared_library("libmiscdevice_service") {
     external_deps += [ "init:libbegetutil" ]
   }
 
+  shlib_type = "sa"
   part_name = "miscdevice"
   subsystem_name = "sensors"
 }
