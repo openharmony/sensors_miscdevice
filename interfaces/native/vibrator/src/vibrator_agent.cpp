@@ -138,7 +138,7 @@ int32_t StopVibrator(const char *mode)
     return SUCCESS;
 }
 
-int32_t StopVibratorAll()
+int32_t Cancel()
 {
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.StopVibrator(DEFAULT_VIBRATOR_ID);

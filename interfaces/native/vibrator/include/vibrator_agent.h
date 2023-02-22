@@ -115,11 +115,11 @@ bool SetLoopCount(int32_t count);
 int32_t StopVibrator(const char *mode);
 
 /**
- * @brief Stop the current motor vibration.
+ * @brief Cancel the current motor vibration.
  * @return Returning 0 indicates success; otherwise, it indicates failure.
  * @since 10
  */
-int32_t StopVibratorAll();
+int32_t Cancel();
 
 /**
  * @brief Set the usage of vibration.
