@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,14 +26,12 @@
 
 namespace OHOS {
 namespace Sensors {
-using ServicePb = std::function<int32_t(uint32_t code, MessageParcel &, MessageParcel &, MessageOption &)>;
+using ServiceStub = std::function<int32_t(uint32_t code, MessageParcel &, MessageParcel &, MessageOption &)>;
 
 class MiscdeviceServiceStub : public IRemoteStub<IMiscdeviceService> {
 public:
     MiscdeviceServiceStub();
-
     virtual ~MiscdeviceServiceStub();
-
     virtual int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
                                     MessageOption &option) override;
 
@@ -41,19 +39,21 @@ private:
     DISALLOW_COPY_AND_MOVE(MiscdeviceServiceStub);
     using MiscBaseFunc = int32_t (MiscdeviceServiceStub::*)(MessageParcel &data, MessageParcel &reply);
 
-    int32_t IsAbilityAvailablePb(MessageParcel &data, MessageParcel &reply);
-    int32_t IsVibratorEffectAvailablePb(MessageParcel &data, MessageParcel &reply);
-    int32_t GetVibratorIdListPb(MessageParcel &data, MessageParcel &reply);
-    int32_t VibratePb(MessageParcel &data, MessageParcel &reply);
-    int32_t CancelVibratorPb(MessageParcel &data, MessageParcel &reply);
-    int32_t PlayVibratorEffectPb(MessageParcel &data, MessageParcel &reply);
-    int32_t PlayCustomVibratorEffectPb(MessageParcel &data, MessageParcel &reply);
-    int32_t StopVibratorEffectPb(MessageParcel &data, MessageParcel &reply);
-    int32_t SetVibratorParameterPb(MessageParcel &data, MessageParcel &reply);
-    int32_t GetVibratorParameterPb(MessageParcel &data, MessageParcel &reply);
-    int32_t GetLightListPb(MessageParcel &data, MessageParcel &reply);
-    int32_t TurnOnPb(MessageParcel &data, MessageParcel &reply);
-    int32_t TurnOffPb(MessageParcel &data, MessageParcel &reply);
+    int32_t IsAbilityAvailableStub(MessageParcel &data, MessageParcel &reply);
+    int32_t IsVibratorEffectAvailableStub(MessageParcel &data, MessageParcel &reply);
+    int32_t GetVibratorIdListStub(MessageParcel &data, MessageParcel &reply);
+    int32_t VibrateStub(MessageParcel &data, MessageParcel &reply);
+    int32_t PlayVibratorEffectStub(MessageParcel &data, MessageParcel &reply);
+    int32_t SetVibratorParameterStub(MessageParcel &data, MessageParcel &reply);
+    int32_t GetVibratorParameterStub(MessageParcel &data, MessageParcel &reply);
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+    int32_t PlayVibratorCustomStub(MessageParcel &data, MessageParcel &reply);
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+    int32_t StopVibratorAllStub(MessageParcel &data, MessageParcel &reply);
+    int32_t StopVibratorByModeStub(MessageParcel &data, MessageParcel &reply);
+    int32_t GetLightListStub(MessageParcel &data, MessageParcel &reply);
+    int32_t TurnOnStub(MessageParcel &data, MessageParcel &reply);
+    int32_t TurnOffStub(MessageParcel &data, MessageParcel &reply);
     bool CheckVibratePermission();
 
     std::map<uint32_t, MiscBaseFunc> baseFuncs_;

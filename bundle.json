@@ -10,7 +10,9 @@
     "name": "miscdevice",
     "subsystem": "sensors",
     "syscap": ["SystemCapability.Sensors.MiscDevice"],
-    "features": [],
+    "features": [
+      "miscdevice_feature_vibrator_custom"
+    ],
     "adapted_system_type": [ "standard" ],
     "rom": "1024KB",
     "ram": "~4096KB",

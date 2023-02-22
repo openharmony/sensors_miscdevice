@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 #include "vibrator_agent.h"
+
+#include "parameters.h"
+
 #include "sensors_errors.h"
 #include "vibrator_service_client.h"
 
@@ -26,6 +29,7 @@ static const HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "VibratorNDK" };
 static const int32_t DEFAULT_VIBRATOR_ID = 123;
 static int32_t g_loopCount = 1;
 static int32_t g_usage = USAGE_UNKNOWN;
+const std::string PHONE_TYPE = "phone";
 
 static int32_t NormalizeErrCode(int32_t code)
 {
@@ -36,7 +40,11 @@ static int32_t NormalizeErrCode(int32_t code)
         case PARAMETER_ERROR: {
             return PARAMETER_ERROR;
         }
+        case IS_NOT_SUPPORTED: {
+            return IS_NOT_SUPPORTED;
+        }
         default: {
+            MISC_HILOGW("operating the device fail");
             return DEVICE_OPERATION_FAILED;
         }
     }
@@ -58,7 +66,7 @@ int32_t StartVibrator(const char *effectId)
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.Vibrate(DEFAULT_VIBRATOR_ID, effectId, g_loopCount, g_usage);
     if (ret != ERR_OK) {
-        MISC_HILOGE("vibrator effectId failed, ret: %{public}d", ret);
+        MISC_HILOGE("vibrate effectId failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
     g_loopCount = 1;
@@ -75,24 +83,67 @@ int32_t StartVibratorOnce(int32_t duration)
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.Vibrate(DEFAULT_VIBRATOR_ID, duration, g_usage);
     if (ret != ERR_OK) {
-        MISC_HILOGE("vibrator duration failed, ret: %{public}d", ret);
+        MISC_HILOGE("vibrate duration failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
     g_usage = USAGE_UNKNOWN;
     return SUCCESS;
 }
 
+bool IsSupportVibratorCustom()
+{
+    return (OHOS::system::GetDeviceType() == PHONE_TYPE);
+}
+
+int32_t PlayVibratorCustom(int32_t fd, int64_t offset, int64_t length)
+{
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+    if (fd < 0 || offset < 0 || length <= 0) {
+        MISC_HILOGE("input parameter invalid, fd:%{public}d, offset:%{public}lld, length:%{public}lld",
+            fd, static_cast<long long>(offset), static_cast<long long>(length));
+        return PARAMETER_ERROR;
+    }
+    auto &client = VibratorServiceClient::GetInstance();
+    RawFileDescriptor rawFd = {
+        .fd = fd,
+        .offset = offset,
+        .length = length
+    };
+    int32_t ret = client.PlayVibratorCustom(DEFAULT_VIBRATOR_ID, rawFd, g_usage);
+    if (ret != ERR_OK) {
+        MISC_HILOGE("PlayVibratorCustom failed, ret:%{public}d", ret);
+        return NormalizeErrCode(ret);
+    }
+    g_usage = USAGE_UNKNOWN;
+    return SUCCESS;
+#else
+    MISC_HILOGE("the device does not support this operation");
+    return IS_NOT_SUPPORTED;
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+}
+
 int32_t StopVibrator(const char *mode)
 {
     CHKPR(mode, PARAMETER_ERROR);
     if (strcmp(mode, "time") != 0 && strcmp(mode, "preset") != 0) {
-        MISC_HILOGE("mode is invalid, mode is %{public}s", mode);
+        MISC_HILOGE("input parameter invalid, mode is %{public}s", mode);
         return PARAMETER_ERROR;
     }
     auto &client = VibratorServiceClient::GetInstance();
-    int32_t ret = client.Stop(DEFAULT_VIBRATOR_ID, mode);
+    int32_t ret = client.StopVibrator(DEFAULT_VIBRATOR_ID, mode);
     if (ret != ERR_OK) {
-        MISC_HILOGE("client is failed, ret: %{public}d", ret);
+        MISC_HILOGE("StopVibrator failed, ret:%{public}d", ret);
+        return NormalizeErrCode(ret);
+    }
+    return SUCCESS;
+}
+
+int32_t Cancel()
+{
+    auto &client = VibratorServiceClient::GetInstance();
+    int32_t ret = client.StopVibrator(DEFAULT_VIBRATOR_ID);
+    if (ret != ERR_OK) {
+        MISC_HILOGE("StopVibrator failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
     return SUCCESS;
