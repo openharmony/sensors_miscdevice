@@ -61,6 +61,7 @@ ohos_shared_library("libmiscdevice_service") {
     defines = [ "OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM" ]
   }
 
+  shlib_type = "sa"
   part_name = "miscdevice"
   subsystem_name = "sensors"
 }
