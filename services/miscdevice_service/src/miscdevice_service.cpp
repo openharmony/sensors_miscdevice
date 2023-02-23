@@ -326,6 +326,33 @@ int32_t MiscdeviceService::DecodeCustomEffect(const RawFileDescriptor &rawFd, st
     return NO_ERROR;
 }
 
+int32_t MiscdeviceService::StartCustomVibration(const RawFileDescriptor &rawFd, const VibrateInfo &info)
+{
+    std::set<VibrateEvent> vibrateSet;
+    int32_t ret = DecodeCustomEffect(rawFd, vibrateSet);
+    if (ret != SUCCESS) {
+        MISC_HILOGE("decoder custom effect error");
+        return ERROR;
+    }
+    HdfCompositeEffect hdfCompositeEffect;
+    hdfCompositeEffect.type = HDF_EFFECT_TYPE_PRIMITIVE;
+    CustomVibrationMatcher matcher;
+    ret = matcher.TransformEffect(vibrateSet, hdfCompositeEffect.compositeEffects);
+    if (ret != SUCCESS) {
+        MISC_HILOGE("transform custom effect error");
+        return ERROR;
+    }
+    auto& compositeEffects = hdfCompositeEffect.compositeEffects;
+    size_t size = compositeEffects.size();
+    MISC_HILOGD("the count of match result:%{public}zu", size);
+    for (size_t i = 0; i < size; ++i) {
+        MISC_HILOGD("match result at %{public}zu th, delay:%{public}d, effectId:%{public}d",
+            i, compositeEffects[i].primitiveEffect.delay, compositeEffects[i].primitiveEffect.effectId);
+    }
+    StartVibrateThread(info);
+    return vibratorHdiConnection_.EnableCompositeEffect(hdfCompositeEffect);
+}
+
 int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, const RawFileDescriptor &rawFd, int32_t usage)
 {
     if (OHOS::system::GetDeviceType() != PHONE_TYPE) {
@@ -340,28 +367,7 @@ int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, const RawFileD
         MISC_HILOGE("invalid file descriptor, fd:%{public}d, offset:%{public}lld, length:%{public}lld",
             rawFd.fd, static_cast<long long>(rawFd.offset), static_cast<long long>(rawFd.length));
         return PARAMETER_ERROR;
-    }
-    std::set<VibrateEvent> vibrateSet;
-    int32_t ret = DecodeCustomEffect(rawFd, vibrateSet);
-    if (ret != SUCCESS) {
-        MISC_HILOGE("decoder custom effect error");
-        return ERROR;
-    }
-    HdfCompositeEffect vibratorCompositeEffect;
-    vibratorCompositeEffect.type = HDF_EFFECT_TYPE_PRIMITIVE;
-    CustomVibrationMatcher matcher;
-    ret = matcher.TransformEffect(vibrateSet, vibratorCompositeEffect.compositeEffects);
-    if (ret != SUCCESS) {
-        MISC_HILOGE("transform custom effect error");
-        return ERROR;
-    }
-    auto& compositeEffects = vibratorCompositeEffect.compositeEffects;
-    size_t size = compositeEffects.size();
-    MISC_HILOGD("the count of match result:%{public}zu", size);
-    for (size_t i = 0; i < size; ++i) {
-        MISC_HILOGD("match result at %{public}zu th, delay:%{public}d, effectId:%{public}d",
-        i, compositeEffects[i].primitiveEffect.delay, compositeEffects[i].primitiveEffect.effectId);
-    }
+    } 
     VibrateInfo info = {
         .mode = "custom",
         .packageName = GetPackageName(GetCallingTokenID()),
@@ -374,8 +380,7 @@ int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, const RawFileD
         MISC_HILOGE("Vibration is ignored and high priority is vibrating");
         return ERROR;
     }
-    StartVibrateThread(info);
-    return vibratorHdiConnection_.EnableCompositeEffect(vibratorCompositeEffect);
+    return StartCustomVibration(rawFd, info);
 }
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
