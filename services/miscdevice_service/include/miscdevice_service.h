@@ -79,6 +79,7 @@ private:
     bool InitLightList();
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     int32_t DecodeCustomEffect(const RawFileDescriptor &rawFd, std::set<VibrateEvent> &vibrateSequence);
+    int32_t StartCustomVibration(const RawFileDescriptor &rawFd, const VibrateInfo &info);
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     VibratorHdiConnection &vibratorHdiConnection_ = VibratorHdiConnection::GetInstance();
     LightHdiConnection &lightHdiConnection_ = LightHdiConnection::GetInstance();

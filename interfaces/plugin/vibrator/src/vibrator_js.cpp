@@ -303,7 +303,7 @@ static napi_value StopAll(napi_env env, napi_value args[], size_t argc)
 {
     sptr<AsyncCallbackInfo> asyncCallbackInfo = new (std::nothrow) AsyncCallbackInfo(env);
     CHKPP(asyncCallbackInfo);
-    asyncCallbackInfo->error.code = StopVibratorAll();
+    asyncCallbackInfo->error.code = Cancel();
     if ((asyncCallbackInfo->error.code != SUCCESS) && (asyncCallbackInfo->error.code == PARAMETER_ERROR)) {
         ThrowErr(env, PARAMETER_ERROR, "Parameters invalid");
         return nullptr;
