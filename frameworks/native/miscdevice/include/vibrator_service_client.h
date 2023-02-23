@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,9 +17,11 @@
 #define VIBRATOR_SERVICE_CLIENT_H
 
 #include <mutex>
+
 #include "iremote_object.h"
-#include "miscdevice_service_proxy.h"
 #include "singleton.h"
+
+#include "miscdevice_service_proxy.h"
 
 namespace OHOS {
 namespace Sensors {
@@ -27,7 +29,11 @@ class VibratorServiceClient : public Singleton<VibratorServiceClient> {
 public:
     int32_t Vibrate(int32_t vibratorId, int32_t timeOut, int32_t usage);
     int32_t Vibrate(int32_t vibratorId, const std::string &effect, int32_t loopCount, int32_t usage);
-    int32_t Stop(int32_t vibratorId, const std::string &type);
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+    int32_t PlayVibratorCustom(int32_t vibratorId, const RawFileDescriptor &rawFd, int32_t usage);
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+    int32_t StopVibrator(int32_t vibratorId, const std::string &mode);
+    int32_t StopVibrator(int32_t vibratorId);
     void ProcessDeathObserver(const wptr<IRemoteObject> &object);
 
 private:

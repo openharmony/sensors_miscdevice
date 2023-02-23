@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 
 #include "hisysevent.h"
 #include "securec.h"
+
 #include "sensors_errors.h"
 
 namespace OHOS {
@@ -34,8 +35,6 @@ MiscdeviceServiceProxy::MiscdeviceServiceProxy(const sptr<IRemoteObject> &impl) 
 int32_t MiscdeviceServiceProxy::Vibrate(int32_t vibratorId, int32_t timeOut, int32_t usage)
 {
     MessageParcel data;
-    MessageParcel reply;
-    MessageOption option;
     if (!data.WriteInterfaceToken(MiscdeviceServiceProxy::GetDescriptor())) {
         MISC_HILOGE("write descriptor failed");
         return WRITE_MSG_ERR;
@@ -54,20 +53,20 @@ int32_t MiscdeviceServiceProxy::Vibrate(int32_t vibratorId, int32_t timeOut, int
     }
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, ERROR);
+    MessageParcel reply;
+    MessageOption option;
     int32_t ret = remote->SendRequest(VIBRATE, data, reply, option);
     if (ret != NO_ERROR) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "Vibrate", "ERROR_CODE", ret);
-        MISC_HILOGE("sendRequest ret : %{public}d", ret);
+        MISC_HILOGE("SendRequest failed, ret:%{public}d", ret);
     }
     return ret;
 }
 
-int32_t MiscdeviceServiceProxy::CancelVibrator(int32_t vibratorId)
+int32_t MiscdeviceServiceProxy::StopVibrator(int32_t vibratorId)
 {
     MessageParcel data;
-    MessageParcel reply;
-    MessageOption option;
     if (!data.WriteInterfaceToken(MiscdeviceServiceProxy::GetDescriptor())) {
         MISC_HILOGE("write descriptor failed");
         return WRITE_MSG_ERR;
@@ -78,11 +77,13 @@ int32_t MiscdeviceServiceProxy::CancelVibrator(int32_t vibratorId)
     }
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, ERROR);
-    int32_t ret = remote->SendRequest(CANCEL_VIBRATOR, data, reply, option);
+    MessageParcel reply;
+    MessageOption option;
+    int32_t ret = remote->SendRequest(STOP_VIBRATOR_ALL, data, reply, option);
     if (ret != NO_ERROR) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
-            HiSysEvent::EventType::FAULT, "PKG_NAME", "CancelVibrator", "ERROR_CODE", ret);
-        MISC_HILOGE("ret : %{public}d", ret);
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "StopVibrator", "ERROR_CODE", ret);
+        MISC_HILOGE("SendRequest failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -91,8 +92,6 @@ int32_t MiscdeviceServiceProxy::PlayVibratorEffect(int32_t vibratorId, const std
     int32_t loopCount, int32_t usage)
 {
     MessageParcel data;
-    MessageParcel reply;
-    MessageOption option;
     if (!data.WriteInterfaceToken(MiscdeviceServiceProxy::GetDescriptor())) {
         MISC_HILOGE("write descriptor failed");
         return WRITE_MSG_ERR;
@@ -110,25 +109,25 @@ int32_t MiscdeviceServiceProxy::PlayVibratorEffect(int32_t vibratorId, const std
         return WRITE_MSG_ERR;
     }
     if (!data.WriteInt32(usage)) {
-        MISC_HILOGE("WriteUint32 usage failed");
+        MISC_HILOGE("Writeint32 usage failed");
         return WRITE_MSG_ERR;
     }
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, ERROR);
+    MessageParcel reply;
+    MessageOption option;
     int32_t ret = remote->SendRequest(PLAY_VIBRATOR_EFFECT, data, reply, option);
     if (ret != NO_ERROR) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "PlayVibratorEffect", "ERROR_CODE", ret);
-        MISC_HILOGE("ret : %{public}d", ret);
+        MISC_HILOGE("SendRequest failed, ret:%{public}d", ret);
     }
     return ret;
 }
 
-int32_t MiscdeviceServiceProxy::StopVibratorEffect(int32_t vibratorId, const std::string &effect)
+int32_t MiscdeviceServiceProxy::StopVibrator(int32_t vibratorId, const std::string &mode)
 {
     MessageParcel data;
-    MessageParcel reply;
-    MessageOption option;
     if (!data.WriteInterfaceToken(MiscdeviceServiceProxy::GetDescriptor())) {
         MISC_HILOGE("write descriptor failed");
         return WRITE_MSG_ERR;
@@ -137,25 +136,68 @@ int32_t MiscdeviceServiceProxy::StopVibratorEffect(int32_t vibratorId, const std
         MISC_HILOGE("WriteInt32 vibratorId failed");
         return WRITE_MSG_ERR;
     }
-    if (!data.WriteString(effect)) {
-        MISC_HILOGE("WriteString effect failed");
+    if (!data.WriteString(mode)) {
+        MISC_HILOGE("WriteString mode failed");
         return WRITE_MSG_ERR;
     }
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, ERROR);
-    int32_t ret = remote->SendRequest(STOP_VIBRATOR_EFFECT, data, reply, option);
+    MessageParcel reply;
+    MessageOption option;
+    int32_t ret = remote->SendRequest(STOP_VIBRATOR_BY_MODE, data, reply, option);
     if (ret != NO_ERROR) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
-            HiSysEvent::EventType::FAULT, "PKG_NAME", "StopVibratorEffect", "ERROR_CODE", ret);
-        MISC_HILOGE("ret : %{public}d", ret);
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "StopVibrator", "ERROR_CODE", ret);
+        MISC_HILOGE("SendRequest failed, ret:%{public}d", ret);
     }
     return ret;
 }
+
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+int32_t MiscdeviceServiceProxy::PlayVibratorCustom(int32_t vibratorId, const RawFileDescriptor &rawFd, int32_t usage)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MiscdeviceServiceProxy::GetDescriptor())) {
+        MISC_HILOGE("write descriptor failed");
+        return WRITE_MSG_ERR;
+    }
+    if (!data.WriteInt32(vibratorId)) {
+        MISC_HILOGE("WriteInt32 vibratorId failed");
+        return WRITE_MSG_ERR;
+    }
+    if (!data.WriteInt32(usage)) {
+        MISC_HILOGE("Writeint32 usage failed");
+        return WRITE_MSG_ERR;
+    }
+    if (!data.WriteInt64(rawFd.offset)) {
+        MISC_HILOGE("Writeint64 offset failed");
+        return WRITE_MSG_ERR;
+    }
+    if (!data.WriteInt64(rawFd.length)) {
+        MISC_HILOGE("Writeint64 length failed");
+        return WRITE_MSG_ERR;
+    }
+    if (!data.WriteFileDescriptor(rawFd.fd)) {
+        MISC_HILOGE("WriteFileDescriptor fd failed");
+        return WRITE_MSG_ERR;
+    }
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, ERROR);
+    MessageParcel reply;
+    MessageOption option;
+    int32_t ret = remote->SendRequest(PLAY_VIBRATOR_CUSTOM, data, reply, option);
+    if (ret != NO_ERROR) {
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "PlayVibratorCustom", "ERROR_CODE", ret);
+        MISC_HILOGE("SendRequest failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+
 std::vector<LightInfo> MiscdeviceServiceProxy::GetLightList()
 {
     MessageParcel data;
-    MessageParcel reply;
-    MessageOption option;
     std::vector<LightInfo> lightInfos;
     if (!data.WriteInterfaceToken(MiscdeviceServiceProxy::GetDescriptor())) {
         MISC_HILOGE("WriteInterfaceToken failed");
@@ -163,12 +205,14 @@ std::vector<LightInfo> MiscdeviceServiceProxy::GetLightList()
     }
     sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {
-        MISC_HILOGE("remote is null");
+        MISC_HILOGE("remote is nullptr");
         return lightInfos;
     }
+    MessageParcel reply;
+    MessageOption option;
     int32_t ret = remote->SendRequest(GET_LIGHT_LIST, data, reply, option);
     if (ret != NO_ERROR) {
-        MISC_HILOGE("failed, ret:%{public}d", ret);
+        MISC_HILOGE("SendRequest failed, ret:%{public}d", ret);
         return lightInfos;
     }
     uint32_t lightCount = 0;
@@ -198,8 +242,6 @@ std::vector<LightInfo> MiscdeviceServiceProxy::GetLightList()
 int32_t MiscdeviceServiceProxy::TurnOn(int32_t lightId, const LightColor &color, const LightAnimation &animation)
 {
     MessageParcel data;
-    MessageParcel reply;
-    MessageOption option;
     if (!data.WriteInterfaceToken(MiscdeviceServiceProxy::GetDescriptor())) {
         MISC_HILOGE("write descriptor failed");
         return WRITE_MSG_ERR;
@@ -218,11 +260,13 @@ int32_t MiscdeviceServiceProxy::TurnOn(int32_t lightId, const LightColor &color,
     }
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, ERROR);
+    MessageParcel reply;
+    MessageOption option;
     int32_t ret = remote->SendRequest(TURN_ON, data, reply, option);
     if (ret != NO_ERROR) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "TurnOn", "ERROR_CODE", ret);
-        MISC_HILOGE("sendRequest failed, ret:%{public}d", ret);
+        MISC_HILOGE("SendRequest failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -230,8 +274,6 @@ int32_t MiscdeviceServiceProxy::TurnOn(int32_t lightId, const LightColor &color,
 int32_t MiscdeviceServiceProxy::TurnOff(int32_t lightId)
 {
     MessageParcel data;
-    MessageParcel reply;
-    MessageOption option;
     if (!data.WriteInterfaceToken(MiscdeviceServiceProxy::GetDescriptor())) {
         MISC_HILOGE("write descriptor failed");
         return WRITE_MSG_ERR;
@@ -242,11 +284,13 @@ int32_t MiscdeviceServiceProxy::TurnOff(int32_t lightId)
     }
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, ERROR);
+    MessageParcel reply;
+    MessageOption option;
     int32_t ret = remote->SendRequest(TURN_OFF, data, reply, option);
     if (ret != NO_ERROR) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "TurnOff", "ERROR_CODE", ret);
-        MISC_HILOGE("sendRequest failed, ret:%{public}d", ret);
+        MISC_HILOGE("SendRequest failed, ret:%{public}d", ret);
     }
     return ret;
 }
