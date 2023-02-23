@@ -54,7 +54,7 @@ enum VibrateTag {
 struct VibrateEvent {
     bool operator<(const VibrateEvent& rhs) const
     {
-        return startTime < rhs.startTime; 
+        return startTime < rhs.startTime;
     }
 
     VibrateTag tag;
