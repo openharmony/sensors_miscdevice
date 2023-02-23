@@ -111,12 +111,7 @@ void VibratorAgentTest::TearDown()
 HWTEST_F(VibratorAgentTest, StartVibratorTest_001, TestSize.Level1)
 {
     HiLog::Info(LABEL, "%{public}s begin", __func__);
-    int ret = 0;
-    if (deviceType_ == TABLET_TYPE) {
-        ret = StartVibrator("haptic.common.click");
-    } else {
-        ret = StartVibrator("haptic.clock.timer");
-    }
+    int ret = StartVibrator("haptic.clock.timer");
     ASSERT_EQ(ret, 0);
 }
 
@@ -248,12 +243,11 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_001, TestSize.Level1)
         int32_t fd = open("/data/test/vibrator/coin_drop.json", O_RDONLY);
         MISC_HILOGD("test fd:%{public}d", fd);
         struct stat64 statbuf = { 0 };
-        if (fstat64(fd, &statbuf) != 0) {
-            MISC_HILOGE("fstat error, errno:%{public}d", errno);
+        if (fstat64(fd, &statbuf) == 0) {
+            int32_t ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
+            ASSERT_EQ(ret, 0);
         }
-        int32_t ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
         close(fd);
-        ASSERT_EQ(ret, 0);
         sleep(5);
     } else {
         ASSERT_EQ(0, 0);
@@ -267,12 +261,11 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_002, TestSize.Level1)
         int32_t fd = open("/data/test/vibrator/on_carpet.json", O_RDONLY);
         MISC_HILOGD("test fd:%{public}d", fd);
         struct stat64 statbuf = { 0 };
-        if (fstat64(fd, &statbuf) != 0) {
-            MISC_HILOGE("fstat error, errno:%{public}d", errno);
+        if (fstat64(fd, &statbuf) == 0) {
+            int32_t ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
+            ASSERT_EQ(ret, 0);
         }
-        int32_t ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
         close(fd);
-        ASSERT_EQ(ret, 0);
         sleep(5);
     } else {
         ASSERT_EQ(0, 0);
@@ -290,12 +283,11 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_003, TestSize.Level1)
         int32_t fd = open("/data/test/vibrator/on_carpet.json", O_RDONLY);
         MISC_HILOGD("test fd:%{public}d", fd);
         struct stat64 statbuf = { 0 };
-        if (fstat64(fd, &statbuf) != 0) {
-            MISC_HILOGE("fstat error, errno:%{public}d", errno);
+        if (fstat64(fd, &statbuf) == 0) {
+            ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
+            ASSERT_NE(ret, 0);
         }
-        ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
         close(fd);
-        ASSERT_NE(ret, 0);
         sleep(5);
     } else {
         ASSERT_EQ(0, 0);
@@ -313,12 +305,11 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_004, TestSize.Level1)
         int32_t fd = open("/data/test/vibrator/on_carpet.json", O_RDONLY);
         MISC_HILOGD("test fd:%{public}d", fd);
         struct stat64 statbuf = { 0 };
-        if (fstat64(fd, &statbuf) != 0) {
-            MISC_HILOGE("fstat error, errno:%{public}d", errno);
+        if (fstat64(fd, &statbuf) == 0) {
+            ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
+            ASSERT_NE(ret, 0);
         }
-        ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
         close(fd);
-        ASSERT_NE(ret, 0);
         sleep(5);
     } else {
         ASSERT_EQ(0, 0);
@@ -336,12 +327,11 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_005, TestSize.Level1)
         int32_t fd = open("/data/test/vibrator/on_carpet.json", O_RDONLY);
         MISC_HILOGD("test fd:%{public}d", fd);
         struct stat64 statbuf = { 0 };
-        if (fstat64(fd, &statbuf) != 0) {
-            MISC_HILOGE("fstat error, errno:%{public}d", errno);
+        if (fstat64(fd, &statbuf) == 0) {
+            ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
+            ASSERT_EQ(ret, 0);
         }
-        ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
         close(fd);
-        ASSERT_EQ(ret, 0);
         sleep(5);
     } else {
         ASSERT_EQ(0, 0);
@@ -352,19 +342,18 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_006, TestSize.Level1)
 {
     HiLog::Info(LABEL, "%{public}s begin", __func__);
     if (deviceType_ == PHONE_TYPE) {
-        int32_t ret = SetUsage(USAGE_ALARM);
-        ASSERT_TRUE(ret);
         int32_t fd = open("/data/test/vibrator/on_carpet.json", O_RDONLY);
         MISC_HILOGD("test fd:%{public}d", fd);
         struct stat64 statbuf = { 0 };
-        if (fstat64(fd, &statbuf) != 0) {
-            MISC_HILOGE("fstat error, errno:%{public}d", errno);
+        if (fstat64(fd, &statbuf) == 0) {
+            int32_t ret = SetUsage(USAGE_ALARM);
+            ASSERT_TRUE(ret);
+            ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
+            ASSERT_EQ(ret, 0);
+            ret = StartVibrator("haptic.clock.timer");
+            ASSERT_NE(ret, 0);
         }
-        ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
         close(fd);
-        ASSERT_EQ(ret, 0);
-        ret = StartVibrator("haptic.clock.timer");
-        ASSERT_NE(ret, 0);
         sleep(5);
     } else {
         ASSERT_EQ(0, 0);
@@ -375,19 +364,18 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_007, TestSize.Level1)
 {
     HiLog::Info(LABEL, "%{public}s begin", __func__);
     if (deviceType_ == PHONE_TYPE) {
-        int32_t ret = SetUsage(USAGE_UNKNOWN);
-        ASSERT_TRUE(ret);
         int32_t fd = open("/data/test/vibrator/on_carpet.json", O_RDONLY);
         MISC_HILOGD("test fd:%{public}d", fd);
         struct stat64 statbuf = { 0 };
-        if (fstat64(fd, &statbuf) != 0) {
-            MISC_HILOGE("fstat error, errno:%{public}d", errno);
+        if (fstat64(fd, &statbuf) == 0) {
+            int32_t ret = SetUsage(USAGE_UNKNOWN);
+            ASSERT_TRUE(ret);
+            ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
+            ASSERT_EQ(ret, 0);
+            ret = StartVibrator("haptic.clock.timer");
+            ASSERT_EQ(ret, 0);
         }
-        ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
-        close(fd);
-        ASSERT_EQ(ret, 0);
-        ret = StartVibrator("haptic.clock.timer");
-        ASSERT_EQ(ret, 0);
+        close(fd);        
         sleep(5);
     } else {
         ASSERT_EQ(0, 0);
@@ -405,12 +393,11 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_008, TestSize.Level1)
         int32_t fd = open("/data/test/vibrator/on_carpet.json", O_RDONLY);
         MISC_HILOGD("test fd:%{public}d", fd);
         struct stat64 statbuf = { 0 };
-        if (fstat64(fd, &statbuf) != 0) {
-            MISC_HILOGE("fstat error, errno:%{public}d", errno);
+        if (fstat64(fd, &statbuf) == 0) {
+            ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
+            ASSERT_NE(ret, 0);
         }
-        ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
         close(fd);
-        ASSERT_NE(ret, 0);
         sleep(5);
     } else {
         ASSERT_EQ(0, 0);
@@ -428,12 +415,11 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_009, TestSize.Level1)
         int32_t fd = open("/data/test/vibrator/on_carpet.json", O_RDONLY);
         MISC_HILOGD("test fd:%{public}d", fd);
         struct stat64 statbuf = { 0 };
-        if (fstat64(fd, &statbuf) != 0) {
-            MISC_HILOGE("fstat error, errno:%{public}d", errno);
+        if (fstat64(fd, &statbuf) == 0) {
+            ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
+            ASSERT_EQ(ret, 0);
         }
-        ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
         close(fd);
-        ASSERT_EQ(ret, 0);
         sleep(5);
     } else {
         ASSERT_EQ(0, 0);
@@ -444,19 +430,18 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_010, TestSize.Level1)
 {
     HiLog::Info(LABEL, "%{public}s begin", __func__);
     if (deviceType_ == PHONE_TYPE) {
-        int32_t ret = SetUsage(USAGE_ALARM);
-        ASSERT_TRUE(ret);
         int32_t fd = open("/data/test/vibrator/on_carpet.json", O_RDONLY);
         MISC_HILOGD("test fd:%{public}d", fd);
         struct stat64 statbuf = { 0 };
-        if (fstat64(fd, &statbuf) != 0) {
-            MISC_HILOGE("fstat error, errno:%{public}d", errno);
+        if (fstat64(fd, &statbuf) == 0) {
+            int32_t ret = SetUsage(USAGE_ALARM);
+            ASSERT_TRUE(ret);
+            ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
+            ASSERT_EQ(ret, 0);
+            ret = StartVibratorOnce(500);
+            ASSERT_NE(ret, 0);
         }
-        ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
         close(fd);
-        ASSERT_EQ(ret, 0);
-        ret = StartVibratorOnce(500);
-        ASSERT_NE(ret, 0);
         sleep(5);
     } else {
         ASSERT_EQ(0, 0);
@@ -467,19 +452,18 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_011, TestSize.Level1)
 {
     HiLog::Info(LABEL, "%{public}s begin", __func__);
     if (deviceType_ == PHONE_TYPE) {
-        int32_t ret = SetUsage(USAGE_UNKNOWN);
-        ASSERT_TRUE(ret);
         int32_t fd = open("/data/test/vibrator/on_carpet.json", O_RDONLY);
         MISC_HILOGD("test fd:%{public}d", fd);
         struct stat64 statbuf = { 0 };
-        if (fstat64(fd, &statbuf) != 0) {
-            MISC_HILOGE("fstat error, errno:%{public}d", errno);
+        if (fstat64(fd, &statbuf) == 0) {
+            int32_t ret = SetUsage(USAGE_UNKNOWN);
+            ASSERT_TRUE(ret);
+            ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
+            ASSERT_EQ(ret, 0);
+            ret = StartVibratorOnce(500);
+            ASSERT_EQ(ret, 0);
         }
-        ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
-        close(fd);
-        ASSERT_EQ(ret, 0);
-        ret = StartVibratorOnce(500);
-        ASSERT_EQ(ret, 0);
+        close(fd);   
         sleep(5);
     } else {
         ASSERT_EQ(0, 0);
@@ -493,12 +477,11 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_012, TestSize.Level1)
         int32_t fd = open("/data/test/vibrator/test_128_event.json", O_RDONLY);
         MISC_HILOGD("test fd:%{public}d", fd);
         struct stat64 statbuf = { 0 };
-        if (fstat64(fd, &statbuf) != 0) {
-            MISC_HILOGE("fstat error, errno:%{public}d", errno);
+        if (fstat64(fd, &statbuf) == 0) {
+            int32_t ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
+            ASSERT_EQ(ret, 0);
         }
-        int32_t ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
         close(fd);
-        ASSERT_EQ(ret, 0);
         sleep(7);
     } else {
         ASSERT_EQ(0, 0);
@@ -512,12 +495,11 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_013, TestSize.Level1)
         int32_t fd = open("/data/test/vibrator/test_invalid_type.json", O_RDONLY);
         MISC_HILOGD("test fd:%{public}d", fd);
         struct stat64 statbuf = { 0 };
-        if (fstat64(fd, &statbuf) != 0) {
-            MISC_HILOGE("fstat error, errno:%{public}d", errno);
+        if (fstat64(fd, &statbuf) == 0) {
+            int32_t ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
+            ASSERT_NE(ret, 0);
         }
-        int32_t ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
         close(fd);
-        ASSERT_NE(ret, 0);
     } else {
         ASSERT_EQ(0, 0);
     }
@@ -530,12 +512,11 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_014, TestSize.Level1)
         int32_t fd = open("/data/test/vibrator/test_invalid_startTime.json", O_RDONLY);
         MISC_HILOGD("test fd:%{public}d", fd);
         struct stat64 statbuf = { 0 };
-        if (fstat64(fd, &statbuf) != 0) {
-            MISC_HILOGE("fstat error, errno:%{public}d", errno);
+        if (fstat64(fd, &statbuf) == 0) {
+            int32_t ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
+            ASSERT_NE(ret, 0);
         }
-        int32_t ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
         close(fd);
-        ASSERT_NE(ret, 0);
     } else {
         ASSERT_EQ(0, 0);
     }
@@ -548,12 +529,11 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_015, TestSize.Level1)
         int32_t fd = open("/data/test/vibrator/test_invalid_duration.json", O_RDONLY);
         MISC_HILOGD("test fd:%{public}d", fd);
         struct stat64 statbuf = { 0 };
-        if (fstat64(fd, &statbuf) != 0) {
-            MISC_HILOGE("fstat error, errno:%{public}d", errno);
+        if (fstat64(fd, &statbuf) == 0) {
+            int32_t ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
+            ASSERT_NE(ret, 0);
         }
-        int32_t ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
         close(fd);
-        ASSERT_NE(ret, 0);
     } else {
         ASSERT_EQ(0, 0);
     }
@@ -566,12 +546,11 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_016, TestSize.Level1)
         int32_t fd = open("/data/test/vibrator/test_invalid_intensity.json", O_RDONLY);
         MISC_HILOGD("test fd:%{public}d", fd);
         struct stat64 statbuf = { 0 };
-        if (fstat64(fd, &statbuf) != 0) {
-            MISC_HILOGE("fstat error, errno:%{public}d", errno);
+        if (fstat64(fd, &statbuf) == 0) {
+            int32_t ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
+            ASSERT_NE(ret, 0);
         }
-        int32_t ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
         close(fd);
-        ASSERT_NE(ret, 0);
     } else {
         ASSERT_EQ(0, 0);
     }
@@ -584,12 +563,11 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_017, TestSize.Level1)
         int32_t fd = open("/data/test/vibrator/test_invalid_frequency.json", O_RDONLY);
         MISC_HILOGD("test fd:%{public}d", fd);
         struct stat64 statbuf = { 0 };
-        if (fstat64(fd, &statbuf) != 0) {
-            MISC_HILOGE("fstat error, errno:%{public}d", errno);
+        if (fstat64(fd, &statbuf) == 0) {
+            int32_t ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
+            ASSERT_NE(ret, 0);
         }
-        int32_t ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
         close(fd);
-        ASSERT_NE(ret, 0);
     } else {
         ASSERT_EQ(0, 0);
     }
@@ -602,12 +580,11 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_018, TestSize.Level1)
         int32_t fd = open("/data/test/vibrator/test_129_event.json", O_RDONLY);
         MISC_HILOGD("test fd:%{public}d", fd);
         struct stat64 statbuf = { 0 };
-        if (fstat64(fd, &statbuf) != 0) {
-            MISC_HILOGE("fstat error, errno:%{public}d", errno);
+        if (fstat64(fd, &statbuf) == 0) {
+            int32_t ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
+            ASSERT_NE(ret, 0);
         }
-        int32_t ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
         close(fd);
-        ASSERT_NE(ret, 0);
     } else {
         ASSERT_EQ(0, 0);
     }
@@ -620,12 +597,11 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_019, TestSize.Level1)
         int32_t fd = open("/data/test/vibrator/test_big_file_size.json", O_RDONLY);
         MISC_HILOGD("test fd:%{public}d", fd);
         struct stat64 statbuf = { 0 };
-        if (fstat64(fd, &statbuf) != 0) {
-            MISC_HILOGE("fstat error, errno:%{public}d", errno);
+        if (fstat64(fd, &statbuf) == 0) {
+            int32_t ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
+            ASSERT_NE(ret, 0);
         }
-        int32_t ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
-        close(fd);
-        ASSERT_NE(ret, 0);
+        close(fd); 
     } else {
         ASSERT_EQ(0, 0);
     }
@@ -638,12 +614,11 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_020, TestSize.Level1)
         int32_t fd = open("/data/test/vibrator/test_event_overlap_1.json", O_RDONLY);
         MISC_HILOGD("test fd:%{public}d", fd);
         struct stat64 statbuf = { 0 };
-        if (fstat64(fd, &statbuf) != 0) {
-            MISC_HILOGE("fstat error, errno:%{public}d", errno);
+        if (fstat64(fd, &statbuf) == 0) {
+            int32_t ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
+            ASSERT_NE(ret, 0);
         }
-        int32_t ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
         close(fd);
-        ASSERT_NE(ret, 0);
     } else {
         ASSERT_EQ(0, 0);
     }
@@ -656,65 +631,61 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_021, TestSize.Level1)
         int32_t fd = open("/data/test/vibrator/test_event_overlap_2.json", O_RDONLY);
         MISC_HILOGD("test fd:%{public}d", fd);
         struct stat64 statbuf = { 0 };
-        if (fstat64(fd, &statbuf) != 0) {
-            MISC_HILOGE("fstat error, errno:%{public}d", errno);
+        if (fstat64(fd, &statbuf) == 0) {
+            int32_t ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
+            ASSERT_NE(ret, 0);
         }
-        int32_t ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
         close(fd);
-        ASSERT_NE(ret, 0);
     } else {
         ASSERT_EQ(0, 0);
     }
 }
 
-HWTEST_F(VibratorAgentTest, StopVibratorAll_001, TestSize.Level1)
+HWTEST_F(VibratorAgentTest, Cancel_001, TestSize.Level1)
 {
     HiLog::Info(LABEL, "%{public}s begin", __func__);
-    int32_t ret = StopVibratorAll();
+    int32_t ret = Cancel();
     ASSERT_NE(ret, 0);
 }
 
-HWTEST_F(VibratorAgentTest, StopVibratorAll_002, TestSize.Level1)
+HWTEST_F(VibratorAgentTest, Cancel_002, TestSize.Level1)
 {
     HiLog::Info(LABEL, "%{public}s begin", __func__);
     if (deviceType_ == PHONE_TYPE) {
         int32_t fd = open("/data/test/vibrator/coin_drop.json", O_RDONLY);
         MISC_HILOGD("test fd:%{public}d", fd);
         struct stat64 statbuf = { 0 };
-        if (fstat64(fd, &statbuf) != 0) {
-            MISC_HILOGE("fstat error, errno:%{public}d", errno);
+        if (fstat64(fd, &statbuf) == 0) {
+            int32_t ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
+            ASSERT_EQ(ret, 0);
+            ret = Cancel();
+            ASSERT_EQ(ret, 0);
         }
-        int32_t ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
         close(fd);
-        ASSERT_EQ(ret, 0);
-        ret = StopVibratorAll();
-        ASSERT_EQ(ret, 0);
     } else {
         ASSERT_EQ(0, 0);
     }
 }
 
-HWTEST_F(VibratorAgentTest, StopVibratorAll_003, TestSize.Level1)
+HWTEST_F(VibratorAgentTest, Cancel_003, TestSize.Level1)
 {
     HiLog::Info(LABEL, "%{public}s begin", __func__);
     int32_t ret = StartVibratorOnce(500);
     ASSERT_EQ(ret, 0);
-    ret = StopVibratorAll();
+    ret = Cancel();
     ASSERT_EQ(ret, 0);
 }
 
-HWTEST_F(VibratorAgentTest, StopVibratorAll_004, TestSize.Level1)
+HWTEST_F(VibratorAgentTest, Cancel_004, TestSize.Level1)
 {
     HiLog::Info(LABEL, "%{public}s begin", __func__);
-    int ret = 0;
-    if (deviceType_ == TABLET_TYPE) {
-        ret = StartVibrator("haptic.common.click");
-    } else {
+    if (deviceType_ != TABLET_TYPE) {
+        int ret = 0;
         ret = StartVibrator("haptic.clock.timer");
+        ASSERT_EQ(ret, 0);
+        ret = Cancel();
+        ASSERT_EQ(ret, 0);
     }
-    ASSERT_EQ(ret, 0);
-    ret = StopVibratorAll();
-    ASSERT_EQ(ret, 0);
 }
 
 HWTEST_F(VibratorAgentTest, IsSupportVibratorCustom_001, TestSize.Level1)
