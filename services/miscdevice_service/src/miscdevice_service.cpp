@@ -312,7 +312,7 @@ int32_t MiscdeviceService::StopVibrator(int32_t vibratorId, const std::string &m
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 int32_t MiscdeviceService::DecodeCustomEffect(const RawFileDescriptor &rawFd, std::set<VibrateEvent> &vibrateSet)
 {
-    std::unique_ptr<VibratorDecoderFactory> defaultFactory(new (std::nothrow) DefaultVibratorDecoderFactory());
+    std::unique_ptr<VibratorDecoderFactory> defaultFactory = std::make_unique<DefaultVibratorDecoderFactory>();
     CHKPR(defaultFactory, ERROR);
     std::unique_ptr<VibratorDecoder> defaultDecoder(defaultFactory->CreateDecoder());
     CHKPR(defaultDecoder, ERROR);
@@ -367,7 +367,7 @@ int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, const RawFileD
         MISC_HILOGE("invalid file descriptor, fd:%{public}d, offset:%{public}lld, length:%{public}lld",
             rawFd.fd, static_cast<long long>(rawFd.offset), static_cast<long long>(rawFd.length));
         return PARAMETER_ERROR;
-    } 
+    }
     VibrateInfo info = {
         .mode = "custom",
         .packageName = GetPackageName(GetCallingTokenID()),
