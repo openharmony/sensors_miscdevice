@@ -32,9 +32,9 @@ public:
     int32_t StartOnce(uint32_t duration) override;
     int32_t Start(const std::string &effectType) override;
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    int32_t EnableCompositeEffect(const HdfCompositeEffect &vibratorCompositeEffect) override;
+    int32_t EnableCompositeEffect(const HdfCompositeEffect &hdfCompositeEffect) override;
     bool IsVibratorRunning() override;
-    int32_t GetEffectInfo(const std::string &effect, HdfEffectInfo &effectInfo) override;
+    std::optional<HdfEffectInfo> GetEffectInfo(const std::string &effect) override;
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     int32_t Stop(HdfVibratorMode mode) override;
     int32_t DestroyHdiConnection() override;

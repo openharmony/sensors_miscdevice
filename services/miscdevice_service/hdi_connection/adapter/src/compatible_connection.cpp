@@ -32,7 +32,7 @@ std::unordered_map<std::string, int32_t> vibratorEffect_ = {
 };
 HdfVibratorMode vibrateMode_;
 }
-uint32_t CompatibleConnection::duration_ = -1;
+uint32_t CompatibleConnection::duration_ = 0;
 std::atomic_bool CompatibleConnection::isStop_ = false;
 
 int32_t CompatibleConnection::ConnectHdi()
@@ -72,20 +72,20 @@ int32_t CompatibleConnection::Start(const std::string &effectType)
 }
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-int32_t CompatibleConnection::EnableCompositeEffect(const HdfCompositeEffect &vibratorCompositeEffect)
+int32_t CompatibleConnection::EnableCompositeEffect(const HdfCompositeEffect &hdfCompositeEffect)
 {
     CALL_LOG_ENTER;
-    if (vibratorCompositeEffect.compositeEffects.empty()) {
+    if (hdfCompositeEffect.compositeEffects.empty()) {
         MISC_HILOGE("compositeEffects is empty");
         return VIBRATOR_ON_ERR;
     }
     duration_ = 0;
-    auto& compositeEffects = vibratorCompositeEffect.compositeEffects;
+    std::vector<CompositeEffect> &compositeEffects = hdfCompositeEffect.compositeEffects;
     size_t size = compositeEffects.size();
     for (size_t i = 0; i < size; ++i) {
-        if (vibratorCompositeEffect.type == HDF_EFFECT_TYPE_TIME) {
+        if (hdfCompositeEffect.type == HDF_EFFECT_TYPE_TIME) {
             duration_ += compositeEffects[i].timeEffect.delay;
-        } else if (vibratorCompositeEffect.type == HDF_EFFECT_TYPE_PRIMITIVE) {
+        } else if (hdfCompositeEffect.type == HDF_EFFECT_TYPE_PRIMITIVE) {
             duration_ += compositeEffects[i].primitiveEffect.delay;
         }
     }
@@ -104,18 +104,19 @@ bool CompatibleConnection::IsVibratorRunning()
     return (!isStop_);
 }
 
-int32_t CompatibleConnection::GetEffectInfo(const std::string &effect, HdfEffectInfo &effectInfo)
+std::optional<HdfEffectInfo> CompatibleConnection::GetEffectInfo(const std::string &effect)
 {
     CALL_LOG_ENTER;
+    HdfEffectInfo effectInfo;
     if (vibratorEffect_.find(effect) == vibratorEffect_.end()) {
         MISC_HILOGI("Not support effect:%{public}s", effect.c_str());
         effectInfo.isSupportEffect = false;
         effectInfo.duration = 0;
-        return ERR_OK;
+        return effectInfo;
     }
     effectInfo.isSupportEffect = true;
     effectInfo.duration = vibratorEffect_[effect];
-    return ERR_OK;
+    return effectInfo;
 }
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
@@ -123,7 +124,7 @@ int32_t CompatibleConnection::Stop(HdfVibratorMode mode)
 {
     CALL_LOG_ENTER;
     if (mode < 0 || mode >= HDF_VIBRATOR_MODE_BUTT) {
-        MISC_HILOGE("mode:%{public}d invalid", mode);
+        MISC_HILOGE("invalid mode:%{public}d", mode);
         return VIBRATOR_OFF_ERR;
     }
     if (vibrateMode_ != mode) {

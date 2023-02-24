@@ -78,13 +78,13 @@ int32_t HdiConnection::Start(const std::string &effectType)
 }
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-int32_t HdiConnection::EnableCompositeEffect(const HdfCompositeEffect &vibratorCompositeEffect)
+int32_t HdiConnection::EnableCompositeEffect(const HdfCompositeEffect &hdfCompositeEffect)
 {
-    if (vibratorCompositeEffect.compositeEffects.empty()) {
+    if (hdfCompositeEffect.compositeEffects.empty()) {
         MISC_HILOGE("compositeEffects is empty");
         return VIBRATOR_ON_ERR;
     }
-    int32_t ret = vibratorInterface_->EnableCompositeEffect(vibratorCompositeEffect);
+    int32_t ret = vibratorInterface_->EnableCompositeEffect(hdfCompositeEffect);
     if (ret < 0) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "EnableCompositeEffect", "ERROR_CODE", ret);
@@ -96,21 +96,22 @@ int32_t HdiConnection::EnableCompositeEffect(const HdfCompositeEffect &vibratorC
 
 bool HdiConnection::IsVibratorRunning()
 {
-    bool state;
+    bool state = false;
     vibratorInterface_->IsVibratorRunning(state);
     return state;
 }
 
-int32_t HdiConnection::GetEffectInfo(const std::string &effect, HdfEffectInfo &effectInfo)
+std::optional<HdfEffectInfo> HdiConnection::GetEffectInfo(const std::string &effect)
 {
+    HdfEffectInfo effectInfo;
     int32_t ret = vibratorInterface_->GetEffectInfo(effect, effectInfo);
     if (ret < 0) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "GetEffectInfo", "ERROR_CODE", ret);
         MISC_HILOGE("GetEffectInfo failed");
-        return ret;
+        return nullopt;
     }
-    return ERR_OK;
+    return effectInfo;
 }
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
