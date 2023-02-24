@@ -16,11 +16,11 @@
 #ifndef I_VIBRATOR_HDI_CONNECTION_H
 #define I_VIBRATOR_HDI_CONNECTION_H
 
-#include <nocopyable.h>
 #include <optional>
 #include <stdint.h>
 #include <string>
 
+#include <nocopyable.h>
 #include "v1_1/vibrator_types.h"
 
 namespace OHOS {

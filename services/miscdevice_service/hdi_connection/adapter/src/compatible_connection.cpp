@@ -80,13 +80,12 @@ int32_t CompatibleConnection::EnableCompositeEffect(const HdfCompositeEffect &hd
         return VIBRATOR_ON_ERR;
     }
     duration_ = 0;
-    const std::vector<CompositeEffect> &compositeEffects = hdfCompositeEffect.compositeEffects;
-    size_t size = compositeEffects.size();
+    size_t size = hdfCompositeEffect.compositeEffects.size();
     for (size_t i = 0; i < size; ++i) {
         if (hdfCompositeEffect.type == HDF_EFFECT_TYPE_TIME) {
-            duration_ += compositeEffects[i].timeEffect.delay;
+            duration_ += hdfCompositeEffect.compositeEffects[i].timeEffect.delay;
         } else if (hdfCompositeEffect.type == HDF_EFFECT_TYPE_PRIMITIVE) {
-            duration_ += compositeEffects[i].primitiveEffect.delay;
+            duration_ += hdfCompositeEffect.compositeEffects[i].primitiveEffect.delay;
         }
     }
     if (!vibrateThread_.joinable()) {

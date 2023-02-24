@@ -24,10 +24,10 @@
 #include "v1_0/light_interface_proxy.h"
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-#include "parameters.h"
 #include "custom_vibration_matcher.h"
 #include "default_vibrator_decoder.h"
 #include "default_vibrator_decoder_factory.h"
+#include "parameters.h"
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
 namespace OHOS {
@@ -228,7 +228,7 @@ int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::str
     }
 #if defined(OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM)
     std::optional<HdfEffectInfo> effectInfo = vibratorHdiConnection_.GetEffectInfo(effect);
-    if (!effectInfo.has_value()) {
+    if (!effectInfo) {
         MISC_HILOGE("GetEffectInfo fail");
         return ERROR;
     }
@@ -339,12 +339,12 @@ int32_t MiscdeviceService::StartCustomVibration(const RawFileDescriptor &rawFd, 
         MISC_HILOGE("transform custom effect error");
         return ERROR;
     }
-    std::vector<CompositeEffect> &compositeEffects = hdfCompositeEffect.compositeEffects;
-    size_t size = compositeEffects.size();
+    size_t size = hdfCompositeEffect.compositeEffects.size();
     MISC_HILOGD("the count of match result:%{public}zu", size);
     for (size_t i = 0; i < size; ++i) {
         MISC_HILOGD("match result at %{public}zu th, delay:%{public}d, effectId:%{public}d",
-            i, compositeEffects[i].primitiveEffect.delay, compositeEffects[i].primitiveEffect.effectId);
+            i, hdfCompositeEffect.compositeEffects[i].primitiveEffect.delay,
+            hdfCompositeEffect.compositeEffects[i].primitiveEffect.effectId);
     }
     StartVibrateThread(info);
     return vibratorHdiConnection_.EnableCompositeEffect(hdfCompositeEffect);
