@@ -30,15 +30,16 @@ bool VibratorThread::Run()
     if (info.mode == "time") {
         int32_t ret = VibratorDevice.StartOnce(static_cast<uint32_t>(info.duration));
         if (ret != SUCCESS) {
-            MISC_HILOGE("StartOnce fail, duration: %{public}d, pid: %{public}d",
-                info.duration, info.pid);
+            MISC_HILOGE("StartOnce fail, duration:%{public}d, package:%{public}s",
+                info.duration, info.packageName.c_str());
             return false;
         }
         cv_.wait_for(vibrateLck, std::chrono::milliseconds(info.duration));
         VibratorDevice.Stop(HDF_VIBRATOR_MODE_ONCE);
         std::unique_lock<std::mutex> readyLck(readyMutex_);
         if (ready_) {
-            MISC_HILOGI("Stop duration: %{public}d, pid: %{public}d", info.duration, info.pid);
+            MISC_HILOGI("Stop duration:%{public}d, package:%{public}s",
+                info.duration, info.packageName.c_str());
             SetReadyStatus(false);
             return false;
         }
@@ -47,14 +48,16 @@ bool VibratorThread::Run()
             std::string effect = info.effect;
             int32_t ret = VibratorDevice.Start(effect);
             if (ret != SUCCESS) {
-                MISC_HILOGE("Vibrate effect %{public}s failed, pid: %{public}d", effect.c_str(), info.pid);
+                MISC_HILOGE("Vibrate effect %{public}s failed, package:%{public}s",
+                    effect.c_str(), info.packageName.c_str());
                 return false;
             }
             cv_.wait_for(vibrateLck, std::chrono::milliseconds(info.duration));
             VibratorDevice.Stop(HDF_VIBRATOR_MODE_PRESET);
             std::unique_lock<std::mutex> readyLck(readyMutex_);
             if (ready_) {
-                MISC_HILOGI("Stop effect %{public}s, pid: %{public}d", effect.c_str(), currentVibration_.pid);
+                MISC_HILOGI("Stop effect %{public}s, package:%{public}s",
+                    effect.c_str(), info.packageName.c_str());
                 SetReadyStatus(false);
                 return false;
             }

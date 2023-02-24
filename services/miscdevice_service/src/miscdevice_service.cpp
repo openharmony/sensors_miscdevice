@@ -227,13 +227,12 @@ int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::str
         return PARAMETER_ERROR;
     }
 #if defined(OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM)
-    HdfEffectInfo effectInfo;
-    int32_t ret = vibratorHdiConnection_.GetEffectInfo(effect, effectInfo);
-    if (ret != SUCCESS) {
+    std::optional<HdfEffectInfo> effectInfo = vibratorHdiConnection_.GetEffectInfo(effect);
+    if (!effectInfo.has_value()) {
         MISC_HILOGE("GetEffectInfo fail");
         return ERROR;
     }
-    if (!effectInfo.isSupportEffect) {
+    if (!(effectInfo->isSupportEffect)) {
         MISC_HILOGE("Effect not supported");
         return PARAMETER_ERROR;
     }
@@ -243,7 +242,7 @@ int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::str
         .pid = GetCallingPid(),
         .uid = GetCallingUid(),
         .usage = usage,
-        .duration = effectInfo.duration,
+        .duration = effectInfo->duration,
         .effect = effect,
         .count = count
     };
@@ -312,17 +311,15 @@ int32_t MiscdeviceService::StopVibrator(int32_t vibratorId, const std::string &m
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 int32_t MiscdeviceService::DecodeCustomEffect(const RawFileDescriptor &rawFd, std::set<VibrateEvent> &vibrateSet)
 {
-    std::unique_ptr<VibratorDecoderFactory> defaultFactory = std::make_unique<DefaultVibratorDecoderFactory>();
-    CHKPR(defaultFactory, ERROR);
+    auto defaultFactory = std::make_unique<DefaultVibratorDecoderFactory>();
     std::unique_ptr<VibratorDecoder> defaultDecoder(defaultFactory->CreateDecoder());
-    CHKPR(defaultDecoder, ERROR);
     JsonParser parser(rawFd);
     int32_t ret = defaultDecoder->DecodeEffect(parser, vibrateSet);
     if (ret != SUCCESS) {
         MISC_HILOGE("decoder effect error");
         return ERROR;
     }
-    MISC_HILOGD("vibrateSet size:%{public}d", static_cast<int32_t>(vibrateSet.size()));
+    MISC_HILOGD("vibrateSet size:%{public}zu", vibrateSet.size());
     return NO_ERROR;
 }
 
@@ -342,7 +339,7 @@ int32_t MiscdeviceService::StartCustomVibration(const RawFileDescriptor &rawFd, 
         MISC_HILOGE("transform custom effect error");
         return ERROR;
     }
-    auto& compositeEffects = hdfCompositeEffect.compositeEffects;
+    std::vector<CompositeEffect> &compositeEffects = hdfCompositeEffect.compositeEffects;
     size_t size = compositeEffects.size();
     MISC_HILOGD("the count of match result:%{public}zu", size);
     for (size_t i = 0; i < size; ++i) {

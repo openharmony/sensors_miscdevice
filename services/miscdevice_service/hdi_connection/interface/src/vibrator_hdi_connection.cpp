@@ -46,6 +46,7 @@ int32_t VibratorHdiConnection::ConnectHdi()
 
 int32_t VibratorHdiConnection::StartOnce(uint32_t duration)
 {
+    CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
     StartTrace(HITRACE_TAG_SENSORS, "StartOnce");
     int32_t ret = iVibratorHdiConnection_->StartOnce(duration);
     FinishTrace(HITRACE_TAG_SENSORS);
@@ -58,6 +59,7 @@ int32_t VibratorHdiConnection::StartOnce(uint32_t duration)
 
 int32_t VibratorHdiConnection::Start(const std::string &effectType)
 {
+    CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
     StartTrace(HITRACE_TAG_SENSORS, "Start");
     int32_t ret = iVibratorHdiConnection_->Start(effectType);
     FinishTrace(HITRACE_TAG_SENSORS);
@@ -69,10 +71,11 @@ int32_t VibratorHdiConnection::Start(const std::string &effectType)
 }
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-int32_t VibratorHdiConnection::EnableCompositeEffect(const HdfCompositeEffect &vibratorCompositeEffect)
+int32_t VibratorHdiConnection::EnableCompositeEffect(const HdfCompositeEffect &hdfCompositeEffect)
 {
+    CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
     StartTrace(HITRACE_TAG_SENSORS, "EnableCompositeEffect");
-    int32_t ret = iVibratorHdiConnection_->EnableCompositeEffect(vibratorCompositeEffect);
+    int32_t ret = iVibratorHdiConnection_->EnableCompositeEffect(hdfCompositeEffect);
     FinishTrace(HITRACE_TAG_SENSORS);
     if (ret != 0) {
         MISC_HILOGE("EnableCompositeEffect failed");
@@ -83,24 +86,26 @@ int32_t VibratorHdiConnection::EnableCompositeEffect(const HdfCompositeEffect &v
 
 bool VibratorHdiConnection::IsVibratorRunning()
 {
+    CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
     return iVibratorHdiConnection_->IsVibratorRunning();
 }
 
-int32_t VibratorHdiConnection::GetEffectInfo(const std::string &effect, HdfEffectInfo &effectInfo)
+std::optional<HdfEffectInfo> VibratorHdiConnection::GetEffectInfo(const std::string &effect)
 {
-    StartTrace(HITRACE_TAG_SENSORS, "GetEffectInfo");
-    int32_t ret = iVibratorHdiConnection_->GetEffectInfo(effect, effectInfo);
-    FinishTrace(HITRACE_TAG_SENSORS);
-    if (ret != 0) {
-        MISC_HILOGE("GetEffectInfo failed");
-        return ERROR;
+    if (iVibratorHdiConnection_ == nullptr) {
+        MISC_HILOGE("connect hdi failed");
+        return std::nullopt;
     }
-    return ERR_OK;
+    StartTrace(HITRACE_TAG_SENSORS, "GetEffectInfo");
+    std::optional<HdfEffectInfo> ret = iVibratorHdiConnection_->GetEffectInfo(effect);
+    FinishTrace(HITRACE_TAG_SENSORS);
+    return ret;
 }
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
 int32_t VibratorHdiConnection::Stop(HdfVibratorMode mode)
 {
+    CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
     StartTrace(HITRACE_TAG_SENSORS, "Stop");
     int32_t ret = iVibratorHdiConnection_->Stop(mode);
     FinishTrace(HITRACE_TAG_SENSORS);
@@ -113,6 +118,7 @@ int32_t VibratorHdiConnection::Stop(HdfVibratorMode mode)
 
 int32_t VibratorHdiConnection::DestroyHdiConnection()
 {
+    CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
     int32_t ret = iVibratorHdiConnection_->DestroyHdiConnection();
     if (ret != 0) {
         MISC_HILOGE("DestroyHdiConnection failed");
