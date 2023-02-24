@@ -29,11 +29,11 @@ constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "VibratorHdiConnection
 
 int32_t VibratorHdiConnection::ConnectHdi()
 {
-    iVibratorHdiConnection_ = std::make_unique<CompatibleConnection>();
+    iVibratorHdiConnection_ = std::make_unique<HdiConnection>();
     int32_t ret = iVibratorHdiConnection_->ConnectHdi();
     if (ret != 0) {
         MISC_HILOGE("hdi direct failed");
-        iVibratorHdiConnection_ = std::make_unique<HdiConnection>();
+        iVibratorHdiConnection_ = std::make_unique<CompatibleConnection>();
         ret = iVibratorHdiConnection_->ConnectHdi();
     }
     if (ret != 0) {
