@@ -92,7 +92,10 @@ bool VibratorHdiConnection::IsVibratorRunning()
 
 std::optional<HdfEffectInfo> VibratorHdiConnection::GetEffectInfo(const std::string &effect)
 {
-    CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
+    if (iVibratorHdiConnection_ == nullptr) {
+        MISC_HILOGE("connect hdi failed");
+        return std::nullopt;
+    }
     StartTrace(HITRACE_TAG_SENSORS, "GetEffectInfo");
     std::optional<HdfEffectInfo> ret = iVibratorHdiConnection_->GetEffectInfo(effect);
     FinishTrace(HITRACE_TAG_SENSORS);

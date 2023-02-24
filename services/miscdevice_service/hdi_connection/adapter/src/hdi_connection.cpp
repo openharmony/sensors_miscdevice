@@ -51,6 +51,7 @@ int32_t HdiConnection::ConnectHdi()
 
 int32_t HdiConnection::StartOnce(uint32_t duration)
 {
+    CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
     int32_t ret = vibratorInterface_->StartOnce(duration);
     if (ret < 0) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
@@ -67,6 +68,7 @@ int32_t HdiConnection::Start(const std::string &effectType)
         MISC_HILOGE("effectType is null");
         return VIBRATOR_ON_ERR;
     }
+    CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
     int32_t ret = vibratorInterface_->Start(effectType);
     if (ret < 0) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
@@ -84,6 +86,7 @@ int32_t HdiConnection::EnableCompositeEffect(const HdfCompositeEffect &hdfCompos
         MISC_HILOGE("compositeEffects is empty");
         return VIBRATOR_ON_ERR;
     }
+    CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
     int32_t ret = vibratorInterface_->EnableCompositeEffect(hdfCompositeEffect);
     if (ret < 0) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
@@ -97,19 +100,24 @@ int32_t HdiConnection::EnableCompositeEffect(const HdfCompositeEffect &hdfCompos
 bool HdiConnection::IsVibratorRunning()
 {
     bool state = false;
+    CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
     vibratorInterface_->IsVibratorRunning(state);
     return state;
 }
 
 std::optional<HdfEffectInfo> HdiConnection::GetEffectInfo(const std::string &effect)
 {
+    if (vibratorInterface_ == nullptr) {
+        MISC_HILOGE("connect v1_1 hdi failed");
+        return std::nullopt;
+    }
     HdfEffectInfo effectInfo;
     int32_t ret = vibratorInterface_->GetEffectInfo(effect, effectInfo);
     if (ret < 0) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "GetEffectInfo", "ERROR_CODE", ret);
         MISC_HILOGE("GetEffectInfo failed");
-        return nullopt;
+        return std::nullopt;
     }
     return effectInfo;
 }
@@ -117,6 +125,7 @@ std::optional<HdfEffectInfo> HdiConnection::GetEffectInfo(const std::string &eff
 
 int32_t HdiConnection::Stop(HdfVibratorMode mode)
 {
+    CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
     int32_t ret = vibratorInterface_->Stop(mode);
     if (ret < 0) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",

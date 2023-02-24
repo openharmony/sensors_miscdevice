@@ -80,7 +80,7 @@ int32_t CompatibleConnection::EnableCompositeEffect(const HdfCompositeEffect &hd
         return VIBRATOR_ON_ERR;
     }
     duration_ = 0;
-    std::vector<CompositeEffect> &compositeEffects = hdfCompositeEffect.compositeEffects;
+    const std::vector<CompositeEffect> &compositeEffects = hdfCompositeEffect.compositeEffects;
     size_t size = compositeEffects.size();
     for (size_t i = 0; i < size; ++i) {
         if (hdfCompositeEffect.type == HDF_EFFECT_TYPE_TIME) {
