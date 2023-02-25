@@ -16,6 +16,7 @@
 #include "miscdevice_service.h"
 
 #include <algorithm>
+#include <cinttypes>
 #include <string_ex.h>
 
 #include "sensors_errors.h"
@@ -361,8 +362,8 @@ int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, const RawFileD
         return PARAMETER_ERROR;
     }
     if ((rawFd.fd < 0) || (rawFd.offset < 0) || (rawFd.length <= 0) || (rawFd.length > MAX_JSON_FILE_SIZE)) {
-        MISC_HILOGE("invalid file descriptor, fd:%{public}d, offset:%{public}lld, length:%{public}lld",
-            rawFd.fd, static_cast<long long>(rawFd.offset), static_cast<long long>(rawFd.length));
+        MISC_HILOGE("invalid file descriptor, fd:%{public}d, offset:%{public}" PRId64 ", length:%{public}" PRId64,
+            rawFd.fd, rawFd.offset, rawFd.length);
         return PARAMETER_ERROR;
     }
     VibrateInfo info = {
