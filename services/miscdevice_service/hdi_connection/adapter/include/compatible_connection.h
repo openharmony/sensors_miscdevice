@@ -33,8 +33,8 @@ public:
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     int32_t EnableCompositeEffect(const HdfCompositeEffect &hdfCompositeEffect) override;
     bool IsVibratorRunning() override;
-    std::optional<HdfEffectInfo> GetEffectInfo(const std::string &effect) override;
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+    std::optional<HdfEffectInfo> GetEffectInfo(const std::string &effect) override;
     int32_t Stop(HdfVibratorMode mode) override;
     int32_t DestroyHdiConnection() override;
 

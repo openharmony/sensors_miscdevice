@@ -102,6 +102,7 @@ bool CompatibleConnection::IsVibratorRunning()
     CALL_LOG_ENTER;
     return (!isStop_);
 }
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
 std::optional<HdfEffectInfo> CompatibleConnection::GetEffectInfo(const std::string &effect)
 {
@@ -117,7 +118,6 @@ std::optional<HdfEffectInfo> CompatibleConnection::GetEffectInfo(const std::stri
     effectInfo.duration = vibratorEffect_[effect];
     return effectInfo;
 }
-#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
 int32_t CompatibleConnection::Stop(HdfVibratorMode mode)
 {

@@ -30,8 +30,13 @@ namespace OHOS {
 namespace Sensors {
 using std::string;
 constexpr int32_t CALLBACK_NUM = 3;
-constexpr uint32_t TYPE_SYSTEM_VIBRATE = 1;
 constexpr uint32_t STRING_LENGTH_MAX = 64;
+
+enum class CallbackType {
+    TYPE_SYSTEM_VIBRATE = 1,
+    TYPE_IS_SUPPORT_EFFECT,
+    TYPE_INVALID,
+};
 
 class AsyncCallbackInfo : public RefBase {
 public:
@@ -47,7 +52,8 @@ public:
     napi_deferred deferred = nullptr;
     napi_ref callback[CALLBACK_NUM] = {0};
     AsyncCallbackError error;
-    uint32_t callbackType = 0;
+    CallbackType callbackType = CallbackType::TYPE_INVALID;
+    bool isSupportEffect {false};
     AsyncCallbackInfo(napi_env env) : env(env) {}
     ~AsyncCallbackInfo();
 };

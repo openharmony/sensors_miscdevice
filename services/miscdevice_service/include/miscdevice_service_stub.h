@@ -51,6 +51,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     int32_t StopVibratorAllStub(MessageParcel &data, MessageParcel &reply);
     int32_t StopVibratorByModeStub(MessageParcel &data, MessageParcel &reply);
+    int32_t IsSupportEffectStub(MessageParcel &data, MessageParcel &reply);
     int32_t GetLightListStub(MessageParcel &data, MessageParcel &reply);
     int32_t TurnOnStub(MessageParcel &data, MessageParcel &reply);
     int32_t TurnOffStub(MessageParcel &data, MessageParcel &reply);

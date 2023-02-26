@@ -309,6 +309,17 @@ int32_t MiscdeviceService::StopVibrator(int32_t vibratorId, const std::string &m
     return NO_ERROR;
 }
 
+int32_t MiscdeviceService::IsSupportEffect(const std::string &effect, bool &state)
+{
+    std::optional<HdfEffectInfo> effectInfo = vibratorHdiConnection_.GetEffectInfo(effect);
+    if (!effectInfo) {
+        MISC_HILOGE("GetEffectInfo fail");
+        return ERROR;
+    }
+    state = effectInfo->isSupportEffect;
+    return NO_ERROR;
+}
+
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 int32_t MiscdeviceService::DecodeCustomEffect(const RawFileDescriptor &rawFd, std::set<VibrateEvent> &vibrateSet)
 {

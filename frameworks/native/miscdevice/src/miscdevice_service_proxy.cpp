@@ -153,6 +153,35 @@ int32_t MiscdeviceServiceProxy::StopVibrator(int32_t vibratorId, const std::stri
     return ret;
 }
 
+int32_t MiscdeviceServiceProxy::IsSupportEffect(const std::string &effect, bool &state)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MiscdeviceServiceProxy::GetDescriptor())) {
+        MISC_HILOGE("write descriptor failed");
+        return WRITE_MSG_ERR;
+    }
+    if (!data.WriteString(effect)) {
+        MISC_HILOGE("WriteString effect failed");
+        return WRITE_MSG_ERR;
+    }
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, ERROR);
+    MessageParcel reply;
+    MessageOption option;
+    int32_t ret = remote->SendRequest(IS_SUPPORT_EFFECT, data, reply, option);
+    if (ret != NO_ERROR) {
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "IsSupportEffect", "ERROR_CODE", ret);
+        MISC_HILOGE("SendRequest failed, ret:%{public}d", ret);
+        return ret;
+    }
+    if (!reply.ReadBool(state)) {
+        MISC_HILOGE("Parcel read state failed");
+        return READ_MSG_ERR;
+    }
+    return ret;
+}
+
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 int32_t MiscdeviceServiceProxy::PlayVibratorCustom(int32_t vibratorId, const RawFileDescriptor &rawFd, int32_t usage)
 {

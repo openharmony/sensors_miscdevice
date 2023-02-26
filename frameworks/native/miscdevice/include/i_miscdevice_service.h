@@ -40,6 +40,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     virtual int32_t StopVibrator(int32_t vibratorId) = 0;
     virtual int32_t StopVibrator(int32_t vibratorId, const std::string &mode) = 0;
+    virtual int32_t IsSupportEffect(const std::string &effect, bool &state) = 0;
     virtual std::vector<LightInfo> GetLightList() = 0;
     virtual int32_t TurnOn(int32_t lightId, const LightColor &color, const LightAnimation &animation) = 0;
     virtual int32_t TurnOff(int32_t lightId) = 0;
@@ -52,6 +53,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
         STOP_VIBRATOR_ALL,
         STOP_VIBRATOR_BY_MODE,
+        IS_SUPPORT_EFFECT,
         GET_LIGHT_LIST,
         TURN_ON,
         TURN_OFF,

@@ -184,7 +184,7 @@ void EmitAsyncCallbackWork(sptr<AsyncCallbackInfo> asyncCallbackInfo)
              * count of the smart pointer is guaranteed to be 1.
              */
             asyncCallbackInfo->DecStrongRef(nullptr);
-            if (asyncCallbackInfo->callbackType == TYPE_SYSTEM_VIBRATE) {
+            if (asyncCallbackInfo->callbackType == CallbackType::TYPE_SYSTEM_VIBRATE) {
                 EmitSystemCallback(env, asyncCallbackInfo);
                 return;
             }
@@ -202,7 +202,12 @@ void EmitAsyncCallbackWork(sptr<AsyncCallbackInfo> asyncCallbackInfo)
                 result = CreateBusinessError(env, asyncCallbackInfo->error.code, msg.value());
                 CHKPV(result);
             } else {
-                CHKCV((napi_get_undefined(env, &result) == napi_ok), "napi_get_undefined fail");
+                if (asyncCallbackInfo->callbackType == CallbackType::TYPE_IS_SUPPORT_EFFECT) {
+                    CHKCV((napi_get_boolean(env, asyncCallbackInfo->isSupportEffect, &result) == napi_ok),
+                        "napi_get_boolean fail");
+                } else {
+                    CHKCV((napi_get_undefined(env, &result) == napi_ok), "napi_get_undefined fail");
+                }
             }
             napi_value callResult = nullptr;
             CHKCV((napi_call_function(env, nullptr, callback, 1, &result, &callResult) == napi_ok),
@@ -241,13 +246,18 @@ void EmitPromiseWork(sptr<AsyncCallbackInfo> asyncCallbackInfo)
              */
             asyncCallbackInfo->DecStrongRef(nullptr);
             CHKPV(asyncCallbackInfo->deferred);
-            if (asyncCallbackInfo->callbackType == TYPE_SYSTEM_VIBRATE) {
+            if (asyncCallbackInfo->callbackType == CallbackType::TYPE_SYSTEM_VIBRATE) {
                 EmitSystemCallback(env, asyncCallbackInfo);
                 return;
             }
             napi_value result = nullptr;
             if (asyncCallbackInfo->error.code == 0) {
-                CHKCV((napi_get_undefined(env, &result) == napi_ok), "napi_get_undefined fail");
+                if (asyncCallbackInfo->callbackType == CallbackType::TYPE_IS_SUPPORT_EFFECT) {
+                    CHKCV((napi_get_boolean(env, asyncCallbackInfo->isSupportEffect, &result) == napi_ok),
+                        "napi_get_boolean fail");
+                } else {
+                    CHKCV((napi_get_undefined(env, &result) == napi_ok), "napi_get_undefined fail");
+                }
                 CHKCV((napi_resolve_deferred(env, asyncCallbackInfo->deferred, result) == napi_ok),
                     "napi_resolve_deferred fail");
             } else {

@@ -698,5 +698,38 @@ HWTEST_F(VibratorAgentTest, IsSupportVibratorCustom_001, TestSize.Level1)
         ASSERT_FALSE(ret);
     }
 }
+
+HWTEST_F(VibratorAgentTest, IsSupportEffect_001, TestSize.Level1)
+{
+    HiLog::Info(LABEL, "%{public}s begin", __func__);
+    bool state { false };
+    int32_t ret = IsSupportEffect("haptic.clock.timer", &state);
+    if (state) {
+        ret = StartVibrator("haptic.clock.timer");
+        ASSERT_EQ(ret, 0);
+        ret = Cancel();
+        ASSERT_EQ(ret, 0);
+    } else {
+        HiLog::Info(LABEL, "Do not support haptic.clock.timer");
+    }
+}
+
+HWTEST_F(VibratorAgentTest, IsSupportEffect_002, TestSize.Level1)
+{
+    HiLog::Info(LABEL, "%{public}s begin", __func__);
+    bool state { false };
+    int32_t ret = IsSupportEffect("haptic.xxx.yyy", &state);
+    ASSERT_EQ(ret, 0);
+    ASSERT_FALSE(state);
+}
+
+HWTEST_F(VibratorAgentTest, IsSupportEffect_003, TestSize.Level1)
+{
+    HiLog::Info(LABEL, "%{public}s begin", __func__);
+    bool state { false };
+    int32_t ret = IsSupportEffect(nullptr, &state);
+    ASSERT_NE(ret, 0);
+    ASSERT_FALSE(state);
+}
 }  // namespace Sensors
 }  // namespace OHOS
