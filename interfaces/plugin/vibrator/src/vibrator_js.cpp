@@ -53,9 +53,6 @@ struct VibrateInfo {
     int32_t duration = 0;
     std::string effectId;
     int32_t count = 0;
-    int32_t fd = 0;
-    int64_t offset = 0;
-    int64_t length = 0;
 };
 
 static napi_value VibrateTime(napi_env env, napi_value args[], size_t argc)
@@ -167,10 +164,6 @@ bool ParseParameter(napi_env env, napi_value args[], size_t argc, VibrateInfo &i
     } else if (info.type == "preset") {
         CHKCF(GetPropertyInt32(env, args[0], "count", info.count), "Get vibrate count fail");
         CHKCF(GetPropertyString(env, args[0], "effectId", info.effectId), "Get vibrate effectId fail");
-    } else if (info.type == "custom") {
-        CHKCF(GetPropertyInt32(env, args[0], "fd", info.fd), "Get vibrate fd fail");
-        CHKCF(GetPropertyInt64(env, args[0], "offset", info.offset), "Get vibrate offset fail");
-        CHKCF(GetPropertyInt64(env, args[0], "length", info.length), "Get vibrate length fail");
     }
     CHKCF(GetPropertyString(env, args[1], "usage", info.usage), "Get vibrate usage fail");
     return true;
@@ -191,7 +184,7 @@ int32_t StartVibrate(const VibrateInfo &info)
         MISC_HILOGE("SetUsage fail");
         return PARAMETER_ERROR;
     }
-    if ((info.type != "time") && (info.type != "preset") && (info.type != "custom")) {
+    if ((info.type != "time") && (info.type != "preset")) {
         MISC_HILOGE("Invalid vibrate type");
         return PARAMETER_ERROR;
     }
@@ -201,8 +194,6 @@ int32_t StartVibrate(const VibrateInfo &info)
             return PARAMETER_ERROR;
         }
         return StartVibrator(info.effectId.c_str());
-    } else if (info.type == "custom") {
-        return PlayVibratorCustom(info.fd, info.offset, info.length);
     }
     return StartVibratorOnce(info.duration);
 }
@@ -265,8 +256,16 @@ static napi_value Vibrate(napi_env env, napi_callback_info info)
     return VibrateEffect(env, args, argc);
 }
 
-static napi_value StopByMode(napi_env env, napi_value args[], size_t argc)
+static napi_value Stop(napi_env env, napi_callback_info info)
 {
+    size_t argc = 2;
+    napi_value args[2] = {};
+    napi_value thisArg = nullptr;
+    napi_status status = napi_get_cb_info(env, info, &argc, args, &thisArg, nullptr);
+    if ((status != napi_ok) || (argc == 0)) {
+        ThrowErr(env, PARAMETER_ERROR, "napi_get_cb_info fail or number of parameter invalid");
+        return nullptr;
+    }
     string mode;
     if (!GetStringValue(env, args[0], mode)) {
         ThrowErr(env, PARAMETER_ERROR, "GetStringValue fail");
@@ -297,51 +296,6 @@ static napi_value StopByMode(napi_env env, napi_value args[], size_t argc)
     asyncCallbackInfo->deferred = deferred;
     EmitPromiseWork(asyncCallbackInfo);
     return promise;
-}
-
-static napi_value StopAll(napi_env env, napi_value args[], size_t argc)
-{
-    sptr<AsyncCallbackInfo> asyncCallbackInfo = new (std::nothrow) AsyncCallbackInfo(env);
-    CHKPP(asyncCallbackInfo);
-    asyncCallbackInfo->error.code = Cancel();
-    if ((asyncCallbackInfo->error.code != SUCCESS) && (asyncCallbackInfo->error.code == PARAMETER_ERROR)) {
-        ThrowErr(env, PARAMETER_ERROR, "Parameters invalid");
-        return nullptr;
-    }
-    if (argc >= 1) {
-        if (!IsMatchType(env, args[0], napi_function)) {
-            ThrowErr(env, PARAMETER_ERROR, "IsMatchType fail, should be function");
-            return nullptr;
-        }
-        if (napi_create_reference(env, args[0], 1, &asyncCallbackInfo->callback[0]) != napi_ok) {
-            ThrowErr(env, PARAMETER_ERROR, "napi_create_reference fail");
-            return nullptr;
-        }
-        EmitAsyncCallbackWork(asyncCallbackInfo);
-        return nullptr;
-    }
-    napi_deferred deferred = nullptr;
-    napi_value promise = nullptr;
-    CHKCP((napi_create_promise(env, &deferred, &promise) == napi_ok), "napi_create_promise fail");
-    asyncCallbackInfo->deferred = deferred;
-    EmitPromiseWork(asyncCallbackInfo);
-    return promise; 
-}
-
-static napi_value Stop(napi_env env, napi_callback_info info)
-{
-    size_t argc = 2;
-    napi_value args[2] = {};
-    napi_value thisArg = nullptr;
-    napi_status status = napi_get_cb_info(env, info, &argc, args, &thisArg, nullptr);
-    if (status != napi_ok) {
-        ThrowErr(env, PARAMETER_ERROR, "napi_get_cb_info fail");
-        return nullptr;
-    }
-    if ((argc > 0) && (IsMatchType(env, args[0], napi_string))) {
-        return StopByMode(env, args, argc);
-    }
-    return StopAll(env, args, argc);
 }
 
 static napi_value EnumClassConstructor(const napi_env env, const napi_callback_info info)
