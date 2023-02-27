@@ -1145,7 +1145,7 @@ describe("VibratorJsTest", function () {
      * @tc.name:VibrateTest015
      * @tc.desc:verify app info is not null
      * @tc.type: FUNC
-     * @tc.require: I53SGE
+     * @tc.require: I6HKTI
      */
     it("VibrateTest015", 0, async function (done) {
         if (g_execute) {
@@ -1203,7 +1203,7 @@ describe("VibratorJsTest", function () {
      * @tc.name:VibrateTest016
      * @tc.desc:verify app info is not null
      * @tc.type: FUNC
-     * @tc.require: I53SGE
+     * @tc.require: I6HKTI
      */
     it("VibrateTest016", 0, async function (done) {
         if (g_execute) {
@@ -1264,7 +1264,7 @@ describe("VibratorJsTest", function () {
      * @tc.name:VibrateTest017
      * @tc.desc:verify app info is not null
      * @tc.type: FUNC
-     * @tc.require: I53SGE
+     * @tc.require: I6HKTI
      */
     it("VibrateTest017", 0, async function (done) {
         if (g_execute) {
@@ -1324,7 +1324,7 @@ describe("VibratorJsTest", function () {
      * @tc.name:VibrateTest018
      * @tc.desc:verify app info is not null
      * @tc.type: FUNC
-     * @tc.require: I53SGE
+     * @tc.require: I6HKTI
      */
     it("VibrateTest018", 0, async function (done) {
         if (g_execute) {
