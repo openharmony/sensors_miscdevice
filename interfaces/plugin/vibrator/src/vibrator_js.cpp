@@ -311,11 +311,7 @@ static napi_value Cancel(napi_env env, napi_callback_info info)
     sptr<AsyncCallbackInfo> asyncCallbackInfo = new (std::nothrow) AsyncCallbackInfo(env);
     CHKPP(asyncCallbackInfo);
     asyncCallbackInfo->error.code = Cancel();
-    if (argc >= 1) {
-        if (!IsMatchType(env, args[0], napi_function)) {
-            ThrowErr(env, PARAMETER_ERROR, "IsMatchType fail, should be function");
-            return nullptr;
-        }
+    if ((argc > 0) && (IsMatchType(env, args[0], napi_function))) {
         NAPI_CALL(env, napi_create_reference(env, args[0], 1, &asyncCallbackInfo->callback[0]));
         EmitAsyncCallbackWork(asyncCallbackInfo);
         return nullptr;
@@ -347,15 +343,7 @@ static napi_value IsSupportEffect(napi_env env, napi_callback_info info)
     CHKPP(asyncCallbackInfo);
     asyncCallbackInfo->error.code = IsSupportEffect(effectId.c_str(), &asyncCallbackInfo->isSupportEffect);
     asyncCallbackInfo->callbackType = CallbackType::TYPE_IS_SUPPORT_EFFECT;
-    if ((asyncCallbackInfo->error.code != SUCCESS) && (asyncCallbackInfo->error.code == PARAMETER_ERROR)) {
-        ThrowErr(env, PARAMETER_ERROR, "Parameters invalid");
-        return nullptr;
-    }
-    if (argc >= 2) {
-        if (!IsMatchType(env, args[1], napi_function)) {
-            ThrowErr(env, PARAMETER_ERROR, "IsMatchType fail, should be function");
-            return nullptr;
-        }
+    if ((argc > 1) && (IsMatchType(env, args[1], napi_function))) {
         NAPI_CALL(env, napi_create_reference(env, args[1], 1, &asyncCallbackInfo->callback[0]));
         EmitAsyncCallbackWork(asyncCallbackInfo);
         return nullptr;
@@ -418,7 +406,7 @@ static napi_value Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("startVibration", Vibrate),
         DECLARE_NAPI_FUNCTION("stopVibration", Stop),
         DECLARE_NAPI_FUNCTION("cancel", Cancel),
-        DECLARE_NAPI_FUNCTION("isSupportEffetc", IsSupportEffect),
+        DECLARE_NAPI_FUNCTION("isSupportEffect", IsSupportEffect),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(napi_property_descriptor), desc));
     NAPI_ASSERT_BASE(env, CreateEnumStopMode(env, exports) != nullptr, "Create enum stop mode fail", exports);
