@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,9 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <thread>
 #include "hdi_connection.h"
+
+#include <thread>
+
 #include "hisysevent.h"
+
 #include "sensors_errors.h"
 
 namespace OHOS {
@@ -37,7 +40,7 @@ int32_t HdiConnection::ConnectHdi()
             return ERR_OK;
         }
         retry++;
-        MISC_HILOGW("connect hdi service failed, retry : %{public}d", retry);
+        MISC_HILOGW("connect hdi service failed, retry:%{public}d", retry);
         std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_MS));
     }
     HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
@@ -48,6 +51,7 @@ int32_t HdiConnection::ConnectHdi()
 
 int32_t HdiConnection::StartOnce(uint32_t duration)
 {
+    CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
     int32_t ret = vibratorInterface_->StartOnce(duration);
     if (ret < 0) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
@@ -64,6 +68,7 @@ int32_t HdiConnection::Start(const std::string &effectType)
         MISC_HILOGE("effectType is null");
         return VIBRATOR_ON_ERR;
     }
+    CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
     int32_t ret = vibratorInterface_->Start(effectType);
     if (ret < 0) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
@@ -74,9 +79,54 @@ int32_t HdiConnection::Start(const std::string &effectType)
     return ERR_OK;
 }
 
-int32_t HdiConnection::Stop(VibratorStopMode mode)
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+int32_t HdiConnection::EnableCompositeEffect(const HdfCompositeEffect &hdfCompositeEffect)
 {
-    int32_t ret = vibratorInterface_->Stop(static_cast<OHOS::HDI::Vibrator::V1_1::HdfVibratorMode>(mode));
+    if (hdfCompositeEffect.compositeEffects.empty()) {
+        MISC_HILOGE("compositeEffects is empty");
+        return VIBRATOR_ON_ERR;
+    }
+    CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
+    int32_t ret = vibratorInterface_->EnableCompositeEffect(hdfCompositeEffect);
+    if (ret < 0) {
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "EnableCompositeEffect", "ERROR_CODE", ret);
+        MISC_HILOGE("EnableCompositeEffect failed");
+        return ret;
+    }
+    return ERR_OK;
+}
+
+bool HdiConnection::IsVibratorRunning()
+{
+    bool state = false;
+    CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
+    vibratorInterface_->IsVibratorRunning(state);
+    return state;
+}
+
+std::optional<HdfEffectInfo> HdiConnection::GetEffectInfo(const std::string &effect)
+{
+    if (vibratorInterface_ == nullptr) {
+        MISC_HILOGE("connect v1_1 hdi failed");
+        return std::nullopt;
+    }
+    HdfEffectInfo effectInfo;
+    int32_t ret = vibratorInterface_->GetEffectInfo(effect, effectInfo);
+    if (ret < 0) {
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "GetEffectInfo", "ERROR_CODE", ret);
+        MISC_HILOGE("GetEffectInfo failed");
+        return std::nullopt;
+    }
+    return effectInfo;
+}
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+
+int32_t HdiConnection::Stop(HdfVibratorMode mode)
+{
+    CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
+    int32_t ret = vibratorInterface_->Stop(mode);
     if (ret < 0) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "Stop", "ERROR_CODE", ret);

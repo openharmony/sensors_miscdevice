@@ -254,15 +254,11 @@ describe("VibratorJsTest", function () {
                     if (error) {
                         console.info('VibratorJsTest008  vibrate error');
                         expect(false).assertTrue();
-                        setTimeout(()=>{
-                            reject();
-                        }, 500);
+                        reject();
                     } else {
                         console.info('VibratorJsTest008  vibrate success');
                         expect(true).assertTrue();
-                        setTimeout(()=>{
-                            resolve();
-                        }, 500);
+                        resolve();
                     }
                 });
             })
@@ -486,15 +482,11 @@ describe("VibratorJsTest", function () {
                 vibrator.vibrate("haptic.clock.timer").then(() => {
                     console.log("VibratorJsTest015  vibrate success");
                     expect(true).assertTrue();
-                    setTimeout(()=>{
-                        resolve();
-                    }, 500);
+                    resolve();
                 }, (error)=>{
                     expect(false).assertTrue();
                     console.log("VibratorJsTest015  vibrate error");
-                    setTimeout(()=>{
-                        reject();
-                    }, 500);
+                    reject();
                 });
             })
     
@@ -1627,15 +1619,11 @@ describe("VibratorJsTest", function () {
                 vibrator.startVibration("haptic.clock.timer").then(() => {
                     console.log("VibrateTest023  vibrate success");
                     expect(true).assertTrue();
-                    setTimeout(()=>{
-                        resolve();
-                    }, 500);
+                    resolve();
                 }, (error)=>{
                     expect(false).assertTrue();
                     console.log("VibrateTest023  vibrate error");
-                    setTimeout(()=>{
-                        reject();
-                    }, 500);
+                    reject();
                 });
             })
     

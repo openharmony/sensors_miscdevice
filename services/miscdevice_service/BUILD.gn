@@ -58,7 +58,14 @@ ohos_shared_library("libmiscdevice_service") {
   ]
 
   if (miscdevice_feature_vibrator_custom) {
+    sources += [
+      "custom_vibrate_decode/src/custom_vibration_matcher.cpp",
+      "custom_vibrate_decode/src/default_vibrator_decoder.cpp",
+      "custom_vibrate_decode/src/default_vibrator_decoder_factory.cpp",
+    ]
+    include_dirs += [ "custom_vibrate_decode/include" ]
     defines = [ "OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM" ]
+    external_deps += [ "init:libbegetutil" ]
   }
 
   shlib_type = "sa"

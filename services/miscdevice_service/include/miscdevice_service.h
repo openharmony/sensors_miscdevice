@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,17 +24,20 @@
 #include <vector>
 
 #include "accesstoken_kit.h"
+#include "nocopyable.h"
 #include "system_ability.h"
 #include "thread_ex.h"
 
+#include "file_utils.h"
+#include "json_parser.h"
 #include "light_hdi_connection.h"
 #include "miscdevice_common.h"
 #include "miscdevice_dump.h"
 #include "miscdevice_service_stub.h"
-#include "nocopyable.h"
 #include "vibrator_hdi_connection.h"
 #include "vibrator_infos.h"
 #include "vibrator_thread.h"
+
 namespace OHOS {
 namespace Sensors {
 using namespace Security::AccessToken;
@@ -61,7 +64,7 @@ public:
     virtual int32_t PlayVibratorCustom(int32_t vibratorId, const RawFileDescriptor &rawFd, int32_t usage) override;
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     virtual int32_t StopVibrator(int32_t vibratorId) override;
-    virtual int32_t StopVibrator(int32_t vibratorId, const std::string &effect) override;
+    virtual int32_t StopVibrator(int32_t vibratorId, const std::string &mode) override;
     virtual std::vector<LightInfo> GetLightList() override;
     virtual int32_t TurnOn(int32_t lightId, const LightColor &color, const LightAnimation &animation) override;
     virtual int32_t TurnOff(int32_t lightId) override;
@@ -74,6 +77,10 @@ private:
     void StartVibrateThread(VibrateInfo info);
     bool ShouldIgnoreVibrate(const VibrateInfo &info);
     bool InitLightList();
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+    int32_t DecodeCustomEffect(const RawFileDescriptor &rawFd, std::set<VibrateEvent> &vibrateSequence);
+    int32_t StartCustomVibration(const RawFileDescriptor &rawFd, const VibrateInfo &info);
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     VibratorHdiConnection &vibratorHdiConnection_ = VibratorHdiConnection::GetInstance();
     LightHdiConnection &lightHdiConnection_ = LightHdiConnection::GetInstance();
     bool lightExist_;

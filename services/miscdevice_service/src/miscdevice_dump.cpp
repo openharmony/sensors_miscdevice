@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -146,10 +146,14 @@ void MiscdeviceDump::DumpMiscdeviceRecord(int32_t fd)
             dprintf(fd, "startTime:%s | uid:%d | pid:%d | packageName:%s | duration:%d | usage:%s\n",
                 record.startTime.c_str(), info.uid, info.pid, info.packageName.c_str(),
                 info.duration, GetUsageName(info.usage).c_str());
-        } else {
+        } else if (info.mode == "preset") {
             dprintf(fd, "startTime:%s | uid:%d | pid:%d | packageName:%s | effect:%s | count:%d | usage:%s\n",
                 record.startTime.c_str(), info.uid, info.pid, info.packageName.c_str(),
                 info.effect.c_str(), info.count, GetUsageName(info.usage).c_str());
+        } else {
+            dprintf(fd, "startTime:%s | uid:%d | pid:%d | packageName:%s | usage:%s\n",
+                record.startTime.c_str(), info.uid, info.pid, info.packageName.c_str(),
+                GetUsageName(info.usage).c_str());
         }
     }
 }

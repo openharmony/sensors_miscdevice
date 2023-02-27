@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,13 +21,6 @@
 
 namespace OHOS {
 namespace Sensors {
-namespace {
-std::unordered_map<std::string, int32_t> vibratorEffects = {
-    {"haptic.clock.timer", 2000},
-    {"haptic.default.effect", 804}
-};
-} // namespace
-
 struct VibrateInfo {
     std::string mode;
     std::string packageName;
@@ -51,6 +44,26 @@ enum VibrateUsage {
     USAGE_SIMULATE_REALITY = 8,
     USAGE_MAX = 9,
 };
+
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+enum VibrateTag {
+    EVENT_TAG_CONTINUOUS = 0,
+    EVENT_TAG_TRANSIENT = 1,
+};
+
+struct VibrateEvent {
+    bool operator<(const VibrateEvent& rhs) const
+    {
+        return startTime < rhs.startTime;
+    }
+
+    VibrateTag tag;
+    int32_t startTime = 0;
+    int32_t duration = 0;
+    int32_t intensity = 0;
+    int32_t frequency = 0;
+};
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 }  // namespace Sensors
 }  // namespace OHOS
 #endif  // VIBRATOR_INFOS_H
