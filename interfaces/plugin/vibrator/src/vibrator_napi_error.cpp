@@ -51,8 +51,11 @@ void ThrowErr(const napi_env &env, const int32_t errCode, const std::string &pri
         MISC_HILOGE("errCode: %{public}d is invalid", errCode);
         return;
     }
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(env, &scope);
     napi_value error = CreateBusinessError(env, errCode, msg.value());
     napi_throw(env, error);
+    napi_close_handle_scope(env, scope);
 }
 }  // namespace Sensors
 }  // namespace OHOS
