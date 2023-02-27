@@ -16,7 +16,7 @@
 #include "miscdevice_service.h"
 
 #include <algorithm>
-#include <inttypes.h>
+#include <cinttypes>
 #include <string_ex.h>
 
 #include "sensors_errors.h"
