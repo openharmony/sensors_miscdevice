@@ -143,7 +143,7 @@ static napi_value VibrateMode(napi_env env, napi_value args[], size_t argc)
     NAPI_ASSERT(env, (argc == 1), "Param number is invalid");
     sptr<AsyncCallbackInfo> asyncCallbackInfo = new (std::nothrow) AsyncCallbackInfo(env);
     CHKPP(asyncCallbackInfo);
-    asyncCallbackInfo->callbackType = CallbackType::TYPE_SYSTEM_VIBRATE;
+    asyncCallbackInfo->callbackType = SYSTEM_VIBRATE_CALLBACK;
     string mode = "long";
     NAPI_ASSERT(env, GetCallbackInfo(env, args, asyncCallbackInfo, mode), "Get callback info fail");
     int32_t duration = ((mode == "long") ? VIBRATE_LONG_DURATION : VIBRATE_SHORT_DURATION);
@@ -341,8 +341,8 @@ static napi_value IsSupportEffect(napi_env env, napi_callback_info info)
     }
     sptr<AsyncCallbackInfo> asyncCallbackInfo = new (std::nothrow) AsyncCallbackInfo(env);
     CHKPP(asyncCallbackInfo);
+    asyncCallbackInfo->callbackType = IS_SUPPORT_EFFECT_CALLBACK;
     asyncCallbackInfo->error.code = IsSupportEffect(effectId.c_str(), &asyncCallbackInfo->isSupportEffect);
-    asyncCallbackInfo->callbackType = CallbackType::TYPE_IS_SUPPORT_EFFECT;
     if ((argc > 1) && (IsMatchType(env, args[1], napi_function))) {
         NAPI_CALL(env, napi_create_reference(env, args[1], 1, &asyncCallbackInfo->callback[0]));
         EmitAsyncCallbackWork(asyncCallbackInfo);

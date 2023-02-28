@@ -137,6 +137,52 @@ bool GetPropertyInt32(const napi_env &env, const napi_value &value, const std::s
     return true;
 }
 
+std::map<int32_t, ConvertDataFunc> g_convertFuncList = {
+    {COMMON_CALLBACK, ConstructCommonResult},
+    {IS_SUPPORT_EFFECT_CALLBACK, ConstructIsSupportEffectResult},
+};
+
+bool ConvertErrorToResult(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo, napi_value &result)
+{
+    CHKPF(asyncCallbackInfo);
+    int32_t code = asyncCallbackInfo->error.code;
+    auto msg = GetNapiError(code);
+    if (!msg) {
+        MISC_HILOGE("errCode: %{public}d is invalid", code);
+        return false;
+    }
+    result = CreateBusinessError(env, code, msg.value());
+    return (result != nullptr);
+}
+
+bool ConstructCommonResult(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo, napi_value result[2])
+{
+    CHKPF(asyncCallbackInfo);
+    if (asyncCallbackInfo->error.code != SUCCESS) {
+        CHKCF(ConvertErrorToResult(env, asyncCallbackInfo, result[0]), "Create napi err fail in async work");
+        CHKCF((napi_get_undefined(env, &result[1]) == napi_ok), "napi_get_undefined fail");
+    } else {
+        CHKCF((napi_get_undefined(env, &result[0]) == napi_ok), "napi_get_undefined fail");
+        CHKCF((napi_get_undefined(env, &result[1]) == napi_ok), "napi_get_undefined fail");
+    }
+    return true;
+}
+
+bool ConstructIsSupportEffectResult(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo,
+    napi_value result[2])
+{
+    CHKPF(asyncCallbackInfo);
+    if (asyncCallbackInfo->error.code != SUCCESS) {
+        CHKCF(ConvertErrorToResult(env, asyncCallbackInfo, result[0]), "Create napi err fail in async work");
+        CHKCF((napi_get_undefined(env, &result[1]) == napi_ok), "napi_get_undefined fail");
+    } else {
+        CHKCF((napi_get_undefined(env, &result[0]) == napi_ok), "napi_get_undefined fail");
+        CHKCF((napi_get_boolean(env, asyncCallbackInfo->isSupportEffect, &result[1]) == napi_ok),
+                    "napi_get_boolean fail");
+    }
+    return true;
+}
+
 void EmitSystemCallback(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo)
 {
     CHKPV(asyncCallbackInfo);
@@ -184,7 +230,7 @@ void EmitAsyncCallbackWork(sptr<AsyncCallbackInfo> asyncCallbackInfo)
              * count of the smart pointer is guaranteed to be 1.
              */
             asyncCallbackInfo->DecStrongRef(nullptr);
-            if (asyncCallbackInfo->callbackType == CallbackType::TYPE_SYSTEM_VIBRATE) {
+            if (asyncCallbackInfo->callbackType == SYSTEM_VIBRATE_CALLBACK) {
                 EmitSystemCallback(env, asyncCallbackInfo);
                 return;
             }
@@ -192,25 +238,13 @@ void EmitAsyncCallbackWork(sptr<AsyncCallbackInfo> asyncCallbackInfo)
             napi_value callback = nullptr;
             napi_status ret = napi_get_reference_value(env, asyncCallbackInfo->callback[0], &callback);
             CHKCV((ret == napi_ok), "napi_get_reference_value fail");
-            napi_value result = nullptr;
-            if (asyncCallbackInfo->error.code != SUCCESS) {
-                auto msg = GetNapiError(asyncCallbackInfo->error.code);
-                if (!msg) {
-                    MISC_HILOGE("errCode: %{public}d is invalid", asyncCallbackInfo->error.code);
-                    return;
-                }
-                result = CreateBusinessError(env, asyncCallbackInfo->error.code, msg.value());
-                CHKPV(result);
-            } else {
-                if (asyncCallbackInfo->callbackType == CallbackType::TYPE_IS_SUPPORT_EFFECT) {
-                    CHKCV((napi_get_boolean(env, asyncCallbackInfo->isSupportEffect, &result) == napi_ok),
-                        "napi_get_boolean fail");
-                } else {
-                    CHKCV((napi_get_undefined(env, &result) == napi_ok), "napi_get_undefined fail");
-                }
-            }
+            napi_value result[2] = {0};
+            CHKCV((g_convertFuncList.find(asyncCallbackInfo->callbackType) != g_convertFuncList.end()),
+                "Callback type invalid in async work");
+            bool stat = g_convertFuncList[asyncCallbackInfo->callbackType](env, asyncCallbackInfo, result);
+            CHKCV(stat, "Create napi data fail in async work");
             napi_value callResult = nullptr;
-            CHKCV((napi_call_function(env, nullptr, callback, 1, &result, &callResult) == napi_ok),
+            CHKCV((napi_call_function(env, nullptr, callback, 2, result, &callResult) == napi_ok),
                 "napi_call_function fail");
         },
         asyncCallbackInfo.GetRefPtr(), &asyncCallbackInfo->asyncWork);
@@ -246,30 +280,21 @@ void EmitPromiseWork(sptr<AsyncCallbackInfo> asyncCallbackInfo)
              */
             asyncCallbackInfo->DecStrongRef(nullptr);
             CHKPV(asyncCallbackInfo->deferred);
-            if (asyncCallbackInfo->callbackType == CallbackType::TYPE_SYSTEM_VIBRATE) {
+            if (asyncCallbackInfo->callbackType == SYSTEM_VIBRATE_CALLBACK) {
                 EmitSystemCallback(env, asyncCallbackInfo);
                 return;
             }
-            napi_value result = nullptr;
-            if (asyncCallbackInfo->error.code == 0) {
-                if (asyncCallbackInfo->callbackType == CallbackType::TYPE_IS_SUPPORT_EFFECT) {
-                    CHKCV((napi_get_boolean(env, asyncCallbackInfo->isSupportEffect, &result) == napi_ok),
-                        "napi_get_boolean fail");
-                } else {
-                    CHKCV((napi_get_undefined(env, &result) == napi_ok), "napi_get_undefined fail");
-                }
-                CHKCV((napi_resolve_deferred(env, asyncCallbackInfo->deferred, result) == napi_ok),
-                    "napi_resolve_deferred fail");
-            } else {
-                auto msg = GetNapiError(asyncCallbackInfo->error.code);
-                if (!msg) {
-                    MISC_HILOGE("errCode: %{public}d is invalid", asyncCallbackInfo->error.code);
-                    return;
-                }
-                result = CreateBusinessError(env, asyncCallbackInfo->error.code, msg.value());
-                CHKPV(result);
-                CHKCV((napi_reject_deferred(env, asyncCallbackInfo->deferred, result) == napi_ok),
+            napi_value result[2] = {0};
+            CHKCV((g_convertFuncList.find(asyncCallbackInfo->callbackType) != g_convertFuncList.end()),
+                "Callback type invalid in promise");
+            bool ret = g_convertFuncList[asyncCallbackInfo->callbackType](env, asyncCallbackInfo, result);
+            CHKCV(ret, "Callback type invalid in promise");
+            if (asyncCallbackInfo->error.code != SUCCESS) {
+                CHKCV((napi_reject_deferred(env, asyncCallbackInfo->deferred, result[0]) == napi_ok),
                     "napi_reject_deferred fail");
+            } else {
+                CHKCV((napi_resolve_deferred(env, asyncCallbackInfo->deferred, result[1]) == napi_ok),
+                    "napi_resolve_deferred fail");
             }
         }, asyncCallbackInfo.GetRefPtr(), &asyncCallbackInfo->asyncWork);
     if (status != napi_ok
