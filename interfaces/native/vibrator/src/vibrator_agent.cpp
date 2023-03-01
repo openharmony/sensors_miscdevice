@@ -163,7 +163,7 @@ int32_t IsSupportEffect(const char *effectId, bool *state)
 {
     CHKPR(effectId, PARAMETER_ERROR);
     auto &client = VibratorServiceClient::GetInstance();
-    int32_t ret = client.IsSupportEffect(effectId, (*state));
+    int32_t ret = client.IsSupportEffect(effectId, *state);
     if (ret != ERR_OK) {
         MISC_HILOGE("Query effect support failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);

@@ -149,7 +149,6 @@ int32_t MiscdeviceServiceStub::IsSupportEffectStub(MessageParcel &data, MessageP
     }
     if (!reply.WriteBool(state)) {
         MISC_HILOGE("Parcel write state failed");
-        return ERROR;
     }
     return ret;
 }

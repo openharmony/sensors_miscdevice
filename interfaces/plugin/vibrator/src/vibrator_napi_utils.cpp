@@ -26,6 +26,7 @@ namespace OHOS {
 namespace Sensors {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MISC_LOG_DOMAIN, "VibratorNapiUtils"};
+constexpr int32_t RESULT_LENGTH = 2;
 }  // namespace
 AsyncCallbackInfo::~AsyncCallbackInfo()
 {
@@ -137,7 +138,7 @@ bool GetPropertyInt32(const napi_env &env, const napi_value &value, const std::s
     return true;
 }
 
-std::map<int32_t, ConvertDataFunc> g_convertFuncList = {
+std::map<int32_t, ConstructResultFunc> g_convertFuncList = {
     {COMMON_CALLBACK, ConstructCommonResult},
     {IS_SUPPORT_EFFECT_CALLBACK, ConstructIsSupportEffectResult},
 };
@@ -155,9 +156,11 @@ bool ConvertErrorToResult(const napi_env &env, sptr<AsyncCallbackInfo> asyncCall
     return (result != nullptr);
 }
 
-bool ConstructCommonResult(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo, napi_value result[2])
+bool ConstructCommonResult(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo, napi_value result[],
+    int32_t length)
 {
     CHKPF(asyncCallbackInfo);
+    CHKCF(length == RESULT_LENGTH, "Array length is different");
     if (asyncCallbackInfo->error.code != SUCCESS) {
         CHKCF(ConvertErrorToResult(env, asyncCallbackInfo, result[0]), "Create napi err fail in async work");
         CHKCF((napi_get_undefined(env, &result[1]) == napi_ok), "napi_get_undefined fail");
@@ -169,9 +172,10 @@ bool ConstructCommonResult(const napi_env &env, sptr<AsyncCallbackInfo> asyncCal
 }
 
 bool ConstructIsSupportEffectResult(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo,
-    napi_value result[2])
+    napi_value result[], int32_t length)
 {
     CHKPF(asyncCallbackInfo);
+    CHKCF(length == RESULT_LENGTH, "Array length is different");
     if (asyncCallbackInfo->error.code != SUCCESS) {
         CHKCF(ConvertErrorToResult(env, asyncCallbackInfo, result[0]), "Create napi err fail in async work");
         CHKCF((napi_get_undefined(env, &result[1]) == napi_ok), "napi_get_undefined fail");
@@ -238,11 +242,12 @@ void EmitAsyncCallbackWork(sptr<AsyncCallbackInfo> asyncCallbackInfo)
             napi_value callback = nullptr;
             napi_status ret = napi_get_reference_value(env, asyncCallbackInfo->callback[0], &callback);
             CHKCV((ret == napi_ok), "napi_get_reference_value fail");
-            napi_value result[2] = {0};
+            napi_value result[RESULT_LENGTH] = { 0 };
             CHKCV((g_convertFuncList.find(asyncCallbackInfo->callbackType) != g_convertFuncList.end()),
                 "Callback type invalid in async work");
-            bool stat = g_convertFuncList[asyncCallbackInfo->callbackType](env, asyncCallbackInfo, result);
-            CHKCV(stat, "Create napi data fail in async work");
+            bool state = g_convertFuncList[asyncCallbackInfo->callbackType](env, asyncCallbackInfo, result,
+                sizeof(result) / sizeof(napi_value));
+            CHKCV(state, "Create napi data fail in async work");
             napi_value callResult = nullptr;
             CHKCV((napi_call_function(env, nullptr, callback, 2, result, &callResult) == napi_ok),
                 "napi_call_function fail");
@@ -284,10 +289,11 @@ void EmitPromiseWork(sptr<AsyncCallbackInfo> asyncCallbackInfo)
                 EmitSystemCallback(env, asyncCallbackInfo);
                 return;
             }
-            napi_value result[2] = {0};
+            napi_value result[RESULT_LENGTH] = { 0 };
             CHKCV((g_convertFuncList.find(asyncCallbackInfo->callbackType) != g_convertFuncList.end()),
                 "Callback type invalid in promise");
-            bool ret = g_convertFuncList[asyncCallbackInfo->callbackType](env, asyncCallbackInfo, result);
+            bool ret = g_convertFuncList[asyncCallbackInfo->callbackType](env, asyncCallbackInfo, result,
+                sizeof(result) / sizeof(napi_value));
             CHKCV(ret, "Callback type invalid in promise");
             if (asyncCallbackInfo->error.code != SUCCESS) {
                 CHKCV((napi_reject_deferred(env, asyncCallbackInfo->deferred, result[0]) == napi_ok),
