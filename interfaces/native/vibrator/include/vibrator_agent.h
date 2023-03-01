@@ -133,13 +133,13 @@ int32_t Cancel();
 bool SetUsage(int32_t usage);
 
 /**
- * @brief 查询是否支持某个振动效果.
+ * @brief Query whether a vibration effect is supported.
  *
  * @param effectId Indicates the preset vibration effect, which is described in {@link vibrator_agent_type.h}, for
  * example:
  * {@link VIBRATOR_TYPE_CLOCK_TIMER}: Describes the vibration effect of the vibrator when a user adjusts the timer.
- * @param state 表示指向查询结果的指针.
- * @return 返回0表示成功，否则表示失败.
+ * @param state Indicates a pointer to the query result.
+ * @return Returning 0 indicates success; otherwise, it indicates failure.
  *
  * @since 10
  */
