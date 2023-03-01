@@ -47,6 +47,7 @@ MiscdeviceService::~MiscdeviceService()
     if (vibratorThread_ != nullptr) {
         while (vibratorThread_->IsRunning()) {
             vibratorThread_->NotifyExit();
+            vibratorThread_->NotifyExitSync();
         }
     }
 }
@@ -187,6 +188,7 @@ int32_t MiscdeviceService::CancelVibrator(int32_t vibratorId)
     while (vibratorThread_->IsRunning()) {
         MISC_HILOGD("Notify the vibratorThread, vibratorId : %{public}d", vibratorId);
         vibratorThread_->NotifyExit();
+        vibratorThread_->NotifyExitSync();
     }
     return NO_ERROR;
 }
@@ -225,6 +227,7 @@ void MiscdeviceService::StartVibrateThread(VibrateInfo info)
     }
     while (vibratorThread_->IsRunning()) {
         vibratorThread_->NotifyExit();
+        vibratorThread_->NotifyExitSync();
     }
     vibratorThread_->UpdateVibratorEffect(info);
     vibratorThread_->Start("VibratorThread");
@@ -246,6 +249,7 @@ int32_t MiscdeviceService::StopVibratorEffect(int32_t vibratorId, const std::str
     while (vibratorThread_->IsRunning()) {
         MISC_HILOGD("notify the vibratorThread, vibratorId : %{public}d", vibratorId);
         vibratorThread_->NotifyExit();
+        vibratorThread_->NotifyExitSync();
     }
     return NO_ERROR;
 }
