@@ -178,7 +178,7 @@ bool ConstructIsSupportEffectResult(const napi_env &env, sptr<AsyncCallbackInfo>
     } else {
         CHKCF((napi_get_undefined(env, &result[0]) == napi_ok), "napi_get_undefined fail");
         CHKCF((napi_get_boolean(env, asyncCallbackInfo->isSupportEffect, &result[1]) == napi_ok),
-                    "napi_get_boolean fail");
+            "napi_get_boolean fail");
     }
     return true;
 }
