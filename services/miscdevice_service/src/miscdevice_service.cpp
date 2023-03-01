@@ -65,6 +65,7 @@ MiscdeviceService::~MiscdeviceService()
     if (vibratorThread_ != nullptr) {
         while (vibratorThread_->IsRunning()) {
             vibratorThread_->NotifyExit();
+            vibratorThread_->NotifyExitSync();
         }
     }
 }
@@ -216,6 +217,7 @@ int32_t MiscdeviceService::StopVibrator(int32_t vibratorId)
     while (vibratorThread_->IsRunning()) {
         MISC_HILOGD("Notify the vibratorThread, vibratorId:%{public}d", vibratorId);
         vibratorThread_->NotifyExit();
+        vibratorThread_->NotifyExitSync();
     }
     return NO_ERROR;
 }
@@ -279,6 +281,7 @@ void MiscdeviceService::StartVibrateThread(VibrateInfo info)
     }
     while (vibratorThread_->IsRunning()) {
         vibratorThread_->NotifyExit();
+        vibratorThread_->NotifyExitSync();
     }
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     while (vibratorHdiConnection_.IsVibratorRunning()) {
@@ -305,6 +308,7 @@ int32_t MiscdeviceService::StopVibrator(int32_t vibratorId, const std::string &m
     while (vibratorThread_->IsRunning()) {
         MISC_HILOGD("notify the vibratorThread, vibratorId:%{public}d", vibratorId);
         vibratorThread_->NotifyExit();
+        vibratorThread_->NotifyExitSync();
     }
     return NO_ERROR;
 }
