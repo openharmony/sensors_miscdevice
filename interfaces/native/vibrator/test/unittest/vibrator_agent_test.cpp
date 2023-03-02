@@ -33,7 +33,7 @@ using Security::AccessToken::AccessTokenID;
 
 namespace {
 const std::string PHONE_TYPE = "phone";
-std::string deviceType_ = "";
+std::string g_deviceType;
 constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "VibratorAgentTest" };
 PermissionDef infoManagerTestPermDef_ = {
     .permissionName = "ohos.permission.VIBRATE",
@@ -89,8 +89,8 @@ void VibratorAgentTest::SetUpTestCase()
     tokenID_ = tokenIdEx.tokenIdExStruct.tokenID;
     ASSERT_NE(0, tokenID_);
     ASSERT_EQ(0, SetSelfTokenID(tokenID_));
-    deviceType_ = OHOS::system::GetDeviceType();
-    MISC_HILOGI("deviceType:%{public}s", deviceType_.c_str());
+    g_deviceType = OHOS::system::GetDeviceType();
+    MISC_HILOGI("deviceType:%{public}s", g_deviceType.c_str());
 }
 
 void VibratorAgentTest::TearDownTestCase()
@@ -700,7 +700,7 @@ HWTEST_F(VibratorAgentTest, IsSupportVibratorCustom_001, TestSize.Level1)
 {
     HiLog::Info(LABEL, "%{public}s begin", __func__);
     bool ret = IsSupportVibratorCustom();
-    if (deviceType_ == PHONE_TYPE) {
+    if (g_deviceType == PHONE_TYPE) {
         ASSERT_TRUE(ret);
     } else {
         ASSERT_FALSE(ret);
