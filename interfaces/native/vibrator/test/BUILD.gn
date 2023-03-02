@@ -46,7 +46,7 @@ ohos_unittest("VibratorAgentTest") {
   ]
 
   if (miscdevice_feature_vibrator_custom) {
-    resource_config_file = "//base/sensors/miscdevice/interfaces/native/vibrator/test/unittest/resource/ohos_test.xml"
+    resource_config_file = "$SUBSYSTEM_DIR/miscdevice/interfaces/native/vibrator/test/unittest/resource/ohos_test.xml"
   }
 }
 

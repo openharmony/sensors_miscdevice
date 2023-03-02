@@ -381,7 +381,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_007, TestSize.Level1)
             ret = StartVibrator("haptic.clock.timer");
             ASSERT_EQ(ret, 0);
         }
-        close(fd);        
+        close(fd);
         sleep(5);
     } else {
         ASSERT_EQ(0, 0);
@@ -469,7 +469,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_011, TestSize.Level1)
             ret = StartVibratorOnce(500);
             ASSERT_EQ(ret, 0);
         }
-        close(fd);   
+        close(fd);
         sleep(5);
     } else {
         ASSERT_EQ(0, 0);
@@ -607,7 +607,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_019, TestSize.Level1)
             int32_t ret = PlayVibratorCustom(fd, 0, statbuf.st_size);
             ASSERT_NE(ret, 0);
         }
-        close(fd); 
+        close(fd);
     } else {
         ASSERT_EQ(0, 0);
     }
