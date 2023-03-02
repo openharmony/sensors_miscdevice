@@ -36,10 +36,6 @@ namespace Sensors {
 using namespace OHOS::HiviewDFX;
 
 namespace {
-std::unordered_map<std::string, int32_t> vibratorEffects = {
-    {"haptic.clock.timer", 2000},
-    {"haptic.default.effect", 804}
-};
 constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "MiscdeviceService" };
 constexpr int32_t MIN_VIBRATOR_TIME = 0;
 constexpr int32_t MAX_VIBRATOR_TIME = 1800000;
@@ -227,7 +223,6 @@ int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::str
         MISC_HILOGE("Invalid parameter");
         return PARAMETER_ERROR;
     }
-#if defined(OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM)
     std::optional<HdfEffectInfo> effectInfo = vibratorHdiConnection_.GetEffectInfo(effect);
     if (!effectInfo) {
         MISC_HILOGE("GetEffectInfo fail");
@@ -247,22 +242,6 @@ int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::str
         .effect = effect,
         .count = count
     };
-#else
-    if (vibratorEffects.find(effect) == vibratorEffects.end()) {
-        MISC_HILOGE("Effect not supported");
-        return PARAMETER_ERROR;
-    }
-    VibrateInfo info = {
-        .mode = "preset",
-        .packageName = GetPackageName(GetCallingTokenID()),
-        .pid = GetCallingPid(),
-        .uid = GetCallingUid(),
-        .usage = usage,
-        .duration = vibratorEffects[effect],
-        .effect = effect,
-        .count = count
-    };
-#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
     if (ShouldIgnoreVibrate(info)) {
         MISC_HILOGE("Vibration is ignored and high priority is vibrating");
@@ -306,6 +285,17 @@ int32_t MiscdeviceService::StopVibrator(int32_t vibratorId, const std::string &m
         MISC_HILOGD("notify the vibratorThread, vibratorId:%{public}d", vibratorId);
         vibratorThread_->NotifyExit();
     }
+    return NO_ERROR;
+}
+
+int32_t MiscdeviceService::IsSupportEffect(const std::string &effect, bool &state)
+{
+    std::optional<HdfEffectInfo> effectInfo = vibratorHdiConnection_.GetEffectInfo(effect);
+    if (!effectInfo) {
+        MISC_HILOGE("GetEffectInfo fail");
+        return ERROR;
+    }
+    state = effectInfo->isSupportEffect;
     return NO_ERROR;
 }
 

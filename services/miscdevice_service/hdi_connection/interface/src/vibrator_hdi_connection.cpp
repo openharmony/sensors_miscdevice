@@ -89,6 +89,7 @@ bool VibratorHdiConnection::IsVibratorRunning()
     CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
     return iVibratorHdiConnection_->IsVibratorRunning();
 }
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
 std::optional<HdfEffectInfo> VibratorHdiConnection::GetEffectInfo(const std::string &effect)
 {
@@ -101,7 +102,6 @@ std::optional<HdfEffectInfo> VibratorHdiConnection::GetEffectInfo(const std::str
     FinishTrace(HITRACE_TAG_SENSORS);
     return ret;
 }
-#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
 int32_t VibratorHdiConnection::Stop(HdfVibratorMode mode)
 {

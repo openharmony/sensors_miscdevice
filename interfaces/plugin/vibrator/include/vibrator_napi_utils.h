@@ -30,8 +30,13 @@ namespace OHOS {
 namespace Sensors {
 using std::string;
 constexpr int32_t CALLBACK_NUM = 3;
-constexpr uint32_t TYPE_SYSTEM_VIBRATE = 1;
 constexpr uint32_t STRING_LENGTH_MAX = 64;
+
+enum CallbackType {
+    SYSTEM_VIBRATE_CALLBACK = 1,
+    COMMON_CALLBACK,
+    IS_SUPPORT_EFFECT_CALLBACK,
+};
 
 class AsyncCallbackInfo : public RefBase {
 public:
@@ -47,10 +52,14 @@ public:
     napi_deferred deferred = nullptr;
     napi_ref callback[CALLBACK_NUM] = {0};
     AsyncCallbackError error;
-    uint32_t callbackType = 0;
+    CallbackType callbackType = COMMON_CALLBACK;
+    bool isSupportEffect {false};
     AsyncCallbackInfo(napi_env env) : env(env) {}
     ~AsyncCallbackInfo();
 };
+
+using ConstructResultFunc = bool(*)(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo,
+    napi_value result[], int32_t length);
 
 bool IsMatchType(const napi_env &env, const napi_value &value, const napi_valuetype &type);
 bool GetNapiInt32(const napi_env &env, const int32_t value, napi_value &result);
@@ -59,6 +68,11 @@ bool GetStringValue(const napi_env &env, const napi_value &value, string &result
 bool GetPropertyString(const napi_env &env, const napi_value &value, const std::string &type, std::string &result);
 bool GetPropertyInt32(const napi_env &env, const napi_value &value, const std::string &type, int32_t &result);
 bool GetNapiParam(const napi_env &env, const napi_callback_info &info, size_t &argc, napi_value &argv);
+bool ConvertErrorToResult(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo, napi_value &result);
+bool ConstructCommonResult(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo, napi_value result[],
+    int32_t length);
+bool ConstructIsSupportEffectResult(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo,
+    napi_value result[], int32_t length);
 void EmitAsyncCallbackWork(sptr<AsyncCallbackInfo> async_callback_info);
 void EmitPromiseWork(sptr<AsyncCallbackInfo> asyncCallbackInfo);
 }  // namespace Sensors

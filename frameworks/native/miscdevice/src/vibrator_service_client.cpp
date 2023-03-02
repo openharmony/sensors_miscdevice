@@ -84,7 +84,6 @@ int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, int32_t timeOut, int3
     FinishTrace(HITRACE_TAG_SENSORS);
     if (ret != ERR_OK) {
         MISC_HILOGE("Vibrate time failed, ret:%{public}d", ret);
-        return ret;
     }
     return ret;
 }
@@ -104,7 +103,6 @@ int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, const std::string &ef
     FinishTrace(HITRACE_TAG_SENSORS);
     if (ret != ERR_OK) {
         MISC_HILOGE("Vibrate effect failed, ret:%{public}d", ret);
-        return ret;
     }
     return ret;
 }
@@ -125,7 +123,6 @@ int32_t VibratorServiceClient::PlayVibratorCustom(int32_t vibratorId, const RawF
     FinishTrace(HITRACE_TAG_SENSORS);
     if (ret != ERR_OK) {
         MISC_HILOGE("PlayVibratorCustom failed, ret:%{public}d", ret);
-        return ret;
     }
     return ret;
 }
@@ -145,7 +142,6 @@ int32_t VibratorServiceClient::StopVibrator(int32_t vibratorId, const std::strin
     FinishTrace(HITRACE_TAG_SENSORS);
     if (ret != ERR_OK) {
         MISC_HILOGE("StopVibrator by mode failed, ret:%{public}d", ret);
-        return ret;
     }
     return ret;
 }
@@ -164,7 +160,24 @@ int32_t VibratorServiceClient::StopVibrator(int32_t vibratorId)
     FinishTrace(HITRACE_TAG_SENSORS);
     if (ret != ERR_OK) {
         MISC_HILOGE("StopVibrator failed, ret:%{public}d", ret);
-        return ret;
+    }
+    return ret;
+}
+
+int32_t VibratorServiceClient::IsSupportEffect(const std::string &effect, bool &state)
+{
+    MISC_HILOGD("IsSupportEffect begin, effect:%{public}s", effect.c_str());
+    int32_t ret = InitServiceClient();
+    if (ret != ERR_OK) {
+        MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
+        return MISC_NATIVE_GET_SERVICE_ERR;
+    }
+    CHKPR(miscdeviceProxy_, ERROR);
+    StartTrace(HITRACE_TAG_SENSORS, "VibrateEffect");
+    ret = miscdeviceProxy_->IsSupportEffect(effect, state);
+    FinishTrace(HITRACE_TAG_SENSORS);
+    if (ret != ERR_OK) {
+        MISC_HILOGE("Query effect support failed, ret:%{public}d", ret);
     }
     return ret;
 }

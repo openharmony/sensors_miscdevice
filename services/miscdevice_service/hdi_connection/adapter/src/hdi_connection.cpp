@@ -104,6 +104,7 @@ bool HdiConnection::IsVibratorRunning()
     vibratorInterface_->IsVibratorRunning(state);
     return state;
 }
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
 std::optional<HdfEffectInfo> HdiConnection::GetEffectInfo(const std::string &effect)
 {
@@ -121,7 +122,6 @@ std::optional<HdfEffectInfo> HdiConnection::GetEffectInfo(const std::string &eff
     }
     return effectInfo;
 }
-#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
 int32_t HdiConnection::Stop(HdfVibratorMode mode)
 {

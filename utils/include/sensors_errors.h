@@ -79,6 +79,7 @@ enum {
     VIBRATOR_SET_PARA_ERR = VIBRATOR_STOP_EFFECT_ERR + 1,
     DUMP_PARAM_ERR = VIBRATOR_SET_PARA_ERR + 1,
     WRITE_MSG_ERR = DUMP_PARAM_ERR + 1,
+    READ_MSG_ERR = WRITE_MSG_ERR + 1,
 };
 
 // Error code for Sensor native

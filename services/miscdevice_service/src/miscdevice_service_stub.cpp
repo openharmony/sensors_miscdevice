@@ -44,6 +44,7 @@ MiscdeviceServiceStub::MiscdeviceServiceStub()
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     baseFuncs_[STOP_VIBRATOR_ALL] = &MiscdeviceServiceStub::StopVibratorAllStub;
     baseFuncs_[STOP_VIBRATOR_BY_MODE] = &MiscdeviceServiceStub::StopVibratorByModeStub;
+    baseFuncs_[IS_SUPPORT_EFFECT] = &MiscdeviceServiceStub::IsSupportEffectStub;
     baseFuncs_[GET_LIGHT_LIST] = &MiscdeviceServiceStub::GetLightListStub;
     baseFuncs_[TURN_ON] = &MiscdeviceServiceStub::TurnOnStub;
     baseFuncs_[TURN_OFF] = &MiscdeviceServiceStub::TurnOffStub;
@@ -131,6 +132,25 @@ int32_t MiscdeviceServiceStub::StopVibratorByModeStub(MessageParcel &data, Messa
         return ERROR;
     }
     return StopVibrator(vibratorId, mode);
+}
+
+int32_t MiscdeviceServiceStub::IsSupportEffectStub(MessageParcel &data, MessageParcel &reply)
+{
+    std::string effect;
+    if (!data.ReadString(effect)) {
+        MISC_HILOGE("Parcel read effect failed");
+        return ERROR;
+    }
+    bool state = false;
+    int32_t ret = IsSupportEffect(effect, state);
+    if (ret != NO_ERROR) {
+        MISC_HILOGE("Query support effect failed");
+        return ret;
+    }
+    if (!reply.WriteBool(state)) {
+        MISC_HILOGE("Parcel write state failed");
+    }
+    return ret;
 }
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM

@@ -131,6 +131,19 @@ int32_t Cancel();
  * @since 9
  */
 bool SetUsage(int32_t usage);
+
+/**
+ * @brief Query whether a vibration effect is supported.
+ *
+ * @param effectId Indicates the preset vibration effect, which is described in {@link vibrator_agent_type.h}, for
+ * example:
+ * {@link VIBRATOR_TYPE_CLOCK_TIMER}: Describes the vibration effect of the vibrator when a user adjusts the timer.
+ * @param state Indicates a pointer to the query result.
+ * @return Returning 0 indicates success; otherwise, it indicates failure.
+ *
+ * @since 10
+ */
+int32_t IsSupportEffect(const char *effectId, bool *state);
 } // namespace Sensors
 } // namespace OHOS
 #ifdef __cplusplus
