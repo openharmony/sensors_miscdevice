@@ -1729,14 +1729,14 @@ describe("VibratorJsTest", function () {
     it("VibrateTest026", 0, async function (done) {
         vibrator.isSupportEffect(INVALID_EFFECT_ID, (error, state) => {
             if (error) {
+                console.info('VibrateTest026 error');
                 expect(false).assertTrue();
-                done();
             } else {
+                console.info('VibrateTest026 success');
                 expect(!state).assertTrue();
-                done();
             }
+            done();
         });
-        done();
     })
 
     /*
@@ -1747,37 +1747,69 @@ describe("VibratorJsTest", function () {
      */
     it("VibrateTest027", 0, async function (done) {
         let isSupport = false;
-        vibrator.isSupportEffect(EFFECT_ID, (error, state) => {
-            if (error) {
-                expect(false).assertTrue();
-                done();
-            } else {
-                expect(state).assertTrue();
-                isSupport = state;
-                done();
-            }
-            done();
-        });
-        if (isSupport) {
-            vibrator.startVibration(EFFECT_ID, (error) => {
-                if (error) {
-                    expect(false).assertTrue();
-                    done();
+
+        function vibratePromise() {
+            return new Promise((resolve, reject) => {
+                if (isSupport) {
+                    vibrator.startVibration({
+                        type: "preset",
+                        effectId: EFFECT_ID,
+                        count: 1,
+                    }, {
+                        usage: "unknown"
+                    }, (error)=>{
+                        if (error) {
+                            expect(false).assertTrue();
+                            reject(error);
+                        } else {
+                            expect(true).assertTrue();
+                            resolve();
+                        }
+                    });
                 } else {
-                    expect(true).assertTrue();
-                    done();
+                    resolve();
                 }
-            });
-            vibrator.stopVibration((error) => {
-                if (error) {
-                    expect(false).assertTrue();
-                    done();
-                } else {
-                    expect(true).assertTrue();
-                    done();
-                }
-            });
+            })
         }
+
+        function stopPromise() {
+            return new Promise((resolve, reject) => {
+                if (isSupport) {
+                    vibrator.stopVibration((error) => {
+                        if (error) {
+                            expect(false).assertTrue();
+                            reject(error);
+                        } else {
+                            expect(true).assertTrue();
+                            resolve();
+                        }
+                    });
+                } else {
+                    resolve();
+                }
+            })
+        }
+
+        let isSupportPromise = new Promise((resolve, reject) => {
+            vibrator.isSupportEffect(EFFECT_ID, (error, state) => {
+                if (error) {
+                    expect(false).assertTrue();
+                    reject(error);
+                } else {
+                    expect(true).assertTrue();
+                    isSupport = state;
+                    resolve();
+                }
+            });
+        })
+
+        await isSupportPromise.then(() =>{
+            return vibratePromise();
+        }).then(() =>{
+            return stopPromise();
+        }).catch((error)=>{
+            expect(false).assertTrue();
+        })
         done();
     })
 
@@ -1810,7 +1842,6 @@ describe("VibratorJsTest", function () {
     it("VibrateTest029", 0, async function (done) {
         try {
             vibrator.isSupportEffect();
-            done();
         } catch (error) {
             console.info("VibrateTest029 exception in");
             expect(error.code).assertEqual(PARAMETER_ERROR_CODE);
@@ -1826,12 +1857,10 @@ describe("VibratorJsTest", function () {
      * @tc.require: I6HLLL
      */
     it("VibrateTest030", 0, async function (done) {
-        vibrator.isSupportEffect(INVALID_EFFECT_ID).then((state) => {
+        await vibrator.isSupportEffect(INVALID_EFFECT_ID).then((state) => {
             expect(!state).assertTrue();
-            done();
         }, (error) => {
             expect(false).assertTrue();
-            done();
         });
         done();
     })
@@ -1844,33 +1873,67 @@ describe("VibratorJsTest", function () {
      */
     it("VibrateTest031", 0, async function (done) {
         let isSupport = false;
-        vibrator.isSupportEffect(EFFECT_ID).then((state) => {
-            expect(state).assertTrue();
-            isSupport = state;
-        }, (error) => {
-            expect(false).assertTrue();
-            done();
-        });
-        if (isSupport) {
-            vibrator.startVibration(EFFECT_ID, (error) => {
-                if (error) {
-                    expect(false).assertTrue();
-                    done();
+
+        function vibratePromise() {
+            return new Promise((resolve, reject) => {
+                if (isSupport) {
+                    vibrator.startVibration({
+                        type: "preset",
+                        effectId: EFFECT_ID,
+                        count: 1,
+                    }, {
+                        usage: "unknown"
+                    }, (error)=>{
+                        if (error) {
+                            expect(false).assertTrue();
+                            reject(error);
+                        } else {
+                            expect(true).assertTrue();
+                            resolve();
+                        }
+                    });
                 } else {
-                    expect(true).assertTrue();
-                    done();
-                }
-            });
-            vibrator.stopVibration((error) => {
-                if (error) {
-                    expect(false).assertTrue();
-                    done();
-                } else {
-                    expect(true).assertTrue();
-                    done();
+                    resolve();
                 }
             })
         }
+
+        function stopPromise() {
+            return new Promise((resolve, reject) => {
+                if (isSupport) {
+                    vibrator.stopVibration((error) => {
+                        if (error) {
+                            expect(false).assertTrue();
+                            reject(error);
+                        } else {
+                            expect(true).assertTrue();
+                            resolve();
+                        }
+                    });
+                } else {
+                    resolve();
+                }
+            })
+        }
+
+        let isSupportPromise = new Promise((resolve, reject) => {
+            vibrator.isSupportEffect(EFFECT_ID).then((state) => {
+                expect(true).assertTrue();
+                isSupport = state;
+                resolve();
+            }, (error) => {
+                expect(false).assertTrue();
+                reject(error);
+            });
+        })
+
+        await isSupportPromise.then(() =>{
+            return vibratePromise();
+        }).then(() =>{
+            return stopPromise();
+        }).catch((error)=>{
+            expect(false).assertTrue();
+        })
         done();
     })
 
@@ -1911,7 +1974,6 @@ describe("VibratorJsTest", function () {
                 expect(false).assertTrue();
                 done();
             });
-            done();
         } catch (error) {
             expect(error.code).assertEqual(PARAMETER_ERROR_CODE);
             expect(error.message).assertEqual(PARAMETER_ERROR_MSG);
@@ -1926,24 +1988,37 @@ describe("VibratorJsTest", function () {
      * @tc.require: I6HLLL
      */
     it("VibrateTest034", 0, async function (done) {
-        vibrator.startVibration(2000, (error) => {
-            if (error) {
-                expect(false).assertTrue();
-                done();
-            } else {
-                expect(true).assertTrue();
-                done();
-            }
-        });
-        vibrator.stopVibration((error) => {
-            if (error) {
-                expect(false).assertTrue();
-                done();
-            } else {
-                expect(true).assertTrue();
-                done();
-            }
-        });
+        function stopPromise() {
+            return new Promise((resolve, reject) => {
+                vibrator.stopVibration((error) => {
+                    if (error) {
+                        expect(false).assertTrue();
+                        reject(error);
+                    } else {
+                        expect(true).assertTrue();
+                        resolve();
+                    }
+                });
+            })
+        }
+
+        let promise = new Promise((resolve, reject) => {
+            vibrator.startVibration(2000, (error) => {
+                if (error) {
+                    expect(false).assertTrue();
+                    reject(error);
+                } else {
+                    expect(true).assertTrue();
+                    resolve();
+                }
+            });
+        })
+
+        await promise.then(() =>{
+            return stopPromise();
+        }).catch((error)=>{
+            expect(false).assertTrue();
+        })
         done();
     })
 
@@ -1954,22 +2029,35 @@ describe("VibratorJsTest", function () {
      * @tc.require: I6HLLL
      */
     it("VibrateTest035", 0, async function (done) {
-        vibrator.startVibration(2000, (error) => {
-            if (error) {
-                expect(false).assertTrue();
-                done();
-            } else {
-                expect(true).assertTrue();
-                done();
-            }
-        });
-        vibrator.stopVibration().then(() => {
-            expect(true).assertTrue();
-            done();
-        }, (error) => {
+        function stopPromise() {
+            return new Promise((resolve, reject) => {
+                vibrator.stopVibration().then(() => {
+                    expect(true).assertTrue();
+                    resolve();
+                }, (error) => {
+                    expect(false).assertTrue();
+                    reject(error);
+                });
+            })
+        }
+
+        let promise = new Promise((resolve, reject) => {
+            vibrator.startVibration(2000, (error) => {
+                if (error) {
+                    expect(false).assertTrue();
+                    reject(error);
+                } else {
+                    expect(true).assertTrue();
+                    resolve();
+                }
+            });
+        })
+
+        await promise.then(() =>{
+            return stopPromise();
+        }).catch((error)=>{
             expect(false).assertTrue();
-            done();
-        });
+        })
         done();
     })
 })
