@@ -53,6 +53,9 @@ struct VibrateInfo {
     int32_t duration = 0;
     std::string effectId;
     int32_t count = 0;
+    int32_t fd = 0;
+    int64_t offset = 0;
+    int64_t length = 0;
 };
 
 static napi_value VibrateTime(napi_env env, napi_value args[], size_t argc)
@@ -164,6 +167,10 @@ bool ParseParameter(napi_env env, napi_value args[], size_t argc, VibrateInfo &i
     } else if (info.type == "preset") {
         CHKCF(GetPropertyInt32(env, args[0], "count", info.count), "Get vibrate count fail");
         CHKCF(GetPropertyString(env, args[0], "effectId", info.effectId), "Get vibrate effectId fail");
+    } else if (info.type == "custom") {
+        CHKCF(GetPropertyInt32(env, args[0], "fd", info.fd), "Get vibrate fd fail");
+        CHKCF(GetPropertyInt64(env, args[0], "offset", info.offset), "Get vibrate offset fail");
+        CHKCF(GetPropertyInt64(env, args[0], "length", info.length), "Get vibrate length fail");
     }
     CHKCF(GetPropertyString(env, args[1], "usage", info.usage), "Get vibrate usage fail");
     return true;
@@ -184,7 +191,7 @@ int32_t StartVibrate(const VibrateInfo &info)
         MISC_HILOGE("SetUsage fail");
         return PARAMETER_ERROR;
     }
-    if ((info.type != "time") && (info.type != "preset")) {
+    if ((info.type != "time") && (info.type != "preset") && (info.type != "custom")) {
         MISC_HILOGE("Invalid vibrate type");
         return PARAMETER_ERROR;
     }
@@ -194,6 +201,8 @@ int32_t StartVibrate(const VibrateInfo &info)
             return PARAMETER_ERROR;
         }
         return StartVibrator(info.effectId.c_str());
+    } else if (info.type == "custom") {
+        return PlayVibratorCustom(info.fd, info.offset, info.length);
     }
     return StartVibratorOnce(info.duration);
 }
