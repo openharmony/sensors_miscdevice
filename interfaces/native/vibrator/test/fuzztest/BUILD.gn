@@ -19,6 +19,8 @@ group("fuzztest") {
   testonly = true
   deps = []
   deps += [
+    "issupporteffect_fuzzer:fuzztest",
+    "playvibratorcustom_fuzzer:fuzztest",
     "setloopcount_fuzzer:fuzztest",
     "setusage_fuzzer:fuzztest",
     "startvibrator_fuzzer:fuzztest",
