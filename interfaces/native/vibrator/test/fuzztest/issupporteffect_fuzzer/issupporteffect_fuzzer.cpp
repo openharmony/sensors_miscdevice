@@ -49,7 +49,7 @@ bool IsSupportEffectFuzzTest(const uint8_t* data, size_t size)
     size_t startPos = 0;
     char effectId[LEN + 1];
     effectId[LEN] = END_CHAR;
-    for (size_t i = 0; i < LEN; i++) {
+    for (size_t i = 0; i < LEN; ++i) {
         startPos += GetObject<char>(data + startPos, size - startPos, effectId[i]);
     }
     bool state { false };
