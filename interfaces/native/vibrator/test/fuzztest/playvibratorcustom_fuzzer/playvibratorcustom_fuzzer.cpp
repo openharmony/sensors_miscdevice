@@ -22,7 +22,7 @@
 namespace OHOS {
 namespace Sensors {
 namespace {
-constexpr size_t DATA_MIN_SIZE = 2;
+constexpr size_t DATA_MIN_SIZE = 20;
 } // namespace
 
 template<class T>
@@ -39,10 +39,10 @@ size_t GetObject(const uint8_t *data, size_t size, T &object)
     return objectSize;
 }
 
-bool PlayVibratorCustomFuzzTest(const uint8_t* data, size_t size)
+void PlayVibratorCustomFuzzTest(const uint8_t* data, size_t size)
 {
     if (data == nullptr || size < DATA_MIN_SIZE) {
-        return false;
+        return;
     }
     size_t startPos = 0;
     int32_t fd { 0 };
@@ -51,11 +51,7 @@ bool PlayVibratorCustomFuzzTest(const uint8_t* data, size_t size)
     startPos += GetObject<int64_t>(data + startPos, size - startPos, offset);
     int64_t length { 0 };
     GetObject<int64_t>(data + startPos, size - startPos, length);
-    int32_t ret = OHOS::Sensors::PlayVibratorCustom(fd, offset, length);
-    if (ret != 0) {
-        return false;
-    }
-    return true;
+    OHOS::Sensors::PlayVibratorCustom(fd, offset, length);
 }
 } // Sensors
 } // OHOS

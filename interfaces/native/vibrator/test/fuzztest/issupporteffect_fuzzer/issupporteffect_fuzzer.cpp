@@ -22,9 +22,9 @@
 namespace OHOS {
 namespace Sensors {
 namespace {
-constexpr size_t DATA_MIN_SIZE = 2;
+constexpr size_t DATA_MIN_SIZE = 20;
 constexpr char END_CHAR = '\0';
-constexpr size_t LEN = 10;
+constexpr size_t LEN = 20;
 } // namespace
 
 template<class T>
@@ -41,10 +41,10 @@ size_t GetObject(const uint8_t *data, size_t size, T &object)
     return objectSize;
 }
 
-bool IsSupportEffectFuzzTest(const uint8_t* data, size_t size)
+void IsSupportEffectFuzzTest(const uint8_t* data, size_t size)
 {
     if (data == nullptr || size < DATA_MIN_SIZE) {
-        return false;
+        return;
     }
     size_t startPos = 0;
     char effectId[LEN + 1];
@@ -53,12 +53,7 @@ bool IsSupportEffectFuzzTest(const uint8_t* data, size_t size)
         startPos += GetObject<char>(data + startPos, size - startPos, effectId[i]);
     }
     bool state { false };
-    GetObject<bool>(data + startPos, size - startPos, state);
-    int32_t ret = OHOS::Sensors::IsSupportEffect(effectId, &state);
-    if (ret != 0) {
-        return false;
-    }
-    return true;
+    OHOS::Sensors::IsSupportEffect(effectId, &state);
 }
 } // Sensors
 } // OHOS
