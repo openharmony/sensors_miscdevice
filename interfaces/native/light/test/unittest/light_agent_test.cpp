@@ -14,7 +14,7 @@
  */
 
 #include <gtest/gtest.h>
-#include <unistd.h>
+#include <thread>
 
 #include "light_agent.h"
 #include "sensors_errors.h"
@@ -25,7 +25,8 @@ using namespace testing::ext;
 using namespace OHOS::HiviewDFX;
 
 namespace {
-    constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "LightAgentTest" };
+constexpr int32_t TIME_WAIT_FOR_OP = 2;
+constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "LightAgentTest" };
 }  // namespace
 
 class LightAgentTest : public testing::Test {
@@ -127,7 +128,7 @@ HWTEST_F(LightAgentTest, StartLightTest_003, TestSize.Level1)
         animation.onTime = 50;
         animation.offTime = 50;
         int32_t ret = TurnOn(lightId_, color, animation);
-        sleep(5);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
         ASSERT_EQ(ret, 0);
     }
 }
@@ -243,7 +244,7 @@ HWTEST_F(LightAgentTest, StartLightTest_008, TestSize.Level1)
         animation.onTime = 2;
         animation.offTime = 2;
         int32_t ret = TurnOn(lightId_, color, animation);
-        sleep(5);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
         ASSERT_EQ(ret, 0);
     }
 }
