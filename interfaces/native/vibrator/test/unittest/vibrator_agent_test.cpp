@@ -32,6 +32,7 @@ using namespace Security::AccessToken;
 using Security::AccessToken::AccessTokenID;
 
 namespace {
+constexpr int32_t TIME_WAIT_FOR_OP = 2;
 const std::string PHONE_TYPE = "phone";
 std::string g_deviceType;
 constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "VibratorAgentTest" };
@@ -254,10 +255,11 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_001, TestSize.Level1)
             ASSERT_EQ(ret, 0);
         }
         close(fd);
-        sleep(5);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     } else {
         ASSERT_EQ(0, 0);
     }
+    Cancel();
 }
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_002, TestSize.Level1)
@@ -272,10 +274,11 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_002, TestSize.Level1)
             ASSERT_EQ(ret, 0);
         }
         close(fd);
-        sleep(5);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     } else {
         ASSERT_EQ(0, 0);
     }
+    Cancel();
 }
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_003, TestSize.Level1)
@@ -294,10 +297,11 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_003, TestSize.Level1)
             ASSERT_NE(ret, 0);
         }
         close(fd);
-        sleep(5);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     } else {
         ASSERT_EQ(0, 0);
     }
+    Cancel();
 }
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_004, TestSize.Level1)
@@ -316,10 +320,11 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_004, TestSize.Level1)
             ASSERT_NE(ret, 0);
         }
         close(fd);
-        sleep(5);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     } else {
         ASSERT_EQ(0, 0);
     }
+    Cancel();
 }
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_005, TestSize.Level1)
@@ -338,10 +343,11 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_005, TestSize.Level1)
             ASSERT_EQ(ret, 0);
         }
         close(fd);
-        sleep(5);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     } else {
         ASSERT_EQ(0, 0);
     }
+    Cancel();
 }
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_006, TestSize.Level1)
@@ -360,10 +366,11 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_006, TestSize.Level1)
             ASSERT_NE(ret, 0);
         }
         close(fd);
-        sleep(5);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     } else {
         ASSERT_EQ(0, 0);
     }
+    Cancel();
 }
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_007, TestSize.Level1)
@@ -382,10 +389,11 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_007, TestSize.Level1)
             ASSERT_EQ(ret, 0);
         }
         close(fd);
-        sleep(5);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     } else {
         ASSERT_EQ(0, 0);
     }
+    Cancel();
 }
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_008, TestSize.Level1)
@@ -404,10 +412,11 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_008, TestSize.Level1)
             ASSERT_NE(ret, 0);
         }
         close(fd);
-        sleep(5);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     } else {
         ASSERT_EQ(0, 0);
     }
+    Cancel();
 }
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_009, TestSize.Level1)
@@ -426,10 +435,11 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_009, TestSize.Level1)
             ASSERT_EQ(ret, 0);
         }
         close(fd);
-        sleep(5);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     } else {
         ASSERT_EQ(0, 0);
     }
+    Cancel();
 }
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_010, TestSize.Level1)
@@ -448,10 +458,11 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_010, TestSize.Level1)
             ASSERT_NE(ret, 0);
         }
         close(fd);
-        sleep(5);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     } else {
         ASSERT_EQ(0, 0);
     }
+    Cancel();
 }
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_011, TestSize.Level1)
@@ -470,10 +481,11 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_011, TestSize.Level1)
             ASSERT_EQ(ret, 0);
         }
         close(fd);
-        sleep(5);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     } else {
         ASSERT_EQ(0, 0);
     }
+    Cancel();
 }
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_012, TestSize.Level1)
@@ -488,10 +500,11 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_012, TestSize.Level1)
             ASSERT_EQ(ret, 0);
         }
         close(fd);
-        sleep(7);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     } else {
         ASSERT_EQ(0, 0);
     }
+    Cancel();
 }
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_013, TestSize.Level1)
