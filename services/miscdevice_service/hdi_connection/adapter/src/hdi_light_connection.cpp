@@ -79,7 +79,7 @@ int32_t HdiLightConnection::TurnOn(int32_t lightId, const LightColor &color, con
 {
     CALL_LOG_ENTER;
     HDI::Light::V1_0::HdfLightColor lightColor;
-    lightColor.colorValue = color.singleColor;
+    lightColor.colorValue.singleColor = color.singleColor;
 
     HDI::Light::V1_0::HdfLightFlashEffect flashEffect;
     flashEffect.flashMode = animation.mode;
