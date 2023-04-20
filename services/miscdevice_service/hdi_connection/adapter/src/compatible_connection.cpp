@@ -32,7 +32,7 @@ std::unordered_map<std::string, int32_t> vibratorEffect_ = {
 };
 HdfVibratorMode vibrateMode_;
 }
-uint32_t CompatibleConnection::duration_ = 0;
+int32_t CompatibleConnection::duration_ = 0;
 std::atomic_bool CompatibleConnection::isStop_ = false;
 
 int32_t CompatibleConnection::ConnectHdi()
@@ -44,7 +44,7 @@ int32_t CompatibleConnection::ConnectHdi()
 int32_t CompatibleConnection::StartOnce(uint32_t duration)
 {
     CALL_LOG_ENTER;
-    duration_ = duration;
+    duration_ = static_cast<int32_t>(duration);
     if (!vibrateThread_.joinable()) {
         std::thread senocdDataThread(CompatibleConnection::VibrateProcess);
         vibrateThread_ = std::move(senocdDataThread);
@@ -148,7 +148,7 @@ void CompatibleConnection::VibrateProcess()
 {
     CALL_LOG_ENTER;
     clock_t vibrateStartTime = clock();
-    while (static_cast<uint32_t>(clock() - vibrateStartTime) < duration_) {
+    while (clock() - vibrateStartTime < duration_) {
         if (isStop_) {
             MISC_HILOGI("thread should stop");
             break;

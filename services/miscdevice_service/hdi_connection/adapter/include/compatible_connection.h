@@ -42,7 +42,7 @@ private:
     DISALLOW_COPY_AND_MOVE(CompatibleConnection);
     std::thread vibrateThread_;
     static void VibrateProcess();
-    static uint32_t duration_;
+    static int32_t duration_;
     static std::atomic_bool isStop_;
 };
 }  // namespace Sensors
