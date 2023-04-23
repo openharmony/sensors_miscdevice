@@ -63,8 +63,8 @@ int32_t HdiLightConnection::GetLightList(std::vector<LightInfo> &lightList) cons
         LightInfo light;
         light.lightId = lightInfos[i].lightId;
         light.lightNumber = lightInfos[i].lightNumber;
-        auto ret = memcpy_s(light.lightName, NAME_MAX_LEN, lightInfos[i].lightName.c_str(),
-                            lightInfos[i].lightName.length());
+        ret = memcpy_s(light.lightName, NAME_MAX_LEN, lightInfos[i].lightName.c_str(),
+                       lightInfos[i].lightName.length());
         if (ret != EOK) {
             MISC_HILOGE("memcpy_s failed, error number: %{public}d", errno);
             return ret;
