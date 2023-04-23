@@ -93,7 +93,7 @@ int32_t LightClient::GetLightList(LightInfo **lightInfo, int32_t &count)
     }
     std::lock_guard<std::mutex> lightInfosLock(lightInfosMutex_);
     if (lightInfos_ == nullptr) {
-        int32_t ret = ConvertLightInfos();
+        ret = ConvertLightInfos();
         if (ret != ERR_OK) {
             MISC_HILOGE("Convert light lists failed");
             ClearLightInfos();
