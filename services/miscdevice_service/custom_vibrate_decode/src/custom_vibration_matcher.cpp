@@ -32,6 +32,9 @@ std::map<int32_t, std::vector<int32_t>> TRANSIENT_VIBRATION_INFOS = {
 constexpr int32_t INTENSITY_MAX = 100;
 constexpr int32_t TRANSIENT_GRADE_NUM = 4;
 constexpr int32_t CONTINUOUS_GRADE_NUM = 8;
+constexpr int32_t CONTINUOUS_GRADE_MASK = 100;
+constexpr float ROUND_OFFSET = 0.5;
+constexpr float TRANSIENT_GRADE_GAIN = 0.25;
 constexpr float CONTINUOUS_GRADE_SCALE = 100. / 8;
 constexpr float INTENSITY_WEIGHT = 0.5;
 constexpr float FREQUENCY_WEIGHT = 0.5;
@@ -78,22 +81,22 @@ void CustomVibrationMatcher::ProcessContinuousEvent(const VibrateEvent &event, i
     if (event.intensity == INTENSITY_MAX) {
         grade = CONTINUOUS_GRADE_NUM - 1;
     } else {
-        grade = round(event.intensity / CONTINUOUS_GRADE_SCALE + 0.5) - 1;
+        grade = round(event.intensity / CONTINUOUS_GRADE_SCALE + ROUND_OFFSET) - 1;
     }
     if ((!compositeEffects.empty()) && (event.startTime == preStartTime + preDuration)) {
         PrimitiveEffect& prePrimitiveEffect = compositeEffects.back().primitiveEffect;
         int32_t preEffectId = prePrimitiveEffect.effectId;
-        int32_t preGrade = preEffectId % 100;
+        int32_t preGrade = preEffectId % CONTINUOUS_GRADE_MASK;
         int32_t mergeDuration = preDuration + event.duration;
         if (preEffectId > EFFECT_ID_BOUNDARY && preGrade == grade && mergeDuration < DURATION_MAX) {
-            prePrimitiveEffect.effectId = mergeDuration * 100 + grade;
+            prePrimitiveEffect.effectId = mergeDuration * CONTINUOUS_GRADE_MASK + grade;
             preDuration = mergeDuration;
             return;
         }
     }
     PrimitiveEffect primitiveEffect;
     primitiveEffect.delay = event.startTime - preStartTime;
-    primitiveEffect.effectId = event.duration * 100 + grade;
+    primitiveEffect.effectId = event.duration * CONTINUOUS_GRADE_MASK + grade;
     CompositeEffect compositeEffect;
     compositeEffect.primitiveEffect = primitiveEffect;
     compositeEffects.push_back(compositeEffect);
@@ -111,7 +114,7 @@ void CustomVibrationMatcher::ProcessTransientEvent(const VibrateEvent &event, in
         const std::vector<int32_t> &info = transientInfo.second;
         float frequencyDistance = std::abs(event.frequency - info[1]);
         for (int32_t j = 0; j < TRANSIENT_GRADE_NUM; ++j) {
-            float intensityDistance = std::abs(event.intensity - info[0] * (1 - j * 0.25));
+            float intensityDistance = std::abs(event.intensity - info[0] * (1 - j * TRANSIENT_GRADE_GAIN));
             float weightSum = INTENSITY_WEIGHT * intensityDistance + FREQUENCY_WEIGHT * frequencyDistance;
             if (weightSum < minWeightSum) {
                 minWeightSum = weightSum;
