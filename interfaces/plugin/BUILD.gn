@@ -11,17 +11,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#import("//build/config/ohos/rules.gni")
+import("./../../miscdevice.gni")
 import("//build/ohos.gni")
+
 ohos_shared_library("vibrator") {
   include_dirs = [
     "//third_party/node/src",
-    "//native_engine",
-    "../native/vibrator/include",
-    "./include",
-    "./vibrator/include",
-    "//commonlibrary/c_utils/base/include",
-    "//base/sensors/miscdevice/utils/include",
+    "$SUBSYSTEM_DIR/interfaces/native/vibrator/include",
+    "$SUBSYSTEM_DIR/interfaces/plugin/vibrator/include",
+    "$SUBSYSTEM_DIR/utils/include",
   ]
   defines = [
     "APP_LOG_TAG = \"vibratorJs\"",
@@ -34,7 +32,7 @@ ohos_shared_library("vibrator") {
     "./vibrator/src/vibrator_napi_utils.cpp",
   ]
 
-  deps = [ "//base/sensors/miscdevice/interfaces/native/vibrator:vibrator_interface_native" ]
+  deps = [ "$SUBSYSTEM_DIR/interfaces/native/vibrator:vibrator_interface_native" ]
   external_deps = [
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",

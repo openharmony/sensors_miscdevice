@@ -11,26 +11,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("./../../../../miscdevice.gni")
 import("//build/test.gni")
 
-SUBSYSTEM_DIR = "//base/sensors"
-module_output_path = "sensors/miscdevice/interfaces"
-
-###########################LightAgentTest###########################
 ohos_unittest("LightAgentTest") {
-  module_out_path = module_output_path
+  module_out_path = "sensors/miscdevice/interfaces"
 
   sources = [ "unittest/light_agent_test.cpp" ]
 
   include_dirs = [
-    "//commonlibrary/c_utils/base/include",
-    "$SUBSYSTEM_DIR/miscdevice/utils/include",
-    "$SUBSYSTEM_DIR/miscdevice/interfaces/native/light/include",
+    "$SUBSYSTEM_DIR/utils/include",
+    "$SUBSYSTEM_DIR/interfaces/native/light/include",
   ]
 
   deps = [
-    "$SUBSYSTEM_DIR/miscdevice/interfaces/native/light:light_interface_native",
-    "$SUBSYSTEM_DIR/miscdevice/utils:libmiscdevice_utils",
+    "$SUBSYSTEM_DIR/interfaces/native/light:light_interface_native",
+    "$SUBSYSTEM_DIR/utils:libmiscdevice_utils",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -40,7 +36,6 @@ ohos_unittest("LightAgentTest") {
   ]
 }
 
-###########################end###########################
 group("unittest") {
   testonly = true
   deps = [ ":LightAgentTest" ]

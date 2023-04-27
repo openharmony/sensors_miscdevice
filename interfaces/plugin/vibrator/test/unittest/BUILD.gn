@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("./../../../../../miscdevice.gni")
 import("//build/test.gni")
 module_output_path = "miscdevice/interfaces"
 
@@ -18,7 +19,7 @@ ohos_js_unittest("VibratorJsTest") {
   module_out_path = module_output_path
   hap_profile = "./config.json"
   certificate_profile =
-      "//test/testfwk/developer_test/signature/openharmony_sx.p7b"
+      "./openharmony_sx.p7b"
 }
 
 group("unittest") {

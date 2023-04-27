@@ -11,19 +11,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("./../../../../../../miscdevice.gni")
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
-module_output_path = "sensors/light"
 
 ohos_fuzztest("StopLightFuzzTest") {
-  module_out_path = module_output_path
+  module_out_path = "sensors/light"
 
-  fuzz_config_file = "//base/sensors/miscdevice/interfaces/native/light/test/fuzztest/stoplight_fuzzer"
+  fuzz_config_file = "$SUBSYSTEM_DIR/interfaces/native/light/test/fuzztest/stoplight_fuzzer"
 
   include_dirs = [
-    "//base/sensors/miscdevice/interfaces/native/light/test/fuzztest/stoplight_fuzzer",
-    "//base/sensors/miscdevice/interfaces/native/light/include",
+    "$SUBSYSTEM_DIR/interfaces/native/light/test/fuzztest/stoplight_fuzzer",
+    "$SUBSYSTEM_DIR/interfaces/native/light/include",
   ]
 
   cflags = [
@@ -36,7 +36,7 @@ ohos_fuzztest("StopLightFuzzTest") {
   sources = [ "stoplight_fuzzer.cpp" ]
 
   deps = [
-    "//base/sensors/miscdevice/interfaces/native/light:light_interface_native",
+    "$SUBSYSTEM_DIR/interfaces/native/light:light_interface_native",
   ]
 
   external_deps = [ "c_utils:utils" ]
