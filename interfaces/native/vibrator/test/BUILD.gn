@@ -11,8 +11,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("./../../../../miscdevice.gni")
 import("//build/test.gni")
+import("./../../../../miscdevice.gni")
 
 ohos_unittest("VibratorAgentTest") {
   module_out_path = "sensors/miscdevice/interfaces"
@@ -20,8 +20,8 @@ ohos_unittest("VibratorAgentTest") {
   sources = [ "unittest/vibrator_agent_test.cpp" ]
 
   include_dirs = [
-    "$SUBSYSTEM_DIR/utils/include",
     "$SUBSYSTEM_DIR/interfaces/native/vibrator/include",
+    "$SUBSYSTEM_DIR/utils/include",
   ]
 
   deps = [

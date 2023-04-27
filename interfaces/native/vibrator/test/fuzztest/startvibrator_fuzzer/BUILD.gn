@@ -11,10 +11,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("./../../../../../../miscdevice.gni")
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
+import("./../../../../../../miscdevice.gni")
 
 ohos_fuzztest("StartVibratorFuzzTest") {
   module_out_path = "sensors/vibrator"
@@ -22,8 +22,8 @@ ohos_fuzztest("StartVibratorFuzzTest") {
   fuzz_config_file = "$SUBSYSTEM_DIR/interfaces/native/vibrator/test/fuzztest/startvibrator_fuzzer"
 
   include_dirs = [
-    "$SUBSYSTEM_DIR/interfaces/native/vibrator/test/fuzztest/startvibrator_fuzzer",
     "$SUBSYSTEM_DIR/interfaces/native/vibrator/include",
+    "$SUBSYSTEM_DIR/interfaces/native/vibrator/test/fuzztest/startvibrator_fuzzer",
   ]
 
   cflags = [
@@ -35,7 +35,8 @@ ohos_fuzztest("StartVibratorFuzzTest") {
 
   sources = [ "startvibrator_fuzzer.cpp" ]
 
-  deps = [ "$SUBSYSTEM_DIR/interfaces/native/vibrator:vibrator_interface_native" ]
+  deps =
+      [ "$SUBSYSTEM_DIR/interfaces/native/vibrator:vibrator_interface_native" ]
 }
 
 group("fuzztest") {

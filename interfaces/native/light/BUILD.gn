@@ -11,8 +11,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("./../../../miscdevice.gni")
 import("//build/ohos.gni")
+import("./../../../miscdevice.gni")
 
 ohos_ndk_library("liblight_ndk") {
   output_name = "light_agent"
@@ -23,8 +23,8 @@ ohos_ndk_library("liblight_ndk") {
 ohos_ndk_headers("light_ndk_header") {
   dest_dir = "$ndk_headers_out_dir/sensors"
   sources = [
-    "./include/light_agent.h",
-    "./include/light_agent_type.h",
+    "include/light_agent.h",
+    "include/light_agent_type.h",
   ]
 }
 
@@ -37,8 +37,8 @@ ohos_shared_library("light_interface_native") {
   sources = [ "src/light_agent.cpp" ]
 
   include_dirs = [
-    "include",
     "$SUBSYSTEM_DIR/frameworks/native/miscdevice/include",
+    "$SUBSYSTEM_DIR/interfaces/native/light/include",
     "$SUBSYSTEM_DIR/utils/include",
   ]
 

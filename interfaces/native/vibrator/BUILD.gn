@@ -11,8 +11,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("./../../../miscdevice.gni")
 import("//build/ohos.gni")
+import("./../../../miscdevice.gni")
 
 ohos_ndk_library("libvibrator_ndk") {
   output_name = "vibrator_agent"
@@ -23,8 +23,8 @@ ohos_ndk_library("libvibrator_ndk") {
 ohos_ndk_headers("vibrator_ndk_header") {
   dest_dir = "$ndk_headers_out_dir/sensors"
   sources = [
-    "./include/vibrator_agent.h",
-    "./include/vibrator_agent_type.h",
+    "include/vibrator_agent.h",
+    "include/vibrator_agent_type.h",
   ]
 }
 
@@ -37,10 +37,10 @@ ohos_shared_library("vibrator_interface_native") {
   sources = [ "src/vibrator_agent.cpp" ]
 
   include_dirs = [
-    "include",
-    "$SUBSYSTEM_DIR/utils/include",
     "$SUBSYSTEM_DIR/frameworks/native/miscdevice/include",
     "$SUBSYSTEM_DIR/interfaces/native/light/include",
+    "$SUBSYSTEM_DIR/interfaces/native/vibrator/include",
+    "$SUBSYSTEM_DIR/utils/include",
   ]
 
   if (miscdevice_feature_vibrator_custom) {

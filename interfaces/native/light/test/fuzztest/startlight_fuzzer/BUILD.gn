@@ -11,15 +11,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("./../../../../../../miscdevice.gni")
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
+import("./../../../../../../miscdevice.gni")
 
 ohos_fuzztest("StartLightFuzzTest") {
   module_out_path = "sensors/light"
 
-  fuzz_config_file = "$SUBSYSTEM_DIR/interfaces/native/light/test/fuzztest/startlight_fuzzer"
+  fuzz_config_file =
+      "$SUBSYSTEM_DIR/interfaces/native/light/test/fuzztest/startlight_fuzzer"
 
   include_dirs = [
     "$SUBSYSTEM_DIR/interfaces/native/light/test/fuzztest/startlight_fuzzer",
@@ -35,9 +36,7 @@ ohos_fuzztest("StartLightFuzzTest") {
 
   sources = [ "startlight_fuzzer.cpp" ]
 
-  deps = [
-    "$SUBSYSTEM_DIR/interfaces/native/light:light_interface_native",
-  ]
+  deps = [ "$SUBSYSTEM_DIR/interfaces/native/light:light_interface_native" ]
 
   external_deps = [ "c_utils:utils" ]
 }
