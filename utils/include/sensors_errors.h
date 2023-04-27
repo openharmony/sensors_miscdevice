@@ -28,8 +28,8 @@ namespace Sensors {
 enum ErrorCode : int32_t {
     PERMISSION_DENIED = 201, // Use this error code when permission is denied.
     PARAMETER_ERROR = 401, // Use this error code when the input parameter type or range does not match.
+    IS_NOT_SUPPORTED = 801, // Use this error code when capability not supported.
     DEVICE_OPERATION_FAILED = 14600101, // Use this error code when operating the device fail.
-    IS_NOT_SUPPORTED = 14600102 // Use this error code when operating is not supported.
 };
 
 enum {

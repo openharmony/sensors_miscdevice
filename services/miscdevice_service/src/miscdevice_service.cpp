@@ -17,6 +17,8 @@
 
 #include <algorithm>
 #include <cinttypes>
+#include <functional>
+#include <map>
 #include <string_ex.h>
 
 #include "sensors_errors.h"
@@ -41,8 +43,11 @@ constexpr int32_t MIN_VIBRATOR_TIME = 0;
 constexpr int32_t MAX_VIBRATOR_TIME = 1800000;
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-constexpr int32_t MAX_JSON_FILE_SIZE = 64000;
+constexpr int32_t MAX_JSON_FILE_SIZE = 64 * 1024;
 const std::string PHONE_TYPE = "phone";
+std::map<std::string, std::function<VibratorDecoderFactory*()>> g_decodeFactorys = {
+    {"json", []() -> VibratorDecoderFactory* { return new DefaultVibratorDecoderFactory(); }},
+};
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 }  // namespace
 
@@ -306,10 +311,14 @@ int32_t MiscdeviceService::IsSupportEffect(const std::string &effect, bool &stat
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 int32_t MiscdeviceService::DecodeCustomEffect(const RawFileDescriptor &rawFd, std::set<VibrateEvent> &vibrateSet)
 {
-    auto defaultFactory = std::make_unique<DefaultVibratorDecoderFactory>();
-    std::unique_ptr<VibratorDecoder> defaultDecoder(defaultFactory->CreateDecoder());
-    JsonParser parser(rawFd);
-    int32_t ret = defaultDecoder->DecodeEffect(parser, vibrateSet);
+    std::string suffix = GetFileSuffix(rawFd.fd);
+    if (g_decodeFactorys.find(suffix) == g_decodeFactorys.end()) {
+        MISC_HILOGE("File type not supported");\
+        return ERROR;
+    }
+    std::unique_ptr<VibratorDecoderFactory> decodeFactory(g_decodeFactorys[suffix]());
+    std::unique_ptr<VibratorDecoder> decoder(decodeFactory->CreateDecoder());
+    int32_t ret = decoder->DecodeEffect(rawFd, vibrateSet);
     if (ret != SUCCESS) {
         MISC_HILOGE("decoder effect error");
         return ERROR;

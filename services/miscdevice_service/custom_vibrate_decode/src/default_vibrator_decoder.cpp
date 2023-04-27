@@ -36,8 +36,9 @@ constexpr int32_t SUPPORT_CHANNEL_NUMBER = 1;
 constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "DefaultVibratorDecoder" };
 } // namespace
 
-int32_t DefaultVibratorDecoder::DecodeEffect(const JsonParser &parser, std::set<VibrateEvent> &vibrateSet)
+int32_t DefaultVibratorDecoder::DecodeEffect(const RawFileDescriptor &rawFd, std::set<VibrateEvent> &vibrateSet)
 {
+    JsonParser parser(rawFd);
     int32_t ret = CheckMetadata(parser);
     CHKCR((ret == SUCCESS), ERROR, "check metadata fail");
     ret = ParseChannel(parser, vibrateSet);

@@ -115,6 +115,18 @@ bool GetStringValue(const napi_env &env, const napi_value &value, string &result
     return true;
 }
 
+bool GetPropertyItem(const napi_env &env, const napi_value &value, const std::string &type, napi_value &item)
+{
+    bool exist = false;
+    napi_status status = napi_has_named_property(env, value, type.c_str(), &exist);
+    if ((status != napi_ok) || (!exist)) {
+        MISC_HILOGE("can not find %{public}s property", type.c_str());
+        return false;
+    }
+    CHKCF((napi_get_named_property(env, value, type.c_str(), &item) == napi_ok), "napi get property fail");
+    return true;
+}
+
 bool GetPropertyString(const napi_env &env, const napi_value &value, const std::string &type, std::string &result)
 {
     bool exist = false;

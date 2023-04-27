@@ -28,6 +28,7 @@ const std::map<int32_t, std::string> ERROR_MESSAGES = {
     {DEVICE_OPERATION_FAILED,  "Device operation failed."},
     {PERMISSION_DENIED,  "Permission denied."},
     {PARAMETER_ERROR,  "The parameter invalid."},
+    {IS_NOT_SUPPORTED,  "Capability not supported."},
 };
 
 napi_value CreateBusinessError(const napi_env &env, const int32_t errCode, const std::string &errMessage);

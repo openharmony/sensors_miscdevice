@@ -167,10 +167,13 @@ bool ParseParameter(napi_env env, napi_value args[], size_t argc, VibrateInfo &i
     } else if (info.type == "preset") {
         CHKCF(GetPropertyInt32(env, args[0], "count", info.count), "Get vibrate count fail");
         CHKCF(GetPropertyString(env, args[0], "effectId", info.effectId), "Get vibrate effectId fail");
-    } else if (info.type == "custom") {
-        CHKCF(GetPropertyInt32(env, args[0], "fd", info.fd), "Get vibrate fd fail");
-        CHKCF(GetPropertyInt64(env, args[0], "offset", info.offset), "Get vibrate offset fail");
-        CHKCF(GetPropertyInt64(env, args[0], "length", info.length), "Get vibrate length fail");
+    } else if (info.type == "file") {
+        napi_value rawFd = nullptr;
+        CHKCF(GetPropertyItem(env, args[0], "rawFd", rawFd), "Get vibrate rawFd fail");
+        CHKCF(IsMatchType(env, rawFd, napi_object), "Wrong argument type. Napi object expected");
+        CHKCF(GetPropertyInt32(env, rawFd, "fd", info.fd), "Get vibrate fd fail");
+        CHKCF(GetPropertyInt64(env, rawFd, "offset", info.offset), "Get vibrate offset fail");
+        CHKCF(GetPropertyInt64(env, rawFd, "length", info.length), "Get vibrate length fail");
     }
     CHKCF(GetPropertyString(env, args[1], "usage", info.usage), "Get vibrate usage fail");
     return true;
@@ -191,7 +194,7 @@ int32_t StartVibrate(const VibrateInfo &info)
         MISC_HILOGE("SetUsage fail");
         return PARAMETER_ERROR;
     }
-    if ((info.type != "time") && (info.type != "preset") && (info.type != "custom")) {
+    if ((info.type != "time") && (info.type != "preset") && (info.type != "file")) {
         MISC_HILOGE("Invalid vibrate type");
         return PARAMETER_ERROR;
     }
@@ -201,7 +204,7 @@ int32_t StartVibrate(const VibrateInfo &info)
             return PARAMETER_ERROR;
         }
         return StartVibrator(info.effectId.c_str());
-    } else if (info.type == "custom") {
+    } else if (info.type == "file") {
         return PlayVibratorCustom(info.fd, info.offset, info.length);
     }
     return StartVibratorOnce(info.duration);
