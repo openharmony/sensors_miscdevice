@@ -63,8 +63,8 @@ int32_t HdiLightConnection::GetLightList(std::vector<LightInfo> &lightList) cons
         LightInfo light;
         light.lightId = lightInfos[i].lightId;
         light.lightNumber = lightInfos[i].lightNumber;
-        auto ret = memcpy_s(light.lightName, NAME_MAX_LEN, lightInfos[i].lightName.c_str(),
-                            lightInfos[i].lightName.length());
+        ret = memcpy_s(light.lightName, NAME_MAX_LEN, lightInfos[i].lightName.c_str(),
+                       lightInfos[i].lightName.length());
         if (ret != EOK) {
             MISC_HILOGE("memcpy_s failed, error number: %{public}d", errno);
             return ret;
@@ -78,18 +78,17 @@ int32_t HdiLightConnection::GetLightList(std::vector<LightInfo> &lightList) cons
 int32_t HdiLightConnection::TurnOn(int32_t lightId, const LightColor &color, const LightAnimation &animation)
 {
     CALL_LOG_ENTER;
-    HDI::Light::V1_0::HdfLightColor lightColor = {
-        .colorValue = color.singleColor
-    };
-    HDI::Light::V1_0::HdfLightFlashEffect flashEffect = {
-        .flashMode = animation.mode,
-        .onTime = animation.onTime,
-        .offTime = animation.offTime
-    };
-    HDI::Light::V1_0::HdfLightEffect effect = {
-        .lightColor = lightColor,
-        .flashEffect = flashEffect
-    };
+    HDI::Light::V1_0::HdfLightColor lightColor;
+    lightColor.colorValue.singleColor = color.singleColor;
+
+    HDI::Light::V1_0::HdfLightFlashEffect flashEffect;
+    flashEffect.flashMode = animation.mode;
+    flashEffect.onTime = animation.onTime;
+    flashEffect.offTime = animation.offTime;
+
+    HDI::Light::V1_0::HdfLightEffect effect;
+    effect.lightColor = lightColor;
+    effect.flashEffect = flashEffect;
     CHKPR(lightInterface_, ERROR);
     int32_t ret = lightInterface_->TurnOnLight(lightId, effect);
     if (ret < 0) {

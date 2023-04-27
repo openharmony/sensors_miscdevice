@@ -110,7 +110,7 @@ void CustomVibrationMatcher::ProcessTransientEvent(const VibrateEvent &event, in
         int32_t id = transientInfo.first;
         const std::vector<int32_t> &info = transientInfo.second;
         float frequencyDistance = std::abs(event.frequency - info[1]);
-        for (size_t j = 0; j < TRANSIENT_GRADE_NUM; ++j) {
+        for (int32_t j = 0; j < TRANSIENT_GRADE_NUM; ++j) {
             float intensityDistance = std::abs(event.intensity - info[0] * (1 - j * 0.25));
             float weightSum = INTENSITY_WEIGHT * intensityDistance + FREQUENCY_WEIGHT * frequencyDistance;
             if (weightSum < minWeightSum) {
