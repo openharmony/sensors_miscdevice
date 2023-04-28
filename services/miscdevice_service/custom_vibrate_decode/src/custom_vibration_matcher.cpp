@@ -23,15 +23,18 @@
 namespace OHOS {
 namespace Sensors {
 namespace {
-std::map<int32_t, std::vector<int32_t>> TRANSIENT_VIBRATION_INFOS = {
+const std::map<int32_t, std::vector<int32_t>> TRANSIENT_VIBRATION_INFOS = {
     {0x28, {0x4d, 0x4d, 0x0b}}, {0x2c, {0x2a, 0x64, 0x07}}, {0x30, {0x44, 0x52, 0x16}},
     {0x3c, {0x45, 0x34, 0x0a}}, {0x40, {0x2e, 0x43, 0x0a}}, {0x48, {0x51, 0x52, 0x0a}},
     {0x4c, {0x3a, 0x0c, 0x0f}}, {0x50, {0x64, 0x20, 0x14}}, {0x54, {0x55, 0x34, 0x1c}},
     {0x5c, {0x32, 0x0c, 0x13}}, {0x60, {0x12, 0x07, 0x0a}}
-};  // {Id, {intensity, frequency, duration}}
+};
 constexpr int32_t INTENSITY_MAX = 100;
 constexpr int32_t TRANSIENT_GRADE_NUM = 4;
 constexpr int32_t CONTINUOUS_GRADE_NUM = 8;
+constexpr int32_t CONTINUOUS_GRADE_MASK = 100;
+constexpr float ROUND_OFFSET = 0.5;
+constexpr float TRANSIENT_GRADE_GAIN = 0.25;
 constexpr float CONTINUOUS_GRADE_SCALE = 100. / 8;
 constexpr float INTENSITY_WEIGHT = 0.5;
 constexpr float FREQUENCY_WEIGHT = 0.5;
@@ -78,22 +81,22 @@ void CustomVibrationMatcher::ProcessContinuousEvent(const VibrateEvent &event, i
     if (event.intensity == INTENSITY_MAX) {
         grade = CONTINUOUS_GRADE_NUM - 1;
     } else {
-        grade = round(event.intensity / CONTINUOUS_GRADE_SCALE + 0.5) - 1;
+        grade = round(event.intensity / CONTINUOUS_GRADE_SCALE + ROUND_OFFSET) - 1;
     }
     if ((!compositeEffects.empty()) && (event.startTime == preStartTime + preDuration)) {
         PrimitiveEffect& prePrimitiveEffect = compositeEffects.back().primitiveEffect;
         int32_t preEffectId = prePrimitiveEffect.effectId;
-        int32_t preGrade = preEffectId % 100;
+        int32_t preGrade = preEffectId % CONTINUOUS_GRADE_MASK;
         int32_t mergeDuration = preDuration + event.duration;
         if (preEffectId > EFFECT_ID_BOUNDARY && preGrade == grade && mergeDuration < DURATION_MAX) {
-            prePrimitiveEffect.effectId = mergeDuration * 100 + grade;
+            prePrimitiveEffect.effectId = mergeDuration * CONTINUOUS_GRADE_MASK + grade;
             preDuration = mergeDuration;
             return;
         }
     }
     PrimitiveEffect primitiveEffect;
     primitiveEffect.delay = event.startTime - preStartTime;
-    primitiveEffect.effectId = event.duration * 100 + grade;
+    primitiveEffect.effectId = event.duration * CONTINUOUS_GRADE_MASK + grade;
     CompositeEffect compositeEffect;
     compositeEffect.primitiveEffect = primitiveEffect;
     compositeEffects.push_back(compositeEffect);
@@ -111,7 +114,7 @@ void CustomVibrationMatcher::ProcessTransientEvent(const VibrateEvent &event, in
         const std::vector<int32_t> &info = transientInfo.second;
         float frequencyDistance = std::abs(event.frequency - info[1]);
         for (int32_t j = 0; j < TRANSIENT_GRADE_NUM; ++j) {
-            float intensityDistance = std::abs(event.intensity - info[0] * (1 - j * 0.25));
+            float intensityDistance = std::abs(event.intensity - info[0] * (1 - j * TRANSIENT_GRADE_GAIN));
             float weightSum = INTENSITY_WEIGHT * intensityDistance + FREQUENCY_WEIGHT * frequencyDistance;
             if (weightSum < minWeightSum) {
                 minWeightSum = weightSum;

@@ -37,10 +37,10 @@ public:
     void TearDown() {}
 };
 
-LightInfo *lightInfo_ = nullptr;
-int32_t lightId_ = -1;
-int32_t invalidLightId_ = -1;
-int32_t lightType_ = -1;
+LightInfo *g_lightInfo = nullptr;
+int32_t g_lightId = -1;
+int32_t g_invalidLightId = -1;
+int32_t g_lightType = -1;
 
 /**
  * @tc.name: StartLightTest_001
@@ -52,12 +52,12 @@ HWTEST_F(LightAgentTest, StartLightTest_001, TestSize.Level1)
 {
     CALL_LOG_ENTER;
     int32_t count = -1;
-    int32_t ret = GetLightList(&lightInfo_, count);
+    int32_t ret = GetLightList(&g_lightInfo, count);
     for (int32_t i = 0; i < count; ++i) {
         MISC_HILOGI("lightId: %{public}d, lightName: %{public}s, lightNumber: %{public}d, lightType: %{public}d",
-            lightInfo_[i].lightId, lightInfo_[i].lightName, lightInfo_[i].lightNumber, lightInfo_[i].lightType);
-        lightId_ = lightInfo_[i].lightId;
-        lightType_ = lightInfo_[i].lightType;
+            g_lightInfo[i].lightId, g_lightInfo[i].lightName, g_lightInfo[i].lightNumber, g_lightInfo[i].lightType);
+        g_lightId = g_lightInfo[i].lightId;
+        g_lightType = g_lightInfo[i].lightType;
     }
     ASSERT_EQ(ret, 0);
 }
@@ -119,15 +119,15 @@ HWTEST_F(LightAgentTest, StartLightTest_003, TestSize.Level1)
     int32_t powerLightId = 1;
     TurnOff(powerLightId);
     LightColor color;
-    bool ret = GetLightColor(color, lightType_);
-    if (!ret) {
-        ASSERT_EQ(ret, -1);
+    bool flag = GetLightColor(color, g_lightType);
+    if (!flag) {
+        ASSERT_FALSE(flag);
     } else {
         LightAnimation animation;
         animation.mode = LIGHT_MODE_DEFAULT;
         animation.onTime = 50;
         animation.offTime = 50;
-        int32_t ret = TurnOn(lightId_, color, animation);
+        int32_t ret = TurnOn(g_lightId, color, animation);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
         ASSERT_EQ(ret, 0);
     }
@@ -143,15 +143,15 @@ HWTEST_F(LightAgentTest, StartLightTest_004, TestSize.Level1)
 {
     CALL_LOG_ENTER;
     LightColor color;
-    bool ret = GetLightColor(color, lightType_);
-    if (!ret) {
-        ASSERT_EQ(ret, -1);
+    bool flag = GetLightColor(color, g_lightType);
+    if (!flag) {
+        ASSERT_FALSE(flag);
     } else {
         LightAnimation animation;
         animation.mode = LIGHT_MODE_BUTT;
         animation.onTime = 50;
         animation.offTime = 50;
-        int32_t ret = TurnOn(lightId_, color, animation);
+        int32_t ret = TurnOn(g_lightId, color, animation);
         ASSERT_EQ(ret, -1);
     }
 }
@@ -166,15 +166,15 @@ HWTEST_F(LightAgentTest, StartLightTest_005, TestSize.Level1)
 {
     CALL_LOG_ENTER;
     LightColor color;
-    bool ret = GetLightColor(color, lightType_);
-    if (!ret) {
-        ASSERT_EQ(ret, -1);
+    bool flag = GetLightColor(color, g_lightType);
+    if (!flag) {
+        ASSERT_FALSE(flag);
     } else {
         LightAnimation animation;
         animation.mode = -1;
         animation.onTime = 50;
         animation.offTime = 50;
-        int32_t ret = TurnOn(lightId_, color, animation);
+        int32_t ret = TurnOn(g_lightId, color, animation);
         ASSERT_EQ(ret, -1);
     }
 }
@@ -189,15 +189,15 @@ HWTEST_F(LightAgentTest, StartLightTest_006, TestSize.Level1)
 {
     CALL_LOG_ENTER;
     LightColor color;
-    bool ret = GetLightColor(color, lightType_);
-    if (!ret) {
-        ASSERT_EQ(ret, -1);
+    bool flag = GetLightColor(color, g_lightType);
+    if (!flag) {
+        ASSERT_FALSE(flag);
     } else {
         LightAnimation animation;
         animation.mode = LIGHT_MODE_DEFAULT;
         animation.onTime = -1;
         animation.offTime = 50;
-        int32_t ret = TurnOn(lightId_, color, animation);
+        int32_t ret = TurnOn(g_lightId, color, animation);
         ASSERT_EQ(ret, -1);
     }
 }
@@ -212,15 +212,15 @@ HWTEST_F(LightAgentTest, StartLightTest_007, TestSize.Level1)
 {
     CALL_LOG_ENTER;
     LightColor color;
-    bool ret = GetLightColor(color, lightType_);
-    if (!ret) {
-        ASSERT_EQ(ret, -1);
+    bool flag = GetLightColor(color, g_lightType);
+    if (!flag) {
+        ASSERT_FALSE(flag);
     } else {
         LightAnimation animation;
         animation.mode = LIGHT_MODE_DEFAULT;
         animation.onTime = 50;
         animation.offTime = -1;
-        int32_t ret = TurnOn(lightId_, color, animation);
+        int32_t ret = TurnOn(g_lightId, color, animation);
         ASSERT_EQ(ret, -1);
     }
 }
@@ -235,15 +235,15 @@ HWTEST_F(LightAgentTest, StartLightTest_008, TestSize.Level1)
 {
     CALL_LOG_ENTER;
     LightColor color;
-    bool ret = GetLightColor(color, lightType_);
-    if (!ret) {
-        ASSERT_EQ(ret, -1);
+    bool flag = GetLightColor(color, g_lightType);
+    if (!flag) {
+        ASSERT_FALSE(flag);
     } else {
         LightAnimation animation;
         animation.mode = LIGHT_MODE_DEFAULT;
         animation.onTime = 2;
         animation.offTime = 2;
-        int32_t ret = TurnOn(lightId_, color, animation);
+        int32_t ret = TurnOn(g_lightId, color, animation);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
         ASSERT_EQ(ret, 0);
     }
@@ -259,15 +259,15 @@ HWTEST_F(LightAgentTest, StartLightTest_009, TestSize.Level1)
 {
     CALL_LOG_ENTER;
     LightColor color;
-    bool ret = GetLightColor(color, lightType_);
-    if (!ret) {
-        ASSERT_EQ(ret, -1);
+    bool flag = GetLightColor(color, g_lightType);
+    if (!flag) {
+        ASSERT_FALSE(flag);
     } else {
         LightAnimation animation;
         animation.mode = LIGHT_MODE_DEFAULT;
         animation.onTime = 2;
         animation.offTime = 2;
-        int32_t ret = TurnOn(invalidLightId_, color, animation);
+        int32_t ret = TurnOn(g_invalidLightId, color, animation);
         ASSERT_EQ(ret, -1);
     }
 }
@@ -281,7 +281,7 @@ HWTEST_F(LightAgentTest, StartLightTest_009, TestSize.Level1)
 HWTEST_F(LightAgentTest, StartLightTest_010, TestSize.Level1)
 {
     CALL_LOG_ENTER;
-    int32_t ret = TurnOff(lightId_);
+    int32_t ret = TurnOff(g_lightId);
     ASSERT_EQ(ret, 0);
 }
 
@@ -294,7 +294,7 @@ HWTEST_F(LightAgentTest, StartLightTest_010, TestSize.Level1)
 HWTEST_F(LightAgentTest, StartLightTest_011, TestSize.Level1)
 {
     CALL_LOG_ENTER;
-    int32_t ret = TurnOff(invalidLightId_);
+    int32_t ret = TurnOff(g_invalidLightId);
     ASSERT_EQ(ret, -1);
 }
 }  // namespace Sensors
