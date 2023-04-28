@@ -19,3 +19,5 @@ declare_args() {
 
 print(
     "miscdevice_feature_vibrator_custom = ${miscdevice_feature_vibrator_custom}")
+
+SUBSYSTEM_DIR = "//base/sensors/miscdevice"

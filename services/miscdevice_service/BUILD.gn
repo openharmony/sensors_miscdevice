@@ -11,10 +11,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//base/sensors/miscdevice/miscdevice_vibrator_custom.gni")
 import("//build/ohos.gni")
+import("./../../miscdevice.gni")
 
-SUBSYSTEM_DIR = "//base/sensors"
 ohos_shared_library("libmiscdevice_service") {
   sources = [
     "hdi_connection/adapter/src/compatible_connection.cpp",
@@ -32,18 +31,16 @@ ohos_shared_library("libmiscdevice_service") {
 
   include_dirs = [
     "include",
-    "//commonlibrary/c_utils/base/include",
-    "//utils/system/safwk/native/include",
-    "$SUBSYSTEM_DIR/miscdevice/frameworks/native/miscdevice/include",
-    "$SUBSYSTEM_DIR/miscdevice/interfaces/native/light/include",
-    "$SUBSYSTEM_DIR/miscdevice/utils/include",
-    "hdi_connection/adapter/include",
-    "hdi_connection/interface/include",
+    "$SUBSYSTEM_DIR/frameworks/native/miscdevice/include",
+    "$SUBSYSTEM_DIR/interfaces/native/light/include",
+    "$SUBSYSTEM_DIR/services/miscdevice_service/hdi_connection/adapter/include",
+    "$SUBSYSTEM_DIR/services/miscdevice_service/hdi_connection/interface/include",
+    "$SUBSYSTEM_DIR/utils/include",
     "//third_party/cJSON",
   ]
 
   cflags = [ "-Wno-error=inconsistent-missing-override" ]
-  deps = [ "$SUBSYSTEM_DIR/miscdevice/utils:libmiscdevice_utils" ]
+  deps = [ "$SUBSYSTEM_DIR/utils:libmiscdevice_utils" ]
 
   external_deps = [
     "access_token:libaccesstoken_sdk",

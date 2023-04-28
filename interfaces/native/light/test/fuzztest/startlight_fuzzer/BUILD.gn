@@ -14,16 +14,17 @@
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
-module_output_path = "sensors/light"
+import("./../../../../../../miscdevice.gni")
 
 ohos_fuzztest("StartLightFuzzTest") {
-  module_out_path = module_output_path
+  module_out_path = "sensors/light"
 
-  fuzz_config_file = "//base/sensors/miscdevice/interfaces/native/light/test/fuzztest/startlight_fuzzer"
+  fuzz_config_file =
+      "$SUBSYSTEM_DIR/interfaces/native/light/test/fuzztest/startlight_fuzzer"
 
   include_dirs = [
-    "//base/sensors/miscdevice/interfaces/native/light/test/fuzztest/startlight_fuzzer",
-    "//base/sensors/miscdevice/interfaces/native/light/include",
+    "$SUBSYSTEM_DIR/interfaces/native/light/test/fuzztest/startlight_fuzzer",
+    "$SUBSYSTEM_DIR/interfaces/native/light/include",
   ]
 
   cflags = [
@@ -35,9 +36,7 @@ ohos_fuzztest("StartLightFuzzTest") {
 
   sources = [ "startlight_fuzzer.cpp" ]
 
-  deps = [
-    "//base/sensors/miscdevice/interfaces/native/light:light_interface_native",
-  ]
+  deps = [ "$SUBSYSTEM_DIR/interfaces/native/light:light_interface_native" ]
 
   external_deps = [ "c_utils:utils" ]
 }

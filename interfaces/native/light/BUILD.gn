@@ -12,8 +12,8 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("./../../../miscdevice.gni")
 
-SUBSYSTEM_DIR = "//base/sensors/miscdevice"
 ohos_ndk_library("liblight_ndk") {
   output_name = "light_agent"
   ndk_description_file = "./liblight.json"
@@ -23,8 +23,8 @@ ohos_ndk_library("liblight_ndk") {
 ohos_ndk_headers("light_ndk_header") {
   dest_dir = "$ndk_headers_out_dir/sensors"
   sources = [
-    "./include/light_agent.h",
-    "./include/light_agent_type.h",
+    "include/light_agent.h",
+    "include/light_agent_type.h",
   ]
 }
 
@@ -37,11 +37,9 @@ ohos_shared_library("light_interface_native") {
   sources = [ "src/light_agent.cpp" ]
 
   include_dirs = [
-    "include",
-    "//base/sensors/miscdevice/frameworks/native/miscdevice/include",
-    "//base/sensors/miscdevice/utils/include",
-    "//commonlibrary/c_utils/base/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "$SUBSYSTEM_DIR/frameworks/native/miscdevice/include",
+    "$SUBSYSTEM_DIR/interfaces/native/light/include",
+    "$SUBSYSTEM_DIR/utils/include",
   ]
 
   cflags = [ "-Wno-error=inconsistent-missing-override" ]

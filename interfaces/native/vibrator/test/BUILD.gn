@@ -11,27 +11,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//base/sensors/miscdevice/miscdevice_vibrator_custom.gni")
 import("//build/test.gni")
+import("./../../../../miscdevice.gni")
 
-SUBSYSTEM_DIR = "//base/sensors"
-module_output_path = "sensors/miscdevice/interfaces"
-
-###########################VibratorAgentTest###########################
 ohos_unittest("VibratorAgentTest") {
-  module_out_path = module_output_path
+  module_out_path = "sensors/miscdevice/interfaces"
 
   sources = [ "unittest/vibrator_agent_test.cpp" ]
 
   include_dirs = [
-    "//commonlibrary/c_utils/base/include",
-    "$SUBSYSTEM_DIR/miscdevice/utils/include",
-    "$SUBSYSTEM_DIR/miscdevice/interfaces/native/vibrator/include",
+    "$SUBSYSTEM_DIR/interfaces/native/vibrator/include",
+    "$SUBSYSTEM_DIR/utils/include",
   ]
 
   deps = [
-    "$SUBSYSTEM_DIR/miscdevice/interfaces/native/vibrator:vibrator_target",
-    "$SUBSYSTEM_DIR/miscdevice/utils:libmiscdevice_utils",
+    "$SUBSYSTEM_DIR/interfaces/native/vibrator:vibrator_target",
+    "$SUBSYSTEM_DIR/utils:libmiscdevice_utils",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -46,11 +41,10 @@ ohos_unittest("VibratorAgentTest") {
   ]
 
   if (miscdevice_feature_vibrator_custom) {
-    resource_config_file = "$SUBSYSTEM_DIR/miscdevice/interfaces/native/vibrator/test/unittest/resource/ohos_test.xml"
+    resource_config_file = "$SUBSYSTEM_DIR/interfaces/native/vibrator/test/unittest/resource/ohos_test.xml"
   }
 }
 
-###########################end###########################
 group("unittest") {
   testonly = true
   deps = [ ":VibratorAgentTest" ]
