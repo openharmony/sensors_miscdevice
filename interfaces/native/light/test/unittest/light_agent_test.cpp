@@ -121,7 +121,7 @@ HWTEST_F(LightAgentTest, StartLightTest_003, TestSize.Level1)
     LightColor color;
     bool flag = GetLightColor(color, g_lightType);
     if (!flag) {
-        ASSERT_EQ(flag, -1);
+        ASSERT_TRUE(flag);
     } else {
         LightAnimation animation;
         animation.mode = LIGHT_MODE_DEFAULT;
@@ -145,7 +145,7 @@ HWTEST_F(LightAgentTest, StartLightTest_004, TestSize.Level1)
     LightColor color;
     bool flag = GetLightColor(color, g_lightType);
     if (!flag) {
-        ASSERT_EQ(flag, -1);
+        ASSERT_TRUE(flag);
     } else {
         LightAnimation animation;
         animation.mode = LIGHT_MODE_BUTT;
@@ -168,7 +168,7 @@ HWTEST_F(LightAgentTest, StartLightTest_005, TestSize.Level1)
     LightColor color;
     bool flag = GetLightColor(color, g_lightType);
     if (!flag) {
-        ASSERT_EQ(flag, -1);
+        ASSERT_TRUE(flag);
     } else {
         LightAnimation animation;
         animation.mode = -1;
@@ -191,7 +191,7 @@ HWTEST_F(LightAgentTest, StartLightTest_006, TestSize.Level1)
     LightColor color;
     bool flag = GetLightColor(color, g_lightType);
     if (!flag) {
-        ASSERT_EQ(flag, -1);
+        ASSERT_TRUE(flag);
     } else {
         LightAnimation animation;
         animation.mode = LIGHT_MODE_DEFAULT;
@@ -214,7 +214,7 @@ HWTEST_F(LightAgentTest, StartLightTest_007, TestSize.Level1)
     LightColor color;
     bool flag = GetLightColor(color, g_lightType);
     if (!flag) {
-        ASSERT_EQ(flag, -1);
+        ASSERT_TRUE(flag);
     } else {
         LightAnimation animation;
         animation.mode = LIGHT_MODE_DEFAULT;
@@ -237,7 +237,7 @@ HWTEST_F(LightAgentTest, StartLightTest_008, TestSize.Level1)
     LightColor color;
     bool flag = GetLightColor(color, g_lightType);
     if (!flag) {
-        ASSERT_EQ(flag, -1);
+        ASSERT_TRUE(flag);
     } else {
         LightAnimation animation;
         animation.mode = LIGHT_MODE_DEFAULT;
@@ -261,7 +261,7 @@ HWTEST_F(LightAgentTest, StartLightTest_009, TestSize.Level1)
     LightColor color;
     bool flag = GetLightColor(color, g_lightType);
     if (!flag) {
-        ASSERT_EQ(flag, -1);
+        ASSERT_TRUE(flag);
     } else {
         LightAnimation animation;
         animation.mode = LIGHT_MODE_DEFAULT;
