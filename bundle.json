@@ -59,6 +59,16 @@
             ],
             "header_base": "//base/sensors/miscdevice/interfaces/native/vibrator/include"
           }
+        },
+        {
+          "name": "//base/sensors/miscdevice/interfaces/native/light:light_interface_native",
+          "header": {
+            "header_files": [
+              "light_agent_type.h",
+              "light_agent.h"
+            ],
+            "header_base": "//base/sensors/miscdevice/interfaces/native/light/include"
+          }
         }
       ],
       "test": [
