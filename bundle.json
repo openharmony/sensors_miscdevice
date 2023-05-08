@@ -21,18 +21,22 @@
     ],
     "deps": {
       "components": [
+        "c_utils",
         "hisysevent_native",
         "napi",
         "hiviewdfx_hilog_native",
+        "drivers_interface_light",
         "drivers_interface_vibrator",
         "access_token",
-        "utils_base",
         "hitrace_native",
+        "init",
         "ipc",
         "safwk",
         "samgr"
       ],
-      "third_party": []
+      "third_party": [
+        "cjson"
+      ]
     },
     "build": {
       "group_type": {
