@@ -161,6 +161,10 @@ int32_t DefaultVibratorDecoder::ParseEvent(const JsonParser &parser, cJSON *even
         MISC_HILOGE("Parameter check of vibration event failed, startTime:%{public}d", vibrateEvent.startTime);
         return ERROR;
     }
+    if (vibrateEvent.intensity == INTENSITY_MIN) {
+        MISC_HILOGI("The event intensity is 0, startTime:%{public}d", vibrateEvent.startTime);
+        return SUCCESS;
+    }
     auto ret = vibrateSet.insert(vibrateEvent);
     if (!ret.second) {
         MISC_HILOGE("Vibration event is duplicated, startTime:%{public}d", vibrateEvent.startTime);
@@ -180,7 +184,7 @@ bool DefaultVibratorDecoder::CheckParameters(const VibrateEvent &vibrateEvent)
         MISC_HILOGE("the event duration is out of range, duration:%{public}d", vibrateEvent.duration);
         return false;
     }
-    if (vibrateEvent.intensity <= INTENSITY_MIN || vibrateEvent.intensity > INTENSITY_MAX) {
+    if (vibrateEvent.intensity < INTENSITY_MIN || vibrateEvent.intensity > INTENSITY_MAX) {
         MISC_HILOGE("the event intensity is out of range, intensity:%{public}d", vibrateEvent.intensity);
         return false;
     }

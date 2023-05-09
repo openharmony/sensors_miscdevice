@@ -90,12 +90,14 @@ bool IsSupportVibratorCustom();
  *
  * @param fd Indicates the file handle for custom vibration sequence.
  * @param offset Indicates the starting address (in bytes) of the custom vibration sequence.
+ * By default, the offset is the starting position in the file.
  * @param length Indicates the total length (in bytes) of the custom vibration sequence.
+ * By default, the length is the rest of bytes in the file from the offset.
  * @return Returning 0 indicates success; otherwise, it indicates failure.
  *
  * @since 10
  */
-int32_t PlayVibratorCustom(int32_t fd, int64_t offset, int64_t length);
+int32_t PlayVibratorCustom(int32_t fd, int64_t offset = 0, int64_t length = -1);
 
 /**
  * @brief Sets the number of cycles for vibration.

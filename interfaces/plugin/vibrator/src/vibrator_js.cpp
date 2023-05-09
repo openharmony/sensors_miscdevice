@@ -55,7 +55,7 @@ struct VibrateInfo {
     int32_t count = 0;
     int32_t fd = 0;
     int64_t offset = 0;
-    int64_t length = 0;
+    int64_t length = -1;
 };
 
 static napi_value VibrateTime(napi_env env, napi_value args[], size_t argc)
@@ -168,12 +168,12 @@ bool ParseParameter(napi_env env, napi_value args[], size_t argc, VibrateInfo &i
         CHKCF(GetPropertyInt32(env, args[0], "count", info.count), "Get vibrate count fail");
         CHKCF(GetPropertyString(env, args[0], "effectId", info.effectId), "Get vibrate effectId fail");
     } else if (info.type == "file") {
-        napi_value rawFd = nullptr;
-        CHKCF(GetPropertyItem(env, args[0], "rawFd", rawFd), "Get vibrate rawFd fail");
-        CHKCF(IsMatchType(env, rawFd, napi_object), "Wrong argument type. Napi object expected");
-        CHKCF(GetPropertyInt32(env, rawFd, "fd", info.fd), "Get vibrate fd fail");
-        CHKCF(GetPropertyInt64(env, rawFd, "offset", info.offset), "Get vibrate offset fail");
-        CHKCF(GetPropertyInt64(env, rawFd, "length", info.length), "Get vibrate length fail");
+        napi_value hapticFd = nullptr;
+        CHKCF(GetPropertyItem(env, args[0], "hapticFd", hapticFd), "Get vibrate hapticFd fail");
+        CHKCF(IsMatchType(env, hapticFd, napi_object), "Wrong argument type. Napi object expected");
+        CHKCF(GetPropertyInt32(env, hapticFd, "fd", info.fd), "Get vibrate fd fail");
+        GetPropertyInt64(env, hapticFd, "offset", info.offset);
+        GetPropertyInt64(env, hapticFd, "length", info.length);
     }
     CHKCF(GetPropertyString(env, args[1], "usage", info.usage), "Get vibrate usage fail");
     return true;
