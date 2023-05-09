@@ -21,18 +21,22 @@
     ],
     "deps": {
       "components": [
+        "c_utils",
         "hisysevent_native",
         "napi",
         "hiviewdfx_hilog_native",
+        "drivers_interface_light",
         "drivers_interface_vibrator",
         "access_token",
-        "utils_base",
         "hitrace_native",
+        "init",
         "ipc",
         "safwk",
         "samgr"
       ],
-      "third_party": []
+      "third_party": [
+        "cjson"
+      ]
     },
     "build": {
       "group_type": {
@@ -58,6 +62,16 @@
               "vibrator_agent_type.h"
             ],
             "header_base": "//base/sensors/miscdevice/interfaces/native/vibrator/include"
+          }
+        },
+        {
+          "name": "//base/sensors/miscdevice/interfaces/native/light:light_interface_native",
+          "header": {
+            "header_files": [
+              "light_agent_type.h",
+              "light_agent.h"
+            ],
+            "header_base": "//base/sensors/miscdevice/interfaces/native/light/include"
           }
         }
       ],

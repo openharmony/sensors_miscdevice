@@ -172,7 +172,7 @@ std::string ReadFd(const RawFileDescriptor &rawFd)
         int64_t onceRead = std::min(realLength - alreadyRead, READ_DATA_BUFF_SIZE - 1);
         fgets(buf, onceRead + 1, fp);
         dataStr += buf;
-        alreadyRead += onceRead;
+        alreadyRead = ftell(fp) - realOffset;
     }
     if (fclose(fp) != 0) {
         MISC_HILOGW("close file failed, errno:%{public}d", errno);

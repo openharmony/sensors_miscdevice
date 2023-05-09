@@ -12,6 +12,8 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("./../miscdevice.gni")
+
 ohos_shared_library("libmiscdevice_utils") {
   sources = [
     "src/file_utils.cpp",
@@ -21,9 +23,7 @@ ohos_shared_library("libmiscdevice_utils") {
   ]
 
   include_dirs = [
-    "include",
-    "//commonlibrary/c_utils/base/include",
-    "//utils/system/safwk/native/include",
+    "$SUBSYSTEM_DIR/utils/include",
     "//third_party/cJSON",
   ]
 

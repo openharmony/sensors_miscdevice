@@ -14,16 +14,16 @@
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
-module_output_path = "sensors/vibrator"
+import("./../../../../../../miscdevice.gni")
 
 ohos_fuzztest("PlayVibratorCustomFuzzTest") {
-  module_out_path = module_output_path
+  module_out_path = "sensors/vibrator"
 
-  fuzz_config_file = "./../playvibratorcustom_fuzzer"
+  fuzz_config_file = "$SUBSYSTEM_DIR/interfaces/native/vibrator/test/fuzztest/playvibratorcustom_fuzzer"
 
   include_dirs = [
-    "./../../../../../../interfaces/native/vibrator/test/fuzztest/playvibratorcustom_fuzzer",
-    "./../../../../../../interfaces/native/vibrator/include",
+    "$SUBSYSTEM_DIR/interfaces/native/vibrator/include",
+    "$SUBSYSTEM_DIR/interfaces/native/vibrator/test/fuzztest/playvibratorcustom_fuzzer",
   ]
 
   cflags = [
@@ -35,9 +35,9 @@ ohos_fuzztest("PlayVibratorCustomFuzzTest") {
 
   sources = [ "playvibratorcustom_fuzzer.cpp" ]
 
-  deps = [
-    "./../../../../../../interfaces/native/vibrator:vibrator_interface_native",
-  ]
+  deps =
+      [ "$SUBSYSTEM_DIR/interfaces/native/vibrator:vibrator_interface_native" ]
+
   external_deps = [ "c_utils:utils" ]
 }
 
