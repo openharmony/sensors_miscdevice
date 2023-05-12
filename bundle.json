@@ -46,7 +46,7 @@
           "//base/sensors/miscdevice/interfaces/native/vibrator:vibrator_target",
           "//base/sensors/miscdevice/interfaces/native/light:light_target",
           "//base/sensors/miscdevice/frameworks/native/miscdevice:miscdevice_native_target",
-          "//base/sensors/miscdevice/utils:miscdevice_utils_target" 
+          "//base/sensors/miscdevice/utils:miscdevice_utils_target"
         ],
         "service_group": [
           "//base/sensors/miscdevice/services/miscdevice_service:miscdevice_service_target",
