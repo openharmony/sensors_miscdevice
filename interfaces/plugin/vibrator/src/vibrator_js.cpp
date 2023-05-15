@@ -22,6 +22,7 @@
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 
+#include "file_utils.h"
 #include "miscdevice_log.h"
 #include "vibrator_agent.h"
 #include "vibrator_napi_error.h"
@@ -173,6 +174,7 @@ bool ParseParameter(napi_env env, napi_value args[], size_t argc, VibrateInfo &i
         CHKCF(IsMatchType(env, hapticFd, napi_object), "Wrong argument type. Napi object expected");
         CHKCF(GetPropertyInt32(env, hapticFd, "fd", info.fd), "Get vibrate fd fail");
         GetPropertyInt64(env, hapticFd, "offset", info.offset);
+        info.length = GetFileSize(info.fd);
         GetPropertyInt64(env, hapticFd, "length", info.length);
     }
     CHKCF(GetPropertyString(env, args[1], "usage", info.usage), "Get vibrate usage fail");

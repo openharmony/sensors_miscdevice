@@ -98,7 +98,7 @@ bool IsSupportVibratorCustom()
 int32_t PlayVibratorCustom(int32_t fd, int64_t offset, int64_t length)
 {
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    if (fd < 0) {
+    if (fd < 0 || offset < 0 || length <= 0) {
         MISC_HILOGE("input parameter invalid, fd:%{public}d, offset:%{public}lld, length:%{public}lld",
             fd, static_cast<long long>(offset), static_cast<long long>(length));
         return PARAMETER_ERROR;

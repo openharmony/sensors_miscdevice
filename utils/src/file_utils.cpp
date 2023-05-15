@@ -31,7 +31,6 @@ constexpr int32_t FILE_SIZE_MAX = 0x5000;
 constexpr int64_t READ_DATA_BUFF_SIZE = 256;
 constexpr int32_t INVALID_FILE_SIZE = -1;
 constexpr int32_t FILE_PATH_MAX = 1024;
-constexpr int32_t MAX_JSON_FILE_SIZE = 64 * 1024;
 }  // namespace
 
 std::string ReadJsonFile(const std::string &filePath)
@@ -144,21 +143,17 @@ std::string ReadFd(const RawFileDescriptor &rawFd)
         return {};
     }
     int64_t fdSize = GetFileSize(rawFd.fd);
-    int64_t realOffset = rawFd.offset;
-    if ((realOffset < 0) || (realOffset > fdSize)) {
-        realOffset = 0;
+    if ((rawFd.offset < 0) || (rawFd.offset > fdSize)) {
+        MISC_HILOGE("offset is invalid, offset:%{public}" PRId64, rawFd.offset);
+        return {};
     }
-    int64_t realLength = rawFd.length;
-    if ((realLength < 0) || (realLength > fdSize - realOffset)) {
-        realLength = fdSize - realOffset;
-    }
-    if (realLength > MAX_JSON_FILE_SIZE) {
-        MISC_HILOGE("length is invalid, realLength:%{public}" PRId64, realLength);
+    if ((rawFd.length <= 0) || (rawFd.length > fdSize - rawFd.offset)) {
+        MISC_HILOGE("length is invalid, length:%{public}" PRId64, rawFd.length);
         return {};
     }
     FILE* fp = fdopen(rawFd.fd, "r");
     CHKPS(fp);
-    if (fseek(fp, realOffset, SEEK_SET) != 0) {
+    if (fseek(fp, rawFd.offset, SEEK_SET) != 0) {
         MISC_HILOGE("fseek failed, errno:%{public}d", errno);
         if (fclose(fp) != 0) {
             MISC_HILOGW("close file failed, errno:%{public}d", errno);
@@ -168,11 +163,11 @@ std::string ReadFd(const RawFileDescriptor &rawFd)
     std::string dataStr;
     char buf[READ_DATA_BUFF_SIZE] = { '\0' };
     int64_t alreadyRead = 0;
-    while (alreadyRead < realLength) {
-        int64_t onceRead = std::min(realLength - alreadyRead, READ_DATA_BUFF_SIZE - 1);
+    while (alreadyRead < rawFd.length) {
+        int64_t onceRead = std::min(rawFd.length - alreadyRead, READ_DATA_BUFF_SIZE - 1);
         fgets(buf, onceRead + 1, fp);
         dataStr += buf;
-        alreadyRead = ftell(fp) - realOffset;
+        alreadyRead = ftell(fp) - rawFd.offset;
     }
     if (fclose(fp) != 0) {
         MISC_HILOGW("close file failed, errno:%{public}d", errno);
