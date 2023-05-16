@@ -698,6 +698,12 @@ describe("VibratorJsTest", function () {
           });
     })
 
+    /*
+     * @tc.name:VibratorJsTest023
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: Issue Number
+     */
     it("VibratorJsTest023", 0, async function (done) {
         vibrator.vibrate(1000, undefined).then(() => {
             console.log("VibratorJsTest023 vibrate success");
@@ -714,6 +720,12 @@ describe("VibratorJsTest", function () {
         });
     })
 
+    /*
+     * @tc.name:VibratorJsTest024
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: Issue Number
+     */
     it("VibratorJsTest024", 0, async function (done) {
         vibrator.vibrate(1000, null).then(() => {
             console.log("VibratorJsTest024 vibrate success");
@@ -730,6 +742,12 @@ describe("VibratorJsTest", function () {
         });
     })
 
+    /*
+     * @tc.name:VibratorJsTest025
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: Issue Number
+     */
     it("VibratorJsTest025", 0, async function (done) {
         vibrator.vibrate(1000, "abc").then(() => {
             console.log("VibratorJsTest025 vibrate success");
@@ -746,6 +764,12 @@ describe("VibratorJsTest", function () {
         });
     })
 
+    /*
+     * @tc.name:VibratorJsTest026
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: Issue Number
+     */
     it("VibratorJsTest026", 0, async function (done) {
         if (g_execute) {
             vibrator.vibrate("haptic.clock.timer", undefined).then(() => {
@@ -768,6 +792,12 @@ describe("VibratorJsTest", function () {
         }
     })
 
+    /*
+     * @tc.name:VibratorJsTest027
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: Issue Number
+     */
     it("VibratorJsTest027", 0, async function (done) {
         if (g_execute) {
             vibrator.vibrate("haptic.clock.timer", null).then(() => {
@@ -790,6 +820,12 @@ describe("VibratorJsTest", function () {
         }
     })
 
+    /*
+     * @tc.name:VibratorJsTest028
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: Issue Number
+     */
     it("VibratorJsTest028", 0, async function (done) {
         if (g_execute) {
             vibrator.vibrate("haptic.clock.timer", "abc").then(() => {
@@ -812,6 +848,12 @@ describe("VibratorJsTest", function () {
         }
     })
 
+    /*
+     * @tc.name:VibratorJsTest029
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: Issue Number
+     */
     it("VibratorJsTest029", 0, async function (done) {
         systemVibrator.vibrate();
         setTimeout(() => {
@@ -820,6 +862,12 @@ describe("VibratorJsTest", function () {
         }, 500);
     })
 
+    /*
+     * @tc.name:VibratorJsTest030
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: Issue Number
+     */
     it("VibratorJsTest030", 0, async function (done) {
         systemVibrator.vibrate(undefined);
         setTimeout(() => {
@@ -828,6 +876,12 @@ describe("VibratorJsTest", function () {
         }, 500);
     })
 
+    /*
+     * @tc.name:VibratorJsTest031
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: Issue Number
+     */
     it("VibratorJsTest031", 0, async function (done) {
         systemVibrator.vibrate(null);
         setTimeout(() => {
@@ -836,6 +890,12 @@ describe("VibratorJsTest", function () {
         }, 500);
     })
 
+    /*
+     * @tc.name:VibratorJsTest032
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: Issue Number
+     */
     it("VibratorJsTest032", 0, async function (done) {
         systemVibrator.vibrate("abc");
         setTimeout(() => {
@@ -844,6 +904,12 @@ describe("VibratorJsTest", function () {
         }, 500);
     })
 
+    /*
+     * @tc.name:VibratorJsTest033
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: Issue Number
+     */
     it("VibratorJsTest033", 0, async function (done) {
         systemVibrator.vibrate({
             mode: undefined,
@@ -857,6 +923,12 @@ describe("VibratorJsTest", function () {
           });
     })
 
+    /*
+     * @tc.name:VibratorJsTest034
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: Issue Number
+     */
     it("VibratorJsTest034", 0, async function (done) {
         systemVibrator.vibrate({
             mode: null,
@@ -870,6 +942,12 @@ describe("VibratorJsTest", function () {
           });
     })
 
+    /*
+     * @tc.name:VibratorJsTest035
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: Issue Number
+     */
     it("VibratorJsTest035", 0, async function (done) {
         systemVibrator.vibrate({
             mode: 123,
@@ -883,6 +961,12 @@ describe("VibratorJsTest", function () {
           });
     })
 
+    /*
+     * @tc.name:VibratorJsTest036
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: Issue Number
+     */
     it("VibratorJsTest036", 0, async function (done) {
         if (g_execute) {
             function stopPromise() {
@@ -928,6 +1012,12 @@ describe("VibratorJsTest", function () {
         }
     })
 
+    /*
+     * @tc.name:VibratorJsTest037
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: Issue Number
+     */
     it("VibratorJsTest037", 0, async function (done) {
         if (g_execute) {
             function stopPromise() {
@@ -973,6 +1063,12 @@ describe("VibratorJsTest", function () {
         }
     })
 
+    /*
+     * @tc.name:VibratorJsTest038
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: Issue Number
+     */
     it("VibratorJsTest038", 0, async function (done) {
         if (g_execute) {
             function stopPromise() {
@@ -2381,6 +2477,12 @@ describe("VibratorJsTest", function () {
         done();
     })
 
+    /*
+     * @tc.name:VibrateTest036
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: I5SWJI
+     */
     it("VibrateTest036", 0, async function (done) {
         if (g_execute) {
             function stopPromise() {
@@ -2426,6 +2528,12 @@ describe("VibratorJsTest", function () {
         }
     })
 
+    /*
+     * @tc.name:VibrateTest037
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: I5SWJI
+     */
     it("VibrateTest037", 0, async function (done) {
         if (g_execute) {
             function stopPromise() {
@@ -2471,6 +2579,12 @@ describe("VibratorJsTest", function () {
         }
     })
 
+    /*
+     * @tc.name:VibrateTest038
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: I5SWJI
+     */
     it("VibrateTest038", 0, async function (done) {
         if (g_execute) {
             function stopPromise() {
@@ -2516,6 +2630,12 @@ describe("VibratorJsTest", function () {
         }
     })
 
+    /*
+     * @tc.name:VibrateTest039
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: I53SGE
+     */
     it("VibrateTest039", 0, async function (done) {
         await vibrator.startVibration({
             type: "time",
@@ -2530,6 +2650,12 @@ describe("VibratorJsTest", function () {
         done();
     })
 
+    /*
+     * @tc.name:VibrateTest040
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: I53SGE
+     */
     it("VibrateTest040", 0, async function (done) {
         await vibrator.startVibration({
             type: "time",
@@ -2544,6 +2670,12 @@ describe("VibratorJsTest", function () {
         done();
     })
 
+    /*
+     * @tc.name:VibrateTest041
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: I53SGE
+     */
     it("VibrateTest041", 0, async function (done) {
         await vibrator.startVibration({
             type: "time",
@@ -2558,6 +2690,12 @@ describe("VibratorJsTest", function () {
         done();
     })
 
+    /*
+     * @tc.name:VibrateTest042
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: I5SWJI
+     */
     it("VibrateTest042", 0, async function (done) {
         function stopPromise() {
             return new Promise((resolve, reject) => {
@@ -2591,6 +2729,12 @@ describe("VibratorJsTest", function () {
         done();
     })
 
+    /*
+     * @tc.name:VibrateTest043
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: I5SWJI
+     */
     it("VibrateTest043", 0, async function (done) {
         function stopPromise() {
             return new Promise((resolve, reject) => {
@@ -2624,10 +2768,16 @@ describe("VibratorJsTest", function () {
         done();
     })
 
+    /*
+     * @tc.name:VibrateTest044
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: I5SWJI
+     */
     it("VibrateTest044", 0, async function (done) {
         function stopPromise() {
             return new Promise((resolve, reject) => {
-                vibrator.stopVibration("abc").then(() => {
+                vibrator.stopVibration(123).then(() => {
                     expect(true).assertTrue();
                     resolve();
                 }, (error) => {
@@ -2657,6 +2807,12 @@ describe("VibratorJsTest", function () {
         done();
     })
 
+    /*
+     * @tc.name:VibrateTest045
+     * @tc.desc:verify the isSupportEffect and stopVibration interface
+     * @tc.type: FUNC
+     * @tc.require: I6HLLL
+     */
     it("VibrateTest045", 0, async function (done) {
         let isSupport = false;
 
@@ -2723,6 +2879,12 @@ describe("VibratorJsTest", function () {
         done();
     })
 
+    /*
+     * @tc.name:VibrateTest046
+     * @tc.desc:verify the isSupportEffect and stopVibration interface
+     * @tc.type: FUNC
+     * @tc.require: I6HLLL
+     */
     it("VibrateTest046", 0, async function (done) {
         let isSupport = false;
 
@@ -2789,6 +2951,12 @@ describe("VibratorJsTest", function () {
         done();
     })
 
+    /*
+     * @tc.name:VibrateTest047
+     * @tc.desc:verify the isSupportEffect and stopVibration interface
+     * @tc.type: FUNC
+     * @tc.require: I6HLLL
+     */
     it("VibrateTest047", 0, async function (done) {
         let isSupport = false;
 
