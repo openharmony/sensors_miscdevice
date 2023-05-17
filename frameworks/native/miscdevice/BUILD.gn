@@ -74,6 +74,7 @@ ohos_shared_library("libvibrator_native") {
     defines = [ "OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM" ]
   }
 
+  innerapi_tags = [ "platformsdk_indirect" ]
   part_name = "miscdevice"
   subsystem_name = "sensors"
 }

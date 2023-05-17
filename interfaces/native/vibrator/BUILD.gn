@@ -63,6 +63,7 @@ ohos_shared_library("vibrator_interface_native") {
   ]
 
   public_configs = [ ":vibrator_config" ]
+  innerapi_tags = [ "platformsdk" ]
   part_name = "miscdevice"
   subsystem_name = "sensors"
 }
