@@ -54,7 +54,7 @@ struct VibrateInfo {
     int32_t duration = 0;
     std::string effectId;
     int32_t count = 0;
-    int32_t fd = 0;
+    int32_t fd = -1;
     int64_t offset = 0;
     int64_t length = -1;
 };
@@ -197,7 +197,7 @@ int32_t StartVibrate(const VibrateInfo &info)
         return PARAMETER_ERROR;
     }
     if ((info.type != "time") && (info.type != "preset") && (info.type != "file")) {
-        MISC_HILOGE("Invalid vibrate type");
+        MISC_HILOGE("Invalid vibrate type, type:%{public}s", info.type.c_str());
         return PARAMETER_ERROR;
     }
     if (info.type == "preset") {

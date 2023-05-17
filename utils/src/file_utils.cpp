@@ -170,7 +170,7 @@ std::string ReadFd(const RawFileDescriptor &rawFd)
         alreadyRead = ftell(fp) - rawFd.offset;
     }
     if (fclose(fp) != 0) {
-        MISC_HILOGW("close file failed, errno:%{public}d", errno);
+        MISC_HILOGW("close file failed after read, errno:%{public}d", errno);
     }
     return dataStr;
 }

@@ -17,8 +17,8 @@
 
 #include <algorithm>
 #include <cinttypes>
-#include <functional>
 #include <map>
+
 #include <string_ex.h>
 
 #include "sensors_errors.h"
@@ -306,31 +306,20 @@ int32_t MiscdeviceService::IsSupportEffect(const std::string &effect, bool &stat
 }
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-int32_t MiscdeviceService::DecodeCustomEffect(const RawFileDescriptor &rawFd, std::set<VibrateEvent> &vibrateSet)
+int32_t MiscdeviceService::StartCustomVibration(const RawFileDescriptor &rawFd, const VibrateInfo &info)
 {
-    auto defaultFactory = std::make_unique<DefaultVibratorDecoderFactory>();
-    std::unique_ptr<VibratorDecoder> defaultDecoder(defaultFactory->CreateDecoder());
-    int32_t ret = defaultDecoder->DecodeEffect(rawFd, vibrateSet);
-    if (ret != SUCCESS) {
-        MISC_HILOGE("decoder effect error");
+    std::unique_ptr<VibratorDecoderFactory> decoderFactory = std::make_unique<DefaultVibratorDecoderFactory>();
+    std::unique_ptr<VibratorDecoder> decoder(decoderFactory->CreateDecoder());
+    std::set<VibrateEvent> vibrateSet = decoder->DecodeEffect(rawFd);
+    if (vibrateSet.empty()) {
+        MISC_HILOGE("decode effect error");
         return ERROR;
     }
     MISC_HILOGD("vibrateSet size:%{public}zu", vibrateSet.size());
-    return NO_ERROR;
-}
-
-int32_t MiscdeviceService::StartCustomVibration(const RawFileDescriptor &rawFd, const VibrateInfo &info)
-{
-    std::set<VibrateEvent> vibrateSet;
-    int32_t ret = DecodeCustomEffect(rawFd, vibrateSet);
-    if (ret != SUCCESS) {
-        MISC_HILOGE("decoder custom effect error");
-        return ERROR;
-    }
     HdfCompositeEffect hdfCompositeEffect;
     hdfCompositeEffect.type = HDF_EFFECT_TYPE_PRIMITIVE;
     CustomVibrationMatcher matcher;
-    ret = matcher.TransformEffect(vibrateSet, hdfCompositeEffect.compositeEffects);
+    int32_t ret = matcher.TransformEffect(vibrateSet, hdfCompositeEffect.compositeEffects);
     if (ret != SUCCESS) {
         MISC_HILOGE("transform custom effect error");
         return ERROR;

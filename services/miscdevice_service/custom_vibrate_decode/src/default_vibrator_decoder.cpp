@@ -36,14 +36,21 @@ constexpr int32_t SUPPORT_CHANNEL_NUMBER = 1;
 constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "DefaultVibratorDecoder" };
 } // namespace
 
-int32_t DefaultVibratorDecoder::DecodeEffect(const RawFileDescriptor &rawFd, std::set<VibrateEvent> &vibrateSet)
+std::set<VibrateEvent> DefaultVibratorDecoder::DecodeEffect(const RawFileDescriptor &rawFd)
 {
     JsonParser parser(rawFd);
     int32_t ret = CheckMetadata(parser);
-    CHKCR((ret == SUCCESS), ERROR, "check metadata fail");
+    if (ret != SUCCESS) {
+        MISC_HILOGE("check metadata fail");
+        return {};
+    }
+    std::set<VibrateEvent> vibrateSet;
     ret = ParseChannel(parser, vibrateSet);
-    CHKCR((ret == SUCCESS), ERROR, "parse channel fail");
-    return SUCCESS;
+    if (ret != SUCCESS) {
+        MISC_HILOGE("parse channel fail");
+        return {};
+    }
+    return vibrateSet;
 }
 
 int32_t DefaultVibratorDecoder::CheckMetadata(const JsonParser &parser)
