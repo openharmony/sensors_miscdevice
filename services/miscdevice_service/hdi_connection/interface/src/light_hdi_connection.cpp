@@ -32,23 +32,24 @@ constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "LightHdiConnection" }
 int32_t LightHdiConnection::ConnectHdi()
 {
     iLightHdiConnection_ = std::make_unique<HdiLightConnection>();
-    int32_t ret = iLightHdiConnection_->ConnectHdi();
-    if (ret != 0) {
-        MISC_HILOGE("hdi direct failed");
-        iLightHdiConnection_ = std::make_unique<CompatibleLightConnection>();
-        CHKPR(iLightHdiConnection_, ERROR);
-        ret = iLightHdiConnection_->ConnectHdi();
+    int32_t ret = ConnectHdiService();
+    if (ret == ERR_OK) {
+        MISC_HILOGI("Connect light hdi success");
+        return ERR_OK;
     }
-    if (ret != 0) {
-        MISC_HILOGE("hdi connection failed");
+    iLightHdiConnection_ = std::make_unique<CompatibleLightConnection>();
+    return ConnectHdiService();
+}
+
+int32_t LightHdiConnection::ConnectHdiService()
+{
+    CHKPR(iLightHdiConnection_, ERROR);
+    int32_t ret = iLightHdiConnection_->ConnectHdi();
+    if (ret != ERR_OK) {
+        MISC_HILOGE("connect hdi service failed");
         return LIGHT_HDF_CONNECT_ERR;
     }
-    ret = iLightHdiConnection_->GetLightList(lightInfoList_);
-    if (ret != 0) {
-        MISC_HILOGE("GetLightList failed");
-        return LIGHT_ERR;
-    }
-    return ERR_OK;
+    return iLightHdiConnection_->GetLightList(lightInfoList_);
 }
 
 int32_t LightHdiConnection::GetLightList(std::vector<LightInfo>& lightList) const
@@ -61,7 +62,7 @@ int32_t LightHdiConnection::TurnOn(int32_t lightId, const LightColor &color, con
 {
     CHKPR(iLightHdiConnection_, ERROR);
     int32_t ret = iLightHdiConnection_->TurnOn(lightId, color, animation);
-    if (ret != 0) {
+    if (ret != ERR_OK) {
         MISC_HILOGE("TurnOn failed");
         return LIGHT_ID_NOT_SUPPORT;
     }
@@ -72,7 +73,7 @@ int32_t LightHdiConnection::TurnOff(int32_t lightId)
 {
     CHKPR(iLightHdiConnection_, ERROR);
     int32_t ret = iLightHdiConnection_->TurnOff(lightId);
-    if (ret != 0) {
+    if (ret != ERR_OK) {
         MISC_HILOGE("TurnOff failed");
         return LIGHT_ERR;
     }
@@ -83,7 +84,7 @@ int32_t LightHdiConnection::DestroyHdiConnection()
 {
     CHKPR(iLightHdiConnection_, ERROR);
     int32_t ret = iLightHdiConnection_->DestroyHdiConnection();
-    if (ret != 0) {
+    if (ret != ERR_OK) {
         MISC_HILOGE("DestroyHdiConnection failed");
         return LIGHT_HDF_CONNECT_ERR;
     }
