@@ -109,16 +109,19 @@ static bool GetCallbackInfo(const napi_env &env, napi_value args[],
     napi_value value = nullptr;
 
     CHKCF(napi_get_named_property(env, args[0], "success", &value) == napi_ok, "napi get sucess property fail");
-    CHKCF(napi_create_reference(env, value, 1, &asyncCallbackInfo->callback[0]) == napi_ok , "napi_create_reference fail");
+    CHKCF(napi_create_reference(env, value, 1, &asyncCallbackInfo->callback[0]) == napi_ok,
+        "napi_create_reference fail");
 
     if (napi_get_named_property(env, args[0], "fail", &value) == napi_ok) {
         if (IsMatchType(env, value, napi_function)) {
-            CHKCF(napi_create_reference(env, value, 1, &asyncCallbackInfo->callback[1]) == napi_ok, "napi_create_reference fail");
+            CHKCF(napi_create_reference(env, value, 1, &asyncCallbackInfo->callback[1]) == napi_ok,
+                "napi_create_reference fail");
         }
     }
     if (napi_get_named_property(env, args[0], "complete", &value) == napi_ok) {
         if (IsMatchType(env, value, napi_function)) {
-            CHKCF(napi_create_reference(env, value, 1, &asyncCallbackInfo->callback[2]) == napi_ok, "napi_create_reference fail");
+            CHKCF(napi_create_reference(env, value, 1, &asyncCallbackInfo->callback[2]) == napi_ok,
+                "napi_create_reference fail");
         }
     }
     if (napi_get_named_property(env, args[0], "mode", &value) == napi_ok) {
@@ -298,7 +301,7 @@ static napi_value Stop(napi_env env, napi_callback_info info)
     }
     if (argc >= 1 && IsMatchType(env, args[0], napi_string)) {
         string mode;
-        if(!GetStringValue(env, args[0], mode)) {
+        if (!GetStringValue(env, args[0], mode)) {
             ThrowErr(env, PARAMETER_ERROR, "Parameters invalid");
             return nullptr;
         }
