@@ -244,19 +244,15 @@ static napi_value Vibrate(napi_env env, napi_callback_info info)
         return nullptr;
     }
     if (argc >= 2 && IsMatchType(env, args[0], napi_object) && IsMatchType(env, args[1], napi_object)) {
-        MISC_HILOGE("ZMH VibrateEffect");
         return VibrateEffect(env, args, argc);
     }
     if (argc >= 1 && IsMatchType(env, args[0], napi_number)) {
-        MISC_HILOGE("ZMH VibrateTime");
         return VibrateTime(env, args, argc);
     }
     if (argc >= 1 && IsMatchType(env, args[0], napi_string)) {
-        MISC_HILOGE("ZMH VibrateEffectId");
         return VibrateEffectId(env, args, argc);
     }
     if (argc == 0 || argc == 1) {
-        MISC_HILOGE("ZMH VibrateMode");
         return VibrateMode(env, args, argc);
     }
     ThrowErr(env, PARAMETER_ERROR, "Parameters invalid");
