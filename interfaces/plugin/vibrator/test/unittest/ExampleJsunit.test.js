@@ -72,13 +72,13 @@ describe("VibratorJsTest", function () {
     it("VibratorJsTest001", 0, async function (done) {
         function vibrateCallback(error) {
             if (error) {
-                console.info('VibratorJsTest001 vibrator error');
+                console.info('VibratorJsTest001  vibrator error');
                 expect(false).assertTrue();
             } else {
-                console.info('VibratorJsTest001 vibrator success');
+                console.info('VibratorJsTest001  vibrator success');
                 expect(true).assertTrue();
             }
-            setTimeout(() => {
+            setTimeout(()=>{
                 done();
             }, 500);
         }
@@ -94,13 +94,13 @@ describe("VibratorJsTest", function () {
     it("VibratorJsTest002", 0, async function (done) {
         function vibrateCallback(error) {
             if (error) {
-                console.info('VibratorJsTest002 vibrator success');
+                console.info('VibratorJsTest002  vibrator success');
                 expect(true).assertTrue();
             } else {
-                console.info('VibratorJsTest002 vibrator error');
+                console.info('VibratorJsTest002  vibrator error');
                 expect(false).assertTrue();
             }
-            setTimeout(() => {
+            setTimeout(()=>{
                 done();
             }, 500);
         }
@@ -116,13 +116,13 @@ describe("VibratorJsTest", function () {
     it("VibratorJsTest003", 0, async function (done) {
         function vibrateCallback(error) {
             if (error) {
-                console.info('VibratorJsTest003 vibrator success');
+                console.info('VibratorJsTest003  vibrator success');
                 expect(true).assertTrue();
             } else {
-                console.info('VibratorJsTest003 vibrator error');
+                console.info('VibratorJsTest003  vibrator error');
                 expect(false).assertTrue();
             }
-            setTimeout(() => {
+            setTimeout(()=>{
                 done();
             }, 500);
         }
@@ -138,13 +138,13 @@ describe("VibratorJsTest", function () {
     it("VibratorJsTest004", 0, async function (done) {
         function vibrateCallback(error) {
             if (error) {
-                console.info('VibratorJsTest004 vibrator error');
+                console.info('VibratorJsTest004  vibrator error');
                 expect(false).assertTrue();
             } else {
-                console.info('VibratorJsTest004 vibrator success');
+                console.info('VibratorJsTest004  vibrator success');
                 expect(true).assertTrue();
             }
-            setTimeout(() => {
+            setTimeout(()=>{
                 done();
             }, 500);
         }
@@ -160,13 +160,13 @@ describe("VibratorJsTest", function () {
     it("VibratorJsTest005", 0, async function (done) {
         function vibrateCallback(error) {
             if (error) {
-                console.info('VibratorJsTest005 vibrator success');
+                console.info('VibratorJsTest005  vibrator success');
                 expect(true).assertTrue();
             } else {
-                console.info('VibratorJsTest005 vibrator error');
+                console.info('VibratorJsTest005  vibrator error');
                 expect(false).assertTrue();
             }
-            setTimeout(() => {
+            setTimeout(()=>{
                 done();
             }, 500);
         }
@@ -182,13 +182,13 @@ describe("VibratorJsTest", function () {
     it("VibratorJsTest006", 0, async function (done) {
         function vibrateCallback(error) {
             if (error) {
-                console.info('VibratorJsTest006 vibrator success');
+                console.info('VibratorJsTest006  vibrator success');
                 expect(true).assertTrue();
             } else {
-                console.info('VibratorJsTest006 vibrator error');
+                console.info('VibratorJsTest006  vibrator error');
                 expect(false).assertTrue();
             }
-            setTimeout(() => {
+            setTimeout(()=>{
                 done();
             }, 500);
         }
@@ -205,13 +205,13 @@ describe("VibratorJsTest", function () {
         if (g_execute) {
             function vibrateCallback(error) {
                 if (error) {
-                    console.info('VibratorJsTest007 vibrator error');
+                    console.info('VibratorJsTest007  vibrator error');
                     expect(false).assertTrue();
                 } else {
-                    console.info('VibratorJsTest007 vibrator success');
+                    console.info('VibratorJsTest007  vibrator success');
                     expect(true).assertTrue();
                 }
-                setTimeout(() => {
+                setTimeout(()=>{
                     done();
                 }, 500);
             }
@@ -233,41 +233,41 @@ describe("VibratorJsTest", function () {
         if (g_execute) {
             function stopPromise() {
                 return new Promise((resolve, reject) => {
-                    vibrator.stop("preset", (error) => {
+                    vibrator.stop("preset", (error)=>{
                         if (error) {
                             console.info('VibratorJsTest008 stop error');
                             expect(false).assertTrue();
-                            setTimeout(() => {
+                            setTimeout(()=>{
                                 reject();
                             }, 500);
                         } else {
                             console.info('VibratorJsTest008 stop success');
                             expect(true).assertTrue();
-                            setTimeout(() => {
+                            setTimeout(()=>{
                                 resolve();
                             }, 500);
                         }
                     });
                 })
             }
-
+    
             let promise = new Promise((resolve, reject) => {
-                vibrator.vibrate("haptic.clock.timer", (error) => {
+                vibrator.vibrate("haptic.clock.timer", (error)=>{
                     if (error) {
-                        console.info('VibratorJsTest008 vibrate error');
+                        console.info('VibratorJsTest008  vibrate error');
                         expect(false).assertTrue();
                         reject();
                     } else {
-                        console.info('VibratorJsTest008 vibrate success');
+                        console.info('VibratorJsTest008  vibrate success');
                         expect(true).assertTrue();
                         resolve();
                     }
                 });
             })
-
-            await promise.then(() => {
+    
+            await promise.then(() =>{
                 return stopPromise();
-            }, () => {
+            }, ()=>{
                 console.info("VibratorJsTest008 reject");
             })
             done();
@@ -287,17 +287,17 @@ describe("VibratorJsTest", function () {
     it("VibratorJsTest009", 0, async function (done) {
         function stopPromise() {
             return new Promise((resolve, reject) => {
-                vibrator.stop("time", (error) => {
+                vibrator.stop("time", (error)=>{
                     if (error) {
                         console.info('VibratorJsTest009 stop error');
                         expect(false).assertTrue();
-                        setTimeout(() => {
+                        setTimeout(()=>{
                             reject();
                         }, 500);
                     } else {
                         console.info('VibratorJsTest009 stop success');
                         expect(true).assertTrue();
-                        setTimeout(() => {
+                        setTimeout(()=>{
                             resolve();
                         }, 500);
                     }
@@ -306,26 +306,26 @@ describe("VibratorJsTest", function () {
         }
 
         let promise = new Promise((resolve, reject) => {
-            vibrator.vibrate(180000, (error) => {
+            vibrator.vibrate(180000, (error)=>{
                 if (error) {
-                    console.info('VibratorJsTest009 vibrate error');
+                    console.info('VibratorJsTest009  vibrate error');
                     expect(false).assertTrue();
-                    setTimeout(() => {
+                    setTimeout(()=>{
                         reject();
                     }, 500);
                 } else {
-                    console.info('VibratorJsTest009 vibrate success');
+                    console.info('VibratorJsTest009  vibrate success');
                     expect(true).assertTrue();
-                    setTimeout(() => {
+                    setTimeout(()=>{
                         resolve();
                     }, 500);
                 }
             });
         })
 
-        await promise.then(() => {
+        await promise.then(() =>{
             return stopPromise();
-        }, () => {
+        }, ()=>{
             console.info("VibratorJsTest009 reject");
         })
         done();
@@ -341,13 +341,13 @@ describe("VibratorJsTest", function () {
         try {
             function vibrateCallback(error) {
                 if (error) {
-                    console.info('VibratorJsTest010 stop success');
+                    console.info('VibratorJsTest010  stop success');
                     expect(true).assertTrue();
                 } else {
-                    console.info('VibratorJsTest010 stop off');
+                    console.info('VibratorJsTest010  stop off');
                     expect(false).assertTrue();
                 }
-                setTimeout(() => {
+                setTimeout(()=>{
                     done();
                 }, 500);
             }
@@ -368,15 +368,15 @@ describe("VibratorJsTest", function () {
      */
     it("VibratorJsTest011", 0, async function (done) {
         vibrator.vibrate(1000).then(() => {
-            console.log("VibratorJsTest011 vibrate success");
+            console.log("VibratorJsTest011  vibrate success");
             expect(true).assertTrue();
-            setTimeout(() => {
+            setTimeout(()=>{
                 done();
             }, 500);
-        }, (error) => {
+        }, (error)=>{
             expect(false).assertTrue();
-            console.log("VibratorJsTest011 vibrate error");
-            setTimeout(() => {
+            console.log("VibratorJsTest011  vibrate error");
+            setTimeout(()=>{
                 done();
             }, 500);
         });
@@ -390,15 +390,15 @@ describe("VibratorJsTest", function () {
      */
     it("VibratorJsTest012", 0, async function (done) {
         vibrator.vibrate(-1).then(() => {
-            console.log("VibratorJsTest012 vibrate error");
+            console.log("VibratorJsTest012  vibrate error");
             expect(false).assertTrue();
-            setTimeout(() => {
+            setTimeout(()=>{
                 done();
             }, 500);
-        }, (error) => {
+        }, (error)=>{
             expect(true).assertTrue();
-            console.log("VibratorJsTest012 vibrate success");
-            setTimeout(() => {
+            console.log("VibratorJsTest012  vibrate success");
+            setTimeout(()=>{
                 done();
             }, 500);
         });
@@ -412,15 +412,15 @@ describe("VibratorJsTest", function () {
      */
     it("VibratorJsTest013", 0, async function (done) {
         vibrator.vibrate(1800000 + 1).then(() => {
-            console.log("VibratorJsTest013 vibrate error");
+            console.log("VibratorJsTest013  vibrate error");
             expect(false).assertTrue();
-            setTimeout(() => {
+            setTimeout(()=>{
                 done();
             }, 500);
-        }, (error) => {
+        }, (error)=>{
             expect(true).assertTrue();
-            console.log("VibratorJsTest013 vibrate success");
-            setTimeout(() => {
+            console.log("VibratorJsTest013  vibrate success");
+            setTimeout(()=>{
                 done();
             }, 500);
         });
@@ -435,15 +435,15 @@ describe("VibratorJsTest", function () {
     it("VibratorJsTest014", 0, async function (done) {
         if (g_execute) {
             vibrator.vibrate("haptic.clock.timer").then(() => {
-                console.log("VibratorJsTest014 vibrate success");
+                console.log("VibratorJsTest014  vibrate success");
                 expect(true).assertTrue();
-                setTimeout(() => {
+                setTimeout(()=>{
                     done();
                 }, 500);
-            }, (error) => {
+            }, (error)=>{
                 expect(false).assertTrue();
-                console.log("VibratorJsTest014 vibrate error");
-                setTimeout(() => {
+                console.log("VibratorJsTest014  vibrate error");
+                setTimeout(()=>{
                     done();
                 }, 500);
             });
@@ -465,36 +465,36 @@ describe("VibratorJsTest", function () {
             function stopPromise() {
                 return new Promise((resolve, reject) => {
                     vibrator.stop("preset").then(() => {
-                        console.log("VibratorJsTest015 off success");
+                        console.log("VibratorJsTest015  off success");
                         expect(true).assertTrue();
-                        setTimeout(() => {
+                        setTimeout(()=>{
                             resolve();
                         }, 500);
-                    }, (error) => {
+                    }, (error)=>{
                         expect(false).assertTrue();
-                        console.log("VibratorJsTest015 off error");
-                        setTimeout(() => {
+                        console.log("VibratorJsTest015  off error");
+                        setTimeout(()=>{
                             reject();
                         }, 500);
                     });
                 })
             }
-
+    
             let promise = new Promise((resolve, reject) => {
                 vibrator.vibrate("haptic.clock.timer").then(() => {
-                    console.log("VibratorJsTest015 vibrate success");
+                    console.log("VibratorJsTest015  vibrate success");
                     expect(true).assertTrue();
                     resolve();
-                }, (error) => {
+                }, (error)=>{
                     expect(false).assertTrue();
-                    console.log("VibratorJsTest015 vibrate error");
+                    console.log("VibratorJsTest015  vibrate error");
                     reject();
                 });
             })
-
-            await promise.then(() => {
+    
+            await promise.then(() =>{
                 return stopPromise();
-            }, () => {
+            }, ()=>{
                 console.info("VibratorJsTest015 reject");
             })
             done();
@@ -513,15 +513,15 @@ describe("VibratorJsTest", function () {
      */
     it("VibratorJsTest016", 0, async function (done) {
         vibrator.vibrate("").then(() => {
-            console.log("VibratorJsTest016 vibrate error");
+            console.log("VibratorJsTest016  vibrate error");
             expect(false).assertTrue();
-            setTimeout(() => {
+            setTimeout(()=>{
                 done();
             }, 500);
-        }, (error) => {
+        }, (error)=>{
             expect(true).assertTrue();
-            console.log("VibratorJsTest016 vibrate success");
-            setTimeout(() => {
+            console.log("VibratorJsTest016  vibrate success");
+            setTimeout(()=>{
                 done();
             }, 500);
         });
@@ -536,15 +536,15 @@ describe("VibratorJsTest", function () {
     it("VibratorJsTest017", 0, async function (done) {
         try {
             vibrator.stop("").then(() => {
-                console.log("VibratorJsTest017 stop error");
+                console.log("VibratorJsTest017  stop error");
                 expect(false).assertTrue();
-                setTimeout(() => {
+                setTimeout(()=>{
                     done();
                 }, 500);
-            }, (error) => {
+            }, (error)=>{
                 expect(true).assertTrue();
-                console.log("VibratorJsTest017 stop success");
-                setTimeout(() => {
+                console.log("VibratorJsTest017  stop success");
+                setTimeout(()=>{
                     done();
                 }, 500);
             });
@@ -566,15 +566,15 @@ describe("VibratorJsTest", function () {
         function stopPromise() {
             return new Promise((resolve, reject) => {
                 vibrator.stop("time").then(() => {
-                    console.log("VibratorJsTest018 stop success");
+                    console.log("VibratorJsTest018  stop success");
                     expect(true).assertTrue();
-                    setTimeout(() => {
+                    setTimeout(()=>{
                         resolve();
                     }, 500);
-                }, (error) => {
+                }, (error)=>{
                     expect(false).assertTrue();
-                    console.log("VibratorJsTest018 stop error");
-                    setTimeout(() => {
+                    console.log("VibratorJsTest018  stop error");
+                    setTimeout(()=>{
                         reject();
                     }, 500);
                 });
@@ -583,23 +583,23 @@ describe("VibratorJsTest", function () {
 
         let promise = new Promise((resolve, reject) => {
             vibrator.vibrate(180000).then(() => {
-                console.log("VibratorJsTest018 vibrate success");
+                console.log("VibratorJsTest018  vibrate success");
                 expect(true).assertTrue();
-                setTimeout(() => {
+                setTimeout(()=>{
                     resolve();
                 }, 500);
-            }, (error) => {
+            }, (error)=>{
                 expect(false).assertTrue();
-                console.log("VibratorJsTest018 vibrate error");
-                setTimeout(() => {
+                console.log("VibratorJsTest018  vibrate error");
+                setTimeout(()=>{
                     reject();
                 }, 500);
             });
         })
 
-        await promise.then(() => {
+        await promise.then(() =>{
             return stopPromise();
-        }, () => {
+        }, ()=>{
             console.info("VibratorJsTest018 reject");
         })
         done();
@@ -1126,7 +1126,7 @@ describe("VibratorJsTest", function () {
             duration: 1000
         }, {
             usage: "unknown"
-        }, (error) => {
+        }, (error)=>{
             if (error) {
                 console.info('VibrateTest001 startVibration error');
                 expect(false).assertTrue();
@@ -1134,7 +1134,7 @@ describe("VibratorJsTest", function () {
                 console.info('VibrateTest001 startVibration success');
                 expect(true).assertTrue();
             }
-            setTimeout(() => {
+            setTimeout(()=>{
                 done();
             }, 500);
         });
@@ -1153,13 +1153,13 @@ describe("VibratorJsTest", function () {
                 duration: 1000
             }, {
                 usage: "unknown"
-            }, (error) => {
+            }, (error)=>{
                 if (error) {
                     expect(true).assertTrue();
                 } else {
                     expect(false).assertTrue();
                 }
-                setTimeout(() => {
+                setTimeout(()=>{
                     done();
                 }, 500);
             });
@@ -1185,7 +1185,7 @@ describe("VibratorJsTest", function () {
                 count: 1,
             }, {
                 usage: "unknown"
-            }, (error) => {
+            }, (error)=>{
                 if (error) {
                     console.info('VibrateTest003 vibrator error');
                     expect(false).assertTrue();
@@ -1193,7 +1193,7 @@ describe("VibratorJsTest", function () {
                     console.info('VibrateTest003 vibrator success');
                     expect(true).assertTrue();
                 }
-                setTimeout(() => {
+                setTimeout(()=>{
                     done();
                 }, 500);
             });
@@ -1218,13 +1218,13 @@ describe("VibratorJsTest", function () {
                 count: 3,
             }, {
                 usage: "unknown"
-            }, (error) => {
+            }, (error)=>{
                 if (error) {
                     expect(true).assertTrue();
                 } else {
                     expect(false).assertTrue();
                 }
-                setTimeout(() => {
+                setTimeout(()=>{
                     done();
                 }, 500);
             });
@@ -1251,9 +1251,9 @@ describe("VibratorJsTest", function () {
                     count: 3,
                 }, {
                     usage: ""
-                }, (error) => {
+                }, (error)=>{
                     expect(false).assertTrue();
-                    setTimeout(() => {
+                    setTimeout(()=>{
                         done();
                     }, 500);
                 });
@@ -1299,9 +1299,9 @@ describe("VibratorJsTest", function () {
             duration: 1000,
         }, {
             usage: "unknown"
-        }).then(() => {
+        }).then(()=>{
             expect(true).assertTrue();
-        }).catch((error) => {
+        }).catch((error)=>{
             expect(false).assertTrue();
         });
         done();
@@ -1320,9 +1320,9 @@ describe("VibratorJsTest", function () {
                 duration: 1000
             }, {
                 usage: "unknown"
-            }).then(() => {
+            }).then(()=>{
                 expect(false).assertTrue();
-            }).catch((error) => {
+            }).catch((error)=>{
                 expect(true).assertTrue();
             });
             done();
@@ -1348,9 +1348,9 @@ describe("VibratorJsTest", function () {
                 count: 1,
             }, {
                 usage: "unknown"
-            }).then(() => {
+            }).then(()=>{
                 expect(true).assertTrue();
-            }).catch((error) => {
+            }).catch((error)=>{
                 expect(false).assertTrue();
             });
             done();
@@ -1375,10 +1375,10 @@ describe("VibratorJsTest", function () {
                 count: 3,
             }, {
                 usage: "unknown"
-            }).then(() => {
+            }).then(()=>{
                 expect(false).assertTrue();
                 done();
-            }).catch((error) => {
+            }).catch((error)=>{
                 expect(true).assertTrue();
                 done();
             });
@@ -1405,10 +1405,10 @@ describe("VibratorJsTest", function () {
                     count: 3,
                 }, {
                     usage: ""
-                }).then(() => {
+                }).then(()=>{
                     expect(false).assertTrue();
                     done();
-                }).catch((error) => {
+                }).catch((error)=>{
                     expect(true).assertTrue();
                     done();
                 });
@@ -1461,13 +1461,13 @@ describe("VibratorJsTest", function () {
                     duration: 100
                 }, {
                     usage: "unknown"
-                }, (error) => {
+                }, (error)=>{
                     if (error) {
                         expect(false).assertTrue();
                     } else {
                         expect(true).assertTrue();
                     }
-                    setTimeout(() => {
+                    setTimeout(()=>{
                         done();
                     }, 500);
                 });
@@ -1480,7 +1480,7 @@ describe("VibratorJsTest", function () {
                 duration: 100
             }, {
                 usage: "unknown"
-            }, (error) => {
+            }, (error)=>{
                 if (error) {
                     expect(false).assertTrue();
                     reject();
@@ -1491,9 +1491,9 @@ describe("VibratorJsTest", function () {
             });
         })
 
-        await promise.then(() => {
+        await promise.then(() =>{
             return vibratePromise();
-        }, () => {
+        }, ()=>{
             console.info("StartVibrationTest013 reject");
         })
         done();
@@ -1515,27 +1515,27 @@ describe("VibratorJsTest", function () {
                         count: 1,
                     }, {
                         usage: "unknown"
-                    }, (error) => {
+                    }, (error)=>{
                         if (error) {
                             expect(error.code).assertEqual(OPERATION_FAIL_CODE);
                             expect(error.message).assertEqual(OPERATION_FAIL_MSG);
                         } else {
                             expect(false).assertTrue();
                         }
-                        setTimeout(() => {
+                        setTimeout(()=>{
                             done();
                         }, 500);
                     });
                 })
             }
-
+    
             let promise = new Promise((resolve, reject) => {
                 vibrator.startVibration({
                     type: "time",
                     duration: 100
                 }, {
                     usage: "alarm"
-                }, (error) => {
+                }, (error)=>{
                     if (error) {
                         expect(false).assertTrue();
                         reject();
@@ -1545,10 +1545,10 @@ describe("VibratorJsTest", function () {
                     }
                 });
             })
-
-            await promise.then(() => {
+    
+            await promise.then(() =>{
                 return vibratePromise();
-            }, () => {
+            }, ()=>{
                 console.info("VibrateTest014 reject");
             })
             done();
@@ -1575,26 +1575,26 @@ describe("VibratorJsTest", function () {
                         count: 3,
                     }, {
                         usage: "unknown",
-                    }, (error) => {
+                    }, (error)=>{
                         if (error) {
                             expect(false).assertTrue();
                         } else {
                             expect(true).assertTrue();
                         }
-                        setTimeout(() => {
+                        setTimeout(()=>{
                             done();
                         }, 500);
                     });
                 })
             }
-
+    
             let promise = new Promise((resolve, reject) => {
                 vibrator.startVibration({
                     type: "time",
                     duration: 10000
                 }, {
                     usage: "alarm"
-                }, (error) => {
+                }, (error)=>{
                     if (error) {
                         expect(false).assertTrue();
                         reject();
@@ -1604,9 +1604,9 @@ describe("VibratorJsTest", function () {
                     }
                 });
             })
-            await promise.then(() => {
+            await promise.then(() =>{
                 return vibratePromise();
-            }, () => {
+            }, ()=>{
                 console.info("VibrateTest015 reject");
             })
             done();
@@ -1633,20 +1633,20 @@ describe("VibratorJsTest", function () {
                         count: 1,
                     }, {
                         usage: "unknown",
-                    }, (error) => {
+                    }, (error)=>{
                         if (error) {
                             expect(error.code).assertEqual(OPERATION_FAIL_CODE);
                             expect(error.message).assertEqual(OPERATION_FAIL_MSG);
                         } else {
                             expect(false).assertTrue();
                         }
-                        setTimeout(() => {
+                        setTimeout(()=>{
                             done();
                         }, 500);
                     });
                 })
             }
-
+    
             let promise = new Promise((resolve, reject) => {
                 vibrator.startVibration({
                     type: "preset",
@@ -1654,7 +1654,7 @@ describe("VibratorJsTest", function () {
                     count: 3,
                 }, {
                     usage: "unknown",
-                }, (error) => {
+                }, (error)=>{
                     if (error) {
                         expect(false).assertTrue();
                         reject();
@@ -1664,10 +1664,10 @@ describe("VibratorJsTest", function () {
                     }
                 });
             })
-
-            await promise.then(() => {
+    
+            await promise.then(() =>{
                 return vibratePromise();
-            }, () => {
+            }, ()=>{
                 console.info("VibrateTest016 reject");
             })
             done();
@@ -1693,20 +1693,20 @@ describe("VibratorJsTest", function () {
                         duration: 3000,
                     }, {
                         usage: "alarm"
-                    }, (error) => {
+                    }, (error)=>{
                         if (error) {
                             expect(error.code).assertEqual(OPERATION_FAIL_CODE);
                             expect(error.message).assertEqual(OPERATION_FAIL_MSG);
                         } else {
                             expect(false).assertTrue();
                         }
-                        setTimeout(() => {
+                        setTimeout(()=>{
                             done();
                         }, 500);
                     });
                 })
             }
-
+    
             let promise = new Promise((resolve, reject) => {
                 vibrator.startVibration({
                     type: "preset",
@@ -1714,7 +1714,7 @@ describe("VibratorJsTest", function () {
                     count: 3,
                 }, {
                     usage: "unknown"
-                }, (error) => {
+                }, (error)=>{
                     if (error) {
                         expect(false).assertTrue();
                         reject();
@@ -1724,10 +1724,10 @@ describe("VibratorJsTest", function () {
                     }
                 });
             })
-
-            await promise.then(() => {
+    
+            await promise.then(() =>{
                 return vibratePromise();
-            }, () => {
+            }, ()=>{
                 console.info("VibrateTest017 reject");
             })
             done();
@@ -1753,19 +1753,19 @@ describe("VibratorJsTest", function () {
                         duration: 3000,
                     }, {
                         usage: "alarm"
-                    }, (error) => {
+                    }, (error)=>{
                         if (error) {
                             expect(false).assertTrue();
                         } else {
                             expect(true).assertTrue();
                         }
-                        setTimeout(() => {
+                        setTimeout(()=>{
                             done();
                         }, 500);
                     });
                 })
             }
-
+    
             let promise = new Promise((resolve, reject) => {
                 vibrator.startVibration({
                     type: "preset",
@@ -1773,7 +1773,7 @@ describe("VibratorJsTest", function () {
                     count: 1,
                 }, {
                     usage: "unknown"
-                }, (error) => {
+                }, (error)=>{
                     if (error) {
                         expect(false).assertTrue();
                         reject();
@@ -1783,10 +1783,10 @@ describe("VibratorJsTest", function () {
                     }
                 });
             })
-
-            await promise.then(() => {
+    
+            await promise.then(() =>{
                 return vibratePromise();
-            }, () => {
+            }, ()=>{
                 console.info("VibrateTest018 reject");
             })
             done();
@@ -1813,19 +1813,19 @@ describe("VibratorJsTest", function () {
                         count: 3,
                     }, {
                         usage: "unknown"
-                    }, (error) => {
+                    }, (error)=>{
                         if (error) {
                             expect(false).assertTrue();
                         } else {
                             expect(true).assertTrue();
                         }
-                        setTimeout(() => {
+                        setTimeout(()=>{
                             done();
                         }, 500);
                     });
                 })
             }
-
+    
             let promise = new Promise((resolve, reject) => {
                 vibrator.startVibration({
                     type: "preset",
@@ -1833,7 +1833,7 @@ describe("VibratorJsTest", function () {
                     count: 3,
                 }, {
                     usage: "unknown"
-                }, (error) => {
+                }, (error)=>{
                     if (error) {
                         expect(false).assertTrue();
                         reject();
@@ -1843,10 +1843,10 @@ describe("VibratorJsTest", function () {
                     }
                 });
             })
-
-            await promise.then(() => {
+    
+            await promise.then(() =>{
                 return vibratePromise();
-            }, () => {
+            }, ()=>{
                 console.info("VibrateTest019 reject");
             })
             done();
@@ -1873,19 +1873,19 @@ describe("VibratorJsTest", function () {
                         count: 1,
                     }, {
                         usage: "ring"
-                    }, (error) => {
+                    }, (error)=>{
                         if (error) {
                             expect(false).assertTrue();
                         } else {
                             expect(true).assertTrue();
                         }
-                        setTimeout(() => {
+                        setTimeout(()=>{
                             done();
                         }, 500);
                     });
                 })
             }
-
+    
             let promise = new Promise((resolve, reject) => {
                 vibrator.startVibration({
                     type: "preset",
@@ -1893,7 +1893,7 @@ describe("VibratorJsTest", function () {
                     count: 1,
                 }, {
                     usage: "notification"
-                }, (error) => {
+                }, (error)=>{
                     if (error) {
                         expect(false).assertTrue();
                         reject();
@@ -1903,10 +1903,10 @@ describe("VibratorJsTest", function () {
                     }
                 });
             })
-
-            await promise.then(() => {
+    
+            await promise.then(() =>{
                 return vibratePromise();
-            }, () => {
+            }, ()=>{
                 console.info("VibrateTest020 reject");
             })
             done();
@@ -1933,20 +1933,20 @@ describe("VibratorJsTest", function () {
                         count: 1,
                     }, {
                         usage: "unknown"
-                    }, (error) => {
+                    }, (error)=>{
                         if (error) {
                             expect(error.code).assertEqual(OPERATION_FAIL_CODE);
                             expect(error.message).assertEqual(OPERATION_FAIL_MSG);
                         } else {
                             expect(false).assertTrue();
                         }
-                        setTimeout(() => {
+                        setTimeout(()=>{
                             done();
                         }, 500);
                     });
                 })
             }
-
+    
             let promise = new Promise((resolve, reject) => {
                 vibrator.startVibration({
                     type: "preset",
@@ -1954,7 +1954,7 @@ describe("VibratorJsTest", function () {
                     count: 1,
                 }, {
                     usage: "notification"
-                }, (error) => {
+                }, (error)=>{
                     if (error) {
                         expect(false).assertTrue();
                         reject();
@@ -1964,10 +1964,10 @@ describe("VibratorJsTest", function () {
                     }
                 });
             })
-
-            await promise.then(() => {
+    
+            await promise.then(() =>{
                 return vibratePromise();
-            }, () => {
+            }, ()=>{
                 console.info("VibrateTest021 reject");
             })
             done();
@@ -1987,13 +1987,13 @@ describe("VibratorJsTest", function () {
      it("VibrateTest022", 0, async function (done) {
         function vibrateCallback(error) {
             if (error) {
-                console.info('VibrateTest022 stop fail');
+                console.info('VibrateTest022  stop fail');
                 expect(false).assertTrue();
             } else {
-                console.info('VibrateTest022 stop off');
+                console.info('VibrateTest022  stop off');
                 expect(false).assertTrue();
             }
-            setTimeout(() => {
+            setTimeout(()=>{
                 done();
             }, 500);
         }
@@ -2018,36 +2018,36 @@ describe("VibratorJsTest", function () {
             function stopPromise() {
                 return new Promise((resolve, reject) => {
                     vibrator.stopVibration("preset").then(() => {
-                        console.log("VibrateTest023 off success");
+                        console.log("VibrateTest023  off success");
                         expect(true).assertTrue();
-                        setTimeout(() => {
+                        setTimeout(()=>{
                             resolve();
                         }, 500);
-                    }, (error) => {
+                    }, (error)=>{
                         expect(false).assertTrue();
-                        console.log("VibrateTest023 off error");
-                        setTimeout(() => {
+                        console.log("VibrateTest023  off error");
+                        setTimeout(()=>{
                             reject();
                         }, 500);
                     });
                 })
             }
-
+    
             let promise = new Promise((resolve, reject) => {
                 vibrator.startVibration("haptic.clock.timer").then(() => {
-                    console.log("VibrateTest023 vibrate success");
+                    console.log("VibrateTest023  vibrate success");
                     expect(true).assertTrue();
                     resolve();
-                }, (error) => {
+                }, (error)=>{
                     expect(false).assertTrue();
-                    console.log("VibrateTest023 vibrate error");
+                    console.log("VibrateTest023  vibrate error");
                     reject();
                 });
             })
-
-            await promise.then(() => {
+    
+            await promise.then(() =>{
                 return stopPromise();
-            }, () => {
+            }, ()=>{
                 console.info("VibrateTest023 reject");
             })
             done();
@@ -2067,15 +2067,15 @@ describe("VibratorJsTest", function () {
     it("VibrateTest024", 0, async function (done) {
         try {
             vibrator.stopVibration("").then(() => {
-                console.log("VibrateTest024 stop error");
+                console.log("VibrateTest024  stop error");
                 expect(false).assertTrue();
-                setTimeout(() => {
+                setTimeout(()=>{
                     done();
                 }, 500);
-            }, (error) => {
+            }, (error)=>{
                 expect(false).assertTrue();
                 console.log("VibrateTest024 stop error");
-                setTimeout(() => {
+                setTimeout(()=>{
                     done();
                 }, 500);
             });
@@ -2099,13 +2099,13 @@ describe("VibratorJsTest", function () {
                 vibrator.stopVibration("time").then(() => {
                     console.log("VibrateTest025 stop success");
                     expect(true).assertTrue();
-                    setTimeout(() => {
+                    setTimeout(()=>{
                         resolve();
                     }, 500);
-                }, (error) => {
+                }, (error)=>{
                     expect(false).assertTrue();
                     console.log("VibrateTest025 stop error");
-                    setTimeout(() => {
+                    setTimeout(()=>{
                         reject();
                     }, 500);
                 });
@@ -2116,21 +2116,21 @@ describe("VibratorJsTest", function () {
             vibrator.vibrate(180000).then(() => {
                 console.log("VibrateTest025 vibrate success");
                 expect(true).assertTrue();
-                setTimeout(() => {
+                setTimeout(()=>{
                     resolve();
                 }, 500);
-            }, (error) => {
+            }, (error)=>{
                 expect(false).assertTrue();
-                console.log("VibrateTest025 vibrate error");
-                setTimeout(() => {
+                console.log("VibrateTest025  vibrate error");
+                setTimeout(()=>{
                     reject();
                 }, 500);
             });
         })
 
-        await promise.then(() => {
+        await promise.then(() =>{
             return stopPromise();
-        }, () => {
+        }, ()=>{
             console.info("VibrateTest025 reject");
         })
         done();
@@ -2173,7 +2173,7 @@ describe("VibratorJsTest", function () {
                         count: 1,
                     }, {
                         usage: "unknown"
-                    }, (error) => {
+                    }, (error)=>{
                         if (error) {
                             expect(false).assertTrue();
                             reject(error);
@@ -2219,11 +2219,11 @@ describe("VibratorJsTest", function () {
             });
         })
 
-        await isSupportPromise.then(() => {
+        await isSupportPromise.then(() =>{
             return vibratePromise();
-        }).then(() => {
+        }).then(() =>{
             return stopPromise();
-        }).catch((error) => {
+        }).catch((error)=>{
             expect(false).assertTrue();
         })
         done();
@@ -2299,7 +2299,7 @@ describe("VibratorJsTest", function () {
                         count: 1,
                     }, {
                         usage: "unknown"
-                    }, (error) => {
+                    }, (error)=>{
                         if (error) {
                             expect(false).assertTrue();
                             reject(error);
@@ -2343,11 +2343,11 @@ describe("VibratorJsTest", function () {
             });
         })
 
-        await isSupportPromise.then(() => {
+        await isSupportPromise.then(() =>{
             return vibratePromise();
-        }).then(() => {
+        }).then(() =>{
             return stopPromise();
-        }).catch((error) => {
+        }).catch((error)=>{
             expect(false).assertTrue();
         })
         done();
@@ -2430,9 +2430,9 @@ describe("VibratorJsTest", function () {
             });
         })
 
-        await promise.then(() => {
+        await promise.then(() =>{
             return stopPromise();
-        }).catch((error) => {
+        }).catch((error)=>{
             expect(false).assertTrue();
         })
         done();
@@ -2469,9 +2469,9 @@ describe("VibratorJsTest", function () {
             });
         })
 
-        await promise.then(() => {
+        await promise.then(() =>{
             return stopPromise();
-        }).catch((error) => {
+        }).catch((error)=>{
             expect(false).assertTrue();
         })
         done();
@@ -3023,3 +3023,4 @@ describe("VibratorJsTest", function () {
         done();
     })
 })
+
