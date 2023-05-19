@@ -2419,7 +2419,7 @@ describe("VibratorJsTest", function () {
         }
 
         let promise = new Promise((resolve, reject) => {
-            vibrator.startVibration(2000, (error) => {
+            vibrator.vibrate(2000, (error) => {
                 if (error) {
                     expect(false).assertTrue();
                     reject(error);
@@ -2458,7 +2458,7 @@ describe("VibratorJsTest", function () {
         }
 
         let promise = new Promise((resolve, reject) => {
-            vibrator.startVibration(2000, (error) => {
+            vibrator.vibrate(2000, (error) => {
                 if (error) {
                     expect(false).assertTrue();
                     reject(error);
@@ -2710,7 +2710,7 @@ describe("VibratorJsTest", function () {
         }
 
         let promise = new Promise((resolve, reject) => {
-            vibrator.startVibration(2000, (error) => {
+            vibrator.vibrate(2000, (error) => {
                 if (error) {
                     expect(false).assertTrue();
                     reject(error);
@@ -2749,7 +2749,7 @@ describe("VibratorJsTest", function () {
         }
 
         let promise = new Promise((resolve, reject) => {
-            vibrator.startVibration(2000, (error) => {
+            vibrator.vibrate(2000, (error) => {
                 if (error) {
                     expect(false).assertTrue();
                     reject(error);
@@ -2788,7 +2788,7 @@ describe("VibratorJsTest", function () {
         }
 
         let promise = new Promise((resolve, reject) => {
-            vibrator.startVibration(2000, (error) => {
+            vibrator.vibrate(2000, (error) => {
                 if (error) {
                     expect(false).assertTrue();
                     reject(error);
