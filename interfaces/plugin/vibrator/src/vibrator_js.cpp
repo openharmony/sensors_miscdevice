@@ -231,7 +231,7 @@ static napi_value VibrateEffect(napi_env env, napi_value args[], size_t argc)
     return promise;
 }
 
-static napi_value Vibrate(napi_env env, napi_callback_info info)
+static napi_value StartVibrate(napi_env env, napi_callback_info info)
 {
     CHKPP(env);
     CHKPP(info);
@@ -239,12 +239,28 @@ static napi_value Vibrate(napi_env env, napi_callback_info info)
     napi_value args[3] = {};
     napi_value thisArg = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, args, &thisArg, nullptr);
+    if (status != napi_ok || argc < 2) {
+        ThrowErr(env, PARAMETER_ERROR, "napi_get_cb_info fail or number of parameter invalid");
+        return nullptr;
+    }
+    if (!IsMatchType(env, args[0], napi_object) || !IsMatchType(env, args[1], napi_object)) {
+        ThrowErr(env, PARAMETER_ERROR, "args[0] and args[1] should is napi_object");
+        return nullptr;
+    }
+     return VibrateEffect(env, args, argc);
+}
+
+static napi_value Vibrate(napi_env env, napi_callback_info info)
+{
+    CHKPP(env);
+    CHKPP(info);
+    size_t argc = 2;
+    napi_value args[2] = {};
+    napi_value thisArg = nullptr;
+    napi_status status = napi_get_cb_info(env, info, &argc, args, &thisArg, nullptr);
     if (status != napi_ok) {
         ThrowErr(env, PARAMETER_ERROR, "napi_get_cb_info fail");
         return nullptr;
-    }
-    if (argc >= 2 && IsMatchType(env, args[0], napi_object) && IsMatchType(env, args[1], napi_object)) {
-        return VibrateEffect(env, args, argc);
     }
     if (argc >= 1 && IsMatchType(env, args[0], napi_number)) {
         return VibrateTime(env, args, argc);
@@ -252,11 +268,7 @@ static napi_value Vibrate(napi_env env, napi_callback_info info)
     if (argc >= 1 && IsMatchType(env, args[0], napi_string)) {
         return VibrateEffectId(env, args, argc);
     }
-    if (argc == 0 || argc == 1) {
-        return VibrateMode(env, args, argc);
-    }
-    ThrowErr(env, PARAMETER_ERROR, "Parameters invalid");
-    return nullptr;
+    return VibrateMode(env, args, argc);
 }
 
 static napi_value Cancel(napi_env env, napi_callback_info info)
@@ -406,7 +418,7 @@ static napi_value Init(napi_env env, napi_value exports)
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("vibrate", Vibrate),
         DECLARE_NAPI_FUNCTION("stop", Stop),
-        DECLARE_NAPI_FUNCTION("startVibration", Vibrate),
+        DECLARE_NAPI_FUNCTION("startVibration", StartVibrate),
         DECLARE_NAPI_FUNCTION("stopVibration", Stop),
         DECLARE_NAPI_FUNCTION("isSupportEffect", IsSupportEffect),
     };
