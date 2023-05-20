@@ -247,7 +247,7 @@ static napi_value StartVibrate(napi_env env, napi_callback_info info)
         ThrowErr(env, PARAMETER_ERROR, "args[0] and args[1] should is napi_object");
         return nullptr;
     }
-     return VibrateEffect(env, args, argc);
+    return VibrateEffect(env, args, argc);
 }
 
 static napi_value Vibrate(napi_env env, napi_callback_info info)
