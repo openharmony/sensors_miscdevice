@@ -57,15 +57,14 @@ struct VibrateInfo {
 
 static napi_value VibrateTime(napi_env env, napi_value args[], size_t argc)
 {
-    NAPI_ASSERT(env, (argc == 1 || argc == 2), "Wrong argument number");
+    NAPI_ASSERT(env, (argc >= 1), "Wrong argument number");
     int32_t duration = 0;
     NAPI_ASSERT(env, GetInt32Value(env, args[0], duration), "Get int number fail");
     sptr<AsyncCallbackInfo> asyncCallbackInfo = new (std::nothrow) AsyncCallbackInfo(env);
     CHKPP(asyncCallbackInfo);
 
     asyncCallbackInfo->error.code = StartVibratorOnce(duration);
-    if (argc == 2) {
-        NAPI_ASSERT(env, IsMatchType(env, args[1], napi_function), "Wrong argument type. function expected");
+    if (argc >= 2 && IsMatchType(env, args[1], napi_function)) {
         NAPI_CALL(env, napi_create_reference(env, args[1], 1, &asyncCallbackInfo->callback[0]));
         EmitAsyncCallbackWork(asyncCallbackInfo);
         return nullptr;
@@ -81,15 +80,14 @@ static napi_value VibrateTime(napi_env env, napi_value args[], size_t argc)
 
 static napi_value VibrateEffectId(napi_env env, napi_value args[], size_t argc)
 {
-    NAPI_ASSERT(env, (argc == 1 || argc == 2), "Wrong argument number");
+    NAPI_ASSERT(env, (argc >= 1), "Wrong argument number");
     string effectId;
     NAPI_ASSERT(env, GetStringValue(env, args[0], effectId), "Wrong argument type. String or function expected");
     sptr<AsyncCallbackInfo> asyncCallbackInfo = new (std::nothrow) AsyncCallbackInfo(env);
     CHKPP(asyncCallbackInfo);
     asyncCallbackInfo->error.code = StartVibrator(effectId.c_str());
 
-    if (argc == 2) {
-        NAPI_ASSERT(env, IsMatchType(env, args[1], napi_function), "Wrong argument type. function expected");
+    if (argc >= 2 && IsMatchType(env, args[1], napi_function)) {
         NAPI_CALL(env, napi_create_reference(env, args[1], 1, &asyncCallbackInfo->callback[0]));
         EmitAsyncCallbackWork(asyncCallbackInfo);
         return nullptr;
@@ -109,27 +107,28 @@ static bool GetCallbackInfo(const napi_env &env, napi_value args[],
     CHKPF(asyncCallbackInfo);
     CHKPF(args);
     napi_value value = nullptr;
-    NAPI_CALL_BASE(env, napi_get_named_property(env, args[0], "success", &value), false);
-    NAPI_CALL_BASE(env, napi_create_reference(env, value, 1, &asyncCallbackInfo->callback[0]), false);
 
-    bool result = false;
-    NAPI_CALL_BASE(env, napi_has_named_property(env, args[0], "mode", &result), false);
-    if (result) {
-        NAPI_CALL_BASE(env, napi_get_named_property(env, args[0], "mode", &value), false);
-        NAPI_ASSERT_BASE(env, GetStringValue(env, value, mode),
-            "Wrong argument type. String or function expected", false);
-        NAPI_ASSERT_BASE(env, (mode == "long" || mode == "short"),
-            "Wrong argument type. Invalid mode value", false);
+    CHKCF(napi_get_named_property(env, args[0], "success", &value) == napi_ok, "napi get sucess property fail");
+    CHKCF(napi_create_reference(env, value, 1, &asyncCallbackInfo->callback[0]) == napi_ok,
+        "napi_create_reference fail");
+
+    if (napi_get_named_property(env, args[0], "fail", &value) == napi_ok) {
+        if (IsMatchType(env, value, napi_function)) {
+            CHKCF(napi_create_reference(env, value, 1, &asyncCallbackInfo->callback[1]) == napi_ok,
+                "napi_create_reference fail");
+        }
     }
-    NAPI_CALL_BASE(env, napi_has_named_property(env, args[0], "fail", &result), false);
-    if (result) {
-        NAPI_CALL_BASE(env, napi_get_named_property(env, args[0], "fail", &value), false);
-        NAPI_CALL_BASE(env, napi_create_reference(env, value, 1, &asyncCallbackInfo->callback[1]), false);
+    if (napi_get_named_property(env, args[0], "complete", &value) == napi_ok) {
+        if (IsMatchType(env, value, napi_function)) {
+            CHKCF(napi_create_reference(env, value, 1, &asyncCallbackInfo->callback[2]) == napi_ok,
+                "napi_create_reference fail");
+        }
     }
-    NAPI_CALL_BASE(env, napi_has_named_property(env, args[0], "complete", &result), false);
-    if (result) {
-        NAPI_CALL_BASE(env, napi_get_named_property(env, args[0], "complete", &value), false);
-        NAPI_CALL_BASE(env, napi_create_reference(env, value, 1, &asyncCallbackInfo->callback[2]), false);
+    if (napi_get_named_property(env, args[0], "mode", &value) == napi_ok) {
+        bool result = GetStringValue(env, value, mode);
+        if (!result || (mode != "long" && mode != "short")) {
+            mode = "long";
+        }
     }
     return true;
 }
@@ -137,15 +136,19 @@ static bool GetCallbackInfo(const napi_env &env, napi_value args[],
 static napi_value VibrateMode(napi_env env, napi_value args[], size_t argc)
 {
     if (argc == 0) {
-        NAPI_ASSERT(env, (StartVibratorOnce(VIBRATE_LONG_DURATION) == 0), "Vibrate long mode fail");
+        if (StartVibratorOnce(VIBRATE_LONG_DURATION) != 0) {
+            MISC_HILOGE("Vibrate long mode fail");
+        }
         return nullptr;
     }
-    NAPI_ASSERT(env, (argc == 1), "Param number is invalid");
     sptr<AsyncCallbackInfo> asyncCallbackInfo = new (std::nothrow) AsyncCallbackInfo(env);
     CHKPP(asyncCallbackInfo);
     asyncCallbackInfo->callbackType = SYSTEM_VIBRATE_CALLBACK;
     string mode = "long";
-    NAPI_ASSERT(env, GetCallbackInfo(env, args, asyncCallbackInfo, mode), "Get callback info fail");
+    if (!GetCallbackInfo(env, args, asyncCallbackInfo, mode)) {
+        MISC_HILOGE("Get callback info fail");
+        return nullptr;
+    }
     int32_t duration = ((mode == "long") ? VIBRATE_LONG_DURATION : VIBRATE_SHORT_DURATION);
     asyncCallbackInfo->error.code = StartVibratorOnce(duration);
     if (asyncCallbackInfo->error.code != SUCCESS) {
@@ -212,11 +215,7 @@ static napi_value VibrateEffect(napi_env env, napi_value args[], size_t argc)
         ThrowErr(env, PARAMETER_ERROR, "parameters invalid");
         return nullptr;
     }
-    if (argc >= 3) {
-        if (!IsMatchType(env, args[2], napi_function)) {
-            ThrowErr(env, PARAMETER_ERROR, "IsMatchType fail, should be function");
-            return nullptr;
-        }
+    if (argc >= 3 && IsMatchType(env, args[2], napi_function)) {
         if (napi_create_reference(env, args[2], 1, &asyncCallbackInfo->callback[0]) != napi_ok) {
             ThrowErr(env, PARAMETER_ERROR, "napi_create_reference fail");
             return nullptr;
@@ -232,7 +231,7 @@ static napi_value VibrateEffect(napi_env env, napi_value args[], size_t argc)
     return promise;
 }
 
-static napi_value Vibrate(napi_env env, napi_callback_info info)
+static napi_value StartVibrate(napi_env env, napi_callback_info info)
 {
     CHKPP(env);
     CHKPP(info);
@@ -240,20 +239,36 @@ static napi_value Vibrate(napi_env env, napi_callback_info info)
     napi_value args[3] = {};
     napi_value thisArg = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, args, &thisArg, nullptr);
-    if ((status != napi_ok) || (argc == 0)) {
+    if (status != napi_ok || argc < 2) {
         ThrowErr(env, PARAMETER_ERROR, "napi_get_cb_info fail or number of parameter invalid");
         return nullptr;
     }
-    if (IsMatchType(env, args[0], napi_number)) {
-        return VibrateTime(env, args, argc);
-    }
-    if (IsMatchType(env, args[0], napi_string)) {
-        return VibrateEffectId(env, args, argc);
-    }
-    if (IsMatchType(env, args[0], napi_object) && argc == 1) {
-        return VibrateMode(env, args, argc);
+    if (!IsMatchType(env, args[0], napi_object) || !IsMatchType(env, args[1], napi_object)) {
+        ThrowErr(env, PARAMETER_ERROR, "args[0] and args[1] should is napi_object");
+        return nullptr;
     }
     return VibrateEffect(env, args, argc);
+}
+
+static napi_value Vibrate(napi_env env, napi_callback_info info)
+{
+    CHKPP(env);
+    CHKPP(info);
+    size_t argc = 2;
+    napi_value args[2] = {};
+    napi_value thisArg = nullptr;
+    napi_status status = napi_get_cb_info(env, info, &argc, args, &thisArg, nullptr);
+    if (status != napi_ok) {
+        ThrowErr(env, PARAMETER_ERROR, "napi_get_cb_info fail");
+        return nullptr;
+    }
+    if (argc >= 1 && IsMatchType(env, args[0], napi_number)) {
+        return VibrateTime(env, args, argc);
+    }
+    if (argc >= 1 && IsMatchType(env, args[0], napi_string)) {
+        return VibrateEffectId(env, args, argc);
+    }
+    return VibrateMode(env, args, argc);
 }
 
 static napi_value Cancel(napi_env env, napi_callback_info info)
@@ -289,38 +304,39 @@ static napi_value Stop(napi_env env, napi_callback_info info)
     napi_value thisArg = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, args, &thisArg, nullptr);
     if (status != napi_ok) {
-        ThrowErr(env, PARAMETER_ERROR, "napi_get_cb_info fail or number of parameter invalid");
+        ThrowErr(env, PARAMETER_ERROR, "napi_get_cb_info fail");
         return nullptr;
     }
-    string mode;
-    if ((argc == 0) || (!GetStringValue(env, args[0], mode))) {
+    if (argc >= 1 && IsMatchType(env, args[0], napi_string)) {
+        string mode;
+        if (!GetStringValue(env, args[0], mode)) {
+            ThrowErr(env, PARAMETER_ERROR, "Parameters invalid");
+            return nullptr;
+        }
+        sptr<AsyncCallbackInfo> asyncCallbackInfo = new (std::nothrow) AsyncCallbackInfo(env);
+        CHKPP(asyncCallbackInfo);
+        asyncCallbackInfo->error.code = StopVibrator(mode.c_str());
+        if ((asyncCallbackInfo->error.code != SUCCESS) && (asyncCallbackInfo->error.code == PARAMETER_ERROR)) {
+            ThrowErr(env, PARAMETER_ERROR, "Parameters invalid");
+            return nullptr;
+        }
+        if (argc >= 2 && IsMatchType(env, args[1], napi_function)) {
+            if (napi_create_reference(env, args[1], 1, &asyncCallbackInfo->callback[0]) != napi_ok) {
+                ThrowErr(env, PARAMETER_ERROR, "napi_create_reference fail");
+                return nullptr;
+            }
+            EmitAsyncCallbackWork(asyncCallbackInfo);
+            return nullptr;
+        }
+        napi_deferred deferred = nullptr;
+        napi_value promise = nullptr;
+        CHKCP((napi_create_promise(env, &deferred, &promise) == napi_ok), "napi_create_promise fail");
+        asyncCallbackInfo->deferred = deferred;
+        EmitPromiseWork(asyncCallbackInfo);
+        return promise;
+    } else {
         return Cancel(env, info);
     }
-    sptr<AsyncCallbackInfo> asyncCallbackInfo = new (std::nothrow) AsyncCallbackInfo(env);
-    CHKPP(asyncCallbackInfo);
-    asyncCallbackInfo->error.code = StopVibrator(mode.c_str());
-    if ((asyncCallbackInfo->error.code != SUCCESS) && (asyncCallbackInfo->error.code == PARAMETER_ERROR)) {
-        ThrowErr(env, PARAMETER_ERROR, "Parameters invalid");
-        return nullptr;
-    }
-    if (argc >= 2) {
-        if (!IsMatchType(env, args[1], napi_function)) {
-            ThrowErr(env, PARAMETER_ERROR, "IsMatchType fail, should be function");
-            return nullptr;
-        }
-        if (napi_create_reference(env, args[1], 1, &asyncCallbackInfo->callback[0]) != napi_ok) {
-            ThrowErr(env, PARAMETER_ERROR, "napi_create_reference fail");
-            return nullptr;
-        }
-        EmitAsyncCallbackWork(asyncCallbackInfo);
-        return nullptr;
-    }
-    napi_deferred deferred = nullptr;
-    napi_value promise = nullptr;
-    CHKCP((napi_create_promise(env, &deferred, &promise) == napi_ok), "napi_create_promise fail");
-    asyncCallbackInfo->deferred = deferred;
-    EmitPromiseWork(asyncCallbackInfo);
-    return promise;
 }
 
 static napi_value IsSupportEffect(napi_env env, napi_callback_info info)
@@ -402,7 +418,7 @@ static napi_value Init(napi_env env, napi_value exports)
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("vibrate", Vibrate),
         DECLARE_NAPI_FUNCTION("stop", Stop),
-        DECLARE_NAPI_FUNCTION("startVibration", Vibrate),
+        DECLARE_NAPI_FUNCTION("startVibration", StartVibrate),
         DECLARE_NAPI_FUNCTION("stopVibration", Stop),
         DECLARE_NAPI_FUNCTION("isSupportEffect", IsSupportEffect),
     };
