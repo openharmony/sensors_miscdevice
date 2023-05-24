@@ -27,7 +27,7 @@ class VibratorDecoder {
 public:
     VibratorDecoder() = default;
     virtual ~VibratorDecoder() = default;
-    virtual int32_t DecodeEffect(const JsonParser &parser, std::set<VibrateEvent> &vibrateSet) = 0;
+    virtual std::set<VibrateEvent> DecodeEffect(const RawFileDescriptor &rawFd) = 0;
 };
 }  // namespace Sensors
 }  // namespace OHOS

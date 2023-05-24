@@ -36,13 +36,21 @@ constexpr int32_t SUPPORT_CHANNEL_NUMBER = 1;
 constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "DefaultVibratorDecoder" };
 } // namespace
 
-int32_t DefaultVibratorDecoder::DecodeEffect(const JsonParser &parser, std::set<VibrateEvent> &vibrateSet)
+std::set<VibrateEvent> DefaultVibratorDecoder::DecodeEffect(const RawFileDescriptor &rawFd)
 {
+    JsonParser parser(rawFd);
     int32_t ret = CheckMetadata(parser);
-    CHKCR((ret == SUCCESS), ERROR, "check metadata fail");
+    if (ret != SUCCESS) {
+        MISC_HILOGE("check metadata fail");
+        return {};
+    }
+    std::set<VibrateEvent> vibrateSet;
     ret = ParseChannel(parser, vibrateSet);
-    CHKCR((ret == SUCCESS), ERROR, "parse channel fail");
-    return SUCCESS;
+    if (ret != SUCCESS) {
+        MISC_HILOGE("parse channel fail");
+        return {};
+    }
+    return vibrateSet;
 }
 
 int32_t DefaultVibratorDecoder::CheckMetadata(const JsonParser &parser)
@@ -160,6 +168,10 @@ int32_t DefaultVibratorDecoder::ParseEvent(const JsonParser &parser, cJSON *even
         MISC_HILOGE("Parameter check of vibration event failed, startTime:%{public}d", vibrateEvent.startTime);
         return ERROR;
     }
+    if (vibrateEvent.intensity == INTENSITY_MIN) {
+        MISC_HILOGI("The event intensity is 0, startTime:%{public}d", vibrateEvent.startTime);
+        return SUCCESS;
+    }
     auto ret = vibrateSet.insert(vibrateEvent);
     if (!ret.second) {
         MISC_HILOGE("Vibration event is duplicated, startTime:%{public}d", vibrateEvent.startTime);
@@ -179,7 +191,7 @@ bool DefaultVibratorDecoder::CheckParameters(const VibrateEvent &vibrateEvent)
         MISC_HILOGE("the event duration is out of range, duration:%{public}d", vibrateEvent.duration);
         return false;
     }
-    if (vibrateEvent.intensity <= INTENSITY_MIN || vibrateEvent.intensity > INTENSITY_MAX) {
+    if (vibrateEvent.intensity < INTENSITY_MIN || vibrateEvent.intensity > INTENSITY_MAX) {
         MISC_HILOGE("the event intensity is out of range, intensity:%{public}d", vibrateEvent.intensity);
         return false;
     }

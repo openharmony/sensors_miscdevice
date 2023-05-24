@@ -3022,4 +3022,29 @@ describe("VibratorJsTest", function () {
         })
         done();
     })
+
+    /*
+     * @tc.name:VibrateTest036
+     * @tc.desc:verify the startVibration interface
+     * @tc.type: FUNC
+     * @tc.require: I6HLLL
+     */
+    it("VibrateTest036", 0, async function (done) {
+        try {
+            vibrator.startVibration({
+                type: "file",
+                hapticFd: { fd: "" }
+            }, {
+                usage: "unknown"
+            }, (error)=>{
+                console.info("VibrateTest036 should not in this method");
+                expect(false).assertTrue();
+                done();
+            });
+        } catch (error) {
+            expect(error.code).assertEqual(PARAMETER_ERROR_CODE);
+            expect(error.message).assertEqual(PARAMETER_ERROR_MSG);
+            done();
+        }
+    })
 })

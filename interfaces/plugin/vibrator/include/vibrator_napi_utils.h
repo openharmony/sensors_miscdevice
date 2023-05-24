@@ -64,9 +64,12 @@ using ConstructResultFunc = bool(*)(const napi_env &env, sptr<AsyncCallbackInfo>
 bool IsMatchType(const napi_env &env, const napi_value &value, const napi_valuetype &type);
 bool GetNapiInt32(const napi_env &env, const int32_t value, napi_value &result);
 bool GetInt32Value(const napi_env &env, const napi_value &value, int32_t &result);
+bool GetInt64Value(const napi_env &env, const napi_value &value, int64_t &result);
 bool GetStringValue(const napi_env &env, const napi_value &value, string &result);
+bool GetPropertyItem(const napi_env &env, const napi_value &value, const std::string &type, napi_value &item);
 bool GetPropertyString(const napi_env &env, const napi_value &value, const std::string &type, std::string &result);
 bool GetPropertyInt32(const napi_env &env, const napi_value &value, const std::string &type, int32_t &result);
+bool GetPropertyInt64(const napi_env &env, const napi_value &value, const std::string &type, int64_t &result);
 bool GetNapiParam(const napi_env &env, const napi_callback_info &info, size_t &argc, napi_value &argv);
 bool ConvertErrorToResult(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo, napi_value &result);
 bool ConstructCommonResult(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo, napi_value result[],

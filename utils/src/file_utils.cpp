@@ -15,6 +15,7 @@
 #include "file_utils.h"
 
 #include <cerrno>
+#include <cinttypes>
 
 #include <sys/stat.h>
 #include <unistd.h>
@@ -27,7 +28,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "MiscdeviceFileUtils" };
 const std::string CONFIG_DIR = "/vendor/etc/vibrator/";
 constexpr int32_t FILE_SIZE_MAX = 0x5000;
-constexpr int32_t READ_DATA_BUFF_SIZE = 256;
+constexpr int64_t READ_DATA_BUFF_SIZE = 256;
 constexpr int32_t INVALID_FILE_SIZE = -1;
 constexpr int32_t FILE_PATH_MAX = 1024;
 }  // namespace
@@ -142,31 +143,34 @@ std::string ReadFd(const RawFileDescriptor &rawFd)
         return {};
     }
     int64_t fdSize = GetFileSize(rawFd.fd);
-    if (rawFd.offset < 0 || rawFd.offset > fdSize) {
-        MISC_HILOGE("offset is invalid, offset:%{public}lld", static_cast<long long>(rawFd.offset));
+    if ((rawFd.offset < 0) || (rawFd.offset > fdSize)) {
+        MISC_HILOGE("offset is invalid, offset:%{public}" PRId64, rawFd.offset);
         return {};
     }
-    if (rawFd.length <= 0 || rawFd.length > fdSize - rawFd.offset) {
-        MISC_HILOGE("length is invalid, length:%{public}lld", static_cast<long long>(rawFd.length));
+    if ((rawFd.length <= 0) || (rawFd.length > fdSize - rawFd.offset)) {
+        MISC_HILOGE("length is invalid, length:%{public}" PRId64, rawFd.length);
         return {};
     }
     FILE* fp = fdopen(rawFd.fd, "r");
     CHKPS(fp);
     if (fseek(fp, rawFd.offset, SEEK_SET) != 0) {
         MISC_HILOGE("fseek failed, errno:%{public}d", errno);
+        if (fclose(fp) != 0) {
+            MISC_HILOGW("close file failed, errno:%{public}d", errno);
+        }
         return {};
     }
     std::string dataStr;
     char buf[READ_DATA_BUFF_SIZE] = { '\0' };
-    while (fgets(buf, sizeof(buf), fp) != nullptr) {
+    int64_t alreadyRead = 0;
+    while (alreadyRead < rawFd.length) {
+        int64_t onceRead = std::min(rawFd.length - alreadyRead, READ_DATA_BUFF_SIZE - 1);
+        fgets(buf, onceRead + 1, fp);
         dataStr += buf;
-        int64_t location = ftell(fp);
-        if (location - rawFd.offset >= rawFd.length) {
-            break;
-        }
+        alreadyRead = ftell(fp) - rawFd.offset;
     }
     if (fclose(fp) != 0) {
-        MISC_HILOGW("close file failed, errno:%{public}d", errno);
+        MISC_HILOGW("close file failed after read, errno:%{public}d", errno);
     }
     return dataStr;
 }

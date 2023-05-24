@@ -28,7 +28,7 @@ class DefaultVibratorDecoder : public VibratorDecoder {
 public:
     DefaultVibratorDecoder() = default;
     ~DefaultVibratorDecoder() = default;
-    int32_t DecodeEffect(const JsonParser &parser, std::set<VibrateEvent> &vibrateSet) override;
+    std::set<VibrateEvent> DecodeEffect(const RawFileDescriptor &rawFd) override;
 
 private:
     int32_t CheckMetadata(const JsonParser &parser);

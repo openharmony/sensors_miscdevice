@@ -22,6 +22,7 @@
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 
+#include "file_utils.h"
 #include "miscdevice_log.h"
 #include "vibrator_agent.h"
 #include "vibrator_napi_error.h"
@@ -53,6 +54,9 @@ struct VibrateInfo {
     int32_t duration = 0;
     std::string effectId;
     int32_t count = 0;
+    int32_t fd = -1;
+    int64_t offset = 0;
+    int64_t length = -1;
 };
 
 static napi_value VibrateTime(napi_env env, napi_value args[], size_t argc)
@@ -167,6 +171,14 @@ bool ParseParameter(napi_env env, napi_value args[], size_t argc, VibrateInfo &i
     } else if (info.type == "preset") {
         CHKCF(GetPropertyInt32(env, args[0], "count", info.count), "Get vibrate count fail");
         CHKCF(GetPropertyString(env, args[0], "effectId", info.effectId), "Get vibrate effectId fail");
+    } else if (info.type == "file") {
+        napi_value hapticFd = nullptr;
+        CHKCF(GetPropertyItem(env, args[0], "hapticFd", hapticFd), "Get vibrate hapticFd fail");
+        CHKCF(IsMatchType(env, hapticFd, napi_object), "Wrong argument type. Napi object expected");
+        CHKCF(GetPropertyInt32(env, hapticFd, "fd", info.fd), "Get vibrate fd fail");
+        GetPropertyInt64(env, hapticFd, "offset", info.offset);
+        info.length = GetFileSize(info.fd);
+        GetPropertyInt64(env, hapticFd, "length", info.length);
     }
     CHKCF(GetPropertyString(env, args[1], "usage", info.usage), "Get vibrate usage fail");
     return true;
@@ -187,8 +199,8 @@ int32_t StartVibrate(const VibrateInfo &info)
         MISC_HILOGE("SetUsage fail");
         return PARAMETER_ERROR;
     }
-    if ((info.type != "time") && (info.type != "preset")) {
-        MISC_HILOGE("Invalid vibrate type");
+    if ((info.type != "time") && (info.type != "preset") && (info.type != "file")) {
+        MISC_HILOGE("Invalid vibrate type, type:%{public}s", info.type.c_str());
         return PARAMETER_ERROR;
     }
     if (info.type == "preset") {
@@ -197,6 +209,8 @@ int32_t StartVibrate(const VibrateInfo &info)
             return PARAMETER_ERROR;
         }
         return StartVibrator(info.effectId.c_str());
+    } else if (info.type == "file") {
+        return PlayVibratorCustom(info.fd, info.offset, info.length);
     }
     return StartVibratorOnce(info.duration);
 }

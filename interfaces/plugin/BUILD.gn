@@ -32,8 +32,10 @@ ohos_shared_library("vibrator") {
     "$SUBSYSTEM_DIR/interfaces/plugin/vibrator/src/vibrator_napi_utils.cpp",
   ]
 
-  deps =
-      [ "$SUBSYSTEM_DIR/interfaces/native/vibrator:vibrator_interface_native" ]
+  deps = [
+    "$SUBSYSTEM_DIR/interfaces/native/vibrator:vibrator_interface_native",
+    "$SUBSYSTEM_DIR/utils:libmiscdevice_utils",
+  ]
 
   external_deps = [
     "c_utils:utils",
