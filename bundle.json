@@ -80,7 +80,8 @@
         "//base/sensors/miscdevice/interfaces/native/vibrator/test/fuzztest:fuzztest",
         "//base/sensors/miscdevice/interfaces/native/light/test/fuzztest:fuzztest",
         "//base/sensors/miscdevice/interfaces/native/vibrator/test:unittest",
-        "//base/sensors/miscdevice/interfaces/native/light/test:unittest"
+        "//base/sensors/miscdevice/interfaces/native/light/test:unittest",
+        "//base/sensors/miscdevice/services/miscdevice_service/test/fuzztest:fuzztest"
       ]
     }
   }
