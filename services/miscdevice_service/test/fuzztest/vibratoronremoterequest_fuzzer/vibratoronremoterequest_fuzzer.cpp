@@ -23,7 +23,6 @@
 #include "miscdevice_service.h"
 #include "securec.h"
 
-
 namespace OHOS {
 namespace Sensors {
 namespace {

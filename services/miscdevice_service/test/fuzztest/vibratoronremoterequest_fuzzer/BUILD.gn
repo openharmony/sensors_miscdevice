@@ -42,20 +42,21 @@ ohos_fuzztest("VibratorOnRemoteRequestFuzzTest") {
 
   sources = [ "vibratoronremoterequest_fuzzer.cpp" ]
 
-  deps =
-      [ "$SUBSYSTEM_DIR/interfaces/native/vibrator:vibrator_interface_native",
-        "$SUBSYSTEM_DIR/interfaces/native/light:light_interface_native",
-        "$SUBSYSTEM_DIR/services/miscdevice_service:libmiscdevice_service_static",
-        "$SUBSYSTEM_DIR/utils:libmiscdevice_utils" ]
+  deps = [
+    "$SUBSYSTEM_DIR/interfaces/native/light:light_interface_native",
+    "$SUBSYSTEM_DIR/interfaces/native/vibrator:vibrator_interface_native",
+    "$SUBSYSTEM_DIR/services/miscdevice_service:libmiscdevice_service_static",
+    "$SUBSYSTEM_DIR/utils:libmiscdevice_utils",
+  ]
 
-  external_deps = [ 
+  external_deps = [
+    "access_token:libaccesstoken_sdk",
     "c_utils:utils",
-    "ipc:ipc_core",
-    "samgr:samgr_proxy",
     "drivers_interface_light:liblight_proxy_1.0",
     "drivers_interface_vibrator:libvibrator_proxy_1.1",
-    "access_token:libaccesstoken_sdk",
     "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "samgr:samgr_proxy",
   ]
 }
 
