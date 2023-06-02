@@ -126,5 +126,8 @@ ohos_shared_library("libmiscdevice_service_static") {
 }
 
 group("miscdevice_service_target") {
-  deps = [ ":libmiscdevice_service" ]
+  deps = [
+    ":libmiscdevice_service",
+    ":libmiscdevice_service_static",
+  ]
 }
