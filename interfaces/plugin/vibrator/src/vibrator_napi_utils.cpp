@@ -70,8 +70,7 @@ bool GetInt32Value(const napi_env &env, const napi_value &value, int32_t &result
     CALL_LOG_ENTER;
     napi_valuetype valuetype = napi_undefined;
     NAPI_CALL_BASE(env, napi_typeof(env, value, &valuetype), false);
-    NAPI_ASSERT_BASE(env, valuetype == napi_number,
-        "Wrong argument type. Number or function expected", false);
+    CHKCF((valuetype == napi_number), "Wrong argument type. Number or function expected");
     NAPI_CALL_BASE(env, napi_get_value_int32(env, value, &result), false);
     return true;
 }
