@@ -35,7 +35,7 @@ ohos_shared_library("libmiscdevice_utils") {
     "hiviewdfx_hilog_native:libhilog",
   ]
 
-  innerapi_tags = [ "platformsdk_indirect" ]
+  innerapi_tags = [ "platformsdk" ]
   part_name = "miscdevice"
   subsystem_name = "sensors"
 }
