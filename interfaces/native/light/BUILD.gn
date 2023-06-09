@@ -57,6 +57,7 @@ ohos_shared_library("light_interface_native") {
   ]
 
   public_configs = [ ":light_config" ]
+  innerapi_tags = [ "platformsdk" ]
   part_name = "miscdevice"
   subsystem_name = "sensors"
 }
