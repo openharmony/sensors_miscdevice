@@ -177,7 +177,9 @@ bool ParseParameter(napi_env env, napi_value args[], size_t argc, VibrateInfo &i
         CHKCF(IsMatchType(env, hapticFd, napi_object), "Wrong argument type. Napi object expected");
         CHKCF(GetPropertyInt32(env, hapticFd, "fd", info.fd), "Get vibrate fd fail");
         GetPropertyInt64(env, hapticFd, "offset", info.offset);
-        info.length = GetFileSize(info.fd);
+        int64_t fdSize = GetFileSize(info.fd);
+        CHKCF((info.offset >= 0) && (info.offset <= fdSize), "The parameter of offset is invalid");
+        info.length = fdSize - info.offset;
         GetPropertyInt64(env, hapticFd, "length", info.length);
     }
     CHKCF(GetPropertyString(env, args[1], "usage", info.usage), "Get vibrate usage fail");
