@@ -24,6 +24,7 @@
 #include "light_agent_type.h"
 #include "miscdevice_common.h"
 #include "raw_file_descriptor.h"
+#include "sensors_ipc_interface_code.h"
 
 namespace OHOS {
 namespace Sensors {
@@ -44,20 +45,6 @@ public:
     virtual std::vector<LightInfo> GetLightList() = 0;
     virtual int32_t TurnOn(int32_t lightId, const LightColor &color, const LightAnimation &animation) = 0;
     virtual int32_t TurnOff(int32_t lightId) = 0;
-
-    enum {
-        VIBRATE,
-        PLAY_VIBRATOR_EFFECT,
-#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-        PLAY_VIBRATOR_CUSTOM,
-#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-        STOP_VIBRATOR_ALL,
-        STOP_VIBRATOR_BY_MODE,
-        IS_SUPPORT_EFFECT,
-        GET_LIGHT_LIST,
-        TURN_ON,
-        TURN_OFF,
-    };
 };
 }  // namespace Sensors
 }  // namespace OHOS
