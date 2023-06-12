@@ -19,7 +19,7 @@
 /* SAID:3602 */
 namespace OHOS {
 namespace Sensors {
-enum class MiscdeviceInterfaceCode{
+enum class MiscdeviceInterfaceCode {
     VIBRATE,
     PLAY_VIBRATOR_EFFECT,
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
