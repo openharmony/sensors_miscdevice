@@ -34,7 +34,7 @@ bool MiscdeviceCommon::CheckCustomVibratorEffect(const std::vector<int32_t> &tim
                                                  const std::vector<int32_t> &intensity, int32_t periodCount)
 {
     if ((periodCount < MIN_VIBRATOR_COUNT) || (periodCount > MAX_VIBRATOR_COUNT)) {
-        MISC_HILOGE("input param invalid is failed");
+        MISC_HILOGE("Input param invalid is failed");
         return false;
     }
     if (timing.size() != intensity.size()) {

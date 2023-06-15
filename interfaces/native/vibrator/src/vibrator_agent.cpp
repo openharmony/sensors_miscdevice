@@ -44,7 +44,7 @@ static int32_t NormalizeErrCode(int32_t code)
             return IS_NOT_SUPPORTED;
         }
         default: {
-            MISC_HILOGW("operating the device fail");
+            MISC_HILOGW("Operating the device fail");
             return DEVICE_OPERATION_FAILED;
         }
     }
@@ -53,7 +53,7 @@ static int32_t NormalizeErrCode(int32_t code)
 bool SetLoopCount(int32_t count)
 {
     if (count <= 0) {
-        MISC_HILOGE("input invalid, count is %{public}d", count);
+        MISC_HILOGE("Input invalid, count is %{public}d", count);
         return false;
     }
     g_loopCount = count;
@@ -66,7 +66,7 @@ int32_t StartVibrator(const char *effectId)
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.Vibrate(DEFAULT_VIBRATOR_ID, effectId, g_loopCount, g_usage);
     if (ret != ERR_OK) {
-        MISC_HILOGE("vibrate effectId failed, ret:%{public}d", ret);
+        MISC_HILOGE("Vibrate effectId failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
     g_loopCount = 1;
@@ -83,7 +83,7 @@ int32_t StartVibratorOnce(int32_t duration)
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.Vibrate(DEFAULT_VIBRATOR_ID, duration, g_usage);
     if (ret != ERR_OK) {
-        MISC_HILOGE("vibrate duration failed, ret:%{public}d", ret);
+        MISC_HILOGE("Vibrate duration failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
     g_usage = USAGE_UNKNOWN;
@@ -99,7 +99,7 @@ int32_t PlayVibratorCustom(int32_t fd, int64_t offset, int64_t length)
 {
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     if (fd < 0 || offset < 0 || length <= 0) {
-        MISC_HILOGE("input parameter invalid, fd:%{public}d, offset:%{public}lld, length:%{public}lld",
+        MISC_HILOGE("Input parameter invalid, fd:%{public}d, offset:%{public}lld, length:%{public}lld",
             fd, static_cast<long long>(offset), static_cast<long long>(length));
         return PARAMETER_ERROR;
     }
@@ -117,7 +117,7 @@ int32_t PlayVibratorCustom(int32_t fd, int64_t offset, int64_t length)
     g_usage = USAGE_UNKNOWN;
     return SUCCESS;
 #else
-    MISC_HILOGE("the device does not support this operation");
+    MISC_HILOGE("The device does not support this operation");
     return IS_NOT_SUPPORTED;
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 }
@@ -126,7 +126,7 @@ int32_t StopVibrator(const char *mode)
 {
     CHKPR(mode, PARAMETER_ERROR);
     if (strcmp(mode, "time") != 0 && strcmp(mode, "preset") != 0) {
-        MISC_HILOGE("input parameter invalid, mode is %{public}s", mode);
+        MISC_HILOGE("Input parameter invalid, mode is %{public}s", mode);
         return PARAMETER_ERROR;
     }
     auto &client = VibratorServiceClient::GetInstance();
@@ -152,7 +152,7 @@ int32_t Cancel()
 bool SetUsage(int32_t usage)
 {
     if ((usage < 0) || (usage >= USAGE_MAX)) {
-        MISC_HILOGE("input invalid, usage is %{public}d", usage);
+        MISC_HILOGE("Input invalid, usage is %{public}d", usage);
         return false;
     }
     g_usage = usage;

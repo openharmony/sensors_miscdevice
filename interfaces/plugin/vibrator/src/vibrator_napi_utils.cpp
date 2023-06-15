@@ -32,12 +32,12 @@ AsyncCallbackInfo::~AsyncCallbackInfo()
 {
     CALL_LOG_ENTER;
     if (asyncWork != nullptr) {
-        MISC_HILOGD("delete work");
+        MISC_HILOGD("Delete work");
         napi_delete_async_work(env, asyncWork);
     }
     for (int32_t i = 0; i < CALLBACK_NUM; ++i) {
         if (callback[i] != nullptr) {
-            MISC_HILOGD("delete reference, i: %{public}d", i);
+            MISC_HILOGD("Delete reference, i:%{public}d", i);
             napi_delete_reference(env, callback[i]);
         }
     }
@@ -118,7 +118,7 @@ bool GetPropertyItem(const napi_env &env, const napi_value &value, const std::st
     bool exist = false;
     napi_status status = napi_has_named_property(env, value, type.c_str(), &exist);
     if ((status != napi_ok) || (!exist)) {
-        MISC_HILOGE("can not find %{public}s property", type.c_str());
+        MISC_HILOGE("Can not find %{public}s property", type.c_str());
         return false;
     }
     CHKCF((napi_get_named_property(env, value, type.c_str(), &item) == napi_ok), "napi get property fail");
@@ -130,7 +130,7 @@ bool GetPropertyString(const napi_env &env, const napi_value &value, const std::
     bool exist = false;
     napi_status status = napi_has_named_property(env, value, type.c_str(), &exist);
     if ((status != napi_ok) || (!exist)) {
-        MISC_HILOGE("can not find %{public}s property", type.c_str());
+        MISC_HILOGE("Can not find %{public}s property", type.c_str());
         return false;
     }
 
@@ -148,7 +148,7 @@ bool GetPropertyInt32(const napi_env &env, const napi_value &value, const std::s
     bool exist = false;
     napi_status status = napi_has_named_property(env, value, type.c_str(), &exist);
     if (status != napi_ok || !exist) {
-        MISC_HILOGE("can not find %{public}s property", type.c_str());
+        MISC_HILOGE("Can not find %{public}s property", type.c_str());
         return false;
     }
     CHKCF((napi_get_named_property(env, value, type.c_str(), &item) == napi_ok), "napi get property fail");
@@ -165,7 +165,7 @@ bool GetPropertyInt64(const napi_env &env, const napi_value &value, const std::s
     bool exist = false;
     napi_status status = napi_has_named_property(env, value, type.c_str(), &exist);
     if (status != napi_ok || !exist) {
-        MISC_HILOGE("can not find %{public}s property", type.c_str());
+        MISC_HILOGE("Can not find %{public}s property", type.c_str());
         return false;
     }
     CHKCF((napi_get_named_property(env, value, type.c_str(), &item) == napi_ok), "napi get property fail");
@@ -187,7 +187,7 @@ bool ConvertErrorToResult(const napi_env &env, sptr<AsyncCallbackInfo> asyncCall
     int32_t code = asyncCallbackInfo->error.code;
     auto msg = GetNapiError(code);
     if (!msg) {
-        MISC_HILOGE("errCode: %{public}d is invalid", code);
+        MISC_HILOGE("ErrCode:%{public}d is invalid", code);
         return false;
     }
     result = CreateBusinessError(env, code, msg.value());

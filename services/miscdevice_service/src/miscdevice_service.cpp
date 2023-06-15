@@ -70,7 +70,7 @@ MiscdeviceService::~MiscdeviceService()
 
 void MiscdeviceService::OnDump()
 {
-    MISC_HILOGI("ondump is invoked");
+    MISC_HILOGI("Ondump is invoked");
 }
 
 void MiscdeviceService::OnStart()
@@ -89,17 +89,17 @@ void MiscdeviceService::OnStart()
         return;
     }
     if (!SystemAbility::Publish(this)) {
-        MISC_HILOGE("publish MiscdeviceService failed");
+        MISC_HILOGE("Publish MiscdeviceService failed");
         return;
     }
     auto ret = miscDeviceIdMap_.insert(std::make_pair(MiscdeviceDeviceId::LED, lightExist_));
     if (!ret.second) {
-        MISC_HILOGI("light exist in miscDeviceIdMap_");
+        MISC_HILOGI("Light exist in miscDeviceIdMap_");
         ret.first->second = lightExist_;
     }
     ret = miscDeviceIdMap_.insert(std::make_pair(MiscdeviceDeviceId::VIBRATOR, vibratorExist_));
     if (!ret.second) {
-        MISC_HILOGI("vibrator exist in miscDeviceIdMap_");
+        MISC_HILOGI("Vibrator exist in miscDeviceIdMap_");
         ret.first->second = vibratorExist_;
     }
     state_ = MiscdeviceServiceState::STATE_RUNNING;
@@ -160,7 +160,7 @@ void MiscdeviceService::OnStop()
     state_ = MiscdeviceServiceState::STATE_STOPPED;
     int32_t ret = vibratorHdiConnection_.DestroyHdiConnection();
     if (ret != ERR_OK) {
-        MISC_HILOGE("destroy hdi connection fail");
+        MISC_HILOGE("Destroy hdi connection fail");
     }
 }
 
@@ -287,7 +287,7 @@ int32_t MiscdeviceService::StopVibrator(int32_t vibratorId, const std::string &m
         return ERROR;
     }
     while (vibratorThread_->IsRunning()) {
-        MISC_HILOGD("notify the vibratorThread, vibratorId:%{public}d", vibratorId);
+        MISC_HILOGD("Notify the vibratorThread, vibratorId:%{public}d", vibratorId);
         vibratorThread_->NotifyExit();
         vibratorThread_->NotifyExitSync();
     }
@@ -312,7 +312,7 @@ int32_t MiscdeviceService::StartCustomVibration(const RawFileDescriptor &rawFd, 
     std::unique_ptr<VibratorDecoder> decoder(decoderFactory->CreateDecoder());
     std::set<VibrateEvent> vibrateSet = decoder->DecodeEffect(rawFd);
     if (vibrateSet.empty()) {
-        MISC_HILOGE("decode effect error");
+        MISC_HILOGE("Decode effect error");
         return ERROR;
     }
     MISC_HILOGD("vibrateSet size:%{public}zu", vibrateSet.size());
@@ -321,13 +321,13 @@ int32_t MiscdeviceService::StartCustomVibration(const RawFileDescriptor &rawFd, 
     CustomVibrationMatcher matcher;
     int32_t ret = matcher.TransformEffect(vibrateSet, hdfCompositeEffect.compositeEffects);
     if (ret != SUCCESS) {
-        MISC_HILOGE("transform custom effect error");
+        MISC_HILOGE("Transform custom effect error");
         return ERROR;
     }
     size_t size = hdfCompositeEffect.compositeEffects.size();
-    MISC_HILOGD("the count of match result:%{public}zu", size);
+    MISC_HILOGD("The count of match result:%{public}zu", size);
     for (size_t i = 0; i < size; ++i) {
-        MISC_HILOGD("match result at %{public}zu th, delay:%{public}d, effectId:%{public}d",
+        MISC_HILOGD("Match result at %{public}zu th, delay:%{public}d, effectId:%{public}d",
             i, hdfCompositeEffect.compositeEffects[i].primitiveEffect.delay,
             hdfCompositeEffect.compositeEffects[i].primitiveEffect.effectId);
     }
@@ -338,15 +338,15 @@ int32_t MiscdeviceService::StartCustomVibration(const RawFileDescriptor &rawFd, 
 int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, const RawFileDescriptor &rawFd, int32_t usage)
 {
     if (OHOS::system::GetDeviceType() != PHONE_TYPE) {
-        MISC_HILOGE("the device does not support this operation");
+        MISC_HILOGE("The device does not support this operation");
         return IS_NOT_SUPPORTED;
     }
     if ((usage >= USAGE_MAX) || (usage < 0)) {
-        MISC_HILOGE("invalid parameter, usage:%{public}d", usage);
+        MISC_HILOGE("Invalid parameter, usage:%{public}d", usage);
         return PARAMETER_ERROR;
     }
     if ((rawFd.fd < 0) || (rawFd.offset < 0) || (rawFd.length <= 0) || (rawFd.length > MAX_JSON_FILE_SIZE)) {
-        MISC_HILOGE("invalid file descriptor, fd:%{public}d, offset:%{public}" PRId64 ", length:%{public}" PRId64,
+        MISC_HILOGE("Invalid file descriptor, fd:%{public}d, offset:%{public}" PRId64 ", length:%{public}" PRId64,
             rawFd.fd, rawFd.offset, rawFd.length);
         return PARAMETER_ERROR;
     }
@@ -374,7 +374,7 @@ std::string MiscdeviceService::GetPackageName(AccessTokenID tokenId)
         case ATokenTypeEnum::TOKEN_HAP: {
             HapTokenInfo hapInfo;
             if (AccessTokenKit::GetHapTokenInfo(tokenId, hapInfo) != 0) {
-                MISC_HILOGE("get hap token info fail");
+                MISC_HILOGE("Get hap token info fail");
                 return {};
             }
             packageName = hapInfo.bundleName;
@@ -384,14 +384,14 @@ std::string MiscdeviceService::GetPackageName(AccessTokenID tokenId)
         case ATokenTypeEnum::TOKEN_SHELL: {
             NativeTokenInfo tokenInfo;
             if (AccessTokenKit::GetNativeTokenInfo(tokenId, tokenInfo) != 0) {
-                MISC_HILOGE("get native token info fail");
+                MISC_HILOGE("Get native token info fail");
                 return {};
             }
             packageName = tokenInfo.processName;
             break;
         }
         default: {
-            MISC_HILOGW("token type not match");
+            MISC_HILOGW("Token type not match");
             break;
         }
     }

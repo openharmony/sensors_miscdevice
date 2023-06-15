@@ -46,7 +46,7 @@ int32_t LightHdiConnection::ConnectHdiService()
     CHKPR(iLightHdiConnection_, ERROR);
     int32_t ret = iLightHdiConnection_->ConnectHdi();
     if (ret != ERR_OK) {
-        MISC_HILOGE("connect hdi service failed");
+        MISC_HILOGE("Connect hdi service failed");
         return LIGHT_HDF_CONNECT_ERR;
     }
     return iLightHdiConnection_->GetLightList(lightInfoList_);

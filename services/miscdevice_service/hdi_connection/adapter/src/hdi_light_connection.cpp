@@ -43,7 +43,7 @@ int32_t HdiLightConnection::ConnectHdi()
             return ERR_OK;
         }
         retry++;
-        MISC_HILOGW("connect hdi service failed, retry:%{public}d", retry);
+        MISC_HILOGW("Connect hdi service failed, retry:%{public}d", retry);
         std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_MS));
     }
     return ERR_INVALID_VALUE;
@@ -56,7 +56,7 @@ int32_t HdiLightConnection::GetLightList(std::vector<LightInfo> &lightList) cons
     CHKPR(lightInterface_, ERROR);
     int32_t ret = lightInterface_->GetLightInfo(lightInfos);
     if (ret != 0) {
-        MISC_HILOGE("get light info failed");
+        MISC_HILOGE("Get light info failed");
         return ret;
     }
     for (size_t i = 0; i < lightInfos.size(); ++i) {
@@ -66,7 +66,7 @@ int32_t HdiLightConnection::GetLightList(std::vector<LightInfo> &lightList) cons
         ret = memcpy_s(light.lightName, NAME_MAX_LEN, lightInfos[i].lightName.c_str(),
                        lightInfos[i].lightName.length());
         if (ret != EOK) {
-            MISC_HILOGE("memcpy_s failed, error number: %{public}d", errno);
+            MISC_HILOGE("memcpy_s failed, error number:%{public}d", errno);
             return ret;
         }
         light.lightType = lightInfos[i].lightType;
@@ -120,7 +120,7 @@ void HdiLightConnection::RegisterHdiDeathRecipient()
 {
     CALL_LOG_ENTER;
     if (lightInterface_ == nullptr) {
-        MISC_HILOGE("connect v1_0 hdi failed");
+        MISC_HILOGE("Connect v1_0 hdi failed");
         return;
     }
     hdiDeathObserver_ = new (std::nothrow) DeathRecipientTemplate(*const_cast<HdiLightConnection *>(this));
@@ -146,7 +146,7 @@ void HdiLightConnection::ProcessDeathObserver(const wptr<IRemoteObject> &object)
     CALL_LOG_ENTER;
     sptr<IRemoteObject> hdiService = object.promote();
     if (hdiService == nullptr || hdiDeathObserver_ == nullptr) {
-        MISC_HILOGE("invalid remote object or hdiDeathObserver_ is null");
+        MISC_HILOGE("Invalid remote object or hdiDeathObserver_ is null");
         return;
     }
     hdiService->RemoveDeathRecipient(hdiDeathObserver_);
@@ -156,7 +156,7 @@ void HdiLightConnection::ProcessDeathObserver(const wptr<IRemoteObject> &object)
 void HdiLightConnection::Reconnect()
 {
     if (ConnectHdi() != ERR_OK) {
-        MISC_HILOGE("connect hdi failed");
+        MISC_HILOGE("Connect hdi failed");
     }
 }
 }  // namespace Sensors
