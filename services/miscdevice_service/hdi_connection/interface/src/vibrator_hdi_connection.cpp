@@ -26,7 +26,7 @@ using namespace OHOS::HiviewDFX;
 
 namespace {
 constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "VibratorHdiConnection" };
-}
+} // namespace
 
 int32_t VibratorHdiConnection::ConnectHdi()
 {

@@ -24,7 +24,7 @@ namespace OHOS {
 namespace Sensors {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "CompatibleLightConnection" };
-}
+} // namespace
 std::vector<LightInfo> lightInfo = {
     {"light_test", 1, 3, 1}
 };

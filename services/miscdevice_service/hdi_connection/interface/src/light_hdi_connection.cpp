@@ -27,7 +27,7 @@ using namespace OHOS::HiviewDFX;
 
 namespace {
 constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "LightHdiConnection" };
-}
+} // namespace
 
 int32_t LightHdiConnection::ConnectHdi()
 {
