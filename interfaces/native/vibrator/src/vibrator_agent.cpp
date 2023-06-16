@@ -25,11 +25,13 @@ using OHOS::HiviewDFX::HiLog;
 using OHOS::HiviewDFX::HiLogLabel;
 using OHOS::Sensors::VibratorServiceClient;
 
-static const HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "VibratorNDK" };
-static const int32_t DEFAULT_VIBRATOR_ID = 123;
-static int32_t g_loopCount = 1;
-static int32_t g_usage = USAGE_UNKNOWN;
+namespace {
+constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "VibratorNDK" };
+constexpr int32_t DEFAULT_VIBRATOR_ID = 123;
+int32_t g_loopCount = 1;
+int32_t g_usage = USAGE_UNKNOWN;
 const std::string PHONE_TYPE = "phone";
+} // namespace
 
 static int32_t NormalizeErrCode(int32_t code)
 {
