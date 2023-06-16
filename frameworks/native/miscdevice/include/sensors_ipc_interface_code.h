@@ -20,7 +20,7 @@
 namespace OHOS {
 namespace Sensors {
 enum class MiscdeviceInterfaceCode {
-    VIBRATE,
+    VIBRATE = 0,
     PLAY_VIBRATOR_EFFECT,
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     PLAY_VIBRATOR_CUSTOM,
