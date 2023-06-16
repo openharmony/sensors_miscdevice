@@ -27,7 +27,6 @@ using OHOS::Sensors::VibratorServiceClient;
 
 namespace {
 constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "VibratorNDK" };
-constexpr int32_t DEFAULT_VIBRATOR_ID = 123;
 int32_t g_loopCount = 1;
 int32_t g_usage = USAGE_UNKNOWN;
 const std::string PHONE_TYPE = "phone";
