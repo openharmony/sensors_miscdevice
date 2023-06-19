@@ -55,7 +55,8 @@ int32_t MiscdeviceServiceProxy::Vibrate(int32_t vibratorId, int32_t timeOut, int
     CHKPR(remote, ERROR);
     MessageParcel reply;
     MessageOption option;
-    int32_t ret = remote->SendRequest(VIBRATE, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MiscdeviceInterfaceCode::VIBRATE),
+        data, reply, option);
     if (ret != NO_ERROR) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "Vibrate", "ERROR_CODE", ret);
@@ -79,7 +80,8 @@ int32_t MiscdeviceServiceProxy::StopVibrator(int32_t vibratorId)
     CHKPR(remote, ERROR);
     MessageParcel reply;
     MessageOption option;
-    int32_t ret = remote->SendRequest(STOP_VIBRATOR_ALL, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MiscdeviceInterfaceCode::STOP_VIBRATOR_ALL),
+        data, reply, option);
     if (ret != NO_ERROR) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "StopVibrator", "ERROR_CODE", ret);
@@ -116,7 +118,8 @@ int32_t MiscdeviceServiceProxy::PlayVibratorEffect(int32_t vibratorId, const std
     CHKPR(remote, ERROR);
     MessageParcel reply;
     MessageOption option;
-    int32_t ret = remote->SendRequest(PLAY_VIBRATOR_EFFECT, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MiscdeviceInterfaceCode::PLAY_VIBRATOR_EFFECT),
+        data, reply, option);
     if (ret != NO_ERROR) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "PlayVibratorEffect", "ERROR_CODE", ret);
@@ -144,7 +147,8 @@ int32_t MiscdeviceServiceProxy::StopVibrator(int32_t vibratorId, const std::stri
     CHKPR(remote, ERROR);
     MessageParcel reply;
     MessageOption option;
-    int32_t ret = remote->SendRequest(STOP_VIBRATOR_BY_MODE, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MiscdeviceInterfaceCode::STOP_VIBRATOR_BY_MODE),
+        data, reply, option);
     if (ret != NO_ERROR) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "StopVibrator", "ERROR_CODE", ret);
@@ -168,7 +172,8 @@ int32_t MiscdeviceServiceProxy::IsSupportEffect(const std::string &effect, bool 
     CHKPR(remote, ERROR);
     MessageParcel reply;
     MessageOption option;
-    int32_t ret = remote->SendRequest(IS_SUPPORT_EFFECT, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MiscdeviceInterfaceCode::IS_SUPPORT_EFFECT),
+        data, reply, option);
     if (ret != NO_ERROR) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "IsSupportEffect", "ERROR_CODE", ret);
@@ -214,7 +219,8 @@ int32_t MiscdeviceServiceProxy::PlayVibratorCustom(int32_t vibratorId, const Raw
     CHKPR(remote, ERROR);
     MessageParcel reply;
     MessageOption option;
-    int32_t ret = remote->SendRequest(PLAY_VIBRATOR_CUSTOM, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MiscdeviceInterfaceCode::PLAY_VIBRATOR_CUSTOM),
+        data, reply, option);
     if (ret != NO_ERROR) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "PlayVibratorCustom", "ERROR_CODE", ret);
@@ -239,7 +245,8 @@ std::vector<LightInfo> MiscdeviceServiceProxy::GetLightList()
     }
     MessageParcel reply;
     MessageOption option;
-    int32_t ret = remote->SendRequest(GET_LIGHT_LIST, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MiscdeviceInterfaceCode::GET_LIGHT_LIST),
+        data, reply, option);
     if (ret != NO_ERROR) {
         MISC_HILOGE("SendRequest failed, ret:%{public}d", ret);
         return lightInfos;
@@ -291,7 +298,8 @@ int32_t MiscdeviceServiceProxy::TurnOn(int32_t lightId, const LightColor &color,
     CHKPR(remote, ERROR);
     MessageParcel reply;
     MessageOption option;
-    int32_t ret = remote->SendRequest(TURN_ON, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MiscdeviceInterfaceCode::TURN_ON),
+        data, reply, option);
     if (ret != NO_ERROR) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "TurnOn", "ERROR_CODE", ret);
@@ -315,7 +323,8 @@ int32_t MiscdeviceServiceProxy::TurnOff(int32_t lightId)
     CHKPR(remote, ERROR);
     MessageParcel reply;
     MessageOption option;
-    int32_t ret = remote->SendRequest(TURN_OFF, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MiscdeviceInterfaceCode::TURN_OFF),
+        data, reply, option);
     if (ret != NO_ERROR) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "TurnOff", "ERROR_CODE", ret);

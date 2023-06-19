@@ -37,17 +37,26 @@ const std::string VIBRATE_PERMISSION = "ohos.permission.VIBRATE";
 
 MiscdeviceServiceStub::MiscdeviceServiceStub()
 {
-    baseFuncs_[VIBRATE] = &MiscdeviceServiceStub::VibrateStub;
-    baseFuncs_[PLAY_VIBRATOR_EFFECT] = &MiscdeviceServiceStub::PlayVibratorEffectStub;
+    baseFuncs_[static_cast<uint32_t>(MiscdeviceInterfaceCode::VIBRATE)] =
+        &MiscdeviceServiceStub::VibrateStub;
+    baseFuncs_[static_cast<uint32_t>(MiscdeviceInterfaceCode::PLAY_VIBRATOR_EFFECT)] =
+        &MiscdeviceServiceStub::PlayVibratorEffectStub;
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    baseFuncs_[PLAY_VIBRATOR_CUSTOM] = &MiscdeviceServiceStub::PlayVibratorCustomStub;
+    baseFuncs_[static_cast<uint32_t>(MiscdeviceInterfaceCode::PLAY_VIBRATOR_CUSTOM)] =
+        &MiscdeviceServiceStub::PlayVibratorCustomStub;
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    baseFuncs_[STOP_VIBRATOR_ALL] = &MiscdeviceServiceStub::StopVibratorAllStub;
-    baseFuncs_[STOP_VIBRATOR_BY_MODE] = &MiscdeviceServiceStub::StopVibratorByModeStub;
-    baseFuncs_[IS_SUPPORT_EFFECT] = &MiscdeviceServiceStub::IsSupportEffectStub;
-    baseFuncs_[GET_LIGHT_LIST] = &MiscdeviceServiceStub::GetLightListStub;
-    baseFuncs_[TURN_ON] = &MiscdeviceServiceStub::TurnOnStub;
-    baseFuncs_[TURN_OFF] = &MiscdeviceServiceStub::TurnOffStub;
+    baseFuncs_[static_cast<uint32_t>(MiscdeviceInterfaceCode::STOP_VIBRATOR_ALL)] =
+        &MiscdeviceServiceStub::StopVibratorAllStub;
+    baseFuncs_[static_cast<uint32_t>(MiscdeviceInterfaceCode::STOP_VIBRATOR_BY_MODE)] =
+        &MiscdeviceServiceStub::StopVibratorByModeStub;
+    baseFuncs_[static_cast<uint32_t>(MiscdeviceInterfaceCode::IS_SUPPORT_EFFECT)] =
+        &MiscdeviceServiceStub::IsSupportEffectStub;
+    baseFuncs_[static_cast<uint32_t>(MiscdeviceInterfaceCode::GET_LIGHT_LIST)] =
+        &MiscdeviceServiceStub::GetLightListStub;
+    baseFuncs_[static_cast<uint32_t>(MiscdeviceInterfaceCode::TURN_ON)] =
+        &MiscdeviceServiceStub::TurnOnStub;
+    baseFuncs_[static_cast<uint32_t>(MiscdeviceInterfaceCode::TURN_OFF)] =
+        &MiscdeviceServiceStub::TurnOffStub;
 }
 
 MiscdeviceServiceStub::~MiscdeviceServiceStub()
