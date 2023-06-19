@@ -36,7 +36,7 @@ ohos_shared_library("liblight_native") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
-    "hisyseventysevent",
+    "hisysevent:libhisysevent",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
   ]
