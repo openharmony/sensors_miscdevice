@@ -47,7 +47,7 @@ int32_t TurnOn(int32_t lightId, const LightColor &color, const LightAnimation &a
     auto &client = LightClient::GetInstance();
     int32_t ret = client.TurnOn(lightId, color, animation);
     if (ret != ERR_OK) {
-        MISC_HILOGE("TurnOn failed, lightId:%{public}d,ret:%{public}d ", lightId, ret);
+        MISC_HILOGE("TurnOn failed, lightId:%{public}d, ret:%{public}d ", lightId, ret);
         return ERROR;
     }
     return SUCCESS;
@@ -62,7 +62,7 @@ int32_t TurnOff(int32_t lightId)
     auto &client = LightClient::GetInstance();
     int32_t ret = client.TurnOff(lightId);
     if (ret != ERR_OK) {
-        MISC_HILOGE("TurnOff failed, lightId:%{public}d,ret:%{public}d", lightId, ret);
+        MISC_HILOGE("TurnOff failed, lightId:%{public}d, ret:%{public}d", lightId, ret);
         return ERROR;
     }
     return SUCCESS;

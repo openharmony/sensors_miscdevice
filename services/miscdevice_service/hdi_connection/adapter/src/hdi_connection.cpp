@@ -40,12 +40,12 @@ int32_t HdiConnection::ConnectHdi()
             return ERR_OK;
         }
         retry++;
-        MISC_HILOGW("connect hdi service failed, retry:%{public}d", retry);
+        MISC_HILOGW("Connect hdi service failed, retry:%{public}d", retry);
         std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_MS));
     }
     HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
         HiSysEvent::EventType::FAULT, "PKG_NAME", "ConnectHdi", "ERROR_CODE", VIBRATOR_HDF_CONNECT_ERR);
-    MISC_HILOGE("vibrator interface initialization failed");
+    MISC_HILOGE("Vibrator interface initialization failed");
     return ERR_INVALID_VALUE;
 }
 
@@ -109,7 +109,7 @@ bool HdiConnection::IsVibratorRunning()
 std::optional<HdfEffectInfo> HdiConnection::GetEffectInfo(const std::string &effect)
 {
     if (vibratorInterface_ == nullptr) {
-        MISC_HILOGE("connect v1_1 hdi failed");
+        MISC_HILOGE("Connect v1_1 hdi failed");
         return std::nullopt;
     }
     HdfEffectInfo effectInfo;
@@ -146,7 +146,7 @@ void HdiConnection::RegisterHdiDeathRecipient()
 {
     CALL_LOG_ENTER;
     if (vibratorInterface_ == nullptr) {
-        MISC_HILOGE("connect v1_1 hdi failed");
+        MISC_HILOGE("Connect v1_1 hdi failed");
         return;
     }
     hdiDeathObserver_ = new (std::nothrow) DeathRecipientTemplate(*const_cast<HdiConnection *>(this));
@@ -172,7 +172,7 @@ void HdiConnection::ProcessDeathObserver(const wptr<IRemoteObject> &object)
     CALL_LOG_ENTER;
     sptr<IRemoteObject> hdiService = object.promote();
     if (hdiService == nullptr || hdiDeathObserver_ == nullptr) {
-        MISC_HILOGE("invalid remote object or hdiDeathObserver_ is null");
+        MISC_HILOGE("Invalid remote object or hdiDeathObserver_ is null");
         return;
     }
     hdiService->RemoveDeathRecipient(hdiDeathObserver_);
@@ -185,7 +185,7 @@ void HdiConnection::Reconnect()
     if (ret != ERR_OK) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "Reconnect", "ERROR_CODE", ret);
-        MISC_HILOGE("connect hdi fail");
+        MISC_HILOGE("Connect hdi fail");
     }
 }
 }  // namespace Sensors

@@ -36,7 +36,7 @@ int32_t MiscdeviceServiceProxy::Vibrate(int32_t vibratorId, int32_t timeOut, int
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(MiscdeviceServiceProxy::GetDescriptor())) {
-        MISC_HILOGE("write descriptor failed");
+        MISC_HILOGE("Write descriptor failed");
         return WRITE_MSG_ERR;
     }
     if (!data.WriteInt32(vibratorId)) {
@@ -69,7 +69,7 @@ int32_t MiscdeviceServiceProxy::StopVibrator(int32_t vibratorId)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(MiscdeviceServiceProxy::GetDescriptor())) {
-        MISC_HILOGE("write descriptor failed");
+        MISC_HILOGE("Write descriptor failed");
         return WRITE_MSG_ERR;
     }
     if (!data.WriteInt32(vibratorId)) {
@@ -95,7 +95,7 @@ int32_t MiscdeviceServiceProxy::PlayVibratorEffect(int32_t vibratorId, const std
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(MiscdeviceServiceProxy::GetDescriptor())) {
-        MISC_HILOGE("write descriptor failed");
+        MISC_HILOGE("Write descriptor failed");
         return WRITE_MSG_ERR;
     }
     if (!data.WriteInt32(vibratorId)) {
@@ -132,7 +132,7 @@ int32_t MiscdeviceServiceProxy::StopVibrator(int32_t vibratorId, const std::stri
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(MiscdeviceServiceProxy::GetDescriptor())) {
-        MISC_HILOGE("write descriptor failed");
+        MISC_HILOGE("Write descriptor failed");
         return WRITE_MSG_ERR;
     }
     if (!data.WriteInt32(vibratorId)) {
@@ -161,7 +161,7 @@ int32_t MiscdeviceServiceProxy::IsSupportEffect(const std::string &effect, bool 
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(MiscdeviceServiceProxy::GetDescriptor())) {
-        MISC_HILOGE("write descriptor failed");
+        MISC_HILOGE("Write descriptor failed");
         return WRITE_MSG_ERR;
     }
     if (!data.WriteString(effect)) {
@@ -192,7 +192,7 @@ int32_t MiscdeviceServiceProxy::PlayVibratorCustom(int32_t vibratorId, const Raw
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(MiscdeviceServiceProxy::GetDescriptor())) {
-        MISC_HILOGE("write descriptor failed");
+        MISC_HILOGE("Write descriptor failed");
         return WRITE_MSG_ERR;
     }
     if (!data.WriteInt32(vibratorId)) {
@@ -279,7 +279,7 @@ int32_t MiscdeviceServiceProxy::TurnOn(int32_t lightId, const LightColor &color,
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(MiscdeviceServiceProxy::GetDescriptor())) {
-        MISC_HILOGE("write descriptor failed");
+        MISC_HILOGE("Write descriptor failed");
         return WRITE_MSG_ERR;
     }
     if (!data.WriteInt32(lightId)) {
@@ -312,7 +312,7 @@ int32_t MiscdeviceServiceProxy::TurnOff(int32_t lightId)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(MiscdeviceServiceProxy::GetDescriptor())) {
-        MISC_HILOGE("write descriptor failed");
+        MISC_HILOGE("Write descriptor failed");
         return WRITE_MSG_ERR;
     }
     if (!data.WriteInt32(lightId)) {

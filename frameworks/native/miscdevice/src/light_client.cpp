@@ -169,7 +169,7 @@ int32_t LightClient::ConvertLightInfos()
 {
     CALL_LOG_ENTER;
     if (lightInfoList_.empty()) {
-        MISC_HILOGE("get light lists failed");
+        MISC_HILOGE("Get light lists failed");
         return ERROR;
     }
     size_t count = lightInfoList_.size();

@@ -71,7 +71,7 @@ int32_t MiscdeviceServiceStub::VibrateStub(MessageParcel &data, MessageParcel &r
     if (ret != PERMISSION_GRANTED) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
             HiSysEvent::EventType::SECURITY, "PKG_NAME", "VibrateStub", "ERROR_CODE", ret);
-        MISC_HILOGE("result: %{public}d", ret);
+        MISC_HILOGE("Result:%{public}d", ret);
         return PERMISSION_DENIED;
     }
     int32_t vibratorId;
@@ -91,7 +91,7 @@ int32_t MiscdeviceServiceStub::StopVibratorAllStub(MessageParcel &data, MessageP
     if (ret != PERMISSION_GRANTED) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
             HiSysEvent::EventType::SECURITY, "PKG_NAME", "StopVibratorStub", "ERROR_CODE", ret);
-        MISC_HILOGE("result:%{public}d", ret);
+        MISC_HILOGE("Result:%{public}d", ret);
         return PERMISSION_DENIED;
     }
     int32_t vibratorId;
@@ -109,7 +109,7 @@ int32_t MiscdeviceServiceStub::PlayVibratorEffectStub(MessageParcel &data, Messa
     if (ret != PERMISSION_GRANTED) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
             HiSysEvent::EventType::SECURITY, "PKG_NAME", "PlayVibratorEffectStub", "ERROR_CODE", ret);
-        MISC_HILOGE("result:%{public}d", ret);
+        MISC_HILOGE("Result:%{public}d", ret);
         return PERMISSION_DENIED;
     }
     int32_t vibratorId;
@@ -131,7 +131,7 @@ int32_t MiscdeviceServiceStub::StopVibratorByModeStub(MessageParcel &data, Messa
     if (ret != PERMISSION_GRANTED) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
             HiSysEvent::EventType::SECURITY, "PKG_NAME", "StopVibratorByModeStub", "ERROR_CODE", ret);
-        MISC_HILOGE("result:%{public}d", ret);
+        MISC_HILOGE("Result:%{public}d", ret);
         return PERMISSION_DENIED;
     }
     int32_t vibratorId;
@@ -256,11 +256,11 @@ int32_t MiscdeviceServiceStub::TurnOffStub(MessageParcel &data, MessageParcel &r
 int32_t MiscdeviceServiceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
                                                MessageOption &option)
 {
-    MISC_HILOGD("remoterequest begin, cmd:%{public}u", code);
+    MISC_HILOGD("Remoterequest begin, cmd:%{public}u", code);
     std::u16string descriptor = MiscdeviceServiceStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {
-        MISC_HILOGE("client and service descriptors are inconsistent");
+        MISC_HILOGE("Client and service descriptors are inconsistent");
         return OBJECT_NULL;
     }
     auto itFunc = baseFuncs_.find(code);

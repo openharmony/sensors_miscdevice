@@ -33,12 +33,12 @@ int32_t VibratorHdiConnection::ConnectHdi()
     iVibratorHdiConnection_ = std::make_unique<HdiConnection>();
     int32_t ret = iVibratorHdiConnection_->ConnectHdi();
     if (ret != ERR_OK) {
-        MISC_HILOGE("hdi direct failed");
+        MISC_HILOGE("Hdi direct failed");
         iVibratorHdiConnection_ = std::make_unique<CompatibleConnection>();
         ret = iVibratorHdiConnection_->ConnectHdi();
     }
     if (ret != ERR_OK) {
-        MISC_HILOGE("hdi connection failed");
+        MISC_HILOGE("Hdi connection failed");
         return VIBRATOR_HDF_CONNECT_ERR;
     }
     return ERR_OK;
@@ -94,7 +94,7 @@ bool VibratorHdiConnection::IsVibratorRunning()
 std::optional<HdfEffectInfo> VibratorHdiConnection::GetEffectInfo(const std::string &effect)
 {
     if (iVibratorHdiConnection_ == nullptr) {
-        MISC_HILOGE("connect hdi failed");
+        MISC_HILOGE("Connect hdi failed");
         return std::nullopt;
     }
     StartTrace(HITRACE_TAG_SENSORS, "GetEffectInfo");

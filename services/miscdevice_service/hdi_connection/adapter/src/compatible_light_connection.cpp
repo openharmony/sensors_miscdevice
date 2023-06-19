@@ -47,7 +47,7 @@ int32_t CompatibleLightConnection::TurnOn(int32_t lightId,  const LightColor &co
 {
     CALL_LOG_ENTER;
     if (std::find(supportLights.begin(), supportLights.end(), lightId) == supportLights.end()) {
-        MISC_HILOGE("not support TurnOn lightId:%{public}d", lightId);
+        MISC_HILOGE("Not support TurnOn lightId:%{public}d", lightId);
         return LIGHT_ID_NOT_SUPPORT;
     }
     if ((animation.mode == LIGHT_MODE_BLINK || animation.mode == LIGHT_MODE_GRADIENT) &&
@@ -67,7 +67,7 @@ int32_t CompatibleLightConnection::TurnOff(int32_t lightId)
 {
     CALL_LOG_ENTER;
     if (std::find(supportLights.begin(), supportLights.end(), lightId) == supportLights.end()) {
-        MISC_HILOGE("not support TurnOff lightId:%{public}d", lightId);
+        MISC_HILOGE("Not support TurnOff lightId:%{public}d", lightId);
         return LIGHT_ID_NOT_SUPPORT;
     }
     if (std::find(turnOnLights_.begin(), turnOnLights_.end(), lightId) == turnOnLights_.end()) {

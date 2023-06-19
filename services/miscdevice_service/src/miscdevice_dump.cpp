@@ -67,7 +67,7 @@ void MiscdeviceDump::ParseCommand(int32_t fd, const std::vector<std::string>& ar
         }
     }
     if (count > MAX_DUMP_PARAMETERS) {
-        MISC_HILOGE("cmd param number not more than 32");
+        MISC_HILOGE("Cmd param number not more than 32");
         dprintf(fd, "cmd param number not more than 32\n");
         return;
     }
@@ -87,7 +87,7 @@ void MiscdeviceDump::ParseCommand(int32_t fd, const std::vector<std::string>& ar
     for (size_t i = 0; i < args.size(); ++i) {
         argv[i] = new (std::nothrow) char[args[i].size() + 1];
         if (argv[i] == nullptr) {
-            MISC_HILOGE("alloc failure");
+            MISC_HILOGE("Alloc failure");
             goto RELEASE_RES;
         }
         if (strcpy_s(argv[i], args[i].size() + 1, args[i].c_str()) != EOK) {
@@ -192,7 +192,7 @@ std::string MiscdeviceDump::GetUsageName(int32_t usage)
 {
     auto it = usageMap_.find(usage);
     if (it == usageMap_.end()) {
-        MISC_HILOGE("usage: %{public}d is invalid", usage);
+        MISC_HILOGE("Usage:%{public}d is invalid", usage);
         return {};
     }
     return it->second;

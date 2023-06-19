@@ -41,13 +41,13 @@ std::set<VibrateEvent> DefaultVibratorDecoder::DecodeEffect(const RawFileDescrip
     JsonParser parser(rawFd);
     int32_t ret = CheckMetadata(parser);
     if (ret != SUCCESS) {
-        MISC_HILOGE("check metadata fail");
+        MISC_HILOGE("Check metadata fail");
         return {};
     }
     std::set<VibrateEvent> vibrateSet;
     ret = ParseChannel(parser, vibrateSet);
     if (ret != SUCCESS) {
-        MISC_HILOGE("parse channel fail");
+        MISC_HILOGE("Parse channel fail");
         return {};
     }
     return vibrateSet;
@@ -61,14 +61,14 @@ int32_t DefaultVibratorDecoder::CheckMetadata(const JsonParser &parser)
     CHKPR(version, ERROR);
     version_ = version->valuedouble;
     if (version_ != SUPPORT_JSON_VERSION) {
-        MISC_HILOGE("json file version is not supported, version:%{public}f", version_);
+        MISC_HILOGE("Json file version is not supported, version:%{public}f", version_);
         return ERROR;
     }
     cJSON* channelNumber = parser.GetObjectItem(metadata, "ChannelNumber");
     CHKPR(channelNumber, ERROR);
     channelNumber_ = channelNumber->valueint;
     if (channelNumber_ != SUPPORT_CHANNEL_NUMBER) {
-        MISC_HILOGE("json file channelNumber is not supported, channelNumber:%{public}d", channelNumber_);
+        MISC_HILOGE("Json file channelNumber is not supported, channelNumber:%{public}d", channelNumber_);
         return ERROR;
     }
     return SUCCESS;
@@ -183,20 +183,20 @@ int32_t DefaultVibratorDecoder::ParseEvent(const JsonParser &parser, cJSON *even
 bool DefaultVibratorDecoder::CheckParameters(const VibrateEvent &vibrateEvent)
 {
     if (vibrateEvent.startTime < STARTTMIE_MIN || vibrateEvent.startTime > STARTTMIE_MAX) {
-        MISC_HILOGE("the event startTime is out of range, startTime:%{public}d", vibrateEvent.startTime);
+        MISC_HILOGE("The event startTime is out of range, startTime:%{public}d", vibrateEvent.startTime);
         return false;
     }
     if (vibrateEvent.duration <= CONTINUOUS_VIBRATION_DURATION_MIN ||
         vibrateEvent.duration >= CONTINUOUS_VIBRATION_DURATION_MAX) {
-        MISC_HILOGE("the event duration is out of range, duration:%{public}d", vibrateEvent.duration);
+        MISC_HILOGE("The event duration is out of range, duration:%{public}d", vibrateEvent.duration);
         return false;
     }
     if (vibrateEvent.intensity < INTENSITY_MIN || vibrateEvent.intensity > INTENSITY_MAX) {
-        MISC_HILOGE("the event intensity is out of range, intensity:%{public}d", vibrateEvent.intensity);
+        MISC_HILOGE("The event intensity is out of range, intensity:%{public}d", vibrateEvent.intensity);
         return false;
     }
     if (vibrateEvent.frequency < FREQUENCY_MIN || vibrateEvent.frequency > FREQUENCY_MAX) {
-        MISC_HILOGE("the event frequency is out of range, frequency:%{public}d", vibrateEvent.frequency);
+        MISC_HILOGE("The event frequency is out of range, frequency:%{public}d", vibrateEvent.frequency);
         return false;
     }
     return true;

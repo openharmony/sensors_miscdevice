@@ -90,7 +90,7 @@ int64_t GetFileSize(int32_t fd)
 bool CheckFileDir(const std::string& filePath, const std::string& dir)
 {
     if (filePath.compare(0, CONFIG_DIR.size(), CONFIG_DIR) != 0) {
-        MISC_HILOGE("FilePath dir is invalid");
+        MISC_HILOGE("filePath dir is invalid");
         return false;
     }
     return true;
@@ -156,7 +156,7 @@ std::string ReadFd(const RawFileDescriptor &rawFd)
     if (fseek(fp, rawFd.offset, SEEK_SET) != 0) {
         MISC_HILOGE("fseek failed, errno:%{public}d", errno);
         if (fclose(fp) != 0) {
-            MISC_HILOGW("close file failed, errno:%{public}d", errno);
+            MISC_HILOGW("Close file failed, errno:%{public}d", errno);
         }
         return {};
     }
@@ -170,7 +170,7 @@ std::string ReadFd(const RawFileDescriptor &rawFd)
         alreadyRead = ftell(fp) - rawFd.offset;
     }
     if (fclose(fp) != 0) {
-        MISC_HILOGW("close file failed after read, errno:%{public}d", errno);
+        MISC_HILOGW("Close file failed after read, errno:%{public}d", errno);
     }
     return dataStr;
 }
@@ -181,13 +181,13 @@ std::string GetFileSuffix(int32_t fd)
     char filePath[FILE_PATH_MAX + 1] = { '\0' };
     ssize_t ret = readlink(fdPath.c_str(), filePath, FILE_PATH_MAX);
     if (ret < 0 || ret > FILE_PATH_MAX) {
-        MISC_HILOGE("readlink failed, errno:%{public}d", errno);
+        MISC_HILOGE("Readlink failed, errno:%{public}d", errno);
         return {};
     }
     std::string fileAbsolutePath(filePath);
     size_t pos = fileAbsolutePath.find_last_of('.');
     if (pos == std::string::npos) {
-        MISC_HILOGE("file suffix is invalid, fileAbsolutePath:%{public}s", fileAbsolutePath.c_str());
+        MISC_HILOGE("File suffix is invalid, fileAbsolutePath:%{public}s", fileAbsolutePath.c_str());
         return {};
     }
     return fileAbsolutePath.substr(pos + 1);

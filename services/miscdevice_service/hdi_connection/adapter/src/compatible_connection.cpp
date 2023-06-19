@@ -123,15 +123,15 @@ int32_t CompatibleConnection::Stop(HdfVibratorMode mode)
 {
     CALL_LOG_ENTER;
     if (mode < 0 || mode >= HDF_VIBRATOR_MODE_BUTT) {
-        MISC_HILOGE("invalid mode:%{public}d", mode);
+        MISC_HILOGE("Invalid mode:%{public}d", mode);
         return VIBRATOR_OFF_ERR;
     }
     if (vibrateMode_ != mode) {
-        MISC_HILOGE("should start vibrate first");
+        MISC_HILOGE("Should start vibrate first");
         return VIBRATOR_OFF_ERR;
     }
     if (vibrateThread_.joinable()) {
-        MISC_HILOGI("stop vibrate thread");
+        MISC_HILOGI("Stop vibrate thread");
         isStop_ = true;
         vibrateThread_.join();
     }
@@ -150,7 +150,7 @@ void CompatibleConnection::VibrateProcess()
     clock_t vibrateStartTime = clock();
     while (clock() - vibrateStartTime < duration_) {
         if (isStop_) {
-            MISC_HILOGI("thread should stop");
+            MISC_HILOGI("Thread should stop");
             break;
         }
     }

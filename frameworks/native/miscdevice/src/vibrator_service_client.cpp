@@ -52,7 +52,7 @@ int32_t VibratorServiceClient::InitServiceClient()
     while (retry < GET_SERVICE_MAX_COUNT) {
         miscdeviceProxy_ = iface_cast<IMiscdeviceService>(sm->GetSystemAbility(MISCDEVICE_SERVICE_ABILITY_ID));
         if (miscdeviceProxy_ != nullptr) {
-            MISC_HILOGD("get service success, retry:%{public}d", retry);
+            MISC_HILOGD("Get service success, retry:%{public}d", retry);
             serviceDeathObserver_ =
                 new (std::nothrow) DeathRecipientTemplate(*const_cast<VibratorServiceClient *>(this));
             if (serviceDeathObserver_ != nullptr) {
@@ -60,13 +60,13 @@ int32_t VibratorServiceClient::InitServiceClient()
             }
             return ERR_OK;
         }
-        MISC_HILOGW("get service failed, retry:%{public}d", retry);
+        MISC_HILOGW("Get service failed, retry:%{public}d", retry);
         std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_MS));
         retry++;
     }
     HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_EXCEPTION",
         HiSysEvent::EventType::FAULT, "PKG_NAME", "InitServiceClient", "ERROR_CODE", MISC_NATIVE_GET_SERVICE_ERR);
-    MISC_HILOGE("get service failed");
+    MISC_HILOGE("Get service failed");
     return MISC_NATIVE_GET_SERVICE_ERR;
 }
 

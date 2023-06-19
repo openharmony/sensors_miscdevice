@@ -54,7 +54,7 @@ HWTEST_F(LightAgentTest, StartLightTest_001, TestSize.Level1)
     int32_t count = -1;
     int32_t ret = GetLightList(&g_lightInfo, count);
     for (int32_t i = 0; i < count; ++i) {
-        MISC_HILOGI("lightId: %{public}d, lightName: %{public}s, lightNumber: %{public}d, lightType: %{public}d",
+        MISC_HILOGI("lightId:%{public}d, lightName:%{public}s, lightNumber:%{public}d, lightType:%{public}d",
             g_lightInfo[i].lightId, g_lightInfo[i].lightName, g_lightInfo[i].lightNumber, g_lightInfo[i].lightType);
         g_lightId = g_lightInfo[i].lightId;
         g_lightType = g_lightInfo[i].lightType;
@@ -101,7 +101,7 @@ bool GetLightColor(LightColor &color, int32_t lightType)
             return true;
         }
         default: {
-            MISC_HILOGE("lightType: %{public}d invalid", lightType);
+            MISC_HILOGE("lightType:%{public}d invalid", lightType);
             return false;
         }
     }
