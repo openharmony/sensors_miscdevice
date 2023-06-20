@@ -27,7 +27,7 @@ namespace {
 constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "HdiConnection" };
 constexpr int32_t GET_HDI_SERVICE_COUNT = 10;
 constexpr uint32_t WAIT_MS = 100;
-}
+} // namespace
 
 int32_t HdiConnection::ConnectHdi()
 {

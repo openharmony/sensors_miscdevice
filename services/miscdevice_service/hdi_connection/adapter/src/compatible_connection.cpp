@@ -31,7 +31,7 @@ std::unordered_map<std::string, int32_t> vibratorEffect_ = {
     {"haptic.default.effect", 804}
 };
 HdfVibratorMode vibrateMode_;
-}
+} // namespace
 int32_t CompatibleConnection::duration_ = 0;
 std::atomic_bool CompatibleConnection::isStop_ = false;
 
