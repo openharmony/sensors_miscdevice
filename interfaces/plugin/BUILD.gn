@@ -39,7 +39,7 @@ ohos_shared_library("vibrator") {
 
   external_deps = [
     "c_utils:utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "napi:ace_napi",
   ]
   relative_install_dir = "module"
