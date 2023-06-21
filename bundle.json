@@ -9,7 +9,7 @@
   "component": {
     "name": "miscdevice",
     "subsystem": "sensors",
-    "syscap": ["SystemCapability.Sensors.MiscDevice"],
+    "syscap": ["SystemCapability.Sensors.MiscDevice", "SystemCapability.Sensors.MiscDevice.Lite"],
     "features": [
       "miscdevice_feature_vibrator_custom"
     ],
