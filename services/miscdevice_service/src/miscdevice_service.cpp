@@ -109,7 +109,7 @@ void MiscdeviceService::OnStartFuzz()
 {
     CALL_LOG_ENTER;
     if (state_ == MiscdeviceServiceState::STATE_RUNNING) {
-        MISC_HILOGW("state_ already started");
+        MISC_HILOGD("state_ already started");
         return;
     }
     if (!InitInterface()) {
