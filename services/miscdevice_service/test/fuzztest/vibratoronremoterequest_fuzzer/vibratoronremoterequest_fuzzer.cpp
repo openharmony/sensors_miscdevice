@@ -51,7 +51,7 @@ void SetUpTestCase()
     if (perms == nullptr) {
         return;
     }
-    if(sizeof(perms) / sizeof(perms[0]) < 1) {
+    if (sizeof(perms) / sizeof(perms[0]) < 1) {
         return;
     }
     perms[0] = "ohos.permission.VIBRATE";
