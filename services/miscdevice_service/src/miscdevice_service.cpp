@@ -105,6 +105,34 @@ void MiscdeviceService::OnStart()
     state_ = MiscdeviceServiceState::STATE_RUNNING;
 }
 
+void MiscdeviceService::OnStartFuzz()
+{
+    CALL_LOG_ENTER;
+    if (state_ == MiscdeviceServiceState::STATE_RUNNING) {
+        MISC_HILOGD("state_ already started");
+        return;
+    }
+    if (!InitInterface()) {
+        MISC_HILOGE("Init interface error");
+        return;
+    }
+    if (!InitLightInterface()) {
+        MISC_HILOGE("InitLightInterface failed");
+        return;
+    }
+    auto ret = miscDeviceIdMap_.insert(std::make_pair(MiscdeviceDeviceId::LED, lightExist_));
+    if (!ret.second) {
+        MISC_HILOGI("Light exist in miscDeviceIdMap_");
+        ret.first->second = lightExist_;
+    }
+    ret = miscDeviceIdMap_.insert(std::make_pair(MiscdeviceDeviceId::VIBRATOR, vibratorExist_));
+    if (!ret.second) {
+        MISC_HILOGI("Vibrator exist in miscDeviceIdMap_");
+        ret.first->second = vibratorExist_;
+    }
+    state_ = MiscdeviceServiceState::STATE_RUNNING;
+}
+
 bool MiscdeviceService::InitInterface()
 {
     auto ret = vibratorHdiConnection_.ConnectHdi();

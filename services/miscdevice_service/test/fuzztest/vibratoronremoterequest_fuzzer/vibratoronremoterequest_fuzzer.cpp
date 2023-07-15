@@ -19,35 +19,75 @@
 #include <cstdint>
 #include <iostream>
 
+#include "accesstoken_kit.h"
 #include "message_parcel.h"
+#include "nativetoken_kit.h"
+#include "securec.h"
+#include "token_setproc.h"
+
 #include "miscdevice_service.h"
 #include "securec.h"
 
 namespace OHOS {
 namespace Sensors {
+using namespace Security::AccessToken;
+using Security::AccessToken::AccessTokenID;
 namespace {
 constexpr size_t FOO_MAX_LEN = 1024;
 constexpr size_t U32_AT_SIZE = 4;
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+constexpr uint32_t IPC_CODE_COUNT = 9;
+#else
+constexpr uint32_t IPC_CODE_COUNT = 8;
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 std::shared_ptr<MiscdeviceService> miscdeviceServicePtr =
                             std::make_shared<MiscdeviceService>(3602, false);
 const std::u16string VIBRATOR_INTERFACE_TOKEN = u"IMiscdeviceService";
 }
 
+void SetUpTestCase()
+{
+    const char **perms = new (std::nothrow) const char *[1];
+    if (perms == nullptr) {
+        return;
+    }
+    if (sizeof(perms) / sizeof(perms[0]) < 1) {
+        return;
+    }
+    perms[0] = "ohos.permission.VIBRATE";
+    TokenInfoParams infoInstance = {
+        .dcapsNum = 0,
+        .permsNum = 1,
+        .aclsNum = 0,
+        .dcaps = nullptr,
+        .perms = perms,
+        .acls = nullptr,
+        .processName = "VibratorOnRemoteRequestFuzzTest",
+        .aplStr = "system_core",
+    };
+    uint64_t tokenId = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(tokenId);
+    AccessTokenKit::ReloadNativeTokenInfo();
+    delete[] perms;
+}
+
 uint32_t GetU32Data(const char* ptr)
 {
     // convert fuzz input data to an integer
-    return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | ptr[3];
+    return ((ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | ptr[3]) % IPC_CODE_COUNT;
 }
 
 bool OnRemoteRequestFuzzTest(const char* data, size_t size)
 {
+    SetUpTestCase();
     uint32_t code = GetU32Data(data);
     MessageParcel datas;
     datas.WriteInterfaceToken(VIBRATOR_INTERFACE_TOKEN);
-    datas.WriteBuffer(data, size);
+    datas.WriteBuffer(data + U32_AT_SIZE, size - U32_AT_SIZE);
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
+    miscdeviceServicePtr->OnStartFuzz();
     miscdeviceServicePtr->OnRemoteRequest(code, datas, reply, option);
     return true;
 }
