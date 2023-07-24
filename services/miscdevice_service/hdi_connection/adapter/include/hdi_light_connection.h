@@ -36,7 +36,7 @@ public:
 
 private:
     DISALLOW_COPY_AND_MOVE(HdiLightConnection);
-    sptr<IRemoteObject::DeathRecipient> hdiDeathObserver_;
+    sptr<IRemoteObject::DeathRecipient> hdiDeathObserver_ = nullptr;
     sptr<ILightInterface> lightInterface_ = nullptr;
     void RegisterHdiDeathRecipient();
     void UnregisterHdiDeathRecipient();

@@ -43,7 +43,7 @@ public:
 private:
     DISALLOW_COPY_AND_MOVE(HdiConnection);
     sptr<IVibratorInterface> vibratorInterface_ = nullptr;
-    sptr<IRemoteObject::DeathRecipient> hdiDeathObserver_;
+    sptr<IRemoteObject::DeathRecipient> hdiDeathObserver_ = nullptr;
     void RegisterHdiDeathRecipient();
     void UnregisterHdiDeathRecipient();
     void Reconnect();

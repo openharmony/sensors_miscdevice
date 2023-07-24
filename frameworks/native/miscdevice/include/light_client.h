@@ -26,6 +26,7 @@ namespace OHOS {
 namespace Sensors {
 class LightClient : public Singleton<LightClient> {
 public:
+    ~LightClient() override;
     int32_t GetLightList(LightInfo **lightInfo, int32_t &count);
     int32_t TurnOn(int32_t lightId, const LightColor &color, const LightAnimation &animation);
     int32_t TurnOff(int32_t lightId);
