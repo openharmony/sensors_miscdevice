@@ -26,11 +26,11 @@ namespace Sensors {
 using namespace OHOS::HiviewDFX;
 namespace {
 constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "CompatibleConnection" };
-std::unordered_map<std::string, int32_t> vibratorEffect_ = {
+std::unordered_map<std::string, int32_t> g_vibratorEffect = {
     {"haptic.clock.timer", 2000},
     {"haptic.default.effect", 804}
 };
-HdfVibratorMode vibrateMode_;
+HdfVibratorMode g_vibrateMode;
 } // namespace
 int32_t CompatibleConnection::duration_ = 0;
 std::atomic_bool CompatibleConnection::isStop_ = false;
@@ -50,24 +50,24 @@ int32_t CompatibleConnection::StartOnce(uint32_t duration)
         vibrateThread_ = std::move(senocdDataThread);
         isStop_ = false;
     }
-    vibrateMode_ = HDF_VIBRATOR_MODE_ONCE;
+    g_vibrateMode = HDF_VIBRATOR_MODE_ONCE;
     return ERR_OK;
 }
 
 int32_t CompatibleConnection::Start(const std::string &effectType)
 {
     CALL_LOG_ENTER;
-    if (vibratorEffect_.find(effectType) == vibratorEffect_.end()) {
+    if (g_vibratorEffect.find(effectType) == g_vibratorEffect.end()) {
         MISC_HILOGE("Do not support effectType:%{public}s", effectType.c_str());
         return VIBRATOR_ON_ERR;
     }
-    duration_ = vibratorEffect_[effectType];
+    duration_ = g_vibratorEffect[effectType];
     if (!vibrateThread_.joinable()) {
         std::thread senocdDataThread(CompatibleConnection::VibrateProcess);
         vibrateThread_ = std::move(senocdDataThread);
         isStop_ = false;
     }
-    vibrateMode_ = HDF_VIBRATOR_MODE_PRESET;
+    g_vibrateMode = HDF_VIBRATOR_MODE_PRESET;
     return ERR_OK;
 }
 
@@ -93,7 +93,7 @@ int32_t CompatibleConnection::EnableCompositeEffect(const HdfCompositeEffect &hd
         vibrateThread_ = std::move(senocdDataThread);
         isStop_ = false;
     }
-    vibrateMode_ = HDF_VIBRATOR_MODE_PRESET;
+    g_vibrateMode = HDF_VIBRATOR_MODE_PRESET;
     return ERR_OK;
 }
 
@@ -108,14 +108,14 @@ std::optional<HdfEffectInfo> CompatibleConnection::GetEffectInfo(const std::stri
 {
     CALL_LOG_ENTER;
     HdfEffectInfo effectInfo;
-    if (vibratorEffect_.find(effect) == vibratorEffect_.end()) {
+    if (g_vibratorEffect.find(effect) == g_vibratorEffect.end()) {
         MISC_HILOGI("Not support effect:%{public}s", effect.c_str());
         effectInfo.isSupportEffect = false;
         effectInfo.duration = 0;
         return effectInfo;
     }
     effectInfo.isSupportEffect = true;
-    effectInfo.duration = vibratorEffect_[effect];
+    effectInfo.duration = g_vibratorEffect[effect];
     return effectInfo;
 }
 
@@ -126,7 +126,7 @@ int32_t CompatibleConnection::Stop(HdfVibratorMode mode)
         MISC_HILOGE("Invalid mode:%{public}d", mode);
         return VIBRATOR_OFF_ERR;
     }
-    if (vibrateMode_ != mode) {
+    if (g_vibrateMode != mode) {
         MISC_HILOGE("Should start vibrate first");
         return VIBRATOR_OFF_ERR;
     }
