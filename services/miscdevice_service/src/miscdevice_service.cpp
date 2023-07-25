@@ -36,9 +36,10 @@
 namespace OHOS {
 namespace Sensors {
 using namespace OHOS::HiviewDFX;
-
 namespace {
 constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "MiscdeviceService" };
+auto g_miscdeviceService = MiscdeviceDelayedSpSingleton<MiscdeviceService>::GetInstance();
+const bool G_REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(g_miscdeviceService.GetRefPtr());
 constexpr int32_t MIN_VIBRATOR_TIME = 0;
 constexpr int32_t MAX_VIBRATOR_TIME = 1800000;
 
@@ -48,15 +49,15 @@ const std::string PHONE_TYPE = "phone";
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 }  // namespace
 
-REGISTER_SYSTEM_ABILITY_BY_ID(MiscdeviceService, MISCDEVICE_SERVICE_ABILITY_ID, true);
-
-MiscdeviceService::MiscdeviceService(int32_t systemAbilityId, bool runOnCreate)
-    : SystemAbility(systemAbilityId, runOnCreate),
+MiscdeviceService::MiscdeviceService()
+    : SystemAbility(MISCDEVICE_SERVICE_ABILITY_ID, true),
       lightExist_(false),
       vibratorExist_(false),
       state_(MiscdeviceServiceState::STATE_STOPPED),
       vibratorThread_(nullptr)
-{}
+{
+    MISC_HILOGD("Add SystemAbility");
+}
 
 MiscdeviceService::~MiscdeviceService()
 {
@@ -88,7 +89,7 @@ void MiscdeviceService::OnStart()
         MISC_HILOGE("InitLightInterface failed");
         return;
     }
-    if (!SystemAbility::Publish(this)) {
+    if (!SystemAbility::Publish(MiscdeviceDelayedSpSingleton<MiscdeviceService>::GetInstance())) {
         MISC_HILOGE("Publish MiscdeviceService failed");
         return;
     }
