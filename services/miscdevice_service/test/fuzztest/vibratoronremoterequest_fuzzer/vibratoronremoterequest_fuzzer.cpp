@@ -40,8 +40,7 @@ constexpr uint32_t IPC_CODE_COUNT = 9;
 #else
 constexpr uint32_t IPC_CODE_COUNT = 8;
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-std::shared_ptr<MiscdeviceService> miscdeviceServicePtr =
-                            std::make_shared<MiscdeviceService>(3602, false);
+auto g_miscdeviceService = MiscdeviceDelayedSpSingleton<MiscdeviceService>::GetInstance();
 const std::u16string VIBRATOR_INTERFACE_TOKEN = u"IMiscdeviceService";
 }
 
@@ -87,8 +86,8 @@ bool OnRemoteRequestFuzzTest(const char* data, size_t size)
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
-    miscdeviceServicePtr->OnStartFuzz();
-    miscdeviceServicePtr->OnRemoteRequest(code, datas, reply, option);
+    g_miscdeviceService->OnStartFuzz();
+    g_miscdeviceService->OnRemoteRequest(code, datas, reply, option);
     return true;
 }
 }  // namespace Sensors

@@ -32,6 +32,7 @@
 #include "json_parser.h"
 #include "light_hdi_connection.h"
 #include "miscdevice_common.h"
+#include "miscdevice_delayed_sp_singleton.h"
 #include "miscdevice_dump.h"
 #include "miscdevice_service_stub.h"
 #include "vibrator_hdi_connection.h"
@@ -48,9 +49,9 @@ enum class MiscdeviceServiceState {
 
 class MiscdeviceService : public SystemAbility, public MiscdeviceServiceStub {
     DECLARE_SYSTEM_ABILITY(MiscdeviceService)
+    MISCDEVICE_DECLARE_DELAYED_SP_SINGLETON(MiscdeviceService);
+
 public:
-    explicit MiscdeviceService(int32_t systemAbilityId, bool runOnCreate = false);
-    ~MiscdeviceService();
     void OnDump() override;
     void OnStart() override;
     void OnStop() override;
