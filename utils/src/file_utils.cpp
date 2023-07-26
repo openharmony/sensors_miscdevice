@@ -52,11 +52,11 @@ std::string ReadJsonFile(const std::string &filePath)
         MISC_HILOGE("Unable to parse files other than json format");
         return {};
     }
-    if (!IsFileExists(filePath)) {
+    if (!IsFileExists(realPath)) {
         MISC_HILOGE("File not exist");
         return {};
     }
-    if (!CheckFileSize(filePath)) {
+    if (!CheckFileSize(realPath)) {
         MISC_HILOGE("File size out of read range");
         return {};
     }
