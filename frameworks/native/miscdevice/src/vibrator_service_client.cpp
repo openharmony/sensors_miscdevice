@@ -66,7 +66,9 @@ int32_t VibratorServiceClient::InitServiceClient()
             serviceDeathObserver_ =
                 new (std::nothrow) DeathRecipientTemplate(*const_cast<VibratorServiceClient *>(this));
             CHKPR(serviceDeathObserver_, MISC_NATIVE_GET_SERVICE_ERR);
-            miscdeviceProxy_->AsObject()->AddDeathRecipient(serviceDeathObserver_);
+            auto remoteObject = miscdeviceProxy_->AsObject();
+            CHKPR(remoteObject, MISC_NATIVE_GET_SERVICE_ERR);
+            remoteObject->AddDeathRecipient(serviceDeathObserver_);
             return ERR_OK;
         }
         MISC_HILOGW("Get service failed, retry:%{public}d", retry);

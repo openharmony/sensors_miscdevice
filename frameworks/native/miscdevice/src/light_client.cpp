@@ -62,7 +62,9 @@ int32_t LightClient::InitLightClient()
             MISC_HILOGD("miscdeviceProxy_ get service success, retry:%{public}d", retry);
             serviceDeathObserver_ = new (std::nothrow) DeathRecipientTemplate(*const_cast<LightClient *>(this));
             CHKPR(serviceDeathObserver_, MISC_NATIVE_GET_SERVICE_ERR);
-            miscdeviceProxy_->AsObject()->AddDeathRecipient(serviceDeathObserver_);
+            auto remoteObject = miscdeviceProxy_->AsObject();
+            CHKPR(remoteObject, MISC_NATIVE_GET_SERVICE_ERR);
+            remoteObject->AddDeathRecipient(serviceDeathObserver_);
             lightInfoList_ = miscdeviceProxy_->GetLightList();
             return ERR_OK;
         }
