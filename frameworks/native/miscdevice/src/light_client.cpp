@@ -37,7 +37,10 @@ constexpr uint32_t WAIT_MS = 200;
 LightClient::~LightClient()
 {
     if (miscdeviceProxy_ != nullptr && serviceDeathObserver_ != nullptr) {
-        miscdeviceProxy_->AsObject()->RemoveDeathRecipient(serviceDeathObserver_);
+        auto remoteObject = miscdeviceProxy_->AsObject();
+        if (remoteObject != nullptr) {
+            remoteObject->RemoveDeathRecipient(serviceDeathObserver_);
+        }
     }
 }
 
