@@ -123,10 +123,9 @@ void HdiLightConnection::RegisterHdiDeathRecipient()
         MISC_HILOGE("Connect v1_0 hdi failed");
         return;
     }
-    hdiDeathObserver_ = new (std::nothrow) DeathRecipientTemplate(*const_cast<HdiLightConnection *>(this));
     if (hdiDeathObserver_ == nullptr) {
-        MISC_HILOGE("hdiDeathObserver_ is nullptr");
-        return;
+        hdiDeathObserver_ = new (std::nothrow) DeathRecipientTemplate(*const_cast<HdiLightConnection *>(this));
+        CHKPV(hdiDeathObserver_);
     }
     OHOS::HDI::hdi_objcast<ILightInterface>(lightInterface_)->AddDeathRecipient(hdiDeathObserver_);
 }

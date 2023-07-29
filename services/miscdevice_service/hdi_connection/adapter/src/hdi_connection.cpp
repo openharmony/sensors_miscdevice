@@ -149,10 +149,9 @@ void HdiConnection::RegisterHdiDeathRecipient()
         MISC_HILOGE("Connect v1_1 hdi failed");
         return;
     }
-    hdiDeathObserver_ = new (std::nothrow) DeathRecipientTemplate(*const_cast<HdiConnection *>(this));
     if (hdiDeathObserver_ == nullptr) {
-        MISC_HILOGE("hdiDeathObserver_ cannot be null");
-        return;
+        hdiDeathObserver_ = new (std::nothrow) DeathRecipientTemplate(*const_cast<HdiConnection *>(this));
+        CHKPV(hdiDeathObserver_);
     }
     OHOS::HDI::hdi_objcast<IVibratorInterface>(vibratorInterface_)->AddDeathRecipient(hdiDeathObserver_);
 }

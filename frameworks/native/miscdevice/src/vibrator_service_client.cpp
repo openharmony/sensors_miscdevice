@@ -35,6 +35,16 @@ constexpr int32_t GET_SERVICE_MAX_COUNT = 30;
 constexpr uint32_t WAIT_MS = 200;
 }  // namespace
 
+VibratorServiceClient::~VibratorServiceClient()
+{
+    if (miscdeviceProxy_ != nullptr && serviceDeathObserver_ != nullptr) {
+        auto remoteObject = miscdeviceProxy_->AsObject();
+        if (remoteObject != nullptr) {
+            remoteObject->RemoveDeathRecipient(serviceDeathObserver_);
+        }
+    }
+}
+
 int32_t VibratorServiceClient::InitServiceClient()
 {
     CALL_LOG_ENTER;
@@ -55,9 +65,10 @@ int32_t VibratorServiceClient::InitServiceClient()
             MISC_HILOGD("Get service success, retry:%{public}d", retry);
             serviceDeathObserver_ =
                 new (std::nothrow) DeathRecipientTemplate(*const_cast<VibratorServiceClient *>(this));
-            if (serviceDeathObserver_ != nullptr) {
-                miscdeviceProxy_->AsObject()->AddDeathRecipient(serviceDeathObserver_);
-            }
+            CHKPR(serviceDeathObserver_, MISC_NATIVE_GET_SERVICE_ERR);
+            auto remoteObject = miscdeviceProxy_->AsObject();
+            CHKPR(remoteObject, MISC_NATIVE_GET_SERVICE_ERR);
+            remoteObject->AddDeathRecipient(serviceDeathObserver_);
             return ERR_OK;
         }
         MISC_HILOGW("Get service failed, retry:%{public}d", retry);

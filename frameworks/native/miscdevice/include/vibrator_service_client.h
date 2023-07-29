@@ -27,6 +27,7 @@ namespace OHOS {
 namespace Sensors {
 class VibratorServiceClient : public Singleton<VibratorServiceClient> {
 public:
+    ~VibratorServiceClient() override;
     int32_t Vibrate(int32_t vibratorId, int32_t timeOut, int32_t usage);
     int32_t Vibrate(int32_t vibratorId, const std::string &effect, int32_t loopCount, int32_t usage);
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM

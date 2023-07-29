@@ -91,7 +91,7 @@ private:
     std::vector<LightInfo> lightInfos_;
     std::map<MiscdeviceDeviceId, bool> miscDeviceIdMap_;
     MiscdeviceServiceState state_;
-    std::shared_ptr<VibratorThread> vibratorThread_;
+    std::shared_ptr<VibratorThread> vibratorThread_ = nullptr;
     std::mutex vibratorThreadMutex_;
 };
 }  // namespace Sensors
