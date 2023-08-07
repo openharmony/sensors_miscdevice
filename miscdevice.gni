@@ -21,3 +21,17 @@ print(
     "miscdevice_feature_vibrator_custom = ${miscdevice_feature_vibrator_custom}")
 
 SUBSYSTEM_DIR = "//base/sensors/miscdevice"
+
+miscdevice_default_defines = []
+
+if (miscdevice_feature_vibrator_custom) {
+  miscdevice_default_defines += [ "OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM" ]
+}
+
+if (!defined(global_parts_info) ||
+    defined(global_parts_info.hdf_drivers_interface_light)) {
+  hdf_drivers_interface_light = true
+  miscdevice_default_defines += [ "HDF_DRIVERS_INTERFACE_LIGHT" ]
+} else {
+  hdf_drivers_interface_light = false
+}

@@ -24,8 +24,9 @@
 #include "sensors_errors.h"
 #include "system_ability_definition.h"
 #include "vibration_priority_manager.h"
+#ifdef HDF_DRIVERS_INTERFACE_LIGHT
 #include "v1_0/light_interface_proxy.h"
-
+#endif // HDF_DRIVERS_INTERFACE_LIGHT
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 #include "custom_vibration_matcher.h"
 #include "default_vibrator_decoder.h"

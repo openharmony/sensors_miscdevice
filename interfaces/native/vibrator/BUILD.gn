@@ -43,9 +43,7 @@ ohos_shared_library("vibrator_interface_native") {
     "$SUBSYSTEM_DIR/utils/include",
   ]
 
-  if (miscdevice_feature_vibrator_custom) {
-    defines = [ "OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM" ]
-  }
+  defines = miscdevice_default_defines
 
   cflags = [ "-Wno-error=inconsistent-missing-override" ]
 
