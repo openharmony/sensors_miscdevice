@@ -19,7 +19,6 @@ ohos_shared_library("libmiscdevice_service") {
     "hdi_connection/adapter/src/compatible_connection.cpp",
     "hdi_connection/adapter/src/compatible_light_connection.cpp",
     "hdi_connection/adapter/src/hdi_connection.cpp",
-    "hdi_connection/adapter/src/hdi_light_connection.cpp",
     "hdi_connection/interface/src/light_hdi_connection.cpp",
     "hdi_connection/interface/src/vibrator_hdi_connection.cpp",
     "src/miscdevice_dump.cpp",
@@ -45,7 +44,6 @@ ohos_shared_library("libmiscdevice_service") {
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "c_utils:utils",
-    "drivers_interface_light:liblight_proxy_1.0",
     "drivers_interface_vibrator:libvibrator_proxy_1.1",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
@@ -54,6 +52,8 @@ ohos_shared_library("libmiscdevice_service") {
     "safwk:system_ability_fwk",
   ]
 
+  defines = miscdevice_default_defines
+
   if (miscdevice_feature_vibrator_custom) {
     sources += [
       "custom_vibrate_decode/src/custom_vibration_matcher.cpp",
@@ -61,9 +61,15 @@ ohos_shared_library("libmiscdevice_service") {
       "custom_vibrate_decode/src/default_vibrator_decoder_factory.cpp",
     ]
     include_dirs += [ "custom_vibrate_decode/include" ]
-    defines = [ "OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM" ]
     external_deps += [ "init:libbegetutil" ]
   }
+
+  if (hdf_drivers_interface_light) {
+    sources += [ "hdi_connection/adapter/src/hdi_light_connection.cpp" ]
+
+    external_deps += [ "drivers_interface_light:liblight_proxy_1.0" ]
+  }
+
   shlib_type = "sa"
   part_name = "miscdevice"
   subsystem_name = "sensors"
@@ -75,7 +81,6 @@ ohos_shared_library("libmiscdevice_service_static") {
     "hdi_connection/adapter/src/compatible_connection.cpp",
     "hdi_connection/adapter/src/compatible_light_connection.cpp",
     "hdi_connection/adapter/src/hdi_connection.cpp",
-    "hdi_connection/adapter/src/hdi_light_connection.cpp",
     "hdi_connection/interface/src/light_hdi_connection.cpp",
     "hdi_connection/interface/src/vibrator_hdi_connection.cpp",
     "src/miscdevice_dump.cpp",
@@ -101,7 +106,6 @@ ohos_shared_library("libmiscdevice_service_static") {
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "c_utils:utils",
-    "drivers_interface_light:liblight_proxy_1.0",
     "drivers_interface_vibrator:libvibrator_proxy_1.1",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
@@ -110,6 +114,8 @@ ohos_shared_library("libmiscdevice_service_static") {
     "safwk:system_ability_fwk",
   ]
 
+  defines = miscdevice_default_defines
+
   if (miscdevice_feature_vibrator_custom) {
     sources += [
       "custom_vibrate_decode/src/custom_vibration_matcher.cpp",
@@ -117,8 +123,13 @@ ohos_shared_library("libmiscdevice_service_static") {
       "custom_vibrate_decode/src/default_vibrator_decoder_factory.cpp",
     ]
     include_dirs += [ "custom_vibrate_decode/include" ]
-    defines = [ "OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM" ]
     external_deps += [ "init:libbegetutil" ]
+  }
+
+  if (hdf_drivers_interface_light) {
+    sources += [ "hdi_connection/adapter/src/hdi_light_connection.cpp" ]
+
+    external_deps += [ "drivers_interface_light:liblight_proxy_1.0" ]
   }
 
   part_name = "miscdevice"

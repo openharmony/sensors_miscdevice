@@ -41,9 +41,7 @@ ohos_shared_library("liblight_native") {
     "samgr:samgr_proxy",
   ]
 
-  if (miscdevice_feature_vibrator_custom) {
-    defines = [ "OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM" ]
-  }
+  defines = miscdevice_default_defines
 
   innerapi_tags = [ "platformsdk_indirect" ]
   part_name = "miscdevice"
@@ -71,9 +69,7 @@ ohos_shared_library("libvibrator_native") {
     "samgr:samgr_proxy",
   ]
 
-  if (miscdevice_feature_vibrator_custom) {
-    defines = [ "OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM" ]
-  }
+  defines = miscdevice_default_defines
 
   innerapi_tags = [ "platformsdk_indirect" ]
   part_name = "miscdevice"

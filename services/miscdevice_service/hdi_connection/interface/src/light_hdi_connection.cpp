@@ -17,7 +17,9 @@
 #include <list>
 
 #include "compatible_light_connection.h"
+#ifdef HDF_DRIVERS_INTERFACE_LIGHT
 #include "hdi_light_connection.h"
+#endif // HDF_DRIVERS_INTERFACE_LIGHT
 #include "hitrace_meter.h"
 #include "sensors_errors.h"
 
@@ -31,12 +33,14 @@ constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "LightHdiConnection" }
 
 int32_t LightHdiConnection::ConnectHdi()
 {
+#ifdef HDF_DRIVERS_INTERFACE_LIGHT
     iLightHdiConnection_ = std::make_unique<HdiLightConnection>();
     int32_t ret = ConnectHdiService();
     if (ret == ERR_OK) {
         MISC_HILOGI("Connect light hdi success");
         return ERR_OK;
     }
+#endif // HDF_DRIVERS_INTERFACE_LIGHT
     iLightHdiConnection_ = std::make_unique<CompatibleLightConnection>();
     return ConnectHdiService();
 }
