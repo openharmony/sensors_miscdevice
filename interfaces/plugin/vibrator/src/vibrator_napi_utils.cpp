@@ -292,7 +292,8 @@ void EmitAsyncCallbackWork(sptr<AsyncCallbackInfo> asyncCallbackInfo)
         },
         asyncCallbackInfo.GetRefPtr(), &asyncCallbackInfo->asyncWork);
     if (status != napi_ok
-        || napi_queue_async_work(asyncCallbackInfo->env, asyncCallbackInfo->asyncWork) != napi_ok) {
+        || napi_queue_async_work_with_qos(
+            asyncCallbackInfo->env, asyncCallbackInfo->asyncWork, napi_qos_default) != napi_ok) {
         MISC_HILOGE("Create async work fail");
         asyncCallbackInfo->DecStrongRef(nullptr);
     }
@@ -342,7 +343,8 @@ void EmitPromiseWork(sptr<AsyncCallbackInfo> asyncCallbackInfo)
             }
         }, asyncCallbackInfo.GetRefPtr(), &asyncCallbackInfo->asyncWork);
     if (status != napi_ok
-        || napi_queue_async_work(asyncCallbackInfo->env, asyncCallbackInfo->asyncWork) != napi_ok) {
+        || napi_queue_async_work_with_qos(
+            asyncCallbackInfo->env, asyncCallbackInfo->asyncWork, napi_qos_default) != napi_ok) {
         MISC_HILOGE("Create async work fail");
         asyncCallbackInfo->DecStrongRef(nullptr);
     }
