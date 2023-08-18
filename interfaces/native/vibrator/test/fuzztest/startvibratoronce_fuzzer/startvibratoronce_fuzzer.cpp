@@ -38,7 +38,7 @@ bool StartVibratorOnceFuzzTest(const uint8_t* data, size_t size)
     }
     return true;
 }
-}
+} // namespace OHOS
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
