@@ -108,7 +108,7 @@ void MiscdeviceDump::ParseCommand(int32_t fd, const std::vector<std::string>& ar
                 break;
             }
             default: {
-                dprintf(fd, "Unrecognized option: %s\nMore info with: \"hidumper -s 3602 -a -h\"\n", argv[optind-1]);
+                dprintf(fd, "Unrecognized option, More info with: \"hidumper -s 3602 -a -h\"\n");
                 break;
             }
         }
