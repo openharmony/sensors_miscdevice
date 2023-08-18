@@ -68,7 +68,7 @@ void MiscdeviceDump::ParseCommand(int32_t fd, const std::vector<std::string>& ar
     }
     if (count > MAX_DUMP_PARAMETERS) {
         MISC_HILOGE("Cmd param number not more than 32");
-        dprintf(fd, "cmd param number not more than 32\n");
+        dprintf(fd, "Cmd param number not more than 32\n");
         return;
     }
     int32_t optionIndex = 0;

@@ -21,16 +21,16 @@
     ],
     "deps": {
       "components": [
+        "access_token",
         "c_utils",
-        "hisysevent",
-        "napi",
-        "hilog",
         "drivers_interface_light",
         "drivers_interface_vibrator",
-        "access_token",
+        "hilog",
+        "hisysevent",
         "hitrace",
-        "init",
         "ipc",
+        "init",
+        "napi",
         "safwk",
         "samgr"
       ],
