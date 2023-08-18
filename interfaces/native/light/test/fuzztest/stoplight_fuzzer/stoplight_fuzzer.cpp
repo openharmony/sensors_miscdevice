@@ -40,8 +40,8 @@ void StopLightuzzTest(const uint8_t* data, size_t size)
     GetObject<int32_t>(lightId, data + startPos, size - startPos);
     OHOS::Sensors::TurnOff(lightId);
 }
-} // Sensors
-} // OHOS
+} // namespace Sensors
+} // namespace OHOS
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)

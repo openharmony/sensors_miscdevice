@@ -55,8 +55,8 @@ void IsSupportEffectFuzzTest(const uint8_t* data, size_t size)
     bool state { false };
     OHOS::Sensors::IsSupportEffect(effectId, &state);
 }
-} // Sensors
-} // OHOS
+} // namespace Sensors
+} // namespace OHOS
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {

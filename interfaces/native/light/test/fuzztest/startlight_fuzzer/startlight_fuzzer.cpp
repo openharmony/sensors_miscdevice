@@ -44,8 +44,8 @@ void StartLightFuzzTest(const uint8_t* data, size_t size)
     GetObject<LightAnimation>(animation, data + startPos, size - startPos);
     OHOS::Sensors::TurnOn(lightId, color, animation);
 }
-} // Sensors
-} // OHOS
+} // namespace Sensors
+} // namespace OHOS
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
