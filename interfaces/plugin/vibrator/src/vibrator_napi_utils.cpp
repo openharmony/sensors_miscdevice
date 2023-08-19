@@ -260,8 +260,8 @@ void EmitAsyncCallbackWork(sptr<AsyncCallbackInfo> asyncCallbackInfo)
     CHKCV((ret == napi_ok), "napi_create_string_latin1 fail");
     asyncCallbackInfo->IncStrongRef(nullptr);
     napi_status status = napi_create_async_work(
-        env, nullptr, resourceName, [](napi_env env, void* data) {},
-        [](napi_env env, napi_status status, void* data) {
+        env, nullptr, resourceName, [](napi_env env, void *data) {},
+        [](napi_env env, napi_status status, void *data) {
             CALL_LOG_ENTER;
             sptr<AsyncCallbackInfo> asyncCallbackInfo(static_cast<AsyncCallbackInfo *>(data));
             /**
@@ -311,8 +311,8 @@ void EmitPromiseWork(sptr<AsyncCallbackInfo> asyncCallbackInfo)
     // Make the reference count of asyncCallbackInfo add 1, and the function exits the non-destructor
     asyncCallbackInfo->IncStrongRef(nullptr);
     napi_status status = napi_create_async_work(
-        env, nullptr, resourceName, [](napi_env env, void* data) {},
-        [](napi_env env, napi_status status, void* data) {
+        env, nullptr, resourceName, [](napi_env env, void *data) {},
+        [](napi_env env, napi_status status, void *data) {
             CALL_LOG_ENTER;
             sptr<AsyncCallbackInfo> asyncCallbackInfo(static_cast<AsyncCallbackInfo *>(data));
             /**

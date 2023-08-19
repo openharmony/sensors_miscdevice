@@ -31,16 +31,16 @@ public:
     explicit JsonParser(const std::string &filePath);
     explicit JsonParser(const RawFileDescriptor &rawFd);
     ~JsonParser();
-    int32_t ParseJsonArray(cJSON *json, const std::string& key, std::vector<std::string>& vals) const;
-    int32_t ParseJsonArray(const std::string& key, std::vector<std::string>& vals) const;
-    cJSON* GetObjectItem(cJSON *json, const std::string& key) const;
-    cJSON* GetObjectItem(const std::string& key) const;
+    int32_t ParseJsonArray(cJSON *json, const std::string &key, std::vector<std::string> &vals) const;
+    int32_t ParseJsonArray(const std::string &key, std::vector<std::string> &vals) const;
+    cJSON *GetObjectItem(cJSON *json, const std::string &key) const;
+    cJSON *GetObjectItem(const std::string &key) const;
     bool IsArray(cJSON *json) const;
     int32_t GetArraySize(cJSON *json) const;
-    cJSON* GetArrayItem(cJSON *json, int32_t index) const;
+    cJSON *GetArrayItem(cJSON *json, int32_t index) const;
 
 private:
-    cJSON* cJson_ = nullptr;
+    cJSON *cJson_ = nullptr;
 };
 }  // namespace Sensors
 }  // namespace OHOS

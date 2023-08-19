@@ -56,7 +56,7 @@ int32_t LightHdiConnection::ConnectHdiService()
     return iLightHdiConnection_->GetLightList(lightInfoList_);
 }
 
-int32_t LightHdiConnection::GetLightList(std::vector<LightInfo>& lightList) const
+int32_t LightHdiConnection::GetLightList(std::vector<LightInfo> &lightList) const
 {
     lightList.assign(lightInfoList_.begin(), lightInfoList_.end());
     return ERR_OK;

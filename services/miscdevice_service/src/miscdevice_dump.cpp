@@ -53,7 +53,7 @@ MiscdeviceDump::MiscdeviceDump() {}
 
 MiscdeviceDump::~MiscdeviceDump() {}
 
-void MiscdeviceDump::ParseCommand(int32_t fd, const std::vector<std::string>& args)
+void MiscdeviceDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
 {
     int32_t count = 0;
     for (const auto &str : args) {
