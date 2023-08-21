@@ -37,7 +37,7 @@ constexpr int32_t TIME_WAIT_FOR_OP = 2;
 const std::string PHONE_TYPE = "phone";
 std::string g_deviceType;
 constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "VibratorAgentTest" };
-PermissionDef infoManagerTestPermDef_ = {
+PermissionDef g_infoManagerTestPermDef = {
     .permissionName = "ohos.permission.VIBRATE",
     .bundleName = "accesstoken_test",
     .grantMode = 1,
@@ -48,7 +48,7 @@ PermissionDef infoManagerTestPermDef_ = {
     .availableLevel = APL_NORMAL
 };
 
-PermissionStateFull infoManagerTestState_ = {
+PermissionStateFull g_infoManagerTestState = {
     .grantFlags = {1},
     .grantStatus = {PermissionState::PERMISSION_GRANTED},
     .isGeneral = true,
@@ -56,14 +56,14 @@ PermissionStateFull infoManagerTestState_ = {
     .resDeviceID = {"local"}
 };
 
-HapPolicyParams infoManagerTestPolicyPrams_ = {
+HapPolicyParams g_infoManagerTestPolicyPrams = {
     .apl = APL_NORMAL,
     .domain = "test.domain",
-    .permList = {infoManagerTestPermDef_},
-    .permStateList = {infoManagerTestState_}
+    .permList = {g_infoManagerTestPermDef},
+    .permStateList = {g_infoManagerTestState}
 };
 
-HapInfoParams infoManagerTestInfoParms_ = {
+HapInfoParams g_infoManagerTestInfoParms = {
     .bundleName = "vibratoragent_test",
     .userID = 1,
     .instIndex = 0,
@@ -87,7 +87,7 @@ AccessTokenID VibratorAgentTest::tokenID_ = 0;
 void VibratorAgentTest::SetUpTestCase()
 {
     AccessTokenIDEx tokenIdEx = {0};
-    tokenIdEx = AccessTokenKit::AllocHapToken(infoManagerTestInfoParms_, infoManagerTestPolicyPrams_);
+    tokenIdEx = AccessTokenKit::AllocHapToken(g_infoManagerTestInfoParms, g_infoManagerTestPolicyPrams);
     tokenID_ = tokenIdEx.tokenIdExStruct.tokenID;
     ASSERT_NE(0, tokenID_);
     ASSERT_EQ(0, SetSelfTokenID(tokenID_));

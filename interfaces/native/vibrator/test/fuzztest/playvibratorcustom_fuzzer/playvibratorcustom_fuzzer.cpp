@@ -53,8 +53,8 @@ void PlayVibratorCustomFuzzTest(const uint8_t* data, size_t size)
     GetObject<int64_t>(data + startPos, size - startPos, length);
     OHOS::Sensors::PlayVibratorCustom(fd, offset, length);
 }
-} // Sensors
-} // OHOS
+} // namespace Sensors
+} // namespace OHOS
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
