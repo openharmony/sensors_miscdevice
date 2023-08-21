@@ -270,7 +270,7 @@ int32_t MiscdeviceServiceStub::OnRemoteRequest(uint32_t code, MessageParcel &dat
             return (this->*memberFunc)(data, reply);
         }
     }
-    MISC_HILOGD("remoterequest no member function default process");
+    MISC_HILOGD("Remoterequest no member function default process");
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 }  // namespace Sensors
