@@ -14,7 +14,7 @@
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
-import("./../../../miscdevice.gni")
+import("./../../../../miscdevice.gni")
 
 group("fuzztest") {
   testonly = true
