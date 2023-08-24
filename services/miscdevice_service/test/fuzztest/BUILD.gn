@@ -19,7 +19,6 @@ group("fuzztest") {
   testonly = true
   deps = []
   deps += [
-    "vibratoronremoterequest_fuzzer:fuzztest",
     "getlightliststub_fuzzer:fuzztest",
     "issupporteffectstub_fuzzer:fuzztest",
     "playvibratoreffectstub_fuzzer:fuzztest",
@@ -28,6 +27,7 @@ group("fuzztest") {
     "turnoffstub_fuzzer:fuzztest",
     "turnonstub_fuzzer:fuzztest",
     "vibratestub_fuzzer:fuzztest",
+    "vibratoronremoterequest_fuzzer:fuzztest",
   ]
 
   if (miscdevice_feature_vibrator_custom) {
