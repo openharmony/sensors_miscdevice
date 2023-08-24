@@ -28,11 +28,11 @@ namespace OHOS {
 namespace Sensors {
 std::string ReadJsonFile(const std::string &filePath);
 std::string ReadFile(const std::string &filePath);
-bool CheckFileDir(const std::string& filePath, const std::string& dir);
-bool CheckFileExtendName(const std::string& filePath, const std::string& checkExtension);
-bool CheckFileSize(const std::string& filePath);
-bool IsFileExists(const std::string& fileName);
-int32_t GetFileSize(const std::string& filePath);
+bool CheckFileDir(const std::string &filePath, const std::string &dir);
+bool CheckFileExtendName(const std::string &filePath, const std::string &checkExtension);
+bool CheckFileSize(const std::string &filePath);
+bool IsFileExists(const std::string &fileName);
+int32_t GetFileSize(const std::string &filePath);
 int64_t GetFileSize(int32_t fd);
 std::string ReadFd(const RawFileDescriptor &rawFd);
 std::string GetFileSuffix(int32_t fd);

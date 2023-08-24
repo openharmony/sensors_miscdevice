@@ -53,7 +53,7 @@ JsonParser::~JsonParser()
     }
 }
 
-cJSON* JsonParser::GetObjectItem(cJSON *json, const std::string& key) const
+cJSON *JsonParser::GetObjectItem(cJSON *json, const std::string &key) const
 {
     if (!cJSON_IsObject(json)) {
         MISC_HILOGE("The json is not object");
@@ -66,22 +66,22 @@ cJSON* JsonParser::GetObjectItem(cJSON *json, const std::string& key) const
     return cJSON_GetObjectItem(json, key.c_str());
 }
 
-cJSON* JsonParser::GetObjectItem(const std::string& key) const
+cJSON *JsonParser::GetObjectItem(const std::string &key) const
 {
     return GetObjectItem(cJson_, key);
 }
 
-int32_t JsonParser::ParseJsonArray(cJSON *json, const std::string& key,
-    std::vector<std::string>& vals) const
+int32_t JsonParser::ParseJsonArray(cJSON *json, const std::string &key,
+    std::vector<std::string> &vals) const
 {
-    cJSON* jsonArray = GetObjectItem(json, key);
+    cJSON *jsonArray = GetObjectItem(json, key);
     if (!cJSON_IsArray(jsonArray)) {
         MISC_HILOGE("The value of %{public}s is not array", key.c_str());
         return ERROR;
     }
     int32_t size = cJSON_GetArraySize(jsonArray);
     for (int32_t i = 0; i < size; ++i) {
-        cJSON* val = cJSON_GetArrayItem(jsonArray, i);
+        cJSON *val = cJSON_GetArrayItem(jsonArray, i);
         if ((!cJSON_IsString(val)) || (val->valuestring == nullptr)) {
             MISC_HILOGE("The value of index %{public}d is not string", i);
             return ERROR;
@@ -91,7 +91,7 @@ int32_t JsonParser::ParseJsonArray(cJSON *json, const std::string& key,
     return SUCCESS;
 }
 
-int32_t JsonParser::ParseJsonArray(const std::string& key, std::vector<std::string>& vals) const
+int32_t JsonParser::ParseJsonArray(const std::string &key, std::vector<std::string> &vals) const
 {
     return ParseJsonArray(cJson_, key, vals);
 }
@@ -106,7 +106,7 @@ int32_t JsonParser::GetArraySize(cJSON *json) const
     return cJSON_GetArraySize(json);
 }
 
-cJSON* JsonParser::GetArrayItem(cJSON *json, int32_t index) const
+cJSON *JsonParser::GetArrayItem(cJSON *json, int32_t index) const
 {
     return cJSON_GetArrayItem(json, index);
 }

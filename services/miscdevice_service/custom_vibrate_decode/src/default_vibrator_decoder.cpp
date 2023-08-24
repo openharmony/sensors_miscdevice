@@ -55,16 +55,16 @@ std::set<VibrateEvent> DefaultVibratorDecoder::DecodeEffect(const RawFileDescrip
 
 int32_t DefaultVibratorDecoder::CheckMetadata(const JsonParser &parser)
 {
-    cJSON* metadata = parser.GetObjectItem("MetaData");
+    cJSON *metadata = parser.GetObjectItem("MetaData");
     CHKPR(metadata, ERROR);
-    cJSON* version = parser.GetObjectItem(metadata, "Version");
+    cJSON *version = parser.GetObjectItem(metadata, "Version");
     CHKPR(version, ERROR);
     version_ = version->valuedouble;
     if (version_ != SUPPORT_JSON_VERSION) {
         MISC_HILOGE("Json file version is not supported, version:%{public}f", version_);
         return ERROR;
     }
-    cJSON* channelNumber = parser.GetObjectItem(metadata, "ChannelNumber");
+    cJSON *channelNumber = parser.GetObjectItem(metadata, "ChannelNumber");
     CHKPR(channelNumber, ERROR);
     channelNumber_ = channelNumber->valueint;
     if (channelNumber_ != SUPPORT_CHANNEL_NUMBER) {
@@ -88,13 +88,13 @@ int32_t DefaultVibratorDecoder::ParseChannel(const JsonParser &parser, std::set<
         return ERROR;
     }
     for (int32_t i = 0; i < size; i++) {
-        cJSON* channel = parser.GetArrayItem(channels, i);
+        cJSON *channel = parser.GetArrayItem(channels, i);
         CHKPR(channel, ERROR);
-        cJSON* channelParameters = parser.GetObjectItem(channel, "Parameters");
+        cJSON *channelParameters = parser.GetObjectItem(channel, "Parameters");
         CHKPR(channelParameters, ERROR);
         int32_t ret = ParseChannelParameters(parser, channelParameters);
         CHKCR((ret == SUCCESS), ERROR, "parse channel parameters fail");
-        cJSON* pattern = parser.GetObjectItem(channel, "Pattern");
+        cJSON *pattern = parser.GetObjectItem(channel, "Pattern");
         CHKPR(pattern, ERROR);
         ret = ParsePattern(parser, pattern, vibrateSet);
         CHKCR((ret == SUCCESS), ERROR, "parse pattern fail");
@@ -104,7 +104,7 @@ int32_t DefaultVibratorDecoder::ParseChannel(const JsonParser &parser, std::set<
 
 int32_t DefaultVibratorDecoder::ParseChannelParameters(const JsonParser &parser, cJSON *channelParameters)
 {
-    cJSON* index = parser.GetObjectItem(channelParameters, "Index");
+    cJSON *index = parser.GetObjectItem(channelParameters, "Index");
     CHKPR(index, ERROR);
     int32_t indexVal = index->valueint;
     CHKCR((indexVal == SUPPORT_CHANNEL_NUMBER), ERROR, "invalid channel index");
@@ -124,9 +124,9 @@ int32_t DefaultVibratorDecoder::ParsePattern(const JsonParser &parser, cJSON *pa
         return ERROR;
     }
     for (int32_t i = 0; i < size; i++) {
-        cJSON* item = parser.GetArrayItem(pattern, i);
+        cJSON *item = parser.GetArrayItem(pattern, i);
         CHKPR(item, ERROR);
-        cJSON* event = parser.GetObjectItem(item, "Event");
+        cJSON *event = parser.GetObjectItem(item, "Event");
         CHKPR(event, ERROR);
         int32_t ret = ParseEvent(parser, event, vibrateSet);
         CHKCR((ret == SUCCESS), ERROR, "parse event fail");
@@ -138,12 +138,12 @@ int32_t DefaultVibratorDecoder::ParseEvent(const JsonParser &parser, cJSON *even
     std::set<VibrateEvent> &vibrateSet)
 {
     VibrateEvent vibrateEvent;
-    cJSON* type = parser.GetObjectItem(event, "Type");
+    cJSON *type = parser.GetObjectItem(event, "Type");
     CHKPR(type, ERROR);
     std::string curType = type->valuestring;
     if (curType == "continuous") {
         vibrateEvent.tag = EVENT_TAG_CONTINUOUS;
-        cJSON* duration = parser.GetObjectItem(event, "Duration");
+        cJSON *duration = parser.GetObjectItem(event, "Duration");
         CHKPR(duration, ERROR);
         vibrateEvent.duration = duration->valueint;
     } else if (curType == "transient") {
@@ -153,15 +153,15 @@ int32_t DefaultVibratorDecoder::ParseEvent(const JsonParser &parser, cJSON *even
         MISC_HILOGE("Unknown event type, curType:%{public}s", curType.c_str());
         return ERROR;
     }
-    cJSON* startTime = parser.GetObjectItem(event, "StartTime");
+    cJSON *startTime = parser.GetObjectItem(event, "StartTime");
     CHKPR(startTime, ERROR);
     vibrateEvent.startTime = startTime->valueint;
-    cJSON* eventParameters = parser.GetObjectItem(event, "Parameters");
+    cJSON *eventParameters = parser.GetObjectItem(event, "Parameters");
     CHKPR(eventParameters, ERROR);
-    cJSON* intensity = parser.GetObjectItem(eventParameters, "Intensity");
+    cJSON *intensity = parser.GetObjectItem(eventParameters, "Intensity");
     CHKPR(intensity, ERROR);
     vibrateEvent.intensity = intensity->valueint;
-    cJSON* frequency = parser.GetObjectItem(eventParameters, "Frequency");
+    cJSON *frequency = parser.GetObjectItem(eventParameters, "Frequency");
     CHKPR(frequency, ERROR);
     vibrateEvent.frequency = frequency->valueint;
     if (!CheckParameters(vibrateEvent)) {

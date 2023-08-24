@@ -27,7 +27,7 @@ constexpr int32_t MIN_VIBRATOR_TIME = 0;
 }  // namespace
 
 namespace OHOS {
-bool StartVibratorOnceFuzzTest(const uint8_t* data, size_t size)
+bool StartVibratorOnceFuzzTest(const uint8_t *data, size_t size)
 {
     std::string argv(reinterpret_cast<const char *>(data), size);
     int32_t duration = static_cast<uint32_t>(std::atoi(argv.c_str()));
@@ -40,7 +40,7 @@ bool StartVibratorOnceFuzzTest(const uint8_t* data, size_t size)
 }
 } // namespace OHOS
 
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     OHOS::StartVibratorOnceFuzzTest(data, size);
     return 0;

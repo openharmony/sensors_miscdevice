@@ -23,7 +23,7 @@
 #include "vibrator_agent.h"
 
 namespace OHOS {
-bool StopVibratorFuzzTest(const uint8_t* data, size_t size)
+bool StopVibratorFuzzTest(const uint8_t *data, size_t size)
 {
     std::string argv(reinterpret_cast<const char *>(data), size);
     int32_t ret = OHOS::Sensors::StopVibrator(argv.c_str());
@@ -35,7 +35,7 @@ bool StopVibratorFuzzTest(const uint8_t* data, size_t size)
 }
 } // namespace OHOS
 
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     OHOS::StopVibratorFuzzTest(data, size);
     return 0;

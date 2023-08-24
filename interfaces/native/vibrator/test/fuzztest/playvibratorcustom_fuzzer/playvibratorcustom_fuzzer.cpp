@@ -39,7 +39,7 @@ size_t GetObject(const uint8_t *data, size_t size, T &object)
     return objectSize;
 }
 
-void PlayVibratorCustomFuzzTest(const uint8_t* data, size_t size)
+void PlayVibratorCustomFuzzTest(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size < DATA_MIN_SIZE) {
         return;
@@ -56,7 +56,7 @@ void PlayVibratorCustomFuzzTest(const uint8_t* data, size_t size)
 } // namespace Sensors
 } // namespace OHOS
 
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     OHOS::Sensors::PlayVibratorCustomFuzzTest(data, size);
     return 0;

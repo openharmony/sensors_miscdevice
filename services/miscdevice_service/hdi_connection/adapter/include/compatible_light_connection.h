@@ -28,7 +28,7 @@ public:
     CompatibleLightConnection() = default;
     virtual ~CompatibleLightConnection() = default;
     int32_t ConnectHdi() override;
-    int32_t GetLightList(std::vector<LightInfo>& lightList) const override;
+    int32_t GetLightList(std::vector<LightInfo> &lightList) const override;
     int32_t TurnOn(int32_t lightId, const LightColor &color, const LightAnimation &animation) override;
     int32_t TurnOff(int32_t lightId) override;
     int32_t DestroyHdiConnection() override;

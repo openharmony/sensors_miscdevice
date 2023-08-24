@@ -63,7 +63,7 @@ std::string ReadJsonFile(const std::string &filePath)
     return ReadFile(realPath);
 }
 
-int32_t GetFileSize(const std::string& filePath)
+int32_t GetFileSize(const std::string &filePath)
 {
     struct stat statbuf = { 0 };
     if (stat(filePath.c_str(), &statbuf) != 0) {
@@ -87,7 +87,7 @@ int64_t GetFileSize(int32_t fd)
     return statbuf.st_size;
 }
 
-bool CheckFileDir(const std::string& filePath, const std::string& dir)
+bool CheckFileDir(const std::string &filePath, const std::string &dir)
 {
     if (filePath.compare(0, CONFIG_DIR.size(), CONFIG_DIR) != 0) {
         MISC_HILOGE("filePath dir is invalid");
@@ -96,7 +96,7 @@ bool CheckFileDir(const std::string& filePath, const std::string& dir)
     return true;
 }
 
-bool CheckFileSize(const std::string& filePath)
+bool CheckFileSize(const std::string &filePath)
 {
     int32_t fileSize = GetFileSize(filePath);
     if ((fileSize <= 0) || (fileSize > FILE_SIZE_MAX)) {
@@ -106,7 +106,7 @@ bool CheckFileSize(const std::string& filePath)
     return true;
 }
 
-bool CheckFileExtendName(const std::string& filePath, const std::string& checkExtension)
+bool CheckFileExtendName(const std::string &filePath, const std::string &checkExtension)
 {
     std::string::size_type pos = filePath.find_last_of('.');
     if (pos == std::string::npos) {
@@ -116,14 +116,14 @@ bool CheckFileExtendName(const std::string& filePath, const std::string& checkEx
     return (filePath.substr(pos + 1, filePath.npos) == checkExtension);
 }
 
-bool IsFileExists(const std::string& fileName)
+bool IsFileExists(const std::string &fileName)
 {
     return (access(fileName.c_str(), F_OK) == 0);
 }
 
 std::string ReadFile(const std::string &filePath)
 {
-    FILE* fp = fopen(filePath.c_str(), "r");
+    FILE *fp = fopen(filePath.c_str(), "r");
     CHKPS(fp);
     std::string dataStr;
     char buf[READ_DATA_BUFF_SIZE] = { '\0' };
@@ -151,7 +151,7 @@ std::string ReadFd(const RawFileDescriptor &rawFd)
         MISC_HILOGE("length is invalid, length:%{public}" PRId64, rawFd.length);
         return {};
     }
-    FILE* fp = fdopen(rawFd.fd, "r");
+    FILE *fp = fdopen(rawFd.fd, "r");
     CHKPS(fp);
     if (fseek(fp, rawFd.offset, SEEK_SET) != 0) {
         MISC_HILOGE("fseek failed, errno:%{public}d", errno);

@@ -41,7 +41,7 @@ size_t GetObject(const uint8_t *data, size_t size, T &object)
     return objectSize;
 }
 
-void IsSupportEffectFuzzTest(const uint8_t* data, size_t size)
+void IsSupportEffectFuzzTest(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size < DATA_MIN_SIZE) {
         return;
@@ -58,7 +58,7 @@ void IsSupportEffectFuzzTest(const uint8_t* data, size_t size)
 } // namespace Sensors
 } // namespace OHOS
 
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     OHOS::Sensors::IsSupportEffectFuzzTest(data, size);
     return 0;

@@ -29,7 +29,7 @@ public:
     ILightHdiConnection() = default;
     virtual ~ILightHdiConnection() = default;
     virtual int32_t ConnectHdi() = 0;
-    virtual int32_t GetLightList(std::vector<LightInfo>& lightList) const = 0;
+    virtual int32_t GetLightList(std::vector<LightInfo> &lightList) const = 0;
     virtual int32_t TurnOn(int32_t lightId, const LightColor &color, const LightAnimation &animation) = 0;
     virtual int32_t TurnOff(int32_t lightId) = 0;
     virtual int32_t DestroyHdiConnection() = 0;

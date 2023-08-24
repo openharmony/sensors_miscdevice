@@ -36,7 +36,7 @@ public:
     DISALLOW_COPY_AND_MOVE(MiscdeviceDump);
     void DumpHelp(int32_t fd);
     void DumpMiscdeviceRecord(int32_t fd);
-    void ParseCommand(int32_t fd, const std::vector<std::string>& args);
+    void ParseCommand(int32_t fd, const std::vector<std::string> &args);
     void SaveVibrateRecord(const VibrateInfo &vibrateInfo);
 
 private:

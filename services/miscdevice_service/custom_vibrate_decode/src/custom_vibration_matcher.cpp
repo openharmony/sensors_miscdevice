@@ -84,7 +84,7 @@ void CustomVibrationMatcher::ProcessContinuousEvent(const VibrateEvent &event, i
         grade = round(event.intensity / CONTINUOUS_GRADE_SCALE + ROUND_OFFSET) - 1;
     }
     if ((!compositeEffects.empty()) && (event.startTime == preStartTime + preDuration)) {
-        PrimitiveEffect& prePrimitiveEffect = compositeEffects.back().primitiveEffect;
+        PrimitiveEffect &prePrimitiveEffect = compositeEffects.back().primitiveEffect;
         int32_t preEffectId = prePrimitiveEffect.effectId;
         int32_t preGrade = preEffectId % CONTINUOUS_GRADE_MASK;
         int32_t mergeDuration = preDuration + event.duration;

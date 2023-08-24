@@ -23,7 +23,7 @@
 #include "vibrator_agent.h"
 
 namespace OHOS {
-bool SetUsageFuzzTest(const uint8_t* data, size_t size)
+bool SetUsageFuzzTest(const uint8_t *data, size_t size)
 {
     std::string argv(reinterpret_cast<const char *>(data), size);
     int32_t usage = static_cast<int32_t>(std::atoi(argv.c_str()));
@@ -36,7 +36,7 @@ bool SetUsageFuzzTest(const uint8_t* data, size_t size)
 }
 } // namespace OHOS
 
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     OHOS::SetUsageFuzzTest(data, size);
     return 0;

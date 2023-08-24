@@ -93,7 +93,7 @@ enum {
 
 class InnerFunctionTracer {
 public:
-    InnerFunctionTracer(const OHOS::HiviewDFX::HiLogLabel& label, const char *func)
+    InnerFunctionTracer(const OHOS::HiviewDFX::HiLogLabel &label, const char *func)
         : label_ { label }, func_ { func }
     {
         OHOS::HiviewDFX::HiLog::Debug(label_, "in %{public}s, enter", func_);
@@ -103,8 +103,8 @@ public:
         OHOS::HiviewDFX::HiLog::Debug(label_, "in %{public}s, leave", func_);
     }
 private:
-    const OHOS::HiviewDFX::HiLogLabel& label_;
-    const char* func_ { nullptr };
+    const OHOS::HiviewDFX::HiLogLabel &label_;
+    const char *func_ { nullptr };
 };
 
 #define CALL_LOG_ENTER   InnerFunctionTracer ___innerFuncTracer___ { LABEL, __FUNCTION__ }
