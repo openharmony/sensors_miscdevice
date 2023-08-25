@@ -71,7 +71,7 @@ bool OnRemoteRequestFuzzTest(const char *data, size_t size)
     MessageOption option;
     g_miscdeviceService->OnStartFuzz();
     g_miscdeviceService->OnRemoteRequest(static_cast<uint32_t>(MiscdeviceInterfaceCode::STOP_VIBRATOR_ALL),
-         datas, reply, option);
+        datas, reply, option);
     return true;
 }
 }  // namespace Sensors
