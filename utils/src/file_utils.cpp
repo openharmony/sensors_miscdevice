@@ -60,7 +60,17 @@ std::string ReadJsonFile(const std::string &filePath)
         MISC_HILOGE("File size out of read range");
         return {};
     }
-    return ReadFile(realPath);
+    FILE *fp = fopen(realPath, "r");
+    CHKPS(fp);
+    std::string dataStr;
+    char buf[READ_DATA_BUFF_SIZE] = { '\0' };
+    while (fgets(buf, sizeof(buf), fp) != nullptr) {
+        dataStr += buf;
+    }
+    if (fclose(fp) != 0) {
+        MISC_HILOGW("Close file failed");
+    }
+    return dataStr;
 }
 
 int32_t GetFileSize(const std::string &filePath)
@@ -119,21 +129,6 @@ bool CheckFileExtendName(const std::string &filePath, const std::string &checkEx
 bool IsFileExists(const std::string &fileName)
 {
     return (access(fileName.c_str(), F_OK) == 0);
-}
-
-std::string ReadFile(const std::string &filePath)
-{
-    FILE *fp = fopen(filePath.c_str(), "r");
-    CHKPS(fp);
-    std::string dataStr;
-    char buf[READ_DATA_BUFF_SIZE] = { '\0' };
-    while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        dataStr += buf;
-    }
-    if (fclose(fp) != 0) {
-        MISC_HILOGW("Close file failed");
-    }
-    return dataStr;
 }
 
 std::string ReadFd(const RawFileDescriptor &rawFd)
