@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef VIBRATOR_ON_REMOTE_REQUEST_FUZZER_H
-#define VIBRATOR_ON_REMOTE_REQUEST_FUZZER_H
+#ifndef IS_SUPPORT_EFFECT_STUB_FUZZER_H
+#define IS_SUPPORT_EFFECT_STUB_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "vibratoronremoterequest_fuzzer"
+#define FUZZ_PROJECT_NAME "issupporteffectstub_fuzzer"
 
-#endif // VIBRATOR_ON_REMOTE_REQUEST_FUZZER_H
+#endif // IS_SUPPORT_EFFECT_STUB_FUZZER_H

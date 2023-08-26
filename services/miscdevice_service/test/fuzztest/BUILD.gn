@@ -14,9 +14,24 @@
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
+import("./../../../../miscdevice.gni")
 
 group("fuzztest") {
   testonly = true
   deps = []
-  deps += [ "vibratoronremoterequest_fuzzer:fuzztest" ]
+  deps += [
+    "getlightliststub_fuzzer:fuzztest",
+    "issupporteffectstub_fuzzer:fuzztest",
+    "playvibratoreffectstub_fuzzer:fuzztest",
+    "stopvibratorallstub_fuzzer:fuzztest",
+    "stopvibratorbymodestub_fuzzer:fuzztest",
+    "turnoffstub_fuzzer:fuzztest",
+    "turnonstub_fuzzer:fuzztest",
+    "vibratestub_fuzzer:fuzztest",
+    "vibratoronremoterequest_fuzzer:fuzztest",
+  ]
+
+  if (miscdevice_feature_vibrator_custom) {
+    deps += [ "playvibratorcustomstub_fuzzer:fuzztest" ]
+  }
 }

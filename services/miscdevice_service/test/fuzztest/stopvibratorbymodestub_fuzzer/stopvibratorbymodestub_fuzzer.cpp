@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "vibratoronremoterequest_fuzzer.h"
+#include "stopvibratorbymodestub_fuzzer.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -32,11 +32,6 @@ using namespace Security::AccessToken;
 using Security::AccessToken::AccessTokenID;
 namespace {
 constexpr size_t U32_AT_SIZE = 4;
-#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-constexpr uint32_t IPC_CODE_COUNT = 9;
-#else
-constexpr uint32_t IPC_CODE_COUNT = 8;
-#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 auto g_miscdeviceService = MiscdeviceDelayedSpSingleton<MiscdeviceService>::GetInstance();
 const std::u16string VIBRATOR_INTERFACE_TOKEN = u"IMiscdeviceService";
 }
@@ -55,7 +50,7 @@ void SetUpTestCase()
         .dcaps = nullptr,
         .perms = perms,
         .acls = nullptr,
-        .processName = "VibratorOnRemoteRequestFuzzTest",
+        .processName = "StopVibratorByModeStubFuzzTest",
         .aplStr = "system_core",
     };
     uint64_t tokenId = GetAccessTokenId(&infoInstance);
@@ -64,24 +59,18 @@ void SetUpTestCase()
     delete[] perms;
 }
 
-uint32_t GetU32Data(const uint8_t *data)
-{
-    // convert fuzz input data to an integer
-    return ((data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3]) % IPC_CODE_COUNT;
-}
-
 bool OnRemoteRequestFuzzTest(const uint8_t *data, size_t size)
 {
     SetUpTestCase();
-    uint32_t code = GetU32Data(data);
     MessageParcel datas;
     datas.WriteInterfaceToken(VIBRATOR_INTERFACE_TOKEN);
-    datas.WriteBuffer(data + U32_AT_SIZE, size - U32_AT_SIZE);
+    datas.WriteBuffer(data, size);
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
     g_miscdeviceService->OnStartFuzz();
-    g_miscdeviceService->OnRemoteRequest(code, datas, reply, option);
+    g_miscdeviceService->OnRemoteRequest(static_cast<uint32_t>(MiscdeviceInterfaceCode::STOP_VIBRATOR_BY_MODE),
+        datas, reply, option);
     return true;
 }
 }  // namespace Sensors
