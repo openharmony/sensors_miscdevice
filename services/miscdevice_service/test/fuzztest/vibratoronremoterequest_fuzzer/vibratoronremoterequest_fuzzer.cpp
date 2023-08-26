@@ -64,7 +64,7 @@ void SetUpTestCase()
     delete[] perms;
 }
 
-uint32_t GetU32Data(const char *ptr)
+uint32_t GetU32Data(const uint8_t *data)
 {
     // convert fuzz input data to an integer
     return ((ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | ptr[3]) % IPC_CODE_COUNT;
