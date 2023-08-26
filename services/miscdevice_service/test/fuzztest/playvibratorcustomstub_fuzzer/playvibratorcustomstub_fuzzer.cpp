@@ -17,7 +17,6 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <iostream>
 
 #include "accesstoken_kit.h"
 #include "message_parcel.h"
@@ -60,12 +59,12 @@ void SetUpTestCase()
     delete[] perms;
 }
 
-bool OnRemoteRequestFuzzTest(const char *data, size_t size)
+bool OnRemoteRequestFuzzTest(const uint8_t *data, size_t size)
 {
     SetUpTestCase();
     MessageParcel datas;
     datas.WriteInterfaceToken(VIBRATOR_INTERFACE_TOKEN);
-    datas.WriteBuffer(data + U32_AT_SIZE, size - U32_AT_SIZE);
+    datas.WriteBuffer(data, size);
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
@@ -81,7 +80,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     /* Run your code on data */
     if (data == nullptr) {
-        std::cout << "invalid data" << std::endl;
         return 0;
     }
 
@@ -90,21 +88,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
         return 0;
     }
 
-    char *ch = static_cast<char *>(malloc(size + 1));
-    if (ch == nullptr) {
-        std::cout << "malloc failed." << std::endl;
-        return 0;
-    }
-
-    (void)memset_s(ch, size + 1, 0x00, size + 1);
-    if (memcpy_s(ch, size, data, size) != EOK) {
-        std::cout << "copy failed." << std::endl;
-        free(ch);
-        ch = nullptr;
-        return 0;
-    }
-    OHOS::Sensors::OnRemoteRequestFuzzTest(ch, size);
-    free(ch);
-    ch = nullptr;
+    OHOS::Sensors::OnRemoteRequestFuzzTest(data, size);
     return 0;
 }

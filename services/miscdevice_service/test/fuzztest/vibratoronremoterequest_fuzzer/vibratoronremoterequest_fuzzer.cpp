@@ -17,7 +17,6 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <iostream>
 
 #include "accesstoken_kit.h"
 #include "message_parcel.h"
@@ -71,7 +70,7 @@ uint32_t GetU32Data(const char *ptr)
     return ((ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | ptr[3]) % IPC_CODE_COUNT;
 }
 
-bool OnRemoteRequestFuzzTest(const char *data, size_t size)
+bool OnRemoteRequestFuzzTest(const uint8_t *data, size_t size)
 {
     SetUpTestCase();
     uint32_t code = GetU32Data(data);
@@ -92,7 +91,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     /* Run your code on data */
     if (data == nullptr) {
-        std::cout << "invalid data" << std::endl;
         return 0;
     }
 
@@ -101,21 +99,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
         return 0;
     }
 
-    char *ch = static_cast<char *>(malloc(size + 1));
-    if (ch == nullptr) {
-        std::cout << "malloc failed." << std::endl;
-        return 0;
-    }
-
-    (void)memset_s(ch, size + 1, 0x00, size + 1);
-    if (memcpy_s(ch, size, data, size) != EOK) {
-        std::cout << "copy failed." << std::endl;
-        free(ch);
-        ch = nullptr;
-        return 0;
-    }
-    OHOS::Sensors::OnRemoteRequestFuzzTest(ch, size);
-    free(ch);
-    ch = nullptr;
+    OHOS::Sensors::OnRemoteRequestFuzzTest(data, size);
     return 0;
 }
