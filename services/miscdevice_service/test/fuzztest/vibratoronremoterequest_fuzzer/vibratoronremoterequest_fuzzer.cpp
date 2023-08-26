@@ -67,7 +67,7 @@ void SetUpTestCase()
 uint32_t GetU32Data(const uint8_t *data)
 {
     // convert fuzz input data to an integer
-    return ((ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | ptr[3]) % IPC_CODE_COUNT;
+    return ((data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3]) % IPC_CODE_COUNT;
 }
 
 bool OnRemoteRequestFuzzTest(const uint8_t *data, size_t size)
