@@ -32,7 +32,7 @@ using namespace Security::AccessToken;
 using Security::AccessToken::AccessTokenID;
 namespace {
 constexpr size_t U32_AT_SIZE = 4;
-auto g_miscdeviceService = MiscdeviceDelayedSpSingleton<MiscdeviceService>::GetInstance();
+auto g_service = MiscdeviceDelayedSpSingleton<MiscdeviceService>::GetInstance();
 const std::u16string VIBRATOR_INTERFACE_TOKEN = u"IMiscdeviceService";
 }
 
@@ -68,8 +68,8 @@ bool OnRemoteRequestFuzzTest(const uint8_t *data, size_t size)
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
-    g_miscdeviceService->OnStartFuzz();
-    g_miscdeviceService->OnRemoteRequest(static_cast<uint32_t>(MiscdeviceInterfaceCode::STOP_VIBRATOR_ALL),
+    g_service->OnStartFuzz();
+    g_service->OnRemoteRequest(static_cast<uint32_t>(MiscdeviceInterfaceCode::STOP_VIBRATOR_ALL),
         datas, reply, option);
     return true;
 }
