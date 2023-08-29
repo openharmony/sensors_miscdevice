@@ -60,6 +60,8 @@ ohos_fuzztest("GetLightListStubFuzzTest") {
     "samgr:samgr_proxy",
   ]
 
+  defines = miscdevice_default_defines
+
   if (hdf_drivers_interface_light) {
     external_deps += [ "drivers_interface_light:liblight_proxy_1.0" ]
   }
