@@ -42,10 +42,9 @@
       "group_type": {
         "base_group": [],
         "fwk_group": [
-          "//base/sensors/miscdevice/interfaces/plugin:vibrator_js_target",
-          "//base/sensors/miscdevice/interfaces/native/vibrator:vibrator_target",
-          "//base/sensors/miscdevice/interfaces/native/light:light_target",
-          "//base/sensors/miscdevice/frameworks/native/miscdevice:miscdevice_native_target",
+          "//base/sensors/miscdevice/frameworks/js/napi:vibrator_js_target",
+          "//base/sensors/miscdevice/frameworks/native/vibrator:vibrator_target",
+          "//base/sensors/miscdevice/frameworks/native/light:light_target",
           "//base/sensors/miscdevice/utils:miscdevice_utils_target"
         ],
         "service_group": [
@@ -55,33 +54,33 @@
       },
       "inner_kits": [
         {
-          "name": "//base/sensors/miscdevice/interfaces/native/vibrator:vibrator_interface_native",
+          "name": "//base/sensors/miscdevice/frameworks/native/vibrator:vibrator_interface_native",
           "header": {
             "header_files": [
               "vibrator_agent.h",
               "vibrator_agent_type.h"
             ],
-            "header_base": "//base/sensors/miscdevice/interfaces/native/vibrator/include"
+            "header_base": "//base/sensors/miscdevice/interfaces/inner_api/vibrator"
           }
         },
         {
-          "name": "//base/sensors/miscdevice/interfaces/native/light:light_interface_native",
+          "name": "//base/sensors/miscdevice/frameworks/native/light:light_interface_native",
           "header": {
             "header_files": [
               "light_agent_type.h",
               "light_agent.h"
             ],
-            "header_base": "//base/sensors/miscdevice/interfaces/native/light/include"
+            "header_base": "//base/sensors/miscdevice/interfaces/inner_api/light"
           }
         }
       ],
       "test": [
-        "//base/sensors/miscdevice/interfaces/plugin/vibrator/test/unittest:unittest",
-        "//base/sensors/miscdevice/interfaces/native/vibrator/test/fuzztest:fuzztest",
-        "//base/sensors/miscdevice/interfaces/native/light/test/fuzztest:fuzztest",
-        "//base/sensors/miscdevice/interfaces/native/vibrator/test:unittest",
-        "//base/sensors/miscdevice/interfaces/native/light/test:unittest",
-        "//base/sensors/miscdevice/services/miscdevice_service/test/fuzztest:fuzztest"
+        "//base/sensors/miscdevice/test/unittest/vibrator/js:unittest",
+        "//base/sensors/miscdevice/test/fuzztest/vibrator:fuzztest",
+        "//base/sensors/miscdevice/test/fuzztest/light:fuzztest",
+        "//base/sensors/miscdevice/test/unittest/vibrator/native:unittest",
+        "//base/sensors/miscdevice/test/unittest/light:unittest",
+        "//base/sensors/miscdevice/test/fuzztest/service:fuzztest"
       ]
     }
   }
