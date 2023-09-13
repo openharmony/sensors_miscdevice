@@ -59,6 +59,31 @@ struct VibrateInfo {
     int64_t length = -1;
 };
 
+static napi_value EmitAsyncWork(napi_value param, sptr<AsyncCallbackInfo> info)
+{
+    CHKPP(info);
+    napi_status status = napi_generic_failure;
+    if (param != nullptr) {
+        status = napi_create_reference(info->env, param, 1, &info->callback[0]);
+        if (status != napi_ok) {
+            MISC_HILOGE("napi_create_reference fail");
+            return nullptr;
+        }
+        EmitAsyncCallbackWork(info);
+        return nullptr;
+    }
+    napi_deferred deferred = nullptr;
+    napi_value promise = nullptr;
+    status = napi_create_promise(info->env, &deferred, &promise);
+    if (status != napi_ok) {
+        MISC_HILOGE("napi_create_promise fail");
+        return nullptr;
+    }
+    info->deferred = deferred;
+    EmitPromiseWork(info);
+    return promise;
+}
+
 static napi_value VibrateTime(napi_env env, napi_value args[], size_t argc)
 {
     NAPI_ASSERT(env, (argc >= 1), "Wrong argument number");
@@ -66,20 +91,11 @@ static napi_value VibrateTime(napi_env env, napi_value args[], size_t argc)
     NAPI_ASSERT(env, GetInt32Value(env, args[0], duration), "Get int number fail");
     sptr<AsyncCallbackInfo> asyncCallbackInfo = new (std::nothrow) AsyncCallbackInfo(env);
     CHKPP(asyncCallbackInfo);
-
     asyncCallbackInfo->error.code = StartVibratorOnce(duration);
     if (argc >= 2 && IsMatchType(env, args[1], napi_function)) {
-        NAPI_CALL(env, napi_create_reference(env, args[1], 1, &asyncCallbackInfo->callback[0]));
-        EmitAsyncCallbackWork(asyncCallbackInfo);
-        return nullptr;
+        return EmitAsyncWork(args[1], asyncCallbackInfo);
     }
-
-    napi_deferred deferred = nullptr;
-    napi_value promise = nullptr;
-    NAPI_CALL(env, napi_create_promise(env, &deferred, &promise));
-    asyncCallbackInfo->deferred = deferred;
-    EmitPromiseWork(asyncCallbackInfo);
-    return promise;
+    return EmitAsyncWork(nullptr, asyncCallbackInfo);
 }
 
 static napi_value VibrateEffectId(napi_env env, napi_value args[], size_t argc)
@@ -90,19 +106,10 @@ static napi_value VibrateEffectId(napi_env env, napi_value args[], size_t argc)
     sptr<AsyncCallbackInfo> asyncCallbackInfo = new (std::nothrow) AsyncCallbackInfo(env);
     CHKPP(asyncCallbackInfo);
     asyncCallbackInfo->error.code = StartVibrator(effectId.c_str());
-
     if (argc >= 2 && IsMatchType(env, args[1], napi_function)) {
-        NAPI_CALL(env, napi_create_reference(env, args[1], 1, &asyncCallbackInfo->callback[0]));
-        EmitAsyncCallbackWork(asyncCallbackInfo);
-        return nullptr;
+        return EmitAsyncWork(args[1], asyncCallbackInfo);
     }
-
-    napi_deferred deferred = nullptr;
-    napi_value promise = nullptr;
-    NAPI_CALL(env, napi_create_promise(env, &deferred, &promise));
-    asyncCallbackInfo->deferred = deferred;
-    EmitPromiseWork(asyncCallbackInfo);
-    return promise;
+    return EmitAsyncWork(nullptr, asyncCallbackInfo);
 }
 
 static bool GetCallbackInfo(const napi_env &env, napi_value args[],
@@ -232,19 +239,9 @@ static napi_value VibrateEffect(napi_env env, napi_value args[], size_t argc)
         return nullptr;
     }
     if (argc >= 3 && IsMatchType(env, args[2], napi_function)) {
-        if (napi_create_reference(env, args[2], 1, &asyncCallbackInfo->callback[0]) != napi_ok) {
-            ThrowErr(env, PARAMETER_ERROR, "napi_create_reference fail");
-            return nullptr;
-        }
-        EmitAsyncCallbackWork(asyncCallbackInfo);
-        return nullptr;
+        return EmitAsyncWork(args[2], asyncCallbackInfo);
     }
-    napi_deferred deferred = nullptr;
-    napi_value promise = nullptr;
-    CHKCP((napi_create_promise(env, &deferred, &promise) == napi_ok), "napi_create_promise fail");
-    asyncCallbackInfo->deferred = deferred;
-    EmitPromiseWork(asyncCallbackInfo);
-    return promise;
+    return EmitAsyncWork(nullptr, asyncCallbackInfo);
 }
 
 static napi_value StartVibrate(napi_env env, napi_callback_info info)
@@ -301,16 +298,9 @@ static napi_value Cancel(napi_env env, napi_callback_info info)
     CHKPP(asyncCallbackInfo);
     asyncCallbackInfo->error.code = Cancel();
     if ((argc > 0) && (IsMatchType(env, args[0], napi_function))) {
-        NAPI_CALL(env, napi_create_reference(env, args[0], 1, &asyncCallbackInfo->callback[0]));
-        EmitAsyncCallbackWork(asyncCallbackInfo);
-        return nullptr;
+        return EmitAsyncWork(args[0], asyncCallbackInfo);
     }
-    napi_deferred deferred = nullptr;
-    napi_value promise = nullptr;
-    NAPI_CALL(env, napi_create_promise(env, &deferred, &promise));
-    asyncCallbackInfo->deferred = deferred;
-    EmitPromiseWork(asyncCallbackInfo);
-    return promise;
+    return EmitAsyncWork(nullptr, asyncCallbackInfo);
 }
 
 static napi_value Stop(napi_env env, napi_callback_info info)
@@ -337,19 +327,9 @@ static napi_value Stop(napi_env env, napi_callback_info info)
             return nullptr;
         }
         if (argc >= 2 && IsMatchType(env, args[1], napi_function)) {
-            if (napi_create_reference(env, args[1], 1, &asyncCallbackInfo->callback[0]) != napi_ok) {
-                ThrowErr(env, PARAMETER_ERROR, "napi_create_reference fail");
-                return nullptr;
-            }
-            EmitAsyncCallbackWork(asyncCallbackInfo);
-            return nullptr;
+            return EmitAsyncWork(args[1], asyncCallbackInfo);
         }
-        napi_deferred deferred = nullptr;
-        napi_value promise = nullptr;
-        CHKCP((napi_create_promise(env, &deferred, &promise) == napi_ok), "napi_create_promise fail");
-        asyncCallbackInfo->deferred = deferred;
-        EmitPromiseWork(asyncCallbackInfo);
-        return promise;
+        return EmitAsyncWork(nullptr, asyncCallbackInfo);
     } else {
         return Cancel(env, info);
     }
@@ -375,16 +355,9 @@ static napi_value IsSupportEffect(napi_env env, napi_callback_info info)
     asyncCallbackInfo->callbackType = IS_SUPPORT_EFFECT_CALLBACK;
     asyncCallbackInfo->error.code = IsSupportEffect(effectId.c_str(), &asyncCallbackInfo->isSupportEffect);
     if ((argc > 1) && (IsMatchType(env, args[1], napi_function))) {
-        NAPI_CALL(env, napi_create_reference(env, args[1], 1, &asyncCallbackInfo->callback[0]));
-        EmitAsyncCallbackWork(asyncCallbackInfo);
-        return nullptr;
+        return EmitAsyncWork(args[1], asyncCallbackInfo);
     }
-    napi_deferred deferred = nullptr;
-    napi_value promise = nullptr;
-    NAPI_CALL(env, napi_create_promise(env, &deferred, &promise));
-    asyncCallbackInfo->deferred = deferred;
-    EmitPromiseWork(asyncCallbackInfo);
-    return promise;
+    return EmitAsyncWork(nullptr, asyncCallbackInfo);
 }
 
 static napi_value EnumClassConstructor(const napi_env env, const napi_callback_info info)
