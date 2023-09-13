@@ -17,7 +17,7 @@ import("//build/test.gni")
 import("./../../../../../../miscdevice.gni")
 
 ohos_fuzztest("StartVibratorFuzzTest") {
-  module_out_path = "sensors/vibrator"
+  module_out_path = FUZZ_MODULE_OUT_PATH
 
   fuzz_config_file = "$SUBSYSTEM_DIR/interfaces/native/vibrator/test/fuzztest/startvibrator_fuzzer"
 
