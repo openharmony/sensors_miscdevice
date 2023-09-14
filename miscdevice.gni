@@ -22,6 +22,8 @@ print(
 
 SUBSYSTEM_DIR = "//base/sensors/miscdevice"
 
+FUZZ_MODULE_OUT_PATH = "miscdevice/miscdevice"
+
 miscdevice_default_defines = []
 
 if (miscdevice_feature_vibrator_custom) {

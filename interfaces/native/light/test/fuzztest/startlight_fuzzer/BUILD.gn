@@ -17,7 +17,7 @@ import("//build/test.gni")
 import("./../../../../../../miscdevice.gni")
 
 ohos_fuzztest("StartLightFuzzTest") {
-  module_out_path = "sensors/light"
+  module_out_path = FUZZ_MODULE_OUT_PATH
 
   fuzz_config_file =
       "$SUBSYSTEM_DIR/interfaces/native/light/test/fuzztest/startlight_fuzzer"
