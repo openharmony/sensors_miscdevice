@@ -30,8 +30,8 @@ ohos_shared_library("libmiscdevice_service") {
 
   include_dirs = [
     "include",
-    "$SUBSYSTEM_DIR/frameworks/native/miscdevice/include",
-    "$SUBSYSTEM_DIR/interfaces/native/light/include",
+    "$SUBSYSTEM_DIR/frameworks/native/common/include",
+    "$SUBSYSTEM_DIR/interfaces/inner_api/light",
     "$SUBSYSTEM_DIR/services/miscdevice_service/hdi_connection/adapter/include",
     "$SUBSYSTEM_DIR/services/miscdevice_service/hdi_connection/interface/include",
     "$SUBSYSTEM_DIR/utils/include",
@@ -92,8 +92,8 @@ ohos_shared_library("libmiscdevice_service_static") {
 
   include_dirs = [
     "include",
-    "$SUBSYSTEM_DIR/frameworks/native/miscdevice/include",
-    "$SUBSYSTEM_DIR/interfaces/native/light/include",
+    "$SUBSYSTEM_DIR/frameworks/native/common/include",
+    "$SUBSYSTEM_DIR/interfaces/inner_api/light",
     "$SUBSYSTEM_DIR/services/miscdevice_service/hdi_connection/adapter/include",
     "$SUBSYSTEM_DIR/services/miscdevice_service/hdi_connection/interface/include",
     "$SUBSYSTEM_DIR/utils/include",
