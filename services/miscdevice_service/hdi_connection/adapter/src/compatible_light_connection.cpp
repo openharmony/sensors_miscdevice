@@ -58,7 +58,7 @@ int32_t CompatibleLightConnection::TurnOn(int32_t lightId,  const LightColor &co
         return LIGHT_ID_NOT_SUPPORT;
     }
     int32_t mode = animation.GetMode();
-    int32_t onTime = animation.GetOnTime;
+    int32_t onTime = animation.GetOnTime();
     int32_t offTime = animation.GetOffTime();
     if ((mode == LIGHT_MODE_BLINK || mode == LIGHT_MODE_GRADIENT) &&
         (onTime <= 0 || offTime <= 0)) {

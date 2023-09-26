@@ -169,7 +169,7 @@ bool MiscdeviceService::IsValid(int32_t lightId)
 bool MiscdeviceService::IsLightAnimationValid(const LightAnimationIPC &animation)
 {
     int32_t mode = animation.GetMode();
-    int32_t onTime = animation.GetOnTime;
+    int32_t onTime = animation.GetOnTime();
     int32_t offTime = animation.GetOffTime();
     if ((mode < 0) || (mode >= LIGHT_MODE_BUTT)) {
         MISC_HILOGE("animation mode is invalid, mode:%{pubilc}d", mode);
