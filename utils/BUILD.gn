@@ -18,6 +18,8 @@ ohos_shared_library("libmiscdevice_utils") {
   sources = [
     "src/file_utils.cpp",
     "src/json_parser.cpp",
+    "src/light_animation_ipc.cpp",
+    "src/light_info_ipc.cpp",
     "src/miscdevice_common.cpp",
     "src/permission_util.cpp",
   ]

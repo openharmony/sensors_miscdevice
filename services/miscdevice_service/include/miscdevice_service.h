@@ -68,8 +68,8 @@ public:
     virtual int32_t StopVibrator(int32_t vibratorId) override;
     virtual int32_t StopVibrator(int32_t vibratorId, const std::string &mode) override;
     virtual int32_t IsSupportEffect(const std::string &effect, bool &state) override;
-    virtual std::vector<LightInfo> GetLightList() override;
-    virtual int32_t TurnOn(int32_t lightId, const LightColor &color, const LightAnimation &animation) override;
+    virtual std::vector<LightInfoIPC> GetLightList() override;
+    virtual int32_t TurnOn(int32_t lightId, const LightColor &color, const LightAnimationIPC &animation) override;
     virtual int32_t TurnOff(int32_t lightId) override;
 
 private:
@@ -88,7 +88,7 @@ private:
     LightHdiConnection &lightHdiConnection_ = LightHdiConnection::GetInstance();
     bool lightExist_;
     bool vibratorExist_;
-    std::vector<LightInfo> lightInfos_;
+    std::vector<LightInfoIPC> lightInfos_;
     std::map<MiscdeviceDeviceId, bool> miscDeviceIdMap_;
     MiscdeviceServiceState state_;
     std::shared_ptr<VibratorThread> vibratorThread_ = nullptr;

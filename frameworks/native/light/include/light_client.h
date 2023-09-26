@@ -44,7 +44,7 @@ private:
     int32_t lightInfoCount_ {-1};
     sptr<IRemoteObject::DeathRecipient> serviceDeathObserver_ = nullptr;
     sptr<IMiscdeviceService> miscdeviceProxy_ = nullptr;
-    std::vector<LightInfo> lightInfoList_;
+    std::vector<LightInfoIPC> lightInfoList_;
     std::mutex clientMutex_;
 };
 }  // namespace Sensors

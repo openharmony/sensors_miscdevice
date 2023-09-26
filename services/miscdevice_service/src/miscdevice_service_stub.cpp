@@ -210,7 +210,7 @@ int32_t MiscdeviceServiceStub::PlayVibratorCustomStub(MessageParcel &data, Messa
 int32_t MiscdeviceServiceStub::GetLightListStub(MessageParcel &data, MessageParcel &reply)
 {
     (void)data;
-    std::vector<LightInfo> lightInfos(GetLightList());
+    std::vector<LightInfoIPC> lightInfos(GetLightList());
     size_t lightCount = lightInfos.size();
     MISC_HILOGE("lightCount:%{public}zu", lightCount);
     if (!reply.WriteUint32(lightCount)) {
@@ -218,8 +218,8 @@ int32_t MiscdeviceServiceStub::GetLightListStub(MessageParcel &data, MessageParc
         return WRITE_MSG_ERR;
     }
     for (size_t i = 0; i < lightCount; ++i) {
-        if (!reply.WriteBuffer(&lightInfos[i], sizeof(LightInfo))) {
-            MISC_HILOGE("WriteBuffer failed");
+        if (!lightInfos[i].Marshalling(reply)) {
+            MISC_HILOGE("lightInfo %{public}zu marshalling failed", i);
             return WRITE_MSG_ERR;
         }
     }
@@ -229,22 +229,12 @@ int32_t MiscdeviceServiceStub::GetLightListStub(MessageParcel &data, MessageParc
 int32_t MiscdeviceServiceStub::TurnOnStub(MessageParcel &data, MessageParcel &reply)
 {
     int32_t lightId = data.ReadInt32();
-    const unsigned char *info = data.ReadBuffer(sizeof(LightColor));
-    CHKPR(info, ERROR);
     LightColor lightColor;
-    if (memcpy_s(&lightColor, sizeof(LightColor), info, sizeof(LightColor)) != EOK) {
-        MISC_HILOGE("memcpy_s lightColor failed");
-        return ERROR;
-    }
-
-    const unsigned char *buf = data.ReadBuffer(sizeof(LightAnimation));
-    CHKPR(buf, ERROR);
-    LightAnimation lightAnimation;
-    if (memcpy_s(&lightAnimation, sizeof(LightAnimation), buf, sizeof(LightAnimation)) != EOK) {
-        MISC_HILOGE("memcpy_s lightAnimation failed");
-        return ERROR;
-    }
-    return TurnOn(lightId, lightColor, lightAnimation);
+    lightColor.singleColor = data.ReadInt32();
+    LightAnimationIPC lightAnimation;
+    auto tmpAnimation = lightAnimation.Unmarshalling(data);
+    CHKPR(tmpAnimation, ERROR);
+    return TurnOn(lightId, lightColor, *tmpAnimation);
 }
 
 int32_t MiscdeviceServiceStub::TurnOffStub(MessageParcel &data, MessageParcel &reply)
