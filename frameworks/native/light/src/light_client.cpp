@@ -198,7 +198,7 @@ int32_t LightClient::ConvertLightInfos()
         LightInfo *lightInfo = lightInfos_ + i;
         errno_t ret = strcpy_s(lightInfo->lightName, NAME_MAX_LEN,
             lightInfoList_[i].GetLightName().c_str());
-        CHKCR(ret == EOK, ERROR);
+        CHKCR(ret == EOK, ERROR, "strcpy_s error");
         lightInfo->lightId = lightInfoList_[i].GetLightId();
         lightInfo->lightNumber = lightInfoList_[i].GetLightNumber();
         lightInfo->lightType = lightInfoList_[i].GetLightType();
