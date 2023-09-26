@@ -57,7 +57,7 @@ public:
     void OnStop() override;
     void OnStartFuzz();
     bool IsValid(int32_t lightId);
-    bool IsLightAnimationValid(const LightAnimation &animation);
+    bool IsLightAnimationValid(const LightAnimationIPC &animation);
     int32_t Dump(int32_t fd, const std::vector<std::u16string> &args) override;
     virtual int32_t Vibrate(int32_t vibratorId, int32_t timeOut, int32_t usage) override;
     virtual int32_t PlayVibratorEffect(int32_t vibratorId, const std::string &effect,
