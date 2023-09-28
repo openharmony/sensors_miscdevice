@@ -754,5 +754,50 @@ HWTEST_F(VibratorAgentTest, IsSupportEffect_003, TestSize.Level1)
     ASSERT_NE(ret, 0);
     ASSERT_FALSE(state);
 }
+
+HWTEST_F(VibratorAgentTest, IsSupportEffect_004, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    bool state { false };
+    int32_t ret = IsSupportEffect(VIBRATOR_TYPE_FAIL, &state);
+    ASSERT_EQ(ret, 0);
+    if (state) {
+        ret = StartVibrator(VIBRATOR_TYPE_FAIL);
+        ASSERT_EQ(ret, 0);
+        Cancel();
+    } else {
+        MISC_HILOGI("Do not support %{public}s", VIBRATOR_TYPE_FAIL);
+    }
+}
+
+HWTEST_F(VibratorAgentTest, IsSupportEffect_005, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    bool state { false };
+    int32_t ret = IsSupportEffect(VIBRATOR_TYPE_CHARGING, &state);
+    ASSERT_EQ(ret, 0);
+    if (state) {
+        ret = StartVibrator(VIBRATOR_TYPE_CHARGING);
+        ASSERT_EQ(ret, 0);
+        Cancel();
+    } else {
+        MISC_HILOGI("Do not support %{public}s", VIBRATOR_TYPE_CHARGING);
+    }
+}
+
+HWTEST_F(VibratorAgentTest, IsSupportEffect_006, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    bool state { false };
+    int32_t ret = IsSupportEffect(VIBRATOR_TYPE_LONG_PRESS_HEAVY, &state);
+    ASSERT_EQ(ret, 0);
+    if (state) {
+        ret = StartVibrator(VIBRATOR_TYPE_LONG_PRESS_HEAVY);
+        ASSERT_EQ(ret, 0);
+        Cancel();
+    } else {
+        MISC_HILOGI("Do not support %{public}s", VIBRATOR_TYPE_LONG_PRESS_HEAVY);
+    }
+}
 }  // namespace Sensors
 }  // namespace OHOS

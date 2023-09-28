@@ -26,6 +26,9 @@ extern "C" {
  * @since 1
  */
 const char *VIBRATOR_TYPE_CLOCK_TIMER = "haptic.clock.timer";
+const char *VIBRATOR_TYPE_FAIL = "haptic.fail";
+const char *VIBRATOR_TYPE_CHARGING = "haptic.charging";
+const char *VIBRATOR_TYPE_LONG_PRESS_HEAVY = "haptic.long_press.heavy";
 
 /**
  * @brief Enumerates vibration usages.
