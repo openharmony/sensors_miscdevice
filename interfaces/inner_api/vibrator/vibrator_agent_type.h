@@ -28,6 +28,27 @@ extern "C" {
 const char *VIBRATOR_TYPE_CLOCK_TIMER = "haptic.clock.timer";
 
 /**
+ * @brief Describes the vibration effect of the vibrator when authentication fails.
+ *
+ * @since 11
+ */
+const char *VIBRATOR_TYPE_FAIL = "haptic.fail";
+
+/**
+ * @brief Describes the vibration effect of the vibrator when charging.
+ *
+ * @since 11
+ */
+const char *VIBRATOR_TYPE_CHARGING = "haptic.charging";
+
+/**
+ * @brief Describes the vibration effect of the vibrator when long pressed.
+ *
+ * @since 11
+ */
+const char *VIBRATOR_TYPE_LONG_PRESS_HEAVY = "haptic.long_press.heavy";
+
+/**
  * @brief Enumerates vibration usages.
  *
  * @since 9
