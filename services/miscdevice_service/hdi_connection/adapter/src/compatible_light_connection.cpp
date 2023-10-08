@@ -55,6 +55,7 @@ int32_t CompatibleLightConnection::TurnOn(int32_t lightId,  const LightColor &co
         MISC_HILOGE("animation parameter error");
         return LIGHT_ERR;
     }
+    std::lock_guard<std::mutex> lock(turnOnLightsMutex_);
     if (std::find(turnOnLights_.begin(), turnOnLights_.end(), lightId) != turnOnLights_.end()) {
         MISC_HILOGI("lightId:%{public}d has been turnOn", lightId);
         return ERR_OK;
@@ -70,6 +71,7 @@ int32_t CompatibleLightConnection::TurnOff(int32_t lightId)
         MISC_HILOGE("Not support TurnOff lightId:%{public}d", lightId);
         return LIGHT_ID_NOT_SUPPORT;
     }
+    std::lock_guard<std::mutex> lock(turnOnLightsMutex_);
     if (std::find(turnOnLights_.begin(), turnOnLights_.end(), lightId) == turnOnLights_.end()) {
         MISC_HILOGE("lightId:%{public}d should not be turn off", lightId);
         return LIGHT_END_ERROR;
