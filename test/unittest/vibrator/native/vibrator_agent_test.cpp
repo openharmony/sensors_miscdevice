@@ -790,5 +790,66 @@ HWTEST_F(VibratorAgentTest, IsSupportEffect_006, TestSize.Level1)
         MISC_HILOGI("Do not support %{public}s", VIBRATOR_TYPE_LONG_PRESS_HEAVY);
     }
 }
+
+HWTEST_F(VibratorAgentTest, IsSupportEffect_007, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    bool state { false };
+    int32_t ret = IsSupportEffect(VIBRATOR_TYPE_LONG_PRESS_LIGHT, &state);
+    ASSERT_EQ(ret, 0);
+    if (state) {
+        ret = StartVibrator(VIBRATOR_TYPE_LONG_PRESS_LIGHT);
+        ASSERT_EQ(ret, 0);
+        Cancel();
+    } else {
+        MISC_HILOGI("Do not support %{public}s", VIBRATOR_TYPE_LONG_PRESS_LIGHT);
+    }
+}
+
+HWTEST_F(VibratorAgentTest, IsSupportEffect_008, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    bool state { false };
+    int32_t ret = IsSupportEffect(VIBRATOR_TYPE_LONG_PRESS_MEDIUM, &state);
+    ASSERT_EQ(ret, 0);
+    if (state) {
+        ret = StartVibrator(VIBRATOR_TYPE_LONG_PRESS_MEDIUM);
+        ASSERT_EQ(ret, 0);
+        Cancel();
+    } else {
+        MISC_HILOGI("Do not support %{public}s", VIBRATOR_TYPE_LONG_PRESS_MEDIUM);
+    }
+}
+
+HWTEST_F(VibratorAgentTest, IsSupportEffect_009, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    bool state { false };
+    int32_t ret = IsSupportEffect(VIBRATOR_TYPE_SLIDE_LIGHT, &state);
+    ASSERT_EQ(ret, 0);
+    if (state) {
+        ret = StartVibrator(VIBRATOR_TYPE_SLIDE_LIGHT);
+        ASSERT_EQ(ret, 0);
+        Cancel();
+    } else {
+        MISC_HILOGI("Do not support %{public}s", VIBRATOR_TYPE_SLIDE_LIGHT);
+    }
+}
+
+HWTEST_F(VibratorAgentTest, IsSupportEffect_010, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    bool state { false };
+    int32_t ret = IsSupportEffect(VIBRATOR_TYPE_THRESHOID, &state);
+    ASSERT_EQ(ret, 0);
+    if (state) {
+        ret = StartVibrator(VIBRATOR_TYPE_THRESHOID);
+        ASSERT_EQ(ret, 0);
+        Cancel();
+    } else {
+        MISC_HILOGI("Do not support %{public}s", VIBRATOR_TYPE_THRESHOID);
+    }
+}
+
 }  // namespace Sensors
 }  // namespace OHOS
