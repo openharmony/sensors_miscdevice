@@ -97,7 +97,7 @@ bool IsSupportVibratorCustom()
 {
     return (OHOS::system::GetDeviceType() == PHONE_TYPE);
 }
-
+///////////////////////////////////
 int32_t PlayVibratorCustom(int32_t fd, int64_t offset, int64_t length)
 {
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
