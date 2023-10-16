@@ -31,6 +31,10 @@ std::unordered_map<std::string, int32_t> g_vibratorEffect = {
     {"haptic.default.effect", 804},
     {"haptic.fail", 60},
     {"haptic.charging", 100},
+    {"haptic.threshold", 42},
+    {"haptic.slide.light", 10},
+    {"haptic.long_press.light", 80},
+    {"haptic.long_press.medium", 80},
     {"haptic.long_press.heavy", 80}
 };
 HdfVibratorMode g_vibrateMode;
