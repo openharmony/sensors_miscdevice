@@ -17,6 +17,7 @@
 #define COMPATIBLE_LIGHT_CONNECTION_H
 
 #include <atomic>
+#include <mutex>
 #include <thread>
 #include <vector>
 
@@ -34,6 +35,7 @@ public:
     int32_t DestroyHdiConnection() override;
 
 private:
+    std::mutex turnOnLightsMutex_;
     std::vector<int32_t> turnOnLights_;
     static std::atomic_bool isStop_;
     DISALLOW_COPY_AND_MOVE(CompatibleLightConnection);

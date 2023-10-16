@@ -64,6 +64,7 @@ bool SetLoopCount(int32_t count)
 
 int32_t StartVibrator(const char *effectId)
 {
+    MISC_HILOGI("Time delay measurement:start time");
     CHKPR(effectId, PARAMETER_ERROR);
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.Vibrate(DEFAULT_VIBRATOR_ID, effectId, g_loopCount, g_usage);
@@ -100,6 +101,7 @@ bool IsSupportVibratorCustom()
 int32_t PlayVibratorCustom(int32_t fd, int64_t offset, int64_t length)
 {
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+    MISC_HILOGI("Time delay measurement:start time");
     if (fd < 0 || offset < 0 || length <= 0) {
         MISC_HILOGE("Input parameter invalid, fd:%{public}d, offset:%{public}lld, length:%{public}lld",
             fd, static_cast<long long>(offset), static_cast<long long>(length));

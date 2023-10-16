@@ -64,6 +64,7 @@ int32_t HdiConnection::StartOnce(uint32_t duration)
 
 int32_t HdiConnection::Start(const std::string &effectType)
 {
+    MISC_HILOGI("Time delay measurement:end time");
     if (effectType.empty()) {
         MISC_HILOGE("effectType is null");
         return VIBRATOR_ON_ERR;
@@ -82,6 +83,7 @@ int32_t HdiConnection::Start(const std::string &effectType)
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 int32_t HdiConnection::EnableCompositeEffect(const HdfCompositeEffect &hdfCompositeEffect)
 {
+    MISC_HILOGI("Time delay measurement:end time");
     if (hdfCompositeEffect.compositeEffects.empty()) {
         MISC_HILOGE("compositeEffects is empty");
         return VIBRATOR_ON_ERR;
