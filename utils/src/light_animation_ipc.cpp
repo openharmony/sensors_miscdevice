@@ -82,12 +82,7 @@ std::unique_ptr<LightAnimationIPC> LightAnimationIPC::Unmarshalling(Parcel &parc
 
 bool LightAnimationIPC::ReadFromParcel(Parcel &parcel)
 {
-    if ((!parcel.ReadInt32(mode_)) ||
-        (!parcel.ReadInt32(onTime_)) ||
-        (!parcel.ReadInt32(offTime_))) {
-        return false;
-    }
-    return true;
+    return (parcel.ReadInt32(mode_)) && (parcel.ReadInt32(onTime_)) && (parcel.ReadInt32(offTime_));
 }
 }  // namespace Sensors
 }  // namespace OHOS

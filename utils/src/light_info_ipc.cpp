@@ -96,13 +96,8 @@ std::unique_ptr<LightInfoIPC> LightInfoIPC::Unmarshalling(Parcel &parcel)
 
 bool LightInfoIPC::ReadFromParcel(Parcel &parcel)
 {
-    if ((!parcel.ReadString(lightName_)) ||
-        (!parcel.ReadInt32(lightId_)) ||
-        (!parcel.ReadInt32(lightNumber_)) ||
-        (!parcel.ReadInt32(lightType_))) {
-        return false;
-    }
-    return true;
+    return (parcel.ReadString(lightName_)) && (parcel.ReadInt32(lightId_)) &&
+        (parcel.ReadInt32(lightNumber_)) && (parcel.ReadInt32(lightType_));
 }
 }  // namespace Sensors
 }  // namespace OHOS
