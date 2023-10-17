@@ -36,22 +36,32 @@ int32_t CompatibleLightConnection::ConnectHdi()
     return ERR_OK;
 }
 
-int32_t CompatibleLightConnection::GetLightList(std::vector<LightInfo> &lightList) const
+int32_t CompatibleLightConnection::GetLightList(std::vector<LightInfoIPC> &lightList) const
 {
     CALL_LOG_ENTER;
-    lightList.assign(lightInfo.begin(), lightInfo.end());
+    for (size_t i = 0; i < lightInfo.size(); ++i) {
+        LightInfoIPC light;
+        light.SetLightName(lightInfo[i].lightName);
+        light.SetLightId(lightInfo[i].lightId);
+        light.SetLightNumber(lightInfo[i].lightNumber);
+        light.SetLightType(lightInfo[i].lightType);
+        lightList.push_back(light);
+    }
     return ERR_OK;
 }
 
-int32_t CompatibleLightConnection::TurnOn(int32_t lightId,  const LightColor &color, const LightAnimation &animation)
+int32_t CompatibleLightConnection::TurnOn(int32_t lightId,  const LightColor &color, const LightAnimationIPC &animation)
 {
     CALL_LOG_ENTER;
     if (std::find(supportLights.begin(), supportLights.end(), lightId) == supportLights.end()) {
         MISC_HILOGE("Not support TurnOn lightId:%{public}d", lightId);
         return LIGHT_ID_NOT_SUPPORT;
     }
-    if ((animation.mode == LIGHT_MODE_BLINK || animation.mode == LIGHT_MODE_GRADIENT) &&
-        (animation.onTime <= 0 || animation.offTime <= 0)) {
+    int32_t mode = animation.GetMode();
+    int32_t onTime = animation.GetOnTime();
+    int32_t offTime = animation.GetOffTime();
+    if ((mode == LIGHT_MODE_BLINK || mode == LIGHT_MODE_GRADIENT) &&
+        (onTime <= 0 || offTime <= 0)) {
         MISC_HILOGE("animation parameter error");
         return LIGHT_ERR;
     }

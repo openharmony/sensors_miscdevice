@@ -159,22 +159,25 @@ bool MiscdeviceService::IsValid(int32_t lightId)
 {
     CALL_LOG_ENTER;
     for (const auto &item : lightInfos_) {
-        if (lightId == item.lightId) {
+        if (lightId == item.GetLightId()) {
             return true;
         }
     }
     return false;
 }
 
-bool MiscdeviceService::IsLightAnimationValid(const LightAnimation &animation)
+bool MiscdeviceService::IsLightAnimationValid(const LightAnimationIPC &animation)
 {
-    if ((animation.mode < 0) || (animation.mode >= LIGHT_MODE_BUTT)) {
-        MISC_HILOGE("animation mode is invalid, mode:%{pubilc}d", animation.mode);
+    int32_t mode = animation.GetMode();
+    int32_t onTime = animation.GetOnTime();
+    int32_t offTime = animation.GetOffTime();
+    if ((mode < 0) || (mode >= LIGHT_MODE_BUTT)) {
+        MISC_HILOGE("animation mode is invalid, mode:%{pubilc}d", mode);
         return false;
     }
-    if ((animation.onTime < 0) || (animation.offTime < 0)) {
+    if ((onTime < 0) || (offTime < 0)) {
         MISC_HILOGE("animation onTime or offTime is invalid, onTime:%{pubilc}d, offTime:%{pubilc}d",
-            animation.onTime, animation.offTime);
+            onTime,  offTime);
         return false;
     }
     return true;
@@ -428,7 +431,7 @@ std::string MiscdeviceService::GetPackageName(AccessTokenID tokenId)
     return packageName;
 }
 
-std::vector<LightInfo> MiscdeviceService::GetLightList()
+std::vector<LightInfoIPC> MiscdeviceService::GetLightList()
 {
     if (!InitLightList()) {
         MISC_HILOGE("InitLightList init failed");
@@ -447,7 +450,7 @@ bool MiscdeviceService::InitLightList()
     return true;
 }
 
-int32_t MiscdeviceService::TurnOn(int32_t lightId, const LightColor &color, const LightAnimation &animation)
+int32_t MiscdeviceService::TurnOn(int32_t lightId, const LightColor &color, const LightAnimationIPC &animation)
 {
     CALL_LOG_ENTER;
     if (!IsValid(lightId)) {

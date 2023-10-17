@@ -21,6 +21,8 @@
 #include <nocopyable.h>
 
 #include "light_agent_type.h"
+#include "light_animation_ipc.h"
+#include "light_info_ipc.h"
 
 namespace OHOS {
 namespace Sensors {
@@ -29,8 +31,8 @@ public:
     ILightHdiConnection() = default;
     virtual ~ILightHdiConnection() = default;
     virtual int32_t ConnectHdi() = 0;
-    virtual int32_t GetLightList(std::vector<LightInfo> &lightList) const = 0;
-    virtual int32_t TurnOn(int32_t lightId, const LightColor &color, const LightAnimation &animation) = 0;
+    virtual int32_t GetLightList(std::vector<LightInfoIPC> &lightList) const = 0;
+    virtual int32_t TurnOn(int32_t lightId, const LightColor &color, const LightAnimationIPC &animation) = 0;
     virtual int32_t TurnOff(int32_t lightId) = 0;
     virtual int32_t DestroyHdiConnection() = 0;
 

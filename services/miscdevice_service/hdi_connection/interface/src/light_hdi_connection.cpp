@@ -56,13 +56,13 @@ int32_t LightHdiConnection::ConnectHdiService()
     return iLightHdiConnection_->GetLightList(lightInfoList_);
 }
 
-int32_t LightHdiConnection::GetLightList(std::vector<LightInfo> &lightList) const
+int32_t LightHdiConnection::GetLightList(std::vector<LightInfoIPC> &lightList) const
 {
     lightList.assign(lightInfoList_.begin(), lightInfoList_.end());
     return ERR_OK;
 }
 
-int32_t LightHdiConnection::TurnOn(int32_t lightId, const LightColor &color, const LightAnimation &animation)
+int32_t LightHdiConnection::TurnOn(int32_t lightId, const LightColor &color, const LightAnimationIPC &animation)
 {
     CHKPR(iLightHdiConnection_, ERROR);
     int32_t ret = iLightHdiConnection_->TurnOn(lightId, color, animation);

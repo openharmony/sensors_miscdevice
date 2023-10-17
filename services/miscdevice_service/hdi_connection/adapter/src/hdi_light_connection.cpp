@@ -49,7 +49,7 @@ int32_t HdiLightConnection::ConnectHdi()
     return ERR_INVALID_VALUE;
 }
 
-int32_t HdiLightConnection::GetLightList(std::vector<LightInfo> &lightList) const
+int32_t HdiLightConnection::GetLightList(std::vector<LightInfoIPC> &lightList) const
 {
     CALL_LOG_ENTER;
     std::vector<HDI::Light::V1_0::HdfLightInfo> lightInfos;
@@ -60,31 +60,26 @@ int32_t HdiLightConnection::GetLightList(std::vector<LightInfo> &lightList) cons
         return ret;
     }
     for (size_t i = 0; i < lightInfos.size(); ++i) {
-        LightInfo light;
-        light.lightId = lightInfos[i].lightId;
-        light.lightNumber = lightInfos[i].lightNumber;
-        ret = memcpy_s(light.lightName, NAME_MAX_LEN, lightInfos[i].lightName.c_str(),
-                       lightInfos[i].lightName.length());
-        if (ret != EOK) {
-            MISC_HILOGE("memcpy_s failed, error number:%{public}d", errno);
-            return ret;
-        }
-        light.lightType = lightInfos[i].lightType;
+        LightInfoIPC light;
+        light.SetLightName(lightInfos[i].lightName);
+        light.SetLightId(lightInfos[i].lightId);
+        light.SetLightNumber(lightInfos[i].lightNumber);
+        light.SetLightType(lightInfos[i].lightType);
         lightList.push_back(light);
     }
     return ERR_OK;
 }
 
-int32_t HdiLightConnection::TurnOn(int32_t lightId, const LightColor &color, const LightAnimation &animation)
+int32_t HdiLightConnection::TurnOn(int32_t lightId, const LightColor &color, const LightAnimationIPC &animation)
 {
     CALL_LOG_ENTER;
     HDI::Light::V1_0::HdfLightColor lightColor;
     lightColor.colorValue.singleColor = color.singleColor;
 
     HDI::Light::V1_0::HdfLightFlashEffect flashEffect;
-    flashEffect.flashMode = animation.mode;
-    flashEffect.onTime = animation.onTime;
-    flashEffect.offTime = animation.offTime;
+    flashEffect.flashMode = animation.GetMode();
+    flashEffect.onTime = animation.GetOnTime();
+    flashEffect.offTime = animation.GetOffTime();
 
     HDI::Light::V1_0::HdfLightEffect effect;
     effect.lightColor = lightColor;

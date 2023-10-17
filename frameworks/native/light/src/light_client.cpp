@@ -87,7 +87,7 @@ bool LightClient::IsLightIdValid(int32_t lightId)
         return false;
     }
     for (const auto &item : lightInfoList_) {
-        if (lightId == item.lightId) {
+        if (lightId == item.GetLightId()) {
             return true;
         }
     }
@@ -143,7 +143,11 @@ int32_t LightClient::TurnOn(int32_t lightId, const LightColor &color, const Ligh
         return PARAMETER_ERROR;
     }
     CHKPR(miscdeviceProxy_, ERROR);
-    return miscdeviceProxy_->TurnOn(lightId, color, animation);
+    LightAnimationIPC animationIPC;
+    animationIPC.SetMode(animation.mode);
+    animationIPC.SetOnTime(animation.onTime);
+    animationIPC.SetOffTime(animation.offTime);
+    return miscdeviceProxy_->TurnOn(lightId, color, animationIPC);
 }
 
 int32_t LightClient::TurnOff(int32_t lightId)
@@ -191,7 +195,13 @@ int32_t LightClient::ConvertLightInfos()
     lightInfos_ = (LightInfo *)malloc(sizeof(LightInfo) * count);
     CHKPR(lightInfos_, ERROR);
     for (size_t i = 0; i < count; ++i) {
-        *(lightInfos_ + i) = lightInfoList_[i];
+        LightInfo *lightInfo = lightInfos_ + i;
+        errno_t ret = strcpy_s(lightInfo->lightName, NAME_MAX_LEN,
+            lightInfoList_[i].GetLightName().c_str());
+        CHKCR(ret == EOK, ERROR, "strcpy_s error");
+        lightInfo->lightId = lightInfoList_[i].GetLightId();
+        lightInfo->lightNumber = lightInfoList_[i].GetLightNumber();
+        lightInfo->lightType = lightInfoList_[i].GetLightType();
     }
     lightInfoCount_ = static_cast<int32_t>(count);
     return SUCCESS;

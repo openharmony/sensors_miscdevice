@@ -22,6 +22,8 @@
 #include "iremote_broker.h"
 
 #include "light_agent_type.h"
+#include "light_animation_ipc.h"
+#include "light_info_ipc.h"
 #include "miscdevice_common.h"
 #include "raw_file_descriptor.h"
 #include "sensors_ipc_interface_code.h"
@@ -42,8 +44,8 @@ public:
     virtual int32_t StopVibrator(int32_t vibratorId) = 0;
     virtual int32_t StopVibrator(int32_t vibratorId, const std::string &mode) = 0;
     virtual int32_t IsSupportEffect(const std::string &effect, bool &state) = 0;
-    virtual std::vector<LightInfo> GetLightList() = 0;
-    virtual int32_t TurnOn(int32_t lightId, const LightColor &color, const LightAnimation &animation) = 0;
+    virtual std::vector<LightInfoIPC> GetLightList() = 0;
+    virtual int32_t TurnOn(int32_t lightId, const LightColor &color, const LightAnimationIPC &animation) = 0;
     virtual int32_t TurnOff(int32_t lightId) = 0;
 };
 }  // namespace Sensors

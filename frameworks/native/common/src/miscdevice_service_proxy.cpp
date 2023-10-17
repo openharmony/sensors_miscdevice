@@ -230,10 +230,10 @@ int32_t MiscdeviceServiceProxy::PlayVibratorCustom(int32_t vibratorId, const Raw
 }
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
-std::vector<LightInfo> MiscdeviceServiceProxy::GetLightList()
+std::vector<LightInfoIPC> MiscdeviceServiceProxy::GetLightList()
 {
     MessageParcel data;
-    std::vector<LightInfo> lightInfos;
+    std::vector<LightInfoIPC> lightInfos;
     if (!data.WriteInterfaceToken(MiscdeviceServiceProxy::GetDescriptor())) {
         MISC_HILOGE("WriteInterfaceToken failed");
         return lightInfos;
@@ -259,23 +259,16 @@ std::vector<LightInfo> MiscdeviceServiceProxy::GetLightList()
     if (lightCount > MAX_LIGHT_COUNT) {
         lightCount = MAX_LIGHT_COUNT;
     }
+    LightInfoIPC lightInfo;
     for (uint32_t i = 0; i < lightCount; ++i) {
-        const uint8_t *info = reply.ReadBuffer(sizeof(LightInfo));
-        if (info == nullptr) {
-            MISC_HILOGE("ReadBuffer failed");
-            return lightInfos;
-        }
-        LightInfo lightInfo;
-        if (memcpy_s(&lightInfo, sizeof(LightInfo), info, sizeof(LightInfo)) != EOK) {
-            MISC_HILOGE("memcpy_s failed");
-            return lightInfos;
-        }
-        lightInfos.push_back(lightInfo);
+        auto tmpLightInfo = lightInfo.Unmarshalling(reply);
+        CHKPC(tmpLightInfo);
+        lightInfos.push_back(*tmpLightInfo);
     }
     return lightInfos;
 }
 
-int32_t MiscdeviceServiceProxy::TurnOn(int32_t lightId, const LightColor &color, const LightAnimation &animation)
+int32_t MiscdeviceServiceProxy::TurnOn(int32_t lightId, const LightColor &color, const LightAnimationIPC &animation)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(MiscdeviceServiceProxy::GetDescriptor())) {
@@ -286,12 +279,12 @@ int32_t MiscdeviceServiceProxy::TurnOn(int32_t lightId, const LightColor &color,
         MISC_HILOGE("WriteUint32 lightId failed");
         return WRITE_MSG_ERR;
     }
-    if (!data.WriteBuffer(&color, sizeof(LightColor))) {
-        MISC_HILOGE("WriteBuffer color failed");
+    if (!data.WriteInt32(color.singleColor)) {
+        MISC_HILOGE("Write color failed");
         return WRITE_MSG_ERR;
     }
-    if (!data.WriteBuffer(&animation, sizeof(LightAnimation))) {
-        MISC_HILOGE("WriteBuffer animation failed");
+    if (!animation.Marshalling(data)) {
+        MISC_HILOGE("Write animation failed");
         return WRITE_MSG_ERR;
     }
     sptr<IRemoteObject> remote = Remote();
