@@ -71,7 +71,7 @@ int32_t MiscdeviceServiceStub::VibrateStub(MessageParcel &data, MessageParcel &r
     if (ret != PERMISSION_GRANTED) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
             HiSysEvent::EventType::SECURITY, "PKG_NAME", "VibrateStub", "ERROR_CODE", ret);
-        MISC_HILOGE("Result:%{public}d", ret);
+        MISC_HILOGE("CheckVibratePermission failed, ret:%{public}d", ret);
         return PERMISSION_DENIED;
     }
     int32_t vibratorId;
@@ -109,7 +109,7 @@ int32_t MiscdeviceServiceStub::PlayVibratorEffectStub(MessageParcel &data, Messa
     if (ret != PERMISSION_GRANTED) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
             HiSysEvent::EventType::SECURITY, "PKG_NAME", "PlayVibratorEffectStub", "ERROR_CODE", ret);
-        MISC_HILOGE("Result:%{public}d", ret);
+        MISC_HILOGE("CheckVibratePermission failed, ret:%{public}d", ret);
         return PERMISSION_DENIED;
     }
     int32_t vibratorId;
@@ -131,7 +131,7 @@ int32_t MiscdeviceServiceStub::StopVibratorByModeStub(MessageParcel &data, Messa
     if (ret != PERMISSION_GRANTED) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
             HiSysEvent::EventType::SECURITY, "PKG_NAME", "StopVibratorByModeStub", "ERROR_CODE", ret);
-        MISC_HILOGE("Result:%{public}d", ret);
+        MISC_HILOGE("CheckVibratePermission failed, ret:%{public}d", ret);
         return PERMISSION_DENIED;
     }
     int32_t vibratorId;
