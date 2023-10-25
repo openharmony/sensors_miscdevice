@@ -26,6 +26,13 @@ ohos_shared_library("vibrator") {
     "LOG_DOMAIN = 0xD002700",
   ]
 
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   sources = [
     "$SUBSYSTEM_DIR/frameworks/js/napi/vibrator/src/vibrator_js.cpp",
     "$SUBSYSTEM_DIR/frameworks/js/napi/vibrator/src/vibrator_napi_error.cpp",
