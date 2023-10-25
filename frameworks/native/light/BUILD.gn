@@ -43,7 +43,6 @@ ohos_shared_library("light_interface_native") {
     "include",
   ]
 
-  branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
     cfi_cross_dso = true
