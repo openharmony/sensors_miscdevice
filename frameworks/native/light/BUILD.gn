@@ -79,7 +79,7 @@ ohos_shared_library("liblight_native") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
-    debug = true
+    debug = false
   }
 
   cflags = [ "-fstack-protector-all" ]
