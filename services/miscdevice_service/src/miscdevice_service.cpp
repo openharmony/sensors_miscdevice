@@ -90,7 +90,7 @@ void MiscdeviceService::OnStart()
         MISC_HILOGE("InitLightInterface failed");
         return;
     }
-    if (!SystemAbility::Publish(this)) {
+    if (!SystemAbility::Publish(MiscdeviceDelayedSpSingleton<MiscdeviceService>::GetInstance())) {
         MISC_HILOGE("Publish MiscdeviceService failed");
         return;
     }

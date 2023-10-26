@@ -83,7 +83,7 @@ ohos_shared_library("libvibrator_native") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
-    debug = false
+    debug = true
   }
 
   deps = [ "$SUBSYSTEM_DIR/utils:libmiscdevice_utils" ]

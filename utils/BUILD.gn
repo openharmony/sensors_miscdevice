@@ -32,7 +32,7 @@ ohos_shared_library("libmiscdevice_utils") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
-    debug = false
+    debug = true
   }
 
   deps = [ "//third_party/cJSON:cjson" ]
