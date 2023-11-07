@@ -38,6 +38,12 @@ ohos_shared_library("libmiscdevice_service") {
     "//third_party/cJSON",
   ]
 
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   cflags = [ "-Wno-error=inconsistent-missing-override" ]
   deps = [ "$SUBSYSTEM_DIR/utils:libmiscdevice_utils" ]
 
@@ -99,6 +105,12 @@ ohos_shared_library("libmiscdevice_service_static") {
     "$SUBSYSTEM_DIR/utils/include",
     "//third_party/cJSON",
   ]
+
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
 
   cflags = [ "-Wno-error=inconsistent-missing-override" ]
   deps = [ "$SUBSYSTEM_DIR/utils:libmiscdevice_utils" ]

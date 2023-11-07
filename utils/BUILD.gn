@@ -29,6 +29,12 @@ ohos_shared_library("libmiscdevice_utils") {
     "//third_party/cJSON",
   ]
 
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   deps = [ "//third_party/cJSON:cjson" ]
 
   external_deps = [

@@ -43,6 +43,12 @@ ohos_shared_library("light_interface_native") {
     "include",
   ]
 
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   cflags = [ "-Wno-error=inconsistent-missing-override" ]
 
   deps = [
@@ -75,6 +81,12 @@ ohos_shared_library("liblight_native") {
     "$SUBSYSTEM_DIR/interfaces/inner_api/light",
     "$SUBSYSTEM_DIR/utils/include",
   ]
+
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
 
   cflags = [ "-fstack-protector-all" ]
 
