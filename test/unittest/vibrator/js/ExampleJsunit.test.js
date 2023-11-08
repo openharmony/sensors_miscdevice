@@ -27,7 +27,7 @@ describe("VibratorJsTest", function () {
          * @tc.setup: setup invoked before all testcases
          */
         console.info('beforeAll called')
-        if (deviceInfo.deviceType == "phone") {
+        if (deviceInfo.deviceType != "phone") {
             g_execute = false;
         }
     })
