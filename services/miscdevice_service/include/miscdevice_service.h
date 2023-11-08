@@ -78,10 +78,10 @@ private:
     bool InitLightInterface();
     std::string GetPackageName(AccessTokenID tokenId);
     void StartVibrateThread(VibrateInfo info);
+    void StopVibrateThread();
     bool ShouldIgnoreVibrate(const VibrateInfo &info);
     bool InitLightList();
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    int32_t DecodeCustomEffect(const RawFileDescriptor &rawFd, std::set<VibrateEvent> &vibrateSequence);
     int32_t StartCustomVibration(const RawFileDescriptor &rawFd, const VibrateInfo &info);
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     VibratorHdiConnection &vibratorHdiConnection_ = VibratorHdiConnection::GetInstance();

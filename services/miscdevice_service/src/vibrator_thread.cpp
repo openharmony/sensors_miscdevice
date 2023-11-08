@@ -34,13 +34,10 @@ bool VibratorThread::Run()
                 info.duration, info.packageName.c_str());
             return false;
         }
-        cv_.wait_for(vibrateLck, std::chrono::milliseconds(info.duration));
+        cv_.wait_for(vibrateLck, std::chrono::milliseconds(info.duration), [this] { return exitFlag_.load(); });
         VibratorDevice.Stop(HDF_VIBRATOR_MODE_ONCE);
-        std::unique_lock<std::mutex> readyLck(readyMutex_);
-        if (ready_) {
-            MISC_HILOGI("Stop duration:%{public}d, package:%{public}s",
-                info.duration, info.packageName.c_str());
-            SetReadyStatus(false);
+        if (exitFlag_) {
+            MISC_HILOGI("Stop duration:%{public}d, package:%{public}s", info.duration, info.packageName.c_str());
             return false;
         }
     } else if (info.mode == "preset") {
@@ -52,13 +49,10 @@ bool VibratorThread::Run()
                     effect.c_str(), info.packageName.c_str());
                 return false;
             }
-            cv_.wait_for(vibrateLck, std::chrono::milliseconds(info.duration));
+            cv_.wait_for(vibrateLck, std::chrono::milliseconds(info.duration), [this] { return exitFlag_.load(); });
             VibratorDevice.Stop(HDF_VIBRATOR_MODE_PRESET);
-            std::unique_lock<std::mutex> readyLck(readyMutex_);
-            if (ready_) {
-                MISC_HILOGI("Stop effect %{public}s, package:%{public}s",
-                    effect.c_str(), info.packageName.c_str());
-                SetReadyStatus(false);
+            if (exitFlag_) {
+                MISC_HILOGI("Stop effect %{public}s, package:%{public}s", effect.c_str(), info.packageName.c_str());
                 return false;
             }
         }
@@ -66,7 +60,7 @@ bool VibratorThread::Run()
     return false;
 }
 
-void VibratorThread::UpdateVibratorEffect(VibrateInfo info)
+void VibratorThread::UpdateVibratorEffect(const VibrateInfo &info)
 {
     std::unique_lock<std::mutex> lck(currentVibrationMutex_);
     currentVibration_ = info;
@@ -78,15 +72,14 @@ VibrateInfo VibratorThread::GetCurrentVibrateInfo()
     return currentVibration_;
 }
 
-void VibratorThread::SetReadyStatus(bool status)
+void VibratorThread::SetExitStatus(bool status)
 {
-    ready_ = status;
+    exitFlag_.store(status);
 }
 
-void VibratorThread::NotifyExit()
+void VibratorThread::WakeUp()
 {
-    std::unique_lock<std::mutex> readyLck(readyMutex_);
-    SetReadyStatus(true);
+    MISC_HILOGD("Notify the vibratorThread");
     cv_.notify_one();
 }
 }  // namespace Sensors
