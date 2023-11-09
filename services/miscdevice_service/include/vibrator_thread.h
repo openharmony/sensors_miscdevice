@@ -21,28 +21,28 @@
 #include <thread>
 
 #include "thread_ex.h"
-#include "vibrator_infos.h"
+
 #include "vibrator_hdi_connection.h"
+#include "vibrator_infos.h"
 
 namespace OHOS {
 namespace Sensors {
 class VibratorThread : public Thread {
 public:
-    void UpdateVibratorEffect(VibrateInfo vibrateInfo);
+    void UpdateVibratorEffect(const VibrateInfo &vibrateInfo);
     VibrateInfo GetCurrentVibrateInfo();
-    void NotifyExit();
+    void SetExitStatus(bool status);
+    void WakeUp();
 
 protected:
     virtual bool Run();
 
 private:
-    void SetReadyStatus(bool status);
-    VibrateInfo currentVibration_;
-    std::condition_variable cv_;
     std::mutex currentVibrationMutex_;
-    std::mutex readyMutex_;
+    VibrateInfo currentVibration_;
     std::mutex vibrateMutex_;
-    bool ready_ = false;
+    std::condition_variable cv_;
+    std::atomic<bool> exitFlag_ = false;
 };
 #define VibratorDevice VibratorHdiConnection::GetInstance()
 }  // namespace Sensors
