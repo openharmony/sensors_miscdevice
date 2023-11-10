@@ -39,7 +39,7 @@ ohos_shared_library("light_interface_native") {
   include_dirs = [
     "$SUBSYSTEM_DIR/frameworks/native/common/include",
     "$SUBSYSTEM_DIR/interfaces/inner_api/light",
-    "$SUBSYSTEM_DIR/utils/include",
+    "$SUBSYSTEM_DIR/utils/common/include",
     "include",
   ]
 
@@ -80,7 +80,7 @@ ohos_shared_library("liblight_native") {
     "include",
     "$SUBSYSTEM_DIR/frameworks/native/common/include",
     "$SUBSYSTEM_DIR/interfaces/inner_api/light",
-    "$SUBSYSTEM_DIR/utils/include",
+    "$SUBSYSTEM_DIR/utils/common/include",
   ]
 
   branch_protector_ret = "pac_ret"
@@ -94,7 +94,7 @@ ohos_shared_library("liblight_native") {
 
   deps = [
     "$SUBSYSTEM_DIR/frameworks/native/light:light_ndk_header",
-    "$SUBSYSTEM_DIR/utils:libmiscdevice_utils",
+    "$SUBSYSTEM_DIR/utils/common:libmiscdevice_utils",
   ]
 
   external_deps = [

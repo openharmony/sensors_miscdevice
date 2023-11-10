@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Copyright (c) 2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -11,32 +11,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/test.gni")
+import("//build/ohos.gni")
 import("./../../../miscdevice.gni")
 
-ohos_unittest("LightAgentTest") {
-  module_out_path = "sensors/miscdevice/test"
-
-  sources = [ "light_agent_test.cpp" ]
+ohos_shared_library("libvibrator_decoder") {
+  sources = [
+    "src/default_vibrator_decoder.cpp",
+    "src/default_vibrator_decoder_factory.cpp",
+  ]
 
   include_dirs = [
-    "$SUBSYSTEM_DIR/interfaces/inner_api/light",
+    "include",
     "$SUBSYSTEM_DIR/utils/common/include",
+    "$SUBSYSTEM_DIR/utils/haptic_decoder/interface",
+    "//third_party/cJSON",
   ]
 
   deps = [
-    "$SUBSYSTEM_DIR/frameworks/native/light:light_interface_native",
-    "$SUBSYSTEM_DIR/utils/common:libmiscdevice_utils",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
+    "//third_party/cJSON:cjson",
+    "$SUBSYSTEM_DIR/utils/common:libmiscdevice_utils"
   ]
+
   external_deps = [
+    "access_token:libaccesstoken_sdk",
     "c_utils:utils",
     "hilog:libhilog",
   ]
-}
 
-group("unittest") {
-  testonly = true
-  deps = [ ":LightAgentTest" ]
+  innerapi_tags = [ "platformsdk" ]
+  part_name = "miscdevice"
+  subsystem_name = "sensors"
 }

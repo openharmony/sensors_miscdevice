@@ -21,12 +21,12 @@ ohos_unittest("VibratorAgentTest") {
 
   include_dirs = [
     "$SUBSYSTEM_DIR/interfaces/inner_api/vibrator",
-    "$SUBSYSTEM_DIR/utils/include",
+    "$SUBSYSTEM_DIR/utils/common/include",
   ]
 
   deps = [
     "$SUBSYSTEM_DIR/frameworks/native/vibrator:vibrator_target",
-    "$SUBSYSTEM_DIR/utils:libmiscdevice_utils",
+    "$SUBSYSTEM_DIR/utils/common:libmiscdevice_utils",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]

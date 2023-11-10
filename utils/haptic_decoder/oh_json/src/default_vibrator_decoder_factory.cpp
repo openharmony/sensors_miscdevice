@@ -13,19 +13,21 @@
  * limitations under the License.
  */
 
-#ifndef DEFAULT_VIBRATOR_DECODER_FACTORY_H
-#define DEFAULT_VIBRATOR_DECODER_FACTORY_H
+#include "default_vibrator_decoder_factory.h"
 
-#include "vibrator_decoder_factory.h"
+#include "default_vibrator_decoder.h"
+#include "sensors_errors.h"
 
 namespace OHOS {
 namespace Sensors {
-class DefaultVibratorDecoderFactory : public VibratorDecoderFactory {
-public:
-    DefaultVibratorDecoderFactory() = default;
-    ~DefaultVibratorDecoderFactory() = default;
-    VibratorDecoder *CreateDecoder() override;
-};
+using namespace OHOS::HiviewDFX;
+namespace {
+constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "DefaultVibratorDecoderFactory" };
+} // namespace
+IVibratorDecoder *DefaultVibratorDecoderFactory::CreateDecoder()
+{
+    CALL_LOG_ENTER;
+    return new DefaultVibratorDecoder();
+}
 }  // namespace Sensors
 }  // namespace OHOS
-#endif  // DEFAULT_VIBRATOR_DECODER_FACTORY_H

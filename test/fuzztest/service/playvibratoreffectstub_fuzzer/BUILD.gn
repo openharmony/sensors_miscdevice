@@ -29,7 +29,7 @@ ohos_fuzztest("PlayVibratorEffectStubFuzzTest") {
     "$SUBSYSTEM_DIR/services/miscdevice_service/include",
     "$SUBSYSTEM_DIR/services/miscdevice_service/hdi_connection/adapter/include",
     "$SUBSYSTEM_DIR/services/miscdevice_service/hdi_connection/interface/include",
-    "$SUBSYSTEM_DIR/utils/include",
+    "$SUBSYSTEM_DIR/utils/common/include",
     "$SUBSYSTEM_DIR/test/fuzztest/service/playvibratoreffectstub_fuzzer",
   ]
 
@@ -46,7 +46,7 @@ ohos_fuzztest("PlayVibratorEffectStubFuzzTest") {
     "$SUBSYSTEM_DIR/frameworks/native/light:light_interface_native",
     "$SUBSYSTEM_DIR/frameworks/native/vibrator:vibrator_interface_native",
     "$SUBSYSTEM_DIR/services/miscdevice_service:libmiscdevice_service_static",
-    "$SUBSYSTEM_DIR/utils:libmiscdevice_utils",
+    "$SUBSYSTEM_DIR/utils/common:libmiscdevice_utils",
   ]
 
   external_deps = [
