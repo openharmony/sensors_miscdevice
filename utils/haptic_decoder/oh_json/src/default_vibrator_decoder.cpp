@@ -70,14 +70,14 @@ int32_t DefaultVibratorDecoder::CheckMetadata(const JsonParser &parser)
     CHKPR(metadataItem, ERROR);
     cJSON *versionItem = parser.GetObjectItem(metadataItem, "Version");
     CHKPR(versionItem, ERROR);
-    version_ = versionItem->valuedouble;
+    version_ = parser.GetDoubleValue(versionItem);
     if (version_ != SUPPORT_JSON_VERSION) {
         MISC_HILOGE("Json file version is not supported, version:%{public}f", version_);
         return ERROR;
     }
     cJSON *channelNumberItem = parser.GetObjectItem(metadataItem, "ChannelNumber");
     CHKPR(channelNumberItem, ERROR);
-    channelNumber_ = channelNumberItem->valueint;
+    channelNumber_ = parser.GetIntValue(channelNumberItem);
     if (channelNumber_ != SUPPORT_CHANNEL_NUMBER) {
         MISC_HILOGE("Json file channelNumber is not supported, channelNumber:%{public}d", channelNumber_);
         return ERROR;
@@ -118,7 +118,7 @@ int32_t DefaultVibratorDecoder::ParseChannelParameters(const JsonParser &parser,
 {
     cJSON *indexItem = parser.GetObjectItem(channelParametersItem, "Index");
     CHKPR(indexItem, ERROR);
-    int32_t indexVal = indexItem->valueint;
+    int32_t indexVal = parser.GetIntValue(indexItem);
     CHKCR((indexVal >= 0) && (indexVal < SUPPORT_CHANNEL_NUMBER), ERROR, "invalid channel index");
     return SUCCESS;
 }
@@ -152,12 +152,12 @@ int32_t DefaultVibratorDecoder::ParseEvent(const JsonParser &parser, cJSON *even
 {
     cJSON *typeItem = parser.GetObjectItem(eventItem, "Type");
     CHKPR(typeItem, ERROR);
-    std::string curType = typeItem->valuestring;
+    std::string curType = parser.GetStringValue(typeItem);
     if (curType == "continuous") {
         event.tag = EVENT_TAG_CONTINUOUS;
         cJSON *durationItem = parser.GetObjectItem(eventItem, "Duration");
         CHKPR(durationItem, ERROR);
-        event.duration = durationItem->valueint;
+        event.duration = parser.GetIntValue(durationItem);
     } else if (curType == "transient") {
         event.tag = EVENT_TAG_TRANSIENT;
         event.duration = TRANSIENT_VIBRATION_DURATION;
@@ -167,15 +167,15 @@ int32_t DefaultVibratorDecoder::ParseEvent(const JsonParser &parser, cJSON *even
     }
     cJSON *startTimeItem = parser.GetObjectItem(eventItem, "StartTime");
     CHKPR(startTimeItem, ERROR);
-    event.time = startTimeItem->valueint;
+    event.time = parser.GetIntValue(startTimeItem);
     cJSON *eventParametersItem = parser.GetObjectItem(eventItem, "Parameters");
     CHKPR(eventParametersItem, ERROR);
     cJSON *intensityItem = parser.GetObjectItem(eventParametersItem, "Intensity");
     CHKPR(intensityItem, ERROR);
-    event.intensity = intensityItem->valueint;
+    event.intensity = parser.GetIntValue(intensityItem);
     cJSON *frequencyItem = parser.GetObjectItem(eventParametersItem, "Frequency");
     CHKPR(frequencyItem, ERROR);
-    event.frequency = frequencyItem->valueint;
+    event.frequency = parser.GetIntValue(frequencyItem);
     if (!CheckEventParameters(event)) {
         MISC_HILOGE("Parameter check of vibration event failed, startTime:%{public}d", event.time);
         return ERROR;
@@ -230,21 +230,21 @@ int32_t DefaultVibratorDecoder::ParseCurve(const JsonParser &parser, cJSON *curv
         CHKPR(item, ERROR);
         cJSON *timeItem = parser.GetObjectItem(item, "Time");
         CHKPR(timeItem, ERROR);
-        point.time = timeItem->valueint;
+        point.time = parser.GetIntValue(timeItem);
         if ((point.time < 0) || (point.time > event.duration)) {
             MISC_HILOGE("The time of curve point is out of bounds, time:%{public}d", point.time);
             return ERROR;
         }
         cJSON *intensityItem = parser.GetObjectItem(item, "Intensity");
         CHKPR(intensityItem, ERROR);
-        point.intensity = (intensityItem->valuedouble) * CURVE_INTENSITY_SCALE;
+        point.intensity = (parser.GetDoubleValue(intensityItem)) * CURVE_INTENSITY_SCALE;
         if ((point.intensity < CURVE_INTENSITY_MIN) || (point.intensity > CURVE_INTENSITY_MAX)) {
             MISC_HILOGE("The intensity of curve point is out of bounds, intensity:%{public}d", point.intensity);
             return ERROR;
         }
         cJSON *frequencyItem = parser.GetObjectItem(item, "Frequency");
         CHKPR(frequencyItem, ERROR);
-        point.frequency = frequencyItem->valueint;
+        point.frequency = parser.GetIntValue(frequencyItem);
         if ((point.frequency < CURVE_FREQUENCY_MIN) || (point.frequency > CURVE_FREQUENCY_MAX)) {
             MISC_HILOGE("The frequency of curve point is out of bounds, frequency:%{public}d", point.frequency);
             return ERROR;
@@ -270,7 +270,7 @@ void DefaultVibratorDecoder::PatternSplit(VibratePattern &originPattern, Vibrate
         if ((slicePattern.events.size() >= PATTERN_CAPACITY) || (i == (size - 1))) {
             patternPackage.patterns.emplace_back(slicePattern);
             slicePattern.events.clear();
-            slicePattern.startTime = originPattern.events[i + 1].time;
+            slicePattern.startTime = ((i < size - 1) ? originPattern.events[i + 1].time : 0);
         }
     }
 }

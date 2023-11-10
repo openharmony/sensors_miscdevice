@@ -38,6 +38,9 @@ public:
     bool IsArray(cJSON *json) const;
     int32_t GetArraySize(cJSON *json) const;
     cJSON *GetArrayItem(cJSON *json, int32_t index) const;
+    int32_t GetIntValue(cJSON *json) const;
+    double GetDoubleValue(cJSON *json) const;
+    std::string GetStringValue(cJSON *json) const;
 
 private:
     cJSON *cJson_ = nullptr;

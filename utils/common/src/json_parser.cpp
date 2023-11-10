@@ -14,6 +14,7 @@
  */
 #include "json_parser.h"
 
+#include <cmath>
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -109,6 +110,30 @@ int32_t JsonParser::GetArraySize(cJSON *json) const
 cJSON *JsonParser::GetArrayItem(cJSON *json, int32_t index) const
 {
     return cJSON_GetArrayItem(json, index);
+}
+
+int32_t JsonParser::GetIntValue(cJSON *json) const
+{
+    if (!cJSON_IsNumber(json)) {
+        return static_cast<int32_t>(NAN);
+    }
+    return json->valueint;
+}
+
+double JsonParser::GetDoubleValue(cJSON *json) const
+{
+    if (!cJSON_IsNumber(json)) {
+        return static_cast<double>(NAN);
+    }
+    return json->valuedouble;
+}
+
+std::string JsonParser::GetStringValue(cJSON *json) const
+{
+    if (!cJSON_IsString(json)) {
+        return NULL;
+    }
+    return json->valuestring;
 }
 }  // namespace Sensors
 }  // namespace OHOS
