@@ -44,6 +44,7 @@ ohos_shared_library("vibrator_interface_native") {
     "$SUBSYSTEM_DIR/utils/include",
   ]
 
+  branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -86,6 +87,7 @@ ohos_shared_library("libvibrator_native") {
     "$SUBSYSTEM_DIR/utils/include",
   ]
 
+  branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
     cfi_cross_dso = true
