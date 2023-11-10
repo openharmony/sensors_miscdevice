@@ -106,11 +106,6 @@ int32_t VibratorThread::PlayCustomByHdHptic(const VibrateInfo &info)
             delayTime = patterns[i].startTime - patterns[i - 1].startTime;
         }
         cv_.wait_for(vibrateLck, std::chrono::milliseconds(delayTime), [this] { return exitFlag_.load(); });
-        // int32_t ret = VibratorDevice.playPattern(patterns[i]);
-        // if (ret != SUCCESS) {
-        //     MISC_HILOGE("Vibrate custom vibration by hd haptic failed");
-        //     return ERROR;
-        // }
         if (exitFlag_) {
             MISC_HILOGI("Stop hd haptic, package:%{public}s", info.packageName.c_str());
             return SUCCESS;

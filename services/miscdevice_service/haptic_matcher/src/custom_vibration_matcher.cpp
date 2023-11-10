@@ -330,8 +330,8 @@ int32_t CustomVibrationMatcher::Interpolation(int32_t x1, int32_t x2, int32_t y1
     if (x1 == x2) {
         return y1;
     }
-    float delta_y = y2 - y1;
-    float delta_x = x2 - x1;
+    float delta_y = static_cast<float>(y2 - y1);
+    float delta_x = static_cast<float>(x2 - x1);
     return y1 + delta_y / delta_x * (x - x1);
 }
 }  // namespace Sensors
