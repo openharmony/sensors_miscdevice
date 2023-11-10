@@ -38,6 +38,11 @@ protected:
     virtual bool Run();
 
 private:
+    int32_t PlayOnce(const VibrateInfo &info);
+    int32_t PlayEffect(const VibrateInfo &info);
+    int32_t PlayCustomByHdHptic(const VibrateInfo &info);
+    int32_t PlayCustomByCompositeEffect(const VibrateInfo &info);
+    int32_t PlayCompositeEffect(const VibrateInfo &info, const HdfCompositeEffect &hdfCompositeEffect);
     std::mutex currentVibrationMutex_;
     VibrateInfo currentVibration_;
     std::mutex vibrateMutex_;
