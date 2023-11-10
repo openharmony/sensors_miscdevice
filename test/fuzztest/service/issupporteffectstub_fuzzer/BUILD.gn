@@ -19,7 +19,8 @@ import("./../../../../miscdevice.gni")
 ohos_fuzztest("IsSupportEffectStubFuzzTest") {
   module_out_path = FUZZ_MODULE_OUT_PATH
 
-  fuzz_config_file = "$SUBSYSTEM_DIR/test/fuzztest/service/issupporteffectstub_fuzzer"
+  fuzz_config_file =
+      "$SUBSYSTEM_DIR/test/fuzztest/service/issupporteffectstub_fuzzer"
 
   include_dirs = [
     "//third_party/cJSON",

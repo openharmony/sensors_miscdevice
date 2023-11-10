@@ -28,8 +28,8 @@ ohos_shared_library("libvibrator_decoder") {
   ]
 
   deps = [
+    "$SUBSYSTEM_DIR/utils/common:libmiscdevice_utils",
     "//third_party/cJSON:cjson",
-    "$SUBSYSTEM_DIR/utils/common:libmiscdevice_utils"
   ]
 
   external_deps = [
