@@ -335,31 +335,15 @@ int32_t MiscdeviceService::IsSupportEffect(const std::string &effect, bool &stat
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 int32_t MiscdeviceService::StartCustomVibration(const RawFileDescriptor &rawFd, const VibrateInfo &info)
 {
-    std::unique_ptr<VibratorDecoderFactory> decoderFactory = std::make_unique<DefaultVibratorDecoderFactory>();
-    std::unique_ptr<VibratorDecoder> decoder(decoderFactory->CreateDecoder());
-    std::set<VibrateEvent> vibrateSet = decoder->DecodeEffect(rawFd);
-    if (vibrateSet.empty()) {
+    std::unique_ptr<IVibratorDecoderFactory> decoderFactory = std::make_unique<DefaultVibratorDecoderFactory>();
+    std::unique_ptr<IVibratorDecoder> decoder(decoderFactory->CreateDecoder());
+    VibratePackage pkg;
+    int32_t ret = decoder->DecodeEffect(rawFd, pkg);
+    if (ret != SUCCESS) {
         MISC_HILOGE("Decode effect error");
         return ERROR;
     }
-    MISC_HILOGD("vibrateSet size:%{public}zu", vibrateSet.size());
-    HdfCompositeEffect hdfCompositeEffect;
-    hdfCompositeEffect.type = HDF_EFFECT_TYPE_PRIMITIVE;
-    CustomVibrationMatcher matcher;
-    int32_t ret = matcher.TransformEffect(vibrateSet, hdfCompositeEffect.compositeEffects);
-    if (ret != SUCCESS) {
-        MISC_HILOGE("Transform custom effect error");
-        return ERROR;
-    }
-    size_t size = hdfCompositeEffect.compositeEffects.size();
-    MISC_HILOGD("The count of match result:%{public}zu", size);
-    for (size_t i = 0; i < size; ++i) {
-        MISC_HILOGD("Match result at %{public}zu th, delay:%{public}d, effectId:%{public}d",
-            i, hdfCompositeEffect.compositeEffects[i].primitiveEffect.delay,
-            hdfCompositeEffect.compositeEffects[i].primitiveEffect.effectId);
-    }
-    StartVibrateThread(info);
-    return vibratorHdiConnection_.EnableCompositeEffect(hdfCompositeEffect);
+    return NO_ERROR;
 }
 
 int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, const RawFileDescriptor &rawFd, int32_t usage)
