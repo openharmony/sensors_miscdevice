@@ -118,14 +118,14 @@ int32_t VibratorThread::PlayCustomByCompositeEffect(const VibrateInfo &info)
 {
     CustomVibrationMatcher matcher;
     HdfCompositeEffect hdfCompositeEffect;
-    if (info.mode == "custom.predefined") {
+    if (info.mode == VIBRATE_CUSTOM_COMPOSITE_EFFECT) {
         hdfCompositeEffect.type = HDF_EFFECT_TYPE_PRIMITIVE;
         int32_t ret = matcher.TransformEffect(info.package, hdfCompositeEffect.compositeEffects);
         if (ret != SUCCESS) {
             MISC_HILOGE("Transform pattern to predefined wave fail");
             return ERROR;
         }
-    } else if (info.mode == "custom.time") {
+    } else if (info.mode == VIBRATE_CUSTOM_COMPOSITE_TIME) {
         hdfCompositeEffect.type = HDF_EFFECT_TYPE_TIME;
         int32_t ret = matcher.TransformTime(info.package, hdfCompositeEffect.compositeEffects);
         if (ret != SUCCESS) {
