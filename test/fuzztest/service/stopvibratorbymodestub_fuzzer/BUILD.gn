@@ -19,7 +19,8 @@ import("./../../../../miscdevice.gni")
 ohos_fuzztest("StopVibratorByModeStubFuzzTest") {
   module_out_path = FUZZ_MODULE_OUT_PATH
 
-  fuzz_config_file = "$SUBSYSTEM_DIR/test/fuzztest/service/stopvibratorbymodestub_fuzzer"
+  fuzz_config_file =
+      "$SUBSYSTEM_DIR/test/fuzztest/service/stopvibratorbymodestub_fuzzer"
 
   include_dirs = [
     "//third_party/cJSON",
@@ -29,7 +30,7 @@ ohos_fuzztest("StopVibratorByModeStubFuzzTest") {
     "$SUBSYSTEM_DIR/services/miscdevice_service/include",
     "$SUBSYSTEM_DIR/services/miscdevice_service/hdi_connection/adapter/include",
     "$SUBSYSTEM_DIR/services/miscdevice_service/hdi_connection/interface/include",
-    "$SUBSYSTEM_DIR/utils/include",
+    "$SUBSYSTEM_DIR/utils/common/include",
     "$SUBSYSTEM_DIR/test/fuzztest/service/stopvibratorbymodestub_fuzzer",
   ]
 
@@ -46,7 +47,7 @@ ohos_fuzztest("StopVibratorByModeStubFuzzTest") {
     "$SUBSYSTEM_DIR/frameworks/native/light:light_interface_native",
     "$SUBSYSTEM_DIR/frameworks/native/vibrator:vibrator_interface_native",
     "$SUBSYSTEM_DIR/services/miscdevice_service:libmiscdevice_service_static",
-    "$SUBSYSTEM_DIR/utils:libmiscdevice_utils",
+    "$SUBSYSTEM_DIR/utils/common:libmiscdevice_utils",
   ]
 
   external_deps = [

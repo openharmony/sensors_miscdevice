@@ -18,7 +18,7 @@ ohos_shared_library("vibrator") {
   include_dirs = [
     "$SUBSYSTEM_DIR/interfaces/inner_api/vibrator",
     "$SUBSYSTEM_DIR/frameworks/js/napi/vibrator/include",
-    "$SUBSYSTEM_DIR/utils/include",
+    "$SUBSYSTEM_DIR/utils/common/include",
     "//third_party/node/src",
   ]
   defines = [
@@ -41,7 +41,7 @@ ohos_shared_library("vibrator") {
 
   deps = [
     "$SUBSYSTEM_DIR/frameworks/native/vibrator:vibrator_interface_native",
-    "$SUBSYSTEM_DIR/utils:libmiscdevice_utils",
+    "$SUBSYSTEM_DIR/utils/common:libmiscdevice_utils",
   ]
 
   external_deps = [

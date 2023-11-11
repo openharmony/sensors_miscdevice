@@ -16,15 +16,15 @@
 #ifndef VIBRATOR_DECODER_FACTORY_H
 #define VIBRATOR_DECODER_FACTORY_H
 
-#include "vibrator_decoder.h"
+#include "i_vibrator_decoder.h"
 
 namespace OHOS {
 namespace Sensors {
-class VibratorDecoderFactory {
+class IVibratorDecoderFactory {
 public:
-    VibratorDecoderFactory() = default;
-    virtual ~VibratorDecoderFactory() = default;
-    virtual VibratorDecoder *CreateDecoder() = 0;
+    IVibratorDecoderFactory() = default;
+    virtual ~IVibratorDecoderFactory() = default;
+    virtual IVibratorDecoder *CreateDecoder() = 0;
 };
 }  // namespace Sensors
 }  // namespace OHOS

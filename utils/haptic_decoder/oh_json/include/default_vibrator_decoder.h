@@ -19,24 +19,26 @@
 #include <cstdint>
 #include <vector>
 
+#include "i_vibrator_decoder.h"
 #include "json_parser.h"
-#include "vibrator_decoder.h"
 
 namespace OHOS {
 namespace Sensors {
-class DefaultVibratorDecoder : public VibratorDecoder {
+class DefaultVibratorDecoder : public IVibratorDecoder {
 public:
     DefaultVibratorDecoder() = default;
     ~DefaultVibratorDecoder() = default;
-    std::set<VibrateEvent> DecodeEffect(const RawFileDescriptor &rawFd) override;
+    int32_t DecodeEffect(const RawFileDescriptor &rawFd, VibratePackage &patternPackage) override;
 
 private:
     int32_t CheckMetadata(const JsonParser &parser);
-    int32_t ParseChannel(const JsonParser &parser, std::set<VibrateEvent> &vibrateSet);
-    int32_t ParseChannelParameters(const JsonParser &parser, cJSON *channelParameters);
-    int32_t ParsePattern(const JsonParser &parser, cJSON *pattern, std::set<VibrateEvent> &vibrateSet);
-    int32_t ParseEvent(const JsonParser &parser, cJSON *event, std::set<VibrateEvent> &vibrateSet);
-    bool CheckParameters(const VibrateEvent &vibrateEvent);
+    int32_t ParseChannel(const JsonParser &parser, VibratePattern &originPattern);
+    int32_t ParseChannelParameters(const JsonParser &parser, cJSON *channelParametersItem);
+    int32_t ParsePattern(const JsonParser &parser, cJSON *patternItem, VibratePattern &originPattern);
+    int32_t ParseEvent(const JsonParser &parser, cJSON *eveventItement, VibrateEvent &events);
+    bool CheckEventParameters(const VibrateEvent &event);
+    int32_t ParseCurve(const JsonParser &parser, cJSON *curveItem, VibrateEvent &event);
+    void PatternSplit(VibratePattern &originPattern, VibratePackage &patternPackage);
     int32_t channelNumber_ = 0;
     double version_ = 0.0;
 };

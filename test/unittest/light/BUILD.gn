@@ -21,12 +21,12 @@ ohos_unittest("LightAgentTest") {
 
   include_dirs = [
     "$SUBSYSTEM_DIR/interfaces/inner_api/light",
-    "$SUBSYSTEM_DIR/utils/include",
+    "$SUBSYSTEM_DIR/utils/common/include",
   ]
 
   deps = [
     "$SUBSYSTEM_DIR/frameworks/native/light:light_interface_native",
-    "$SUBSYSTEM_DIR/utils:libmiscdevice_utils",
+    "$SUBSYSTEM_DIR/utils/common:libmiscdevice_utils",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]

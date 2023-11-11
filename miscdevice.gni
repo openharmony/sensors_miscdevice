@@ -14,7 +14,7 @@
 import("//build/ohos.gni")
 
 declare_args() {
-  miscdevice_feature_vibrator_custom = false
+  miscdevice_feature_vibrator_custom = true
 }
 
 print(
