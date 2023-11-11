@@ -81,9 +81,6 @@ private:
     void StopVibrateThread();
     bool ShouldIgnoreVibrate(const VibrateInfo &info);
     bool InitLightList();
-#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    int32_t StartCustomVibration(const RawFileDescriptor &rawFd, const VibrateInfo &info);
-#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     VibratorHdiConnection &vibratorHdiConnection_ = VibratorHdiConnection::GetInstance();
     LightHdiConnection &lightHdiConnection_ = LightHdiConnection::GetInstance();
     bool lightExist_;

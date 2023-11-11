@@ -16,7 +16,7 @@ import("./../../miscdevice.gni")
 
 ohos_shared_library("libmiscdevice_service") {
   sources = [
-    "custom_vibrate_decode/src/custom_vibration_matcher.cpp",
+    "haptic_matcher/src/custom_vibration_matcher.cpp",
     "hdi_connection/adapter/src/compatible_connection.cpp",
     "hdi_connection/adapter/src/compatible_light_connection.cpp",
     "hdi_connection/adapter/src/hdi_connection.cpp",
@@ -30,7 +30,7 @@ ohos_shared_library("libmiscdevice_service") {
   ]
 
   include_dirs = [
-    "custom_vibrate_decode/include",
+    "haptic_matcher/include",
     "include",
     "$SUBSYSTEM_DIR/frameworks/native/common/include",
     "$SUBSYSTEM_DIR/interfaces/inner_api/light",
@@ -83,7 +83,7 @@ ohos_shared_library("libmiscdevice_service") {
 #############################################################################
 ohos_shared_library("libmiscdevice_service_static") {
   sources = [
-    "custom_vibrate_decode/src/custom_vibration_matcher.cpp",
+    "haptic_matcher/src/custom_vibration_matcher.cpp",
     "hdi_connection/adapter/src/compatible_connection.cpp",
     "hdi_connection/adapter/src/compatible_light_connection.cpp",
     "hdi_connection/adapter/src/hdi_connection.cpp",
@@ -97,7 +97,7 @@ ohos_shared_library("libmiscdevice_service_static") {
   ]
 
   include_dirs = [
-    "custom_vibrate_decode/include",
+    "haptic_matcher/include",
     "include",
     "$SUBSYSTEM_DIR/frameworks/native/common/include",
     "$SUBSYSTEM_DIR/interfaces/inner_api/light",
