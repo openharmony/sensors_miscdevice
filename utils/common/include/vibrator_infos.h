@@ -20,6 +20,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "parcel.h"
 namespace OHOS {
 namespace Sensors {
 const std::string VIBRATE_BUTT = "butt";
@@ -46,6 +47,12 @@ enum VibrateTag {
     EVENT_TAG_UNKNOWN = -1,
     EVENT_TAG_CONTINUOUS = 0,
     EVENT_TAG_TRANSIENT = 1,
+};
+
+enum VibrateCustomMode {
+    VIBRATE_MODE_HD = 0,
+    VIBRATE_MODE_MAPPING = 1,
+    VIBRATE_MODE_TIMES = 2,
 };
 
 struct VibrateCurvePoint {
@@ -80,10 +87,22 @@ struct VibratePattern {
     }
     int32_t startTime = 0;
     std::vector<VibrateEvent> events;
+    void Dump() const;
+    bool Marshalling(Parcel &parcel) const;
+    std::optional<VibratePattern> Unmarshalling(Parcel &data);
 };
 
 struct VibratePackage {
     std::vector<VibratePattern> patterns;
+    void Dump() const;
+};
+
+struct VibratorCapacity {
+    bool isSupportHdHaptic = false;
+    bool isSupportPresetMapping = false;
+    bool isSupportTimeDelay = false;
+    void Dump() const;
+    int32_t GetVibrateMode();
 };
 
 struct VibrateSlice {

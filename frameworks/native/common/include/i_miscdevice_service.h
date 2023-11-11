@@ -27,6 +27,7 @@
 #include "miscdevice_common.h"
 #include "raw_file_descriptor.h"
 #include "sensors_ipc_interface_code.h"
+#include "vibrator_infos.h"
 
 namespace OHOS {
 namespace Sensors {
@@ -47,6 +48,8 @@ public:
     virtual std::vector<LightInfoIPC> GetLightList() = 0;
     virtual int32_t TurnOn(int32_t lightId, const LightColor &color, const LightAnimationIPC &animation) = 0;
     virtual int32_t TurnOff(int32_t lightId) = 0;
+    virtual int32_t GetDelayTime(int32_t &delayTime) = 0;
+    virtual int32_t PlayPattern(const VibratePattern &pattern, int32_t usage) = 0;
 };
 }  // namespace Sensors
 }  // namespace OHOS

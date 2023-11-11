@@ -13,27 +13,21 @@
  * limitations under the License.
  */
 
-#ifndef SENSORS_IPC_INTERFACE_CODE_H
-#define SENSORS_IPC_INTERFACE_CODE_H
+#ifndef VIBRATOR_DECODER_MANAGER_H
+#define VIBRATOR_DECODER_MANAGER_H
 
-/* SAID:3602 */
+#include "i_vibrator_decoder.h"
+#include "raw_file_descriptor.h"
+#include "vibrator_infos.h"
+
 namespace OHOS {
 namespace Sensors {
-enum class MiscdeviceInterfaceCode {
-    VIBRATE = 0,
-    PLAY_VIBRATOR_EFFECT,
-#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    PLAY_VIBRATOR_CUSTOM,
-#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    STOP_VIBRATOR_ALL,
-    STOP_VIBRATOR_BY_MODE,
-    IS_SUPPORT_EFFECT,
-    GET_LIGHT_LIST,
-    TURN_ON,
-    TURN_OFF,
-    PlAY_PATTERN,
-    GET_DELAY_TIME,
+class VibratorDecoderCreator {
+public:
+    VibratorDecoderCreator() = default;
+    virtual ~VibratorDecoderCreator() = default;
+    IVibratorDecoder *CreateDecoder(const RawFileDescriptor &fd);
 };
 }  // namespace Sensors
 }  // namespace OHOS
-#endif  // SENSORS_IPC_INTERFACE_CODE_H
+#endif  // VIBRATOR_DECODER_MANAGER_H

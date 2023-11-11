@@ -38,6 +38,7 @@ std::unordered_map<std::string, int32_t> g_vibratorEffect = {
     {"haptic.long_press.heavy", 80}
 };
 HdfVibratorMode g_vibrateMode;
+constexpr int32_t VIBRATE_DELAY_TIME = 10;
 } // namespace
 int32_t CompatibleConnection::duration_ = 0;
 std::atomic_bool CompatibleConnection::isStop_ = false;
@@ -142,6 +143,23 @@ int32_t CompatibleConnection::Stop(HdfVibratorMode mode)
         isStop_ = true;
         vibrateThread_.join();
     }
+    return ERR_OK;
+}
+
+int32_t CompatibleConnection::GetDelayTime(int32_t mode, int32_t &delayTime)
+{
+    CALL_LOG_ENTER;
+    delayTime = VIBRATE_DELAY_TIME;
+    return ERR_OK;
+}
+
+int32_t CompatibleConnection::GetVibratorCapacity(VibratorCapacity &capacity)
+{
+    return ERR_OK;
+}
+
+int32_t CompatibleConnection::PlayPattern(const VibratePattern &pattern)
+{
     return ERR_OK;
 }
 

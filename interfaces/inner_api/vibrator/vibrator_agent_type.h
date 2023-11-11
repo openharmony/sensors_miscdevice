@@ -94,6 +94,75 @@ typedef enum VibratorUsage {
     USAGE_MAX = 9
 } VibratorUsage;
 
+/**
+ * @brief Vibration effect description file.
+ *
+ * @since 11
+ */
+typedef struct VibratorFileDescription {
+    int32_t fd = -1;
+    int64_t offset = -1;
+    int64_t length = -1;
+} VibratorFileDescription;
+
+/**
+ * @brief The type of vibration event.
+ *
+ * @since 11
+ */
+typedef enum VibratorEventType {
+    EVENT_TYPE_UNKNOWN = -1, /**< Unknown vibration event type */
+    EVENT_TYPE_CONTINUOUS = 0, /**< Continuous vibration event type */
+    EVENT_TYPE_TRANSIENT = 1, /**< Transient vibration event type */
+} VibratorEventType;
+
+/**
+ * @brief Vibration curve adjustment point.
+ *
+ * @since 11
+ */
+typedef struct VibratorCurvePoint {
+    int32_t time = -1;
+    int32_t intensity = -1;
+    int32_t frequency = -1;
+} VibratorCurvePoint;
+
+/**
+ * @brief The vibration event.
+ *
+ * @since 11
+ */
+typedef struct VibratorEvent {
+    VibratorEventType type = EVENT_TYPE_UNKNOWN;
+    int32_t time = -1;
+    int32_t duration = -1;
+    int32_t intensity = -1;
+    int32_t frequency = -1;
+    int32_t index = 0; // 0:both 1:left 2:right
+    int32_t pointNum = 0;
+    VibratorCurvePoint *points = nullptr;
+} VibratorEvent;
+
+/**
+ * @brief Describe the vibration pattern, including the vibration event sequence.
+ *
+ * @since 11
+ */
+typedef struct VibratorPattern {
+    int32_t time = -1;
+    int32_t eventNum = 0;
+    VibratorEvent *events = nullptr;
+} VibratorPattern;
+
+/**
+ * @brief Describes the vibration package structure, including the vibration pattern sequence.
+ *
+ * @since 11
+ */
+typedef struct VibratorPackage {
+    int32_t patternNum = 0; // pattern
+    VibratorPattern *patterns = nullptr;
+} VibratorPackage;
 /** @} */
 #ifdef __cplusplus
 };

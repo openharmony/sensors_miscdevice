@@ -174,5 +174,50 @@ int32_t IsSupportEffect(const char *effectId, bool *state)
     }
     return SUCCESS;
 }
+
+int32_t PreProcess(const VibratorFileDescription &fd, VibratorPackage &package)
+{
+    auto &client = VibratorServiceClient::GetInstance();
+    int32_t ret = client.PreProcess(fd, package);
+    if (ret != ERR_OK) {
+        MISC_HILOGE("DecodeVibratorFile failed, ret:%{public}d", ret);
+        return NormalizeErrCode(ret);
+    }
+    return SUCCESS;
+}
+
+int32_t GetDelayTime(int32_t &delayTime)
+{
+    auto &client = VibratorServiceClient::GetInstance();
+    int32_t ret = client.GetDelayTime(delayTime);
+    if (ret != ERR_OK) {
+        MISC_HILOGE("GetDelayTime failed, ret:%{public}d", ret);
+        return NormalizeErrCode(ret);
+    }
+    return SUCCESS;
+}
+
+int32_t PlayPattern(const VibratorPattern &pattern)
+{
+    auto &client = VibratorServiceClient::GetInstance();
+    int32_t ret = client.PlayPattern(pattern, g_usage);
+    g_usage = USAGE_UNKNOWN;
+    if (ret != ERR_OK) {
+        MISC_HILOGE("PlayPattern failed, ret:%{public}d", ret);
+        return NormalizeErrCode(ret);
+    }
+    return SUCCESS;
+}
+
+int32_t FreeVibratorPackage(VibratorPackage &package)
+{
+    auto &client = VibratorServiceClient::GetInstance();
+    int32_t ret = client.FreeVibratorPackage(package);
+    if (ret != ERR_OK) {
+        MISC_HILOGE("FreeVibratorPackage failed, ret:%{public}d", ret);
+        return NormalizeErrCode(ret);
+    }
+    return SUCCESS;
+}
 }  // namespace Sensors
 }  // namespace OHOS

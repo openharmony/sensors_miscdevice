@@ -144,6 +144,42 @@ bool SetUsage(int32_t usage);
  * @since 10
  */
 int32_t IsSupportEffect(const char *effectId, bool *state);
+
+/**
+ * @brief Obtain the vibration delay, the time interval from the time the vibration is issued
+ *        to the time when the vibration is started, which can be used in the scene of sound
+ *        and vibration coordination.
+ * @param delayTime: Out of the parameter, return the vibration time delay, the time interval
+ *        from the time the vibration is issued to the start of the vibration, in milliseconds.
+ * @return 0 indicates success, otherwise indicates failure.
+ * @since 11
+ */
+int32_t GetDelayTime(int32_t &delayTime);
+
+/**
+ * @brief Decodes the vibration media file and generates the vibration waveform.
+ * @param fileDescription: The resulting vibration sequence package, such as {@link VibrationPackage}.
+ * @param package: the resulting vibration sequence package, such as {@link VibrationPackage}.
+ * @return 0 indicates success, otherwise indicates failure.
+ * @since 11
+ */
+int32_t PreProcess(const VibratorFileDescription &fd, VibratorPackage &package);
+
+/**
+ * @brief Free up the vibration sequence package memory.
+ * @param package: Vibration sequence packages, such as {@link VibrationPackage}.
+ * @return 0 indicates success, otherwise indicates failure.
+ * @since 11
+ */
+int32_t FreeVibratorPackage(VibratorPackage &package);
+
+/**
+ * @brief Play the vibration sequence.
+ * @param pattern: Vibration sequences, such as {@link VibratorPattern}.
+ * @return 0 indicates success, otherwise indicates failure.
+ * @since 11
+ */
+int32_t PlayPattern(const VibratorPattern &pattern);
 } // namespace Sensors
 } // namespace OHOS
 #ifdef __cplusplus

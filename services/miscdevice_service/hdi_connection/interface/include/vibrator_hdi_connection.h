@@ -36,6 +36,9 @@ public:
     std::optional<HdfEffectInfo> GetEffectInfo(const std::string &effect) override;
     int32_t Stop(HdfVibratorMode mode) override;
     int32_t DestroyHdiConnection() override;
+    int32_t GetDelayTime(int32_t mode, int32_t &delayTime) override;
+    int32_t GetVibratorCapacity(VibratorCapacity &capacity) override;
+    int32_t PlayPattern(const VibratePattern &pattern) override;
 
 private:
     DISALLOW_COPY_AND_MOVE(VibratorHdiConnection);

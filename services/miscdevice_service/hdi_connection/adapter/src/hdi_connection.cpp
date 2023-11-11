@@ -138,6 +138,73 @@ int32_t HdiConnection::Stop(HdfVibratorMode mode)
     return ERR_OK;
 }
 
+int32_t HdiConnection::GetDelayTime(int32_t mode, int32_t &delayTime)
+{
+    CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
+    int32_t ret = vibratorInterface_->GetHapticStartUpTime(mode, delayTime);
+    if (ret < 0) {
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "GetDelayTime", "ERROR_CODE", ret);
+        MISC_HILOGE("GetDelayTime failed");
+        return ret;
+    }
+    return ERR_OK;
+}
+
+int32_t HdiConnection::GetVibratorCapacity(VibratorCapacity &capacity)
+{
+    CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
+    HapticCapacity hapticCapacity;
+    int32_t ret = vibratorInterface_->GetHapticCapacity(hapticCapacity);
+    if (ret < 0) {
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "GetVibratorCapacity", "ERROR_CODE", ret);
+        MISC_HILOGE("GetVibratorCapacity failed");
+        return ret;
+    }
+    capacity.isSupportHdHaptic = hapticCapacity.isSupportHdHaptic;
+    capacity.isSupportPresetMapping = hapticCapacity.isSupportPresetMapping;
+    capacity.isSupportTimeDelay = hapticCapacity.isSupportTimeDelay;
+    capacity.Dump();
+    return ERR_OK;
+}
+
+int32_t HdiConnection::PlayPattern(const VibratePattern &pattern)
+{
+    CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
+    HapticPaket packet = {};
+    packet.time = pattern.startTime;
+    int32_t eventNum = static_cast<int32_t>(pattern.events.size());
+    packet.eventNum = eventNum;
+    for (int32_t i = 0; i < eventNum; ++i) {
+        HapticEvent hapticEvent = {};
+        hapticEvent.type = static_cast<EVENT_TYPE>(pattern.events[i].tag);
+        hapticEvent.time = pattern.events[i].time;
+        hapticEvent.duration = pattern.events[i].duration;
+        hapticEvent.intensity = pattern.events[i].intensity;
+        hapticEvent.frequency = pattern.events[i].frequency;
+        hapticEvent.index = pattern.events[i].index;
+        int32_t pointNum = static_cast<int32_t>(pattern.events[i].points.size());
+        hapticEvent.pointNum = pointNum;
+        for (int32_t j = 0; j < pointNum; ++j) {
+            CurvePoint hapticPoint = {};
+            hapticPoint.time = pattern.events[i].points[j].time;
+            hapticPoint.intensity = pattern.events[i].points[j].intensity;
+            hapticPoint.frequency = pattern.events[i].points[j].frequency;
+            hapticEvent.points.emplace_back(hapticPoint);
+        }
+        packet.events.emplace_back(hapticEvent);
+    }
+    int32_t ret = vibratorInterface_->PlayHapticPattern(packet);
+    if (ret < 0) {
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "PlayHapticPattern", "ERROR_CODE", ret);
+        MISC_HILOGE("PlayHapticPattern failed");
+        return ret;
+    }
+    return ERR_OK;
+}
+
 int32_t HdiConnection::DestroyHdiConnection()
 {
     UnregisterHdiDeathRecipient();
