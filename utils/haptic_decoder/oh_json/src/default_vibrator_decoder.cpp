@@ -78,7 +78,7 @@ int32_t DefaultVibratorDecoder::CheckMetadata(const JsonParser &parser)
     cJSON *channelNumberItem = parser.GetObjectItem(metadataItem, "ChannelNumber");
     CHKPR(channelNumberItem, ERROR);
     channelNumber_ = parser.GetIntValue(channelNumberItem);
-    if (channelNumber_ != SUPPORT_CHANNEL_NUMBER) {
+    if ((channelNumber_ <= 0)|| (channelNumber_ >= SUPPORT_CHANNEL_NUMBER)) {
         MISC_HILOGE("Json file channelNumber is not supported, channelNumber:%{public}d", channelNumber_);
         return ERROR;
     }
