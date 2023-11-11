@@ -635,6 +635,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_020, TestSize.Level1)
     } else {
         ASSERT_EQ(0, 0);
     }
+    Cancel();
 }
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_021, TestSize.Level1)
@@ -651,6 +652,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_021, TestSize.Level1)
     } else {
         ASSERT_EQ(0, 0);
     }
+    Cancel();
 }
 
 HWTEST_F(VibratorAgentTest, Cancel_001, TestSize.Level1)
