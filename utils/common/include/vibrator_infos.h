@@ -18,19 +18,16 @@
 
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 namespace OHOS {
 namespace Sensors {
-struct VibrateInfo {
-    std::string mode;
-    std::string packageName;
-    int32_t pid = -1;
-    int32_t uid = -1;
-    int32_t usage = 0;
-    int32_t duration = 0;
-    std::string effect;
-    int32_t count = 0;
-};
+const std::string VIBRATE_BUTT = "butt";
+const std::string VIBRATE_TIME = "time";
+const std::string VIBRATE_PRESET = "preset";
+const std::string VIBRATE_CUSTOM_HD = "custom.hd";
+const std::string VIBRATE_CUSTOM_COMPOSITE_EFFECT = "custom.composite.effect";
+const std::string VIBRATE_CUSTOM_COMPOSITE_TIME = "custom.composite.time";
 
 enum VibrateUsage {
     USAGE_UNKNOWN = 0,
@@ -45,25 +42,68 @@ enum VibrateUsage {
     USAGE_MAX = 9,
 };
 
-#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 enum VibrateTag {
+    EVENT_TAG_UNKNOWN = -1,
     EVENT_TAG_CONTINUOUS = 0,
     EVENT_TAG_TRANSIENT = 1,
+};
+
+struct VibrateCurvePoint {
+    bool operator<(const VibrateCurvePoint &rhs) const
+    {
+        return time < rhs.time;
+    }
+    int32_t time = 0;
+    int32_t intensity = 0;
+    int32_t frequency = 0;
 };
 
 struct VibrateEvent {
     bool operator<(const VibrateEvent &rhs) const
     {
-        return startTime < rhs.startTime;
+        return time < rhs.time;
     }
 
     VibrateTag tag;
+    int32_t time = 0;
+    int32_t duration = 0;
+    int32_t intensity = 0;
+    int32_t frequency = 0;
+    int32_t index = 0;
+    std::vector<VibrateCurvePoint> points;
+};
+
+struct VibratePattern {
+    bool operator<(const VibratePattern &rhs) const
+    {
+        return startTime < rhs.startTime;
+    }
     int32_t startTime = 0;
+    std::vector<VibrateEvent> events;
+};
+
+struct VibratePackage {
+    std::vector<VibratePattern> patterns;
+};
+
+struct VibrateSlice {
+    int32_t time = 0;
     int32_t duration = 0;
     int32_t intensity = 0;
     int32_t frequency = 0;
 };
-#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+
+struct VibrateInfo {
+    std::string mode;
+    std::string packageName;
+    int32_t pid = -1;
+    int32_t uid = -1;
+    int32_t usage = 0;
+    int32_t duration = 0;
+    std::string effect;
+    int32_t count = 0;
+    VibratePackage package;
+};
 }  // namespace Sensors
 }  // namespace OHOS
 #endif  // VIBRATOR_INFOS_H

@@ -52,7 +52,7 @@ int32_t CustomVibrationMatcher::TransformEffect(const std::set<VibrateEvent> &vi
     int32_t preStartTime = 0;
     int32_t preDuration = 0;
     for (const auto &event : vibrateSet) {
-        if ((preDuration != 0) && (event.startTime < preStartTime + preDuration)) {
+        if ((preDuration != 0) && (event.time < preStartTime + preDuration)) {
             MISC_HILOGE("Vibration events overlap");
             return ERROR;
         }
@@ -83,7 +83,7 @@ void CustomVibrationMatcher::ProcessContinuousEvent(const VibrateEvent &event, i
     } else {
         grade = round(event.intensity / CONTINUOUS_GRADE_SCALE + ROUND_OFFSET) - 1;
     }
-    if ((!compositeEffects.empty()) && (event.startTime == preStartTime + preDuration)) {
+    if ((!compositeEffects.empty()) && (event.time == preStartTime + preDuration)) {
         PrimitiveEffect &prePrimitiveEffect = compositeEffects.back().primitiveEffect;
         int32_t preEffectId = prePrimitiveEffect.effectId;
         int32_t preGrade = preEffectId % CONTINUOUS_GRADE_MASK;
@@ -95,12 +95,12 @@ void CustomVibrationMatcher::ProcessContinuousEvent(const VibrateEvent &event, i
         }
     }
     PrimitiveEffect primitiveEffect;
-    primitiveEffect.delay = event.startTime - preStartTime;
+    primitiveEffect.delay = event.time - preStartTime;
     primitiveEffect.effectId = event.duration * CONTINUOUS_GRADE_MASK + grade;
     CompositeEffect compositeEffect;
     compositeEffect.primitiveEffect = primitiveEffect;
     compositeEffects.push_back(compositeEffect);
-    preStartTime = event.startTime;
+    preStartTime = event.time;
     preDuration = event.duration;
 }
 
@@ -123,12 +123,12 @@ void CustomVibrationMatcher::ProcessTransientEvent(const VibrateEvent &event, in
         }
     }
     PrimitiveEffect primitiveEffect;
-    primitiveEffect.delay = event.startTime - preStartTime;
+    primitiveEffect.delay = event.time - preStartTime;
     primitiveEffect.effectId = matchId;
     CompositeEffect compositeEffect;
     compositeEffect.primitiveEffect = primitiveEffect;
     compositeEffects.push_back(compositeEffect);
-    preStartTime = event.startTime;
+    preStartTime = event.time;
     preDuration = event.duration;
 }
 }  // namespace Sensors

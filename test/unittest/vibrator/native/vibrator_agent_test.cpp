@@ -630,7 +630,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_020, TestSize.Level1)
         struct stat64 statbuf = { 0 };
         if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
             int32_t ret = PlayVibratorCustom(fileDescriptor.fd, 0, statbuf.st_size);
-            ASSERT_NE(ret, 0);
+            ASSERT_EQ(ret, 0);
         }
     } else {
         ASSERT_EQ(0, 0);
@@ -646,7 +646,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_021, TestSize.Level1)
         struct stat64 statbuf = { 0 };
         if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
             int32_t ret = PlayVibratorCustom(fileDescriptor.fd, 0, statbuf.st_size);
-            ASSERT_NE(ret, 0);
+            ASSERT_EQ(ret, 0);
         }
     } else {
         ASSERT_EQ(0, 0);
