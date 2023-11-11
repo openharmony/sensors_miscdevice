@@ -116,6 +116,24 @@ int32_t VibratorHdiConnection::Stop(HdfVibratorMode mode)
     return ERR_OK;
 }
 
+int32_t VibratorHdiConnection::GetDelayTime(int32_t mode, int32_t &delayTime)
+{
+    CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
+    return iVibratorHdiConnection_->GetDelayTime(mode, delayTime);
+}
+
+int32_t VibratorHdiConnection::GetVibratorCapacity(VibratorCapacity &capacity)
+{
+    CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
+    return iVibratorHdiConnection_->GetVibratorCapacity(capacity);
+}
+    
+int32_t VibratorHdiConnection::PlayPattern(const VibratePattern &pattern)
+{
+    CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
+    return iVibratorHdiConnection_->PlayPattern(pattern);
+}
+
 int32_t VibratorHdiConnection::DestroyHdiConnection()
 {
     CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);

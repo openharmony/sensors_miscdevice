@@ -16,12 +16,12 @@
 #ifndef HDI_CONNECTION_H
 #define HDI_CONNECTION_H
 
-#include "v1_1/vibrator_interface_proxy.h"
+#include "v1_2/vibrator_interface_proxy.h"
 
 #include "death_recipient_template.h"
 #include "i_vibrator_hdi_connection.h"
 
-using OHOS::HDI::Vibrator::V1_1::IVibratorInterface;
+using OHOS::HDI::Vibrator::V1_2::IVibratorInterface;
 namespace OHOS {
 namespace Sensors {
 class HdiConnection : public IVibratorHdiConnection {
@@ -37,6 +37,9 @@ public:
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     std::optional<HdfEffectInfo> GetEffectInfo(const std::string &effect) override;
     int32_t Stop(HdfVibratorMode mode) override;
+    int32_t GetDelayTime(int32_t mode, int32_t &delayTime) override;
+    int32_t GetVibratorCapacity(VibratorCapacity &capacity) override;
+    int32_t PlayPattern(const VibratePattern &pattern) override;
     int32_t DestroyHdiConnection() override;
     void ProcessDeathObserver(const wptr<IRemoteObject> &object);
 

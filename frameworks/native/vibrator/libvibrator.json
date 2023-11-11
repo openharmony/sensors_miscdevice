@@ -14,5 +14,17 @@
    },
    {
         "name": "StopVibrator"
+   },
+   {
+        "name": "GetDelayTime"
+   },
+   {
+        "name": "PreProcess"
+   },
+   {
+        "name": "FreeVibratorPackage"
+   },
+   {
+        "name": "PlayPattern"
    }
 ]

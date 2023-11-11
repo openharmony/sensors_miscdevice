@@ -22,6 +22,7 @@ ohos_shared_library("libmiscdevice_utils") {
     "src/light_info_ipc.cpp",
     "src/miscdevice_common.cpp",
     "src/permission_util.cpp",
+    "src/vibrator_infos.cpp",
   ]
 
   include_dirs = [

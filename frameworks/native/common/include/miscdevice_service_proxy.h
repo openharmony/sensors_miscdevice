@@ -39,6 +39,8 @@ public:
     virtual std::vector<LightInfoIPC> GetLightList() override;
     virtual int32_t TurnOn(int32_t lightId, const LightColor &color, const LightAnimationIPC &animation) override;
     virtual int32_t TurnOff(int32_t lightId) override;
+    virtual int32_t GetDelayTime(int32_t &delayTime) override;
+    virtual int32_t PlayPattern(const VibratePattern &pattern, int32_t usage) override;
 
 private:
     DISALLOW_COPY_AND_MOVE(MiscdeviceServiceProxy);

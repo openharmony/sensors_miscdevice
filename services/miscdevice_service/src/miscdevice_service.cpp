@@ -136,6 +136,9 @@ bool MiscdeviceService::InitInterface()
         MISC_HILOGE("InitVibratorServiceImpl failed");
         return false;
     }
+    if (vibratorHdiConnection_.GetVibratorCapacity(capacity_) != ERR_OK) {
+        MISC_HILOGE("GetVibratorCapacity failed");
+    }
     return true;
 }
 
@@ -477,6 +480,54 @@ int32_t MiscdeviceService::Dump(int32_t fd, const std::vector<std::u16string> &a
     });
     DumpHelper->ParseCommand(fd, argList);
     return ERR_OK;
+}
+
+int32_t MiscdeviceService::PlayPattern(const VibratePattern &pattern, int32_t usage)
+{
+    CALL_LOG_ENTER;
+    pattern.Dump();
+    capacity_.Dump();
+    VibrateInfo info = {
+        .mode = VIBRATE_BUTT,
+        .packageName = GetPackageName(GetCallingTokenID()),
+        .pid = GetCallingPid(),
+        .uid = GetCallingUid(),
+        .usage = usage,
+    };
+    if (capacity_.isSupportHdHaptic) {
+        std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
+        if (ShouldIgnoreVibrate(info)) {
+            MISC_HILOGE("Vibration is ignored and high priority is vibrating");
+            return ERROR;
+        }
+        StartVibrateThread(info);
+        return vibratorHdiConnection_.PlayPattern(pattern);
+    } else if (capacity_.isSupportPresetMapping) {
+        info.mode = VIBRATE_CUSTOM_COMPOSITE_EFFECT;
+    } else if (capacity_.isSupportTimeDelay) {
+        info.mode = VIBRATE_CUSTOM_COMPOSITE_TIME;
+    }
+    VibratePattern vibratePattern = {
+        .startTime = 0,
+        .events = pattern.events
+    };
+    std::vector<VibratePattern> patterns = {vibratePattern};
+    VibratePackage package = {
+        .patterns = patterns
+    };
+    info.package = package;
+    std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
+    if (ShouldIgnoreVibrate(info)) {
+        MISC_HILOGE("Vibration is ignored and high priority is vibrating");
+        return ERROR;
+    }
+    StartVibrateThread(info);
+    return ERR_OK;
+}
+
+int32_t MiscdeviceService::GetDelayTime(int32_t &delayTime)
+{
+    return vibratorHdiConnection_.GetDelayTime(capacity_.GetVibrateMode(), delayTime);
 }
 }  // namespace Sensors
 }  // namespace OHOS

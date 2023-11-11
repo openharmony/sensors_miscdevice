@@ -16,6 +16,7 @@ import("./../../../miscdevice.gni")
 
 ohos_shared_library("libvibrator_decoder") {
   sources = [
+    "../interface/vibrator_decoder_creator.cpp",
     "src/default_vibrator_decoder.cpp",
     "src/default_vibrator_decoder_factory.cpp",
   ]
@@ -38,7 +39,6 @@ ohos_shared_library("libvibrator_decoder") {
     "hilog:libhilog",
   ]
 
-  innerapi_tags = [ "platformsdk" ]
   part_name = "miscdevice"
   subsystem_name = "sensors"
 }

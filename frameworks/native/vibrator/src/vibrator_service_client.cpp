@@ -24,6 +24,7 @@
 
 #include "death_recipient_template.h"
 #include "sensors_errors.h"
+#include "vibrator_decoder_creator.h"
 
 namespace OHOS {
 namespace Sensors {
@@ -33,6 +34,12 @@ namespace {
 constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "VibratorServiceClient" };
 constexpr int32_t GET_SERVICE_MAX_COUNT = 30;
 constexpr uint32_t WAIT_MS = 200;
+constexpr int32_t PATH_MAX_LENGTH = 64;
+#ifdef __aarch64__
+    static const std::string DECODER_LIBRARY_PATH = "/system/lib64/libvibrator_decoder.z.so";
+#else
+    static const std::string DECODER_LIBRARY_PATH = "/system/lib/libvibrator_decoder.z.so";
+#endif
 }  // namespace
 
 VibratorServiceClient::~VibratorServiceClient()
@@ -42,6 +49,11 @@ VibratorServiceClient::~VibratorServiceClient()
         if (remoteObject != nullptr) {
             remoteObject->RemoveDeathRecipient(serviceDeathObserver_);
         }
+    }
+    std::lock_guard<std::mutex> decodeLock(decodeMutex_);
+    if (decodeHandle_.destroy != nullptr && decodeHandle_.handle != nullptr) {
+        decodeHandle_.destroy(decodeHandle_.decoder);
+        decodeHandle_.Free();
     }
 }
 
@@ -203,6 +215,204 @@ void VibratorServiceClient::ProcessDeathObserver(const wptr<IRemoteObject> &obje
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
         return;
     }
+}
+
+int32_t VibratorServiceClient::LoadDecoderLibrary(const std::string& path)
+{
+    std::lock_guard<std::mutex> decodeLock(decodeMutex_);
+    if (decodeHandle_.handle != nullptr) {
+        MISC_HILOGD("The library has already been loaded");
+        return ERR_OK;
+    }
+    char libRealPath[PATH_MAX_LENGTH] = {};
+    if (realpath(path.c_str(), libRealPath) == nullptr) {
+        MISC_HILOGD("Get file real path fail");
+        return ERROR;
+    }
+    decodeHandle_.handle = dlopen(libRealPath, RTLD_LAZY);
+    if (decodeHandle_.handle == nullptr) {
+        MISC_HILOGE("dlopen failed, reason:%{public}s", dlerror());
+        return ERROR;
+    }
+    decodeHandle_.create = reinterpret_cast<IVibratorDecoder *(*)(const RawFileDescriptor &)>(
+        dlsym(decodeHandle_.handle, "Create"));
+    if (decodeHandle_.create == nullptr) {
+        MISC_HILOGE("dlsym create failed: error: %{public}s", dlerror());
+        decodeHandle_.Free();
+        return ERROR;
+    }
+    decodeHandle_.destroy = reinterpret_cast<void (*)(IVibratorDecoder *)>
+        (dlsym(decodeHandle_.handle,"Destroy"));
+    if (decodeHandle_.destroy == nullptr) {
+        MISC_HILOGE("dlsym destroy failed: error: %{public}s", dlerror());
+        decodeHandle_.Free();
+        return ERROR;
+    }
+    return ERR_OK;
+}
+
+int32_t VibratorServiceClient::PreProcess(
+    const VibratorFileDescription &fd, VibratorPackage &package)
+{
+    if (LoadDecoderLibrary(DECODER_LIBRARY_PATH) != 0) {
+        MISC_HILOGD("LoadDecoderLibrary fail");
+        return ERROR;
+    }
+    RawFileDescriptor rawFd = {
+        .fd = fd.fd,
+        .offset = fd.offset,
+        .length = fd.length
+    };
+    decodeHandle_.decoder = decodeHandle_.create(rawFd);
+    CHKPR(decodeHandle_.decoder, ERROR);
+    VibratePackage pkg = {};
+    if (decodeHandle_.decoder->DecodeEffect(rawFd, pkg) != 0) {
+        MISC_HILOGD("DecodeEffect fail");
+        decodeHandle_.destroy(decodeHandle_.decoder);
+        return ERROR;
+    }
+    decodeHandle_.destroy(decodeHandle_.decoder);
+    return ConvertVibratePackage(pkg, package);
+}
+
+int32_t VibratorServiceClient::GetDelayTime(int32_t &delayTime)
+{
+    int32_t ret = InitServiceClient();
+    if (ret != ERR_OK) {
+        MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
+        return MISC_NATIVE_GET_SERVICE_ERR;
+    }
+    CHKPR(miscdeviceProxy_, ERROR);
+    StartTrace(HITRACE_TAG_SENSORS, "GetDelayTime");
+    ret = miscdeviceProxy_->GetDelayTime(delayTime);
+    FinishTrace(HITRACE_TAG_SENSORS);
+    if (ret != ERR_OK) {
+        MISC_HILOGE("GetDelayTime failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t VibratorServiceClient::PlayPattern(const VibratorPattern &pattern, int32_t usage)
+{
+    CALL_LOG_ENTER;
+    int32_t ret = InitServiceClient();
+    if (ret != ERR_OK) {
+        MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
+        return MISC_NATIVE_GET_SERVICE_ERR;
+    }
+    CHKPR(miscdeviceProxy_, ERROR);
+    StartTrace(HITRACE_TAG_SENSORS, "PlayPattern");
+    VibratePattern vibratePattern = {};
+    vibratePattern.startTime = pattern.time;
+    for (int32_t i = 0; i < pattern.eventNum; ++i) {
+        if (pattern.events == nullptr) {
+            MISC_HILOGE("VibratorPattern's events is null");
+            return ERROR;
+        }
+        VibrateEvent event;
+        event.tag = static_cast<VibrateTag>(pattern.events[i].type);
+        event.time = pattern.events[i].time;
+        event.duration = pattern.events[i].duration;
+        event.intensity = pattern.events[i].intensity;
+        event.frequency = pattern.events[i].frequency;
+        event.index = pattern.events[i].index;
+        for (int32_t j = 0; j < pattern.events[i].pointNum; ++j) {
+            if (pattern.events[i].points == nullptr) {
+                MISC_HILOGE("VibratorEvent's points is null");
+                continue;
+            }
+            VibrateCurvePoint point;
+            point.time = pattern.events[i].points[j].time;
+            point.intensity = pattern.events[i].points[j].intensity;
+            point.frequency = pattern.events[i].points[j].frequency;
+            event.points.emplace_back(point);
+        }
+        vibratePattern.events.emplace_back(event);
+    }
+    ret = miscdeviceProxy_->PlayPattern(vibratePattern, usage);
+    FinishTrace(HITRACE_TAG_SENSORS);
+    if (ret != ERR_OK) {
+        MISC_HILOGE("PlayPattern failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t VibratorServiceClient::ConvertVibratePackage(const VibratePackage& inPkg,
+    VibratorPackage &outPkg)
+{
+    inPkg.Dump();
+    int32_t patternSize = static_cast<int32_t>(inPkg.patterns.size());
+    VibratorPattern *patterns = (VibratorPattern *)malloc(sizeof(VibratorPattern) * patternSize);
+    CHKPR(patterns, ERROR);
+    outPkg.patternNum = patternSize;
+    for (int32_t i = 0; i < patternSize; ++i) {
+        patterns[i].time = inPkg.patterns[i].startTime;
+        auto vibrateEvents = inPkg.patterns[i].events;
+        int32_t eventSize = static_cast<int32_t>(vibrateEvents.size());
+        patterns[i].eventNum = eventSize;
+        VibratorEvent *events = (VibratorEvent *)malloc(sizeof(VibratorEvent) * eventSize);
+        if (events == nullptr) {
+            free(patterns);
+            patterns = nullptr;
+            return ERROR;
+        }
+        for (int32_t j = 0; j < eventSize; ++j) {
+            events[j].type = static_cast<VibratorEventType >(vibrateEvents[j].tag);
+            events[j].time = vibrateEvents[j].time;
+            events[j].duration = vibrateEvents[j].duration;
+            events[j].intensity = vibrateEvents[j].intensity;
+            events[j].frequency = vibrateEvents[j].frequency;
+            events[j].index = vibrateEvents[j].index;
+            auto vibratePoints = vibrateEvents[j].points;
+            events[j].pointNum = static_cast<int32_t>(vibratePoints.size());
+            VibratorCurvePoint *points = (VibratorCurvePoint *)malloc(sizeof(VibratorCurvePoint) * events[j].pointNum);
+            if (points == nullptr) {
+                free(patterns);
+                patterns = nullptr;
+                free(events);
+                events = nullptr;
+                return ERROR;
+            }
+            for (int32_t k = 0; k < events[j].pointNum; ++k) {
+                points[k].time = vibratePoints[k].time;
+                points[k].intensity  = vibratePoints[k].intensity;
+                points[k].frequency  = vibratePoints[k].frequency;
+            }
+            events[j].points = points;
+        }
+        patterns[i].events = events;
+    }
+    outPkg.patterns = patterns;
+    return ERR_OK;
+}
+
+int32_t VibratorServiceClient::FreeVibratorPackage(VibratorPackage &package)
+{
+    int32_t patternSize = package.patternNum;
+    if ((patternSize <= 0) || (package.patterns == nullptr)) {
+        MISC_HILOGW("Patterns is not need to free, pattern size:%{public}d", patternSize);
+        return ERROR;
+    }
+    auto patterns = package.patterns;
+    for (int32_t i = 0; i < patternSize; ++i) {
+        int32_t eventNum = patterns[i].eventNum;
+        if ((eventNum <= 0) || (patterns[i].events == nullptr)) {
+            MISC_HILOGW("Events is not need to free, event size:%{public}d", eventNum);
+            continue;
+        }
+        auto events = patterns[i].events;
+        for (int32_t j = 0; j < eventNum; ++j) {
+            if (events[j].points != nullptr) {
+                free(events[j].points);
+                events[j].points = nullptr;
+            }
+        }
+        free(events);
+        events = nullptr;
+    }
+    free(patterns);
+    patterns = nullptr;
+    return ERR_OK;
 }
 }  // namespace Sensors
 }  // namespace OHOS

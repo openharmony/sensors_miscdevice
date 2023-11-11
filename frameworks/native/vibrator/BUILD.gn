@@ -42,6 +42,7 @@ ohos_shared_library("vibrator_interface_native") {
     "$SUBSYSTEM_DIR/interfaces/inner_api/light",
     "$SUBSYSTEM_DIR/interfaces/inner_api/vibrator",
     "$SUBSYSTEM_DIR/utils/common/include",
+    "$SUBSYSTEM_DIR/utils/haptic_decoder/interface",
   ]
 
   branch_protector_ret = "pac_ret"
@@ -81,6 +82,8 @@ ohos_shared_library("libvibrator_native") {
   ]
 
   include_dirs = [
+    "$SUBSYSTEM_DIR/utils/haptic_decoder/interface",
+    "$SUBSYSTEM_DIR/interfaces/inner_api/vibrator",
     "include",
     "$SUBSYSTEM_DIR/frameworks/native/common/include",
     "$SUBSYSTEM_DIR/interfaces/inner_api/light",

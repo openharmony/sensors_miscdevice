@@ -57,6 +57,10 @@ MiscdeviceServiceStub::MiscdeviceServiceStub()
         &MiscdeviceServiceStub::TurnOnStub;
     baseFuncs_[static_cast<uint32_t>(MiscdeviceInterfaceCode::TURN_OFF)] =
         &MiscdeviceServiceStub::TurnOffStub;
+    baseFuncs_[static_cast<uint32_t>(MiscdeviceInterfaceCode::PlAY_PATTERN)] =
+        &MiscdeviceServiceStub::PlayPatternStub;
+    baseFuncs_[static_cast<uint32_t>(MiscdeviceInterfaceCode::GET_DELAY_TIME)] =
+        &MiscdeviceServiceStub::GetDelayTimeStub;
 }
 
 MiscdeviceServiceStub::~MiscdeviceServiceStub()
@@ -262,6 +266,38 @@ int32_t MiscdeviceServiceStub::OnRemoteRequest(uint32_t code, MessageParcel &dat
     }
     MISC_HILOGD("Remoterequest no member function default process");
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+}
+
+int32_t MiscdeviceServiceStub::PlayPatternStub(MessageParcel &data, MessageParcel &reply)
+{
+    CALL_LOG_ENTER;
+    VibratePattern vibratePattern;
+    auto pattern = vibratePattern.Unmarshalling(data);
+    if (!pattern.has_value()) {
+        MISC_HILOGE("Pattern Unmarshalling failed");
+        return ERROR;
+    }
+    int32_t usage = 0;
+    if (!data.ReadInt32(usage)) {
+        MISC_HILOGE("Parcel read usage failed");
+        return ERROR;
+    }
+    return PlayPattern(pattern.value(), usage);
+}
+
+int32_t MiscdeviceServiceStub::GetDelayTimeStub(MessageParcel &data, MessageParcel &reply)
+{
+    CALL_LOG_ENTER;
+    int32_t delayTime = 0;
+    if (GetDelayTime(delayTime) != ERR_OK) {
+        MISC_HILOGE("GetDelayTime failed");
+        return ERROR;
+    }
+    if (!reply.WriteInt32(delayTime)) {
+        MISC_HILOGE("Failed, write delayTime failed");
+        return ERROR;
+    }
+    return NO_ERROR;
 }
 }  // namespace Sensors
 }  // namespace OHOS

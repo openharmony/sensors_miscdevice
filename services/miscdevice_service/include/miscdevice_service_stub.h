@@ -56,7 +56,8 @@ private:
     int32_t TurnOnStub(MessageParcel &data, MessageParcel &reply);
     int32_t TurnOffStub(MessageParcel &data, MessageParcel &reply);
     bool CheckVibratePermission();
-
+    int32_t PlayPatternStub(MessageParcel &data, MessageParcel &reply);
+    int32_t GetDelayTimeStub(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, MiscBaseFunc> baseFuncs_;
 };
 }  // namespace Sensors
