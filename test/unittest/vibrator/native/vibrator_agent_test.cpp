@@ -853,21 +853,6 @@ HWTEST_F(VibratorAgentTest, IsSupportEffect_010, TestSize.Level1)
     }
 }
 
-HWTEST_F(VibratorAgentTest, IsSupportEffect_010, TestSize.Level1)
-{
-    CALL_LOG_ENTER;
-    bool state { false };
-    int32_t ret = IsSupportEffect(VIBRATOR_TYPE_THRESHOID, &state);
-    ASSERT_EQ(ret, 0);
-    if (state) {
-        ret = StartVibrator(VIBRATOR_TYPE_THRESHOID);
-        ASSERT_EQ(ret, 0);
-        Cancel();
-    } else {
-        MISC_HILOGI("Do not support %{public}s", VIBRATOR_TYPE_THRESHOID);
-    }
-}
-
 HWTEST_F(VibratorAgentTest, GetDelayTime_001, TestSize.Level1)
 {
     CALL_LOG_ENTER;
