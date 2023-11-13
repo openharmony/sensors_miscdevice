@@ -853,5 +853,280 @@ HWTEST_F(VibratorAgentTest, IsSupportEffect_010, TestSize.Level1)
     }
 }
 
+HWTEST_F(VibratorAgentTest, GetDelayTime_001, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    if (IsSupportVibratorCustom()) {
+        int32_t delayTime { -1 };
+        int32_t ret = GetDelayTime(delayTime);
+        ASSERT_EQ(ret, 0);
+    } else {
+        ASSERT_EQ(0, 0);
+    }
+}
+
+HWTEST_F(VibratorAgentTest, PreProcess_002, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    if (IsSupportVibratorCustom()) {
+        FileDescriptor fileDescriptor("invalid_file_name");
+        MISC_HILOGD("fd:%{public}d", fileDescriptor.fd);
+        VibratorFileDescription vfd;
+        VibratorPackage package;
+        struct stat64 statbuf = { 0 };
+        if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
+            vfd.fd = fileDescriptor.fd;
+            vfd.offset = 0;
+            vfd.length = statbuf.st_size;
+            int32_t ret = PreProcess(vfd, package);
+            ASSERT_NE(ret, 0);
+            ret = FreeVibratorPackage(package);
+            ASSERT_NE(ret, 0);
+        } else {
+            ASSERT_EQ(0, 0);
+        }
+    } else {
+        ASSERT_EQ(0, 0);
+    }
+}
+
+HWTEST_F(VibratorAgentTest, PreProcess_003, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    if (IsSupportVibratorCustom()) {
+        FileDescriptor fileDescriptor("/data/test/vibrator/test_invalid_duration.json");
+        MISC_HILOGD("fd:%{public}d", fileDescriptor.fd);
+        VibratorFileDescription vfd;
+        VibratorPackage package;
+        struct stat64 statbuf = { 0 };
+        if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
+            vfd.fd = fileDescriptor.fd;
+            vfd.offset = 0;
+            vfd.length = statbuf.st_size;
+            int32_t ret = PreProcess(vfd, package);
+            ASSERT_NE(ret, 0);
+            ret = FreeVibratorPackage(package);
+            ASSERT_NE(ret, 0);
+        } else {
+            ASSERT_FALSE(true);
+        }
+    } else {
+        ASSERT_EQ(0, 0);
+    }
+}
+
+HWTEST_F(VibratorAgentTest, PreProcess_004, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    if (IsSupportVibratorCustom()) {
+        FileDescriptor fileDescriptor("/data/test/vibrator/test_invalid_frequency.json");
+        MISC_HILOGD("fd:%{public}d", fileDescriptor.fd);
+        VibratorFileDescription vfd;
+        VibratorPackage package;
+        struct stat64 statbuf = { 0 };
+        if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
+            vfd.fd = fileDescriptor.fd;
+            vfd.offset = 0;
+            vfd.length = statbuf.st_size;
+            int32_t ret = PreProcess(vfd, package);
+            ASSERT_NE(ret, 0);
+            ret = FreeVibratorPackage(package);
+            ASSERT_NE(ret, 0);
+        } else {
+            ASSERT_FALSE(true);
+        }
+    } else {
+        ASSERT_EQ(0, 0);
+    }
+}
+
+HWTEST_F(VibratorAgentTest, PreProcess_005, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    if (IsSupportVibratorCustom()) {
+        FileDescriptor fileDescriptor("/data/test/vibrator/test_invalid_intensity.json");
+        MISC_HILOGD("fd:%{public}d", fileDescriptor.fd);
+        VibratorFileDescription vfd;
+        VibratorPackage package;
+        struct stat64 statbuf = { 0 };
+        if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
+            vfd.fd = fileDescriptor.fd;
+            vfd.offset = 0;
+            vfd.length = statbuf.st_size;
+            int32_t ret = PreProcess(vfd, package);
+            ASSERT_NE(ret, 0);
+            ret = FreeVibratorPackage(package);
+            ASSERT_NE(ret, 0);
+        } else {
+            ASSERT_FALSE(true);
+        }
+    } else {
+        ASSERT_EQ(0, 0);
+    }
+}
+
+HWTEST_F(VibratorAgentTest, PreProcess_006, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    if (IsSupportVibratorCustom()) {
+        FileDescriptor fileDescriptor("/data/test/vibrator/test_invalid_startTime.json");
+        MISC_HILOGD("fd:%{public}d", fileDescriptor.fd);
+        VibratorFileDescription vfd;
+        VibratorPackage package;
+        struct stat64 statbuf = { 0 };
+        if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
+            vfd.fd = fileDescriptor.fd;
+            vfd.offset = 0;
+            vfd.length = statbuf.st_size;
+            int32_t ret = PreProcess(vfd, package);
+            ASSERT_NE(ret, 0);
+            ret = FreeVibratorPackage(package);
+            ASSERT_NE(ret, 0);
+        } else {
+            ASSERT_FALSE(true);
+        }
+    } else {
+        ASSERT_EQ(0, 0);
+    }
+}
+
+HWTEST_F(VibratorAgentTest, PreProcess_007, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    if (IsSupportVibratorCustom()) {
+        FileDescriptor fileDescriptor("/data/test/vibrator/test_invalid_type.json");
+        MISC_HILOGD("fd:%{public}d", fileDescriptor.fd);
+        VibratorFileDescription vfd;
+        VibratorPackage package;
+        struct stat64 statbuf = { 0 };
+        if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
+            vfd.fd = fileDescriptor.fd;
+            vfd.offset = 0;
+            vfd.length = statbuf.st_size;
+            int32_t ret = PreProcess(vfd, package);
+            ASSERT_NE(ret, 0);
+            ret = FreeVibratorPackage(package);
+            ASSERT_NE(ret, 0);
+        } else {
+            ASSERT_FALSE(true);
+        }
+    } else {
+        ASSERT_EQ(0, 0);
+    }
+}
+
+HWTEST_F(VibratorAgentTest, PreProcess_008, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    if (IsSupportVibratorCustom()) {
+        FileDescriptor fileDescriptor("/data/test/vibrator/test_event_overlap_1.json");
+        MISC_HILOGD("fd:%{public}d", fileDescriptor.fd);
+        VibratorFileDescription vfd;
+        VibratorPackage package;
+        struct stat64 statbuf = { 0 };
+        if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
+            vfd.fd = fileDescriptor.fd;
+            vfd.offset = 0;
+            vfd.length = statbuf.st_size;
+            int32_t ret = PreProcess(vfd, package);
+            ASSERT_EQ(ret, 0);
+            ret = FreeVibratorPackage(package);
+            ASSERT_EQ(ret, 0);
+        } else {
+            ASSERT_FALSE(true);
+        }
+    } else {
+        ASSERT_EQ(0, 0);
+    }
+}
+
+HWTEST_F(VibratorAgentTest, PreProcess_009, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    if (IsSupportVibratorCustom()) {
+        FileDescriptor fileDescriptor("/data/test/vibrator/test_event_overlap_2.json");
+        MISC_HILOGD("fd:%{public}d", fileDescriptor.fd);
+        VibratorFileDescription vfd;
+        VibratorPackage package;
+        struct stat64 statbuf = { 0 };
+        if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
+            vfd.fd = fileDescriptor.fd;
+            vfd.offset = 0;
+            vfd.length = statbuf.st_size;
+            int32_t ret = PreProcess(vfd, package);
+            ASSERT_EQ(ret, 0);
+            ret = FreeVibratorPackage(package);
+            ASSERT_EQ(ret, 0);
+        } else {
+            ASSERT_FALSE(true);
+        }
+    } else {
+        ASSERT_EQ(0, 0);
+    }
+}
+
+HWTEST_F(VibratorAgentTest, PreProcess_010, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    if (IsSupportVibratorCustom()) {
+        FileDescriptor fileDescriptor("/data/test/vibrator/test_129_event.json");
+        MISC_HILOGD("fd:%{public}d", fileDescriptor.fd);
+        VibratorFileDescription vfd;
+        VibratorPackage package;
+        struct stat64 statbuf = { 0 };
+        if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
+            vfd.fd = fileDescriptor.fd;
+            vfd.offset = 0;
+            vfd.length = statbuf.st_size;
+            int32_t ret = PreProcess(vfd, package);
+            ASSERT_NE(ret, 0);
+            ret = FreeVibratorPackage(package);
+            ASSERT_NE(ret, 0);
+        } else {
+            ASSERT_FALSE(true);
+        }
+    } else {
+        ASSERT_EQ(0, 0);
+    }
+}
+
+HWTEST_F(VibratorAgentTest, PlayPattern_001, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    if (IsSupportVibratorCustom()) {
+        int32_t delayTime { -1 };
+        int32_t ret = GetDelayTime(delayTime);
+        ASSERT_EQ(ret, 0);
+        MISC_HILOGD("delayTime:%{public}d", delayTime);
+        FileDescriptor fileDescriptor("/data/test/vibrator/coin_drop.json");
+        MISC_HILOGD("fd:%{public}d", fileDescriptor.fd);
+        VibratorFileDescription vfd;
+        VibratorPackage package;
+        struct stat64 statbuf = { 0 };
+        if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
+            vfd.fd = fileDescriptor.fd;
+            vfd.offset = 0;
+            vfd.length = statbuf.st_size;
+            ret = PreProcess(vfd, package);
+            ASSERT_EQ(ret, 0);
+            for (int32_t i = 0; i < package.patternNum; ++i) {
+                if (i == 0) {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(package.patterns[i].time));
+                } else {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(package.patterns[i].time) -
+                        std::chrono::milliseconds(package.patterns[i - 1].time));
+                }
+                ASSERT_EQ(SetUsage(USAGE_UNKNOWN), true);
+                MISC_HILOGD("pointNum:%{public}d", package.patterns[i].events[i].pointNum);
+                ret = PlayPattern(package.patterns[i]);
+                ASSERT_EQ(ret, 0);
+            }
+        }
+        ret = FreeVibratorPackage(package);
+        ASSERT_EQ(ret, 0);
+    } else {
+        ASSERT_EQ(0, 0);
+    }
+}
 }  // namespace Sensors
 }  // namespace OHOS
