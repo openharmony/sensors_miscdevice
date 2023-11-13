@@ -53,6 +53,7 @@ VibratorServiceClient::~VibratorServiceClient()
     std::lock_guard<std::mutex> decodeLock(decodeMutex_);
     if (decodeHandle_.destroy != nullptr && decodeHandle_.handle != nullptr) {
         decodeHandle_.destroy(decodeHandle_.decoder);
+        decodeHandle_.decoder = nullptr;
         decodeHandle_.Free();
     }
 }
@@ -269,9 +270,11 @@ int32_t VibratorServiceClient::PreProcess(
     if (decodeHandle_.decoder->DecodeEffect(rawFd, pkg) != 0) {
         MISC_HILOGD("DecodeEffect fail");
         decodeHandle_.destroy(decodeHandle_.decoder);
+        decodeHandle_.decoder = nullptr;
         return ERROR;
     }
     decodeHandle_.destroy(decodeHandle_.decoder);
+    decodeHandle_.decoder = nullptr;
     return ConvertVibratePackage(pkg, package);
 }
 
