@@ -16,7 +16,6 @@
 #include "miscdevice_service.h"
 
 #include <algorithm>
-#include <cinttypes>
 #include <map>
 
 #include <string_ex.h>
@@ -44,7 +43,6 @@ constexpr int32_t MIN_VIBRATOR_TIME = 0;
 constexpr int32_t MAX_VIBRATOR_TIME = 1800000;
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-constexpr int32_t MAX_JSON_FILE_SIZE = 64 * 1024;
 const std::string PHONE_TYPE = "phone";
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 }  // namespace
@@ -342,11 +340,6 @@ int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, const RawFileD
     }
     if ((usage >= USAGE_MAX) || (usage < 0)) {
         MISC_HILOGE("Invalid parameter, usage:%{public}d", usage);
-        return PARAMETER_ERROR;
-    }
-    if ((rawFd.fd < 0) || (rawFd.offset < 0) || (rawFd.length <= 0) || (rawFd.length > MAX_JSON_FILE_SIZE)) {
-        MISC_HILOGE("Invalid file descriptor, fd:%{public}d, offset:%{public}" PRId64 ", length:%{public}" PRId64,
-            rawFd.fd, rawFd.offset, rawFd.length);
         return PARAMETER_ERROR;
     }
     std::unique_ptr<IVibratorDecoderFactory> decoderFactory = std::make_unique<DefaultVibratorDecoderFactory>();

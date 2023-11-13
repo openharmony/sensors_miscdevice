@@ -16,6 +16,7 @@
 #include "default_vibrator_decoder.h"
 
 #include <algorithm>
+#include <cinttypes>
 
 #include "sensors_errors.h"
 
@@ -27,7 +28,7 @@ constexpr int32_t STARTTMIE_MIN = 0;
 constexpr int32_t STARTTMIE_MAX = 1800000;
 constexpr int32_t CONTINUOUS_VIBRATION_DURATION_MIN = 0;
 constexpr int32_t CONTINUOUS_VIBRATION_DURATION_MAX = 5000;
-constexpr int32_t TRANSIENT_VIBRATION_DURATION = 30;
+constexpr int32_t TRANSIENT_VIBRATION_DURATION = 48;
 constexpr int32_t INTENSITY_MIN = 0;
 constexpr int32_t INTENSITY_MAX = 100;
 constexpr int32_t FREQUENCY_MIN = 0;
@@ -43,11 +44,17 @@ constexpr int32_t CURVE_INTENSITY_MAX = 100;
 constexpr int32_t CURVE_INTENSITY_SCALE = 100;
 constexpr int32_t CURVE_FREQUENCY_MIN = -100;
 constexpr int32_t CURVE_FREQUENCY_MAX = 100;
+constexpr int32_t MAX_JSON_FILE_SIZE = 64 * 1024;
 constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "DefaultVibratorDecoder" };
 } // namespace
 
 int32_t DefaultVibratorDecoder::DecodeEffect(const RawFileDescriptor &rawFd, VibratePackage &patternPackage)
 {
+    if ((rawFd.fd < 0) || (rawFd.offset < 0) || (rawFd.length <= 0) || (rawFd.length > MAX_JSON_FILE_SIZE)) {
+        MISC_HILOGE("Invalid file descriptor, fd:%{public}d, offset:%{public}" PRId64 ", length:%{public}" PRId64,
+            rawFd.fd, rawFd.offset, rawFd.length);
+        return PARAMETER_ERROR;
+    }
     JsonParser parser(rawFd);
     int32_t ret = CheckMetadata(parser);
     if (ret != SUCCESS) {
