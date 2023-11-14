@@ -15,6 +15,8 @@
 
 #include "vibrator_thread.h"
 
+#include <sys/prctl.h>
+
 #include "custom_vibration_matcher.h"
 #include "sensors_errors.h"
 
@@ -22,11 +24,14 @@ namespace OHOS {
 namespace Sensors {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "VibratorThread" };
+const std::string VIBRATE_CONTROL_THREAD_NAME = "OS_VibControl";
 constexpr size_t COMPOSITE_EFFECT_PART = 128;
 }  // namespace
 
 bool VibratorThread::Run()
 {
+    CALL_LOG_ENTER;
+    prctl(PR_SET_NAME, VIBRATE_CONTROL_THREAD_NAME.c_str());
     VibrateInfo info = GetCurrentVibrateInfo();
     if (info.mode == VIBRATE_TIME) {
         int32_t ret = PlayOnce(info);

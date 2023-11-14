@@ -30,7 +30,7 @@ class PermissionUtil : public Singleton<PermissionUtil> {
 public:
     PermissionUtil() = default;
     virtual ~PermissionUtil() {};
-    int32_t CheckVibratePermission(AccessTokenID callerToken, std::string permissionName);
+    int32_t CheckVibratePermission(AccessTokenID callerToken, const std::string &permissionName);
 };
 }  // namespace Sensors
 }  // namespace OHOS
