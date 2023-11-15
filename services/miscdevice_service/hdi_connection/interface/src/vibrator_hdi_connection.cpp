@@ -18,7 +18,7 @@
 
 #ifdef BUILD_VARIANT_ENG
 #include "compatible_connection.h"
-#endif
+#endif // BUILD_VARIANT_ENG
 #include "hdi_connection.h"
 #include "sensors_errors.h"
 
@@ -44,7 +44,7 @@ int32_t VibratorHdiConnection::ConnectHdi()
         MISC_HILOGE("Hdi connection failed");
         return VIBRATOR_HDF_CONNECT_ERR;
     }
-#endif
+#endif // BUILD_VARIANT_ENG
     return ret;
 }
 
