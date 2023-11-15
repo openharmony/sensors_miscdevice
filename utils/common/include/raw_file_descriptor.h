@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace Sensors {
 struct RawFileDescriptor {
-    int32_t fd = 0;
+    int32_t fd = -1;
     int64_t offset = 0;
     int64_t length = -1;
 };
