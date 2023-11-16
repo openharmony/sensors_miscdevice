@@ -21,6 +21,13 @@ ohos_shared_library("libvibrator_decoder") {
     "src/default_vibrator_decoder_factory.cpp",
   ]
 
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   include_dirs = [
     "include",
     "$SUBSYSTEM_DIR/utils/common/include",
