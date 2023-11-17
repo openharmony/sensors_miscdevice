@@ -17,6 +17,7 @@ import("./../../miscdevice.gni")
 ohos_shared_library("libmiscdevice_service") {
   sources = [
     "haptic_matcher/src/custom_vibration_matcher.cpp",
+    "hdi_connection/adapter/src/compatible_light_connection.cpp",
     "hdi_connection/adapter/src/hdi_connection.cpp",
     "hdi_connection/interface/src/light_hdi_connection.cpp",
     "hdi_connection/interface/src/vibrator_hdi_connection.cpp",
@@ -43,7 +44,6 @@ ohos_shared_library("libmiscdevice_service") {
   if (miscdevice_build_eng) {
     sources += [
       "hdi_connection/adapter/src/compatible_connection.cpp",
-      "hdi_connection/adapter/src/compatible_light_connection.cpp",
     ]
   }
 
@@ -89,6 +89,7 @@ ohos_shared_library("libmiscdevice_service") {
 ohos_shared_library("libmiscdevice_service_static") {
   sources = [
     "haptic_matcher/src/custom_vibration_matcher.cpp",
+    "hdi_connection/adapter/src/compatible_light_connection.cpp",
     "hdi_connection/adapter/src/hdi_connection.cpp",
     "hdi_connection/interface/src/light_hdi_connection.cpp",
     "hdi_connection/interface/src/vibrator_hdi_connection.cpp",
@@ -115,7 +116,6 @@ ohos_shared_library("libmiscdevice_service_static") {
   if (miscdevice_build_eng) {
     sources += [
       "hdi_connection/adapter/src/compatible_connection.cpp",
-      "hdi_connection/adapter/src/compatible_light_connection.cpp",
     ]
   }
 
