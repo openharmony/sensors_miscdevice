@@ -37,3 +37,10 @@ if (!defined(global_parts_info) ||
 } else {
   hdf_drivers_interface_light = false
 }
+
+if (build_variant == "root") {
+  miscdevice_default_defines += [ "BUILD_VARIANT_ENG" ]
+  miscdevice_build_eng = true
+} else {
+  miscdevice_build_eng = false
+}
