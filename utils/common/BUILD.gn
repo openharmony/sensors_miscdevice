@@ -25,6 +25,13 @@ ohos_shared_library("libmiscdevice_utils") {
     "src/vibrator_infos.cpp",
   ]
 
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   include_dirs = [
     "include",
     "//third_party/cJSON",

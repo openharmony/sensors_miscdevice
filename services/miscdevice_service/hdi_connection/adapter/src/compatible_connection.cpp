@@ -16,6 +16,7 @@
 
 #include <ctime>
 #include <string>
+#include <sys/prctl.h>
 #include <unordered_map>
 #include <vector>
 
@@ -26,6 +27,7 @@ namespace Sensors {
 using namespace OHOS::HiviewDFX;
 namespace {
 constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "CompatibleConnection" };
+const std::string VIBRATE_MOCK_THREAD_NAME = "OS_VibMock";
 std::unordered_map<std::string, int32_t> g_vibratorEffect = {
     {"haptic.clock.timer", 2000},
     {"haptic.default.effect", 804},
@@ -172,6 +174,7 @@ int32_t CompatibleConnection::DestroyHdiConnection()
 void CompatibleConnection::VibrateProcess()
 {
     CALL_LOG_ENTER;
+    prctl(PR_SET_NAME, VIBRATE_MOCK_THREAD_NAME.c_str());
     clock_t vibrateStartTime = clock();
     while (clock() - vibrateStartTime < duration_) {
         if (isStop_) {

@@ -115,6 +115,7 @@ ohos_shared_library("libmiscdevice_service_static") {
     sources += [ "hdi_connection/adapter/src/compatible_connection.cpp" ]
   }
 
+  branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
     cfi_cross_dso = true

@@ -91,7 +91,7 @@ typedef enum VibratorUsage {
     USAGE_MEDIA = 6,              /**< Vibration is used for media */
     USAGE_PHYSICAL_FEEDBACK = 7,  /**< Vibration is used for physical feedback */
     USAGE_SIMULATE_REALITY = 8,   /**< Vibration is used for simulate reality */
-    USAGE_MAX = 9
+    USAGE_MAX
 } VibratorUsage;
 
 /**
