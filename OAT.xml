@@ -27,6 +27,7 @@
                 <policyitem type="compatibility" name="Apache" path="sa_profile/.*" rule="may" group="defaultGroup" filefilter="defaultPolicyFilter" desc=""/>
                 <policyitem type="compatibility" name="Apache" path="services/.*" rule="may" group="defaultGroup" filefilter="defaultPolicyFilter" desc=""/>
                 <policyitem type="compatibility" name="Apache" path="utils/.*" rule="may" group="defaultGroup" filefilter="defaultPolicyFilter" desc=""/>
+                <policyitem type="copyright" name="Shanghai Ruisheng Kaitai Acoustic Science Co., Ltd." path="utils/haptic_decoder/he_json/.*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc=""/>
             </policy>
         </policylist>
         <filefilterlist>
