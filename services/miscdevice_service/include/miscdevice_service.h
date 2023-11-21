@@ -92,7 +92,6 @@ private:
     MiscdeviceServiceState state_;
     std::shared_ptr<VibratorThread> vibratorThread_ = nullptr;
     std::mutex vibratorThreadMutex_;
-    VibratorCapacity capacity_;
 };
 }  // namespace Sensors
 }  // namespace OHOS
