@@ -41,7 +41,7 @@ auto g_miscdeviceService = MiscdeviceDelayedSpSingleton<MiscdeviceService>::GetI
 const bool G_REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(g_miscdeviceService.GetRefPtr());
 constexpr int32_t MIN_VIBRATOR_TIME = 0;
 constexpr int32_t MAX_VIBRATOR_TIME = 1800000;
-
+VibratorCapacity g_capacity;
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 const std::string PHONE_TYPE = "phone";
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
@@ -134,7 +134,7 @@ bool MiscdeviceService::InitInterface()
         MISC_HILOGE("InitVibratorServiceImpl failed");
         return false;
     }
-    if (vibratorHdiConnection_.GetVibratorCapacity(capacity_) != ERR_OK) {
+    if (vibratorHdiConnection_.GetVibratorCapacity(g_capacity) != ERR_OK) {
         MISC_HILOGE("GetVibratorCapacity failed");
     }
     return true;
@@ -479,7 +479,7 @@ int32_t MiscdeviceService::PlayPattern(const VibratePattern &pattern, int32_t us
 {
     CALL_LOG_ENTER;
     pattern.Dump();
-    capacity_.Dump();
+    g_capacity.Dump();
     VibrateInfo info = {
         .mode = VIBRATE_BUTT,
         .packageName = GetPackageName(GetCallingTokenID()),
@@ -487,7 +487,7 @@ int32_t MiscdeviceService::PlayPattern(const VibratePattern &pattern, int32_t us
         .uid = GetCallingUid(),
         .usage = usage,
     };
-    if (capacity_.isSupportHdHaptic) {
+    if (g_capacity.isSupportHdHaptic) {
         std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
         if (ShouldIgnoreVibrate(info)) {
             MISC_HILOGE("Vibration is ignored and high priority is vibrating");
@@ -495,9 +495,9 @@ int32_t MiscdeviceService::PlayPattern(const VibratePattern &pattern, int32_t us
         }
         StartVibrateThread(info);
         return vibratorHdiConnection_.PlayPattern(pattern);
-    } else if (capacity_.isSupportPresetMapping) {
+    } else if (g_capacity.isSupportPresetMapping) {
         info.mode = VIBRATE_CUSTOM_COMPOSITE_EFFECT;
-    } else if (capacity_.isSupportTimeDelay) {
+    } else if (g_capacity.isSupportTimeDelay) {
         info.mode = VIBRATE_CUSTOM_COMPOSITE_TIME;
     }
     VibratePattern vibratePattern = {
@@ -520,7 +520,7 @@ int32_t MiscdeviceService::PlayPattern(const VibratePattern &pattern, int32_t us
 
 int32_t MiscdeviceService::GetDelayTime(int32_t &delayTime)
 {
-    return vibratorHdiConnection_.GetDelayTime(capacity_.GetVibrateMode(), delayTime);
+    return vibratorHdiConnection_.GetDelayTime(g_capacity.GetVibrateMode(), delayTime);
 }
 }  // namespace Sensors
 }  // namespace OHOS
