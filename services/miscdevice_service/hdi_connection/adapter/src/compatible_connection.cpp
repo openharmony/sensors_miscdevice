@@ -43,7 +43,7 @@ HdfVibratorMode g_vibrateMode;
 constexpr int32_t VIBRATE_DELAY_TIME = 10;
 } // namespace
 int32_t CompatibleConnection::duration_ = 0;
-std::atomic_bool CompatibleConnection::isStop_ = false;
+std::atomic_bool CompatibleConnection::isStop_ = true;
 
 int32_t CompatibleConnection::ConnectHdi()
 {
