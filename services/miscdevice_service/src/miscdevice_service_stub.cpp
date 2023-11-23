@@ -33,6 +33,7 @@ using namespace OHOS::HiviewDFX;
 namespace {
 constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "MiscdeviceServiceStub" };
 const std::string VIBRATE_PERMISSION = "ohos.permission.VIBRATE";
+const std::string LIGHT_PERMISSION = "ohos.permission.SYSTEM_LIGHT_CONTROL";
 }  // namespace
 
 MiscdeviceServiceStub::MiscdeviceServiceStub()
@@ -232,6 +233,14 @@ int32_t MiscdeviceServiceStub::GetLightListStub(MessageParcel &data, MessageParc
 
 int32_t MiscdeviceServiceStub::TurnOnStub(MessageParcel &data, MessageParcel &reply)
 {
+    PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
+    int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), LIGHT_PERMISSION);
+    if (ret != PERMISSION_GRANTED) {
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "LIGHT_PERMISSIONS_EXCEPTION",
+            HiSysEvent::EventType::SECURITY, "PKG_NAME", "turnOnStub", "ERROR_CODE", ret);
+        MISC_HILOGE("CheckLightPermission failed, ret:%{public}d", ret);
+        return PERMISSION_DENIED;
+    }
     int32_t lightId = data.ReadInt32();
     LightColor lightColor;
     lightColor.singleColor = data.ReadInt32();
@@ -243,6 +252,14 @@ int32_t MiscdeviceServiceStub::TurnOnStub(MessageParcel &data, MessageParcel &re
 
 int32_t MiscdeviceServiceStub::TurnOffStub(MessageParcel &data, MessageParcel &reply)
 {
+    PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
+    int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), LIGHT_PERMISSION);
+    if (ret != PERMISSION_GRANTED) {
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "LIGHT_PERMISSIONS_EXCEPTION",
+            HiSysEvent::EventType::SECURITY, "PKG_NAME", "TurnOffStub", "ERROR_CODE", ret);
+        MISC_HILOGE("CheckLightPermission failed, ret:%{public}d", ret);
+        return PERMISSION_DENIED;
+    }
     int32_t lightId = data.ReadInt32();
     return TurnOff(lightId);
 }
