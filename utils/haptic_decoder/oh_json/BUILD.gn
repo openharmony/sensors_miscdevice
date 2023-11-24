@@ -26,6 +26,9 @@ ohos_shared_library("libvibrator_decoder") {
     cfi = true
     cfi_cross_dso = true
     debug = false
+    boundary_sanitize = true
+    integer_overflow = true
+    ubsan = true
   }
 
   include_dirs = [
