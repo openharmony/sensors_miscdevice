@@ -56,7 +56,8 @@ public:
     int32_t Vibrate(int32_t vibratorId, int32_t timeOut, int32_t usage);
     int32_t Vibrate(int32_t vibratorId, const std::string &effect, int32_t loopCount, int32_t usage);
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    int32_t PlayVibratorCustom(int32_t vibratorId, const RawFileDescriptor &rawFd, int32_t usage);
+    int32_t PlayVibratorCustom(int32_t vibratorId, const RawFileDescriptor &rawFd, int32_t usage,
+        const VibratorParameter &parameter);
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     int32_t StopVibrator(int32_t vibratorId, const std::string &mode);
     int32_t StopVibrator(int32_t vibratorId);
@@ -64,7 +65,7 @@ public:
     void ProcessDeathObserver(const wptr<IRemoteObject> &object);
     int32_t PreProcess(const VibratorFileDescription &fd, VibratorPackage &package);
     int32_t GetDelayTime(int32_t &delayTime);
-    int32_t PlayPattern(const VibratorPattern &pattern, int32_t usage);
+    int32_t PlayPattern(const VibratorPattern &pattern, int32_t usage, const VibratorParameter &parameter);
     int32_t FreeVibratorPackage(VibratorPackage &package);
 
 private:

@@ -188,7 +188,8 @@ int32_t MiscdeviceServiceProxy::IsSupportEffect(const std::string &effect, bool 
 }
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-int32_t MiscdeviceServiceProxy::PlayVibratorCustom(int32_t vibratorId, const RawFileDescriptor &rawFd, int32_t usage)
+int32_t MiscdeviceServiceProxy::PlayVibratorCustom(int32_t vibratorId, const RawFileDescriptor &rawFd, int32_t usage,
+    const VibrateParameter &parameter)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(MiscdeviceServiceProxy::GetDescriptor())) {
@@ -201,6 +202,10 @@ int32_t MiscdeviceServiceProxy::PlayVibratorCustom(int32_t vibratorId, const Raw
     }
     if (!data.WriteInt32(usage)) {
         MISC_HILOGE("Writeint32 usage failed");
+        return WRITE_MSG_ERR;
+    }
+    if (!parameter.Marshalling(data)) {
+        MISC_HILOGE("Write adjust parameter failed");
         return WRITE_MSG_ERR;
     }
     if (!data.WriteInt64(rawFd.offset)) {
@@ -351,7 +356,8 @@ int32_t MiscdeviceServiceProxy::GetDelayTime(int32_t &delayTime)
     return ret;
 }
 
-int32_t MiscdeviceServiceProxy::PlayPattern(const VibratePattern &pattern, int32_t usage)
+int32_t MiscdeviceServiceProxy::PlayPattern(const VibratePattern &pattern, int32_t usage,
+    const VibrateParameter &parameter)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(MiscdeviceServiceProxy::GetDescriptor())) {
@@ -364,6 +370,10 @@ int32_t MiscdeviceServiceProxy::PlayPattern(const VibratePattern &pattern, int32
     }
     if (!data.WriteInt32(usage)) {
         MISC_HILOGE("WriteUint32 usage failed");
+        return WRITE_MSG_ERR;
+    }
+    if (!parameter.Marshalling(data)) {
+        MISC_HILOGE("Write adjust parameter failed");
         return WRITE_MSG_ERR;
     }
     sptr<IRemoteObject> remote = Remote();

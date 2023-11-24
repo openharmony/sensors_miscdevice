@@ -63,7 +63,8 @@ public:
     virtual int32_t PlayVibratorEffect(int32_t vibratorId, const std::string &effect,
                                        int32_t loopCount, int32_t usage) override;
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    virtual int32_t PlayVibratorCustom(int32_t vibratorId, const RawFileDescriptor &rawFd, int32_t usage) override;
+    virtual int32_t PlayVibratorCustom(int32_t vibratorId, const RawFileDescriptor &rawFd, int32_t usage,
+        const VibrateParameter &parameter) override;
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     virtual int32_t StopVibrator(int32_t vibratorId) override;
     virtual int32_t StopVibrator(int32_t vibratorId, const std::string &mode) override;
@@ -71,7 +72,8 @@ public:
     virtual std::vector<LightInfoIPC> GetLightList() override;
     virtual int32_t TurnOn(int32_t lightId, const LightColor &color, const LightAnimationIPC &animation) override;
     virtual int32_t TurnOff(int32_t lightId) override;
-    virtual int32_t PlayPattern(const VibratePattern &pattern, int32_t usage) override;
+    virtual int32_t PlayPattern(const VibratePattern &pattern, int32_t usage,
+        const VibrateParameter &parameter) override;
     virtual int32_t GetDelayTime(int32_t &delayTime) override;
 
 private:
@@ -82,6 +84,7 @@ private:
     void StartVibrateThread(VibrateInfo info);
     void StopVibrateThread();
     bool ShouldIgnoreVibrate(const VibrateInfo &info);
+    void MergeVibratorParmeters(const VibrateParameter &parameter, VibratePackage &package);
     bool InitLightList();
     VibratorHdiConnection &vibratorHdiConnection_ = VibratorHdiConnection::GetInstance();
     LightHdiConnection &lightHdiConnection_ = LightHdiConnection::GetInstance();

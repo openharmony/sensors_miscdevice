@@ -163,6 +163,17 @@ typedef struct VibratorPackage {
     int32_t patternNum = 0; // pattern
     VibratorPattern *patterns = nullptr;
 } VibratorPackage;
+
+/**
+ * @brief Vibration effect adjustment parameters.
+ *
+ * @since 11
+ */
+typedef struct VibratorParameter {
+    int32_t intensity = 100;  // from 0 to 100
+    int32_t frequency = 0;    // from -100 to 100
+    int32_t reserved = 0;
+} VibratorParameter;
 /** @} */
 #ifdef __cplusplus
 };

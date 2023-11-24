@@ -132,7 +132,8 @@ int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, const std::string &ef
 }
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-int32_t VibratorServiceClient::PlayVibratorCustom(int32_t vibratorId, const RawFileDescriptor &rawFd, int32_t usage)
+int32_t VibratorServiceClient::PlayVibratorCustom(int32_t vibratorId, const RawFileDescriptor &rawFd, int32_t usage,
+    const VibratorParameter &parameter)
 {
     MISC_HILOGD("PlayVibratorCustom begin, fd:%{public}d, offset:%{public}lld, length:%{public}lld",
         rawFd.fd, static_cast<long long>(rawFd.offset), static_cast<long long>(rawFd.length));
@@ -143,7 +144,11 @@ int32_t VibratorServiceClient::PlayVibratorCustom(int32_t vibratorId, const RawF
     }
     CHKPR(miscdeviceProxy_, ERROR);
     StartTrace(HITRACE_TAG_SENSORS, "PlayVibratorCustom");
-    ret = miscdeviceProxy_->PlayVibratorCustom(vibratorId, rawFd, usage);
+    VibrateParameter vibateParameter = {
+        .intensity = parameter.intensity,
+        .frequency = parameter.frequency
+    };
+    ret = miscdeviceProxy_->PlayVibratorCustom(vibratorId, rawFd, usage, vibateParameter);
     FinishTrace(HITRACE_TAG_SENSORS);
     if (ret != ERR_OK) {
         MISC_HILOGE("PlayVibratorCustom failed, ret:%{public}d", ret);
@@ -252,8 +257,7 @@ int32_t VibratorServiceClient::LoadDecoderLibrary(const std::string& path)
     return ERR_OK;
 }
 
-int32_t VibratorServiceClient::PreProcess(
-    const VibratorFileDescription &fd, VibratorPackage &package)
+int32_t VibratorServiceClient::PreProcess(const VibratorFileDescription &fd, VibratorPackage &package)
 {
     if (LoadDecoderLibrary(DECODER_LIBRARY_PATH) != 0) {
         MISC_HILOGD("LoadDecoderLibrary fail");
@@ -295,7 +299,8 @@ int32_t VibratorServiceClient::GetDelayTime(int32_t &delayTime)
     return ret;
 }
 
-int32_t VibratorServiceClient::PlayPattern(const VibratorPattern &pattern, int32_t usage)
+int32_t VibratorServiceClient::PlayPattern(const VibratorPattern &pattern, int32_t usage,
+    const VibratorParameter &parameter)
 {
     CALL_LOG_ENTER;
     int32_t ret = InitServiceClient();
@@ -332,7 +337,11 @@ int32_t VibratorServiceClient::PlayPattern(const VibratorPattern &pattern, int32
         }
         vibratePattern.events.emplace_back(event);
     }
-    ret = miscdeviceProxy_->PlayPattern(vibratePattern, usage);
+    VibrateParameter vibateParameter = {
+        .intensity = parameter.intensity,
+        .frequency = parameter.frequency
+    };
+    ret = miscdeviceProxy_->PlayPattern(vibratePattern, usage, vibateParameter);
     FinishTrace(HITRACE_TAG_SENSORS);
     if (ret != ERR_OK) {
         MISC_HILOGE("PlayPattern failed, ret:%{public}d", ret);

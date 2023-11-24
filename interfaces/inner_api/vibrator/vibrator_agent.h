@@ -180,6 +180,14 @@ int32_t FreeVibratorPackage(VibratorPackage &package);
  * @since 11
  */
 int32_t PlayPattern(const VibratorPattern &pattern);
+
+/**
+ * @brief Set the vibration effect adjustment parameters.
+ * @param parameter: Vibration adjustment parameter, such as {@link VibratorParameter}.
+ * @return true indicates success, otherwise indicates failure.
+ * @since 11
+ */
+bool SetParameters(const VibratorParameter &parameter);
 } // namespace Sensors
 } // namespace OHOS
 #ifdef __cplusplus
