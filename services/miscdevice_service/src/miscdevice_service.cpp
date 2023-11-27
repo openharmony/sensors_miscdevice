@@ -366,6 +366,7 @@ int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, const RawFileD
         return ERROR;
     }
     MergeVibratorParmeters(parameter, package);
+    package.Dump();
     VibrateInfo info = {
         .packageName = GetPackageName(GetCallingTokenID()),
         .pid = GetCallingPid(),
@@ -506,11 +507,10 @@ int32_t MiscdeviceService::PlayPattern(const VibratePattern &pattern, int32_t us
     }
     if ((parameter.intensity < INTENSITY_ADJUST_MIN) || (parameter.intensity > INTENSITY_ADJUST_MAX) ||
         (parameter.frequency < FREQUENCY_ADJUST_MIN) || (parameter.frequency > FREQUENCY_ADJUST_MAX)) {
-        MISC_HILOGE("Input invalid, intensity parameter is %{public}d, frequency parameter is %{public}d"
-            , parameter.intensity, parameter.frequency);
+        MISC_HILOGE("Input invalid, intensity parameter is %{public}d, frequency parameter is %{public}d",
+            parameter.intensity, parameter.frequency);
         return PARAMETER_ERROR;
     }
-    g_capacity.Dump();
     VibratePattern vibratePattern = {
         .startTime = 0,
         .events = pattern.events
@@ -520,7 +520,7 @@ int32_t MiscdeviceService::PlayPattern(const VibratePattern &pattern, int32_t us
         .patterns = patterns
     };
     MergeVibratorParmeters(parameter, package);
-    pattern.Dump();
+    package.Dump();
     VibrateInfo info = {
         .mode = VIBRATE_BUTT,
         .packageName = GetPackageName(GetCallingTokenID()),
@@ -528,6 +528,7 @@ int32_t MiscdeviceService::PlayPattern(const VibratePattern &pattern, int32_t us
         .uid = GetCallingUid(),
         .usage = usage,
     };
+    g_capacity.Dump();
     if (g_capacity.isSupportHdHaptic) {
         std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
         if (ShouldIgnoreVibrate(info)) {
@@ -566,7 +567,7 @@ void MiscdeviceService::MergeVibratorParmeters(const VibrateParameter &parameter
     for (VibratePattern &pattern : package.patterns) {
         for (VibrateEvent &event : pattern.events) {
             float intensityScale = static_cast<float>(parameter.intensity) / INTENSITY_ADJUST_MAX;
-            if (event.tag == EVENT_TAG_TRANSIENT) {
+            if ((event.tag == EVENT_TAG_TRANSIENT) || (event.points.empty())) {
                 event.intensity = static_cast<int32_t>(event.intensity * intensityScale);
                 event.intensity = std::max(std::min(event.intensity, INTENSITY_MAX), INTENSITY_MIN);
                 event.frequency = event.frequency + parameter.frequency;
