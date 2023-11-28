@@ -188,6 +188,12 @@ int32_t MiscdeviceServiceStub::PlayVibratorCustomStub(MessageParcel &data, Messa
         MISC_HILOGE("Parcel read usage failed");
         return ERROR;
     }
+    VibrateParameter vibrateParameter;
+    auto parameter = vibrateParameter.Unmarshalling(data);
+    if (!parameter.has_value()) {
+        MISC_HILOGE("Parameter Unmarshalling failed");
+        return ERROR;
+    }
     RawFileDescriptor rawFd;
     if (!data.ReadInt64(rawFd.offset)) {
         MISC_HILOGE("Parcel read offset failed");
@@ -202,7 +208,7 @@ int32_t MiscdeviceServiceStub::PlayVibratorCustomStub(MessageParcel &data, Messa
         MISC_HILOGE("Parcel ReadFileDescriptor failed");
         return ERROR;
     }
-    ret = PlayVibratorCustom(vibratorId, rawFd, usage);
+    ret = PlayVibratorCustom(vibratorId, rawFd, usage, parameter.value());
     close(rawFd.fd);
     if (ret != ERR_OK) {
         MISC_HILOGE("PlayVibratorCustom failed, ret:%{public}d", ret);
@@ -299,7 +305,13 @@ int32_t MiscdeviceServiceStub::PlayPatternStub(MessageParcel &data, MessageParce
         MISC_HILOGE("Parcel read usage failed");
         return ERROR;
     }
-    return PlayPattern(pattern.value(), usage);
+    VibrateParameter vibrateParameter;
+    auto parameter = vibrateParameter.Unmarshalling(data);
+    if (!parameter.has_value()) {
+        MISC_HILOGE("Parameter Unmarshalling failed");
+        return ERROR;
+    }
+    return PlayPattern(pattern.value(), usage, parameter.value());
 }
 
 int32_t MiscdeviceServiceStub::GetDelayTimeStub(MessageParcel &data, MessageParcel &reply)

@@ -124,7 +124,7 @@ void VibratorAgentTest::TearDown()
 
 HWTEST_F(VibratorAgentTest, StartVibratorTest_001, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("StartVibratorTest_001 in");
     bool state { false };
     int32_t ret = IsSupportEffect("haptic.clock.timer", &state);
     ASSERT_EQ(ret, 0);
@@ -138,77 +138,77 @@ HWTEST_F(VibratorAgentTest, StartVibratorTest_001, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, StartVibratorTest_002, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("StartVibratorTest_002 in");
     int32_t ret = StartVibrator("");
     ASSERT_NE(ret, 0);
 }
 
 HWTEST_F(VibratorAgentTest, StartVibratorTest_003, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("StartVibratorTest_003 in");
     int32_t ret = StartVibrator(nullptr);
     ASSERT_NE(ret, 0);
 }
 
 HWTEST_F(VibratorAgentTest, StartVibratorOnceTest_001, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("StartVibratorOnceTest_001 in");
     int32_t ret = StartVibratorOnce(300);
     ASSERT_EQ(ret, 0);
 }
 
 HWTEST_F(VibratorAgentTest, StartVibratorOnceTest_002, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("StartVibratorOnceTest_002 in");
     int32_t ret = StartVibratorOnce(0);
     ASSERT_NE(ret, 0);
 }
 
 HWTEST_F(VibratorAgentTest, StartVibratorOnceTest_003, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("StartVibratorOnceTest_003 in");
     int32_t ret = StartVibratorOnce(1800000);
     ASSERT_EQ(ret, 0);
 }
 
 HWTEST_F(VibratorAgentTest, StartVibratorOnceTest_004, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("StartVibratorOnceTest_004 in");
     int32_t ret = StartVibratorOnce(1800001);
     ASSERT_NE(ret, 0);
 }
 
 HWTEST_F(VibratorAgentTest, StopVibratorTest_001, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("StopVibratorTest_001 in");
     int32_t ret = StopVibrator("time");
     ASSERT_EQ(ret, 0);
 }
 
 HWTEST_F(VibratorAgentTest, StopVibratorTest_002, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("StopVibratorTest_002 in");
     int32_t ret = StopVibrator("preset");
     ASSERT_NE(ret, 0);
 }
 
 HWTEST_F(VibratorAgentTest, StopVibratorTest_003, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("StopVibratorTest_003 in");
     int32_t ret = StopVibrator("");
     ASSERT_NE(ret, 0);
 }
 
 HWTEST_F(VibratorAgentTest, StopVibratorTest_004, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("StopVibratorTest_004 in");
     int32_t ret = StopVibrator(nullptr);
     ASSERT_NE(ret, 0);
 }
 
 HWTEST_F(VibratorAgentTest, StopVibratorTest_005, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("StopVibratorTest_005 in");
     int32_t ret = StartVibratorOnce(300);
     ASSERT_EQ(ret, 0);
     ret = StopVibrator("time");
@@ -217,49 +217,49 @@ HWTEST_F(VibratorAgentTest, StopVibratorTest_005, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, SetLoopCount_001, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("SetLoopCount_001 in");
     bool ret = SetLoopCount(300);
     ASSERT_TRUE(ret);
 }
 
 HWTEST_F(VibratorAgentTest, SetLoopCount_002, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("SetLoopCount_002 in");
     bool ret = SetLoopCount(-1);
     ASSERT_FALSE(ret);
 }
 
 HWTEST_F(VibratorAgentTest, SetLoopCount_003, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("SetLoopCount_003 in");
     bool ret = SetLoopCount(0);
     ASSERT_FALSE(ret);
 }
 
 HWTEST_F(VibratorAgentTest, SetUsage_001, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("SetUsage_001 in");
     bool ret = SetUsage(0);
     ASSERT_TRUE(ret);
 }
 
 HWTEST_F(VibratorAgentTest, SetUsage_002, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("SetUsage_002 in");
     bool ret = SetUsage(-1);
     ASSERT_FALSE(ret);
 }
 
 HWTEST_F(VibratorAgentTest, SetUsage_003, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("SetUsage_003 in");
     bool ret = SetUsage(USAGE_MAX);
     ASSERT_FALSE(ret);
 }
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_001, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("PlayVibratorCustom_001 in");
     if (IsSupportVibratorCustom()) {
         FileDescriptor fileDescriptor("/data/test/vibrator/coin_drop.json");
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
@@ -277,7 +277,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_001, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_002, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("PlayVibratorCustom_002 in");
     if (IsSupportVibratorCustom()) {
         FileDescriptor fileDescriptor("/data/test/vibrator/on_carpet.json");
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
@@ -295,7 +295,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_002, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_003, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("PlayVibratorCustom_003 in");
     if (IsSupportVibratorCustom()) {
         int32_t ret = SetLoopCount(2);
         ASSERT_TRUE(ret);
@@ -317,7 +317,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_003, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_004, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("PlayVibratorCustom_004 in");
     if (IsSupportVibratorCustom()) {
         int32_t ret = SetUsage(USAGE_ALARM);
         ASSERT_TRUE(ret);
@@ -339,7 +339,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_004, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_005, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("PlayVibratorCustom_005 in");
     if (IsSupportVibratorCustom()) {
         int32_t ret = SetUsage(USAGE_UNKNOWN);
         ASSERT_TRUE(ret);
@@ -361,7 +361,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_005, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_006, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("PlayVibratorCustom_006 in");
     if (IsSupportVibratorCustom()) {
         FileDescriptor fileDescriptor("/data/test/vibrator/on_carpet.json");
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
@@ -383,7 +383,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_006, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_007, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("PlayVibratorCustom_007 in");
     if (IsSupportVibratorCustom()) {
         FileDescriptor fileDescriptor("/data/test/vibrator/on_carpet.json");
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
@@ -405,7 +405,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_007, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_008, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("PlayVibratorCustom_008 in");
     if (IsSupportVibratorCustom()) {
         int32_t ret = SetUsage(USAGE_ALARM);
         ASSERT_TRUE(ret);
@@ -427,7 +427,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_008, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_009, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("PlayVibratorCustom_009 in");
     if (IsSupportVibratorCustom()) {
         int32_t ret = SetUsage(USAGE_UNKNOWN);
         ASSERT_TRUE(ret);
@@ -449,7 +449,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_009, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_010, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("PlayVibratorCustom_010 in");
     if (IsSupportVibratorCustom()) {
         FileDescriptor fileDescriptor("/data/test/vibrator/on_carpet.json");
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
@@ -471,7 +471,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_010, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_011, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("PlayVibratorCustom_011 in");
     if (IsSupportVibratorCustom()) {
         FileDescriptor fileDescriptor("/data/test/vibrator/on_carpet.json");
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
@@ -493,7 +493,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_011, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_012, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("PlayVibratorCustom_012 in");
     if (IsSupportVibratorCustom()) {
         FileDescriptor fileDescriptor("/data/test/vibrator/test_128_event.json");
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
@@ -511,7 +511,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_012, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_013, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("PlayVibratorCustom_013 in");
     if (IsSupportVibratorCustom()) {
         FileDescriptor fileDescriptor("/data/test/vibrator/test_invalid_type.json");
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
@@ -527,7 +527,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_013, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_014, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("PlayVibratorCustom_014 in");
     if (IsSupportVibratorCustom()) {
         FileDescriptor fileDescriptor("/data/test/vibrator/test_invalid_startTime.json");
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
@@ -543,7 +543,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_014, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_015, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("PlayVibratorCustom_015 in");
     if (IsSupportVibratorCustom()) {
         FileDescriptor fileDescriptor("/data/test/vibrator/test_invalid_duration.json");
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
@@ -559,7 +559,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_015, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_016, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("PlayVibratorCustom_016 in");
     if (IsSupportVibratorCustom()) {
         FileDescriptor fileDescriptor("/data/test/vibrator/test_invalid_intensity.json");
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
@@ -575,7 +575,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_016, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_017, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("PlayVibratorCustom_017 in");
     if (IsSupportVibratorCustom()) {
         FileDescriptor fileDescriptor("/data/test/vibrator/test_invalid_frequency.json");
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
@@ -591,7 +591,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_017, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_018, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("PlayVibratorCustom_018 in");
     if (IsSupportVibratorCustom()) {
         FileDescriptor fileDescriptor("/data/test/vibrator/test_129_event.json");
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
@@ -607,7 +607,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_018, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_019, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("PlayVibratorCustom_019 in");
     if (IsSupportVibratorCustom()) {
         FileDescriptor fileDescriptor("/data/test/vibrator/test_big_file_size.json");
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
@@ -623,7 +623,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_019, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_020, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("PlayVibratorCustom_020 in");
     if (IsSupportVibratorCustom()) {
         FileDescriptor fileDescriptor("/data/test/vibrator/test_event_overlap_1.json");
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
@@ -640,7 +640,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_020, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_021, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("PlayVibratorCustom_021 in");
     if (IsSupportVibratorCustom()) {
         FileDescriptor fileDescriptor("/data/test/vibrator/test_event_overlap_2.json");
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
@@ -655,16 +655,86 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_021, TestSize.Level1)
     Cancel();
 }
 
+HWTEST_F(VibratorAgentTest, SetParameters_001, TestSize.Level1)
+{
+    MISC_HILOGI("SetParameters_001 in");
+    VibratorParameter parameter = {
+        .intensity = -1,
+        .frequency = -15
+    };
+    bool ret = SetParameters(parameter);
+    ASSERT_FALSE(ret);
+}
+
+HWTEST_F(VibratorAgentTest, SetParameters_002, TestSize.Level1)
+{
+    MISC_HILOGI("SetParameters_002 in");
+    VibratorParameter parameter = {
+        .intensity = 70,
+        .frequency = 150
+    };
+    bool ret = SetParameters(parameter);
+    ASSERT_FALSE(ret);
+}
+
+HWTEST_F(VibratorAgentTest, SetParameters_003, TestSize.Level1)
+{
+    MISC_HILOGI("SetParameters_003 in");
+    if (IsSupportVibratorCustom()) {
+        FileDescriptor fileDescriptor("/data/test/vibrator/coin_drop.json");
+        MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
+        struct stat64 statbuf = { 0 };
+        if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
+            VibratorParameter parameter = {
+                .intensity = 50,
+                .frequency = -15
+            };
+            int32_t ret = SetParameters(parameter);
+            ASSERT_TRUE(ret);
+            ret = PlayVibratorCustom(fileDescriptor.fd, 0, statbuf.st_size);
+            ASSERT_EQ(ret, 0);
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    } else {
+        ASSERT_EQ(0, 0);
+    }
+    Cancel();
+}
+
+HWTEST_F(VibratorAgentTest, SetParameters_004, TestSize.Level1)
+{
+    MISC_HILOGI("SetParameters_004 in");
+    if (IsSupportVibratorCustom()) {
+        FileDescriptor fileDescriptor("/data/test/vibrator/on_carpet.json");
+        MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
+        struct stat64 statbuf = { 0 };
+        if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
+            VibratorParameter parameter = {
+                .intensity = 33,
+                .frequency = 55
+            };
+            int32_t ret = SetParameters(parameter);
+            ASSERT_TRUE(ret);
+            ret = PlayVibratorCustom(fileDescriptor.fd, 0, statbuf.st_size);
+            ASSERT_EQ(ret, 0);
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    } else {
+        ASSERT_EQ(0, 0);
+    }
+    Cancel();
+}
+
 HWTEST_F(VibratorAgentTest, Cancel_001, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("Cancel_001 in");
     int32_t ret = Cancel();
     ASSERT_NE(ret, 0);
 }
 
 HWTEST_F(VibratorAgentTest, Cancel_002, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("Cancel_002 in");
     if (IsSupportVibratorCustom()) {
         FileDescriptor fileDescriptor("/data/test/vibrator/coin_drop.json");
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
@@ -682,7 +752,7 @@ HWTEST_F(VibratorAgentTest, Cancel_002, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, Cancel_003, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("Cancel_003 in");
     int32_t ret = StartVibratorOnce(500);
     ASSERT_EQ(ret, 0);
     ret = Cancel();
@@ -691,7 +761,7 @@ HWTEST_F(VibratorAgentTest, Cancel_003, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, Cancel_004, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("Cancel_004 in");
     bool state { false };
     int32_t ret = IsSupportEffect("haptic.clock.timer", &state);
     ASSERT_EQ(ret, 0);
@@ -705,7 +775,7 @@ HWTEST_F(VibratorAgentTest, Cancel_004, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, IsSupportVibratorCustom_001, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("IsSupportVibratorCustom_001 in");
     bool ret = IsSupportVibratorCustom();
     if (g_deviceType == PHONE_TYPE) {
         ASSERT_TRUE(ret);
@@ -716,7 +786,7 @@ HWTEST_F(VibratorAgentTest, IsSupportVibratorCustom_001, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, IsSupportEffect_001, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("IsSupportEffect_001 in");
     bool state { false };
     int32_t ret = IsSupportEffect("haptic.clock.timer", &state);
     ASSERT_EQ(ret, 0);
@@ -732,7 +802,7 @@ HWTEST_F(VibratorAgentTest, IsSupportEffect_001, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, IsSupportEffect_002, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("IsSupportEffect_002 in");
     bool state { false };
     int32_t ret = IsSupportEffect("haptic.xxx.yyy", &state);
     ASSERT_EQ(ret, 0);
@@ -741,7 +811,7 @@ HWTEST_F(VibratorAgentTest, IsSupportEffect_002, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, IsSupportEffect_003, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("IsSupportEffect_003 in");
     bool state { false };
     int32_t ret = IsSupportEffect(nullptr, &state);
     ASSERT_NE(ret, 0);
@@ -750,7 +820,7 @@ HWTEST_F(VibratorAgentTest, IsSupportEffect_003, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, IsSupportEffect_004, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("IsSupportEffect_004 in");
     bool state { false };
     int32_t ret = IsSupportEffect(VIBRATOR_TYPE_FAIL, &state);
     ASSERT_EQ(ret, 0);
@@ -765,7 +835,7 @@ HWTEST_F(VibratorAgentTest, IsSupportEffect_004, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, IsSupportEffect_005, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("IsSupportEffect_005 in");
     bool state { false };
     int32_t ret = IsSupportEffect(VIBRATOR_TYPE_CHARGING, &state);
     ASSERT_EQ(ret, 0);
@@ -780,7 +850,7 @@ HWTEST_F(VibratorAgentTest, IsSupportEffect_005, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, IsSupportEffect_006, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("IsSupportEffect_006 in");
     bool state { false };
     int32_t ret = IsSupportEffect(VIBRATOR_TYPE_LONG_PRESS_HEAVY, &state);
     ASSERT_EQ(ret, 0);
@@ -795,7 +865,7 @@ HWTEST_F(VibratorAgentTest, IsSupportEffect_006, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, IsSupportEffect_007, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("IsSupportEffect_007 in");
     bool state { false };
     int32_t ret = IsSupportEffect(VIBRATOR_TYPE_LONG_PRESS_LIGHT, &state);
     ASSERT_EQ(ret, 0);
@@ -810,7 +880,7 @@ HWTEST_F(VibratorAgentTest, IsSupportEffect_007, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, IsSupportEffect_008, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("IsSupportEffect_008 in");
     bool state { false };
     int32_t ret = IsSupportEffect(VIBRATOR_TYPE_LONG_PRESS_MEDIUM, &state);
     ASSERT_EQ(ret, 0);
@@ -825,7 +895,7 @@ HWTEST_F(VibratorAgentTest, IsSupportEffect_008, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, IsSupportEffect_009, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("IsSupportEffect_009 in");
     bool state { false };
     int32_t ret = IsSupportEffect(VIBRATOR_TYPE_SLIDE_LIGHT, &state);
     ASSERT_EQ(ret, 0);
@@ -840,7 +910,7 @@ HWTEST_F(VibratorAgentTest, IsSupportEffect_009, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, IsSupportEffect_010, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("IsSupportEffect_010 in");
     bool state { false };
     int32_t ret = IsSupportEffect(VIBRATOR_TYPE_THRESHOID, &state);
     ASSERT_EQ(ret, 0);
@@ -855,7 +925,7 @@ HWTEST_F(VibratorAgentTest, IsSupportEffect_010, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, GetDelayTime_001, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("GetDelayTime_001 in");
     if (IsSupportVibratorCustom()) {
         int32_t delayTime { -1 };
         int32_t ret = GetDelayTime(delayTime);
@@ -865,9 +935,9 @@ HWTEST_F(VibratorAgentTest, GetDelayTime_001, TestSize.Level1)
     }
 }
 
-HWTEST_F(VibratorAgentTest, PreProcess_002, TestSize.Level1)
+HWTEST_F(VibratorAgentTest, PreProcess_001, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("PreProcess_001 in");
     if (IsSupportVibratorCustom()) {
         FileDescriptor fileDescriptor("invalid_file_name");
         MISC_HILOGD("fd:%{public}d", fileDescriptor.fd);
@@ -890,9 +960,9 @@ HWTEST_F(VibratorAgentTest, PreProcess_002, TestSize.Level1)
     }
 }
 
-HWTEST_F(VibratorAgentTest, PreProcess_003, TestSize.Level1)
+HWTEST_F(VibratorAgentTest, PreProcess_002, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("PreProcess_002 in");
     if (IsSupportVibratorCustom()) {
         FileDescriptor fileDescriptor("/data/test/vibrator/test_invalid_duration.json");
         MISC_HILOGD("fd:%{public}d", fileDescriptor.fd);
@@ -915,9 +985,9 @@ HWTEST_F(VibratorAgentTest, PreProcess_003, TestSize.Level1)
     }
 }
 
-HWTEST_F(VibratorAgentTest, PreProcess_004, TestSize.Level1)
+HWTEST_F(VibratorAgentTest, PreProcess_003, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("PreProcess_003 in");
     if (IsSupportVibratorCustom()) {
         FileDescriptor fileDescriptor("/data/test/vibrator/test_invalid_frequency.json");
         MISC_HILOGD("fd:%{public}d", fileDescriptor.fd);
@@ -940,9 +1010,9 @@ HWTEST_F(VibratorAgentTest, PreProcess_004, TestSize.Level1)
     }
 }
 
-HWTEST_F(VibratorAgentTest, PreProcess_005, TestSize.Level1)
+HWTEST_F(VibratorAgentTest, PreProcess_004, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("PreProcess_004 in");
     if (IsSupportVibratorCustom()) {
         FileDescriptor fileDescriptor("/data/test/vibrator/test_invalid_intensity.json");
         MISC_HILOGD("fd:%{public}d", fileDescriptor.fd);
@@ -965,9 +1035,9 @@ HWTEST_F(VibratorAgentTest, PreProcess_005, TestSize.Level1)
     }
 }
 
-HWTEST_F(VibratorAgentTest, PreProcess_006, TestSize.Level1)
+HWTEST_F(VibratorAgentTest, PreProcess_005, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("PreProcess_005 in");
     if (IsSupportVibratorCustom()) {
         FileDescriptor fileDescriptor("/data/test/vibrator/test_invalid_startTime.json");
         MISC_HILOGD("fd:%{public}d", fileDescriptor.fd);
@@ -990,9 +1060,9 @@ HWTEST_F(VibratorAgentTest, PreProcess_006, TestSize.Level1)
     }
 }
 
-HWTEST_F(VibratorAgentTest, PreProcess_007, TestSize.Level1)
+HWTEST_F(VibratorAgentTest, PreProcess_006, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("PreProcess_006 in");
     if (IsSupportVibratorCustom()) {
         FileDescriptor fileDescriptor("/data/test/vibrator/test_invalid_type.json");
         MISC_HILOGD("fd:%{public}d", fileDescriptor.fd);
@@ -1015,9 +1085,9 @@ HWTEST_F(VibratorAgentTest, PreProcess_007, TestSize.Level1)
     }
 }
 
-HWTEST_F(VibratorAgentTest, PreProcess_008, TestSize.Level1)
+HWTEST_F(VibratorAgentTest, PreProcess_007, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("PreProcess_007 in");
     if (IsSupportVibratorCustom()) {
         FileDescriptor fileDescriptor("/data/test/vibrator/test_event_overlap_1.json");
         MISC_HILOGD("fd:%{public}d", fileDescriptor.fd);
@@ -1040,9 +1110,9 @@ HWTEST_F(VibratorAgentTest, PreProcess_008, TestSize.Level1)
     }
 }
 
-HWTEST_F(VibratorAgentTest, PreProcess_009, TestSize.Level1)
+HWTEST_F(VibratorAgentTest, PreProcess_008, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("PreProcess_008 in");
     if (IsSupportVibratorCustom()) {
         FileDescriptor fileDescriptor("/data/test/vibrator/test_event_overlap_2.json");
         MISC_HILOGD("fd:%{public}d", fileDescriptor.fd);
@@ -1065,9 +1135,9 @@ HWTEST_F(VibratorAgentTest, PreProcess_009, TestSize.Level1)
     }
 }
 
-HWTEST_F(VibratorAgentTest, PreProcess_010, TestSize.Level1)
+HWTEST_F(VibratorAgentTest, PreProcess_009, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("PreProcess_009 in");
     if (IsSupportVibratorCustom()) {
         FileDescriptor fileDescriptor("/data/test/vibrator/test_129_event.json");
         MISC_HILOGD("fd:%{public}d", fileDescriptor.fd);
@@ -1092,7 +1162,7 @@ HWTEST_F(VibratorAgentTest, PreProcess_010, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, PlayPattern_001, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    MISC_HILOGI("PlayPattern_001 in");
     if (IsSupportVibratorCustom()) {
         int32_t delayTime { -1 };
         int32_t ret = GetDelayTime(delayTime);

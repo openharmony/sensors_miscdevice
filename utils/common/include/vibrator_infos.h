@@ -123,6 +123,15 @@ struct VibrateInfo {
     int32_t count = 0;
     VibratePackage package;
 };
+
+struct VibrateParameter {
+    int32_t intensity = 100;  // from 0 to 100
+    int32_t frequency = 0;    // from -100 to 100
+    int32_t reserved = 0;
+    void Dump() const;
+    bool Marshalling(Parcel &parcel) const;
+    std::optional<VibrateParameter> Unmarshalling(Parcel &data);
+};
 }  // namespace Sensors
 }  // namespace OHOS
 #endif  // VIBRATOR_INFOS_H

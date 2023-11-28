@@ -30,7 +30,12 @@ constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "VibratorNDK" };
 constexpr int32_t DEFAULT_VIBRATOR_ID = 123;
 int32_t g_loopCount = 1;
 int32_t g_usage = USAGE_UNKNOWN;
+VibratorParameter g_vibratorParameter;
 const std::string PHONE_TYPE = "phone";
+const int32_t INTENSITY_ADJUST_MIN = 0;
+const int32_t INTENSITY_ADJUST_MAX = 100;
+const int32_t FREQUENCY_ADJUST_MIN = -100;
+const int32_t FREQUENCY_ADJUST_MAX = 100;
 } // namespace
 
 static int32_t NormalizeErrCode(int32_t code)
@@ -68,12 +73,12 @@ int32_t StartVibrator(const char *effectId)
     CHKPR(effectId, PARAMETER_ERROR);
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.Vibrate(DEFAULT_VIBRATOR_ID, effectId, g_loopCount, g_usage);
+    g_loopCount = 1;
+    g_usage = USAGE_UNKNOWN;
     if (ret != ERR_OK) {
         MISC_HILOGE("Vibrate effectId failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
-    g_loopCount = 1;
-    g_usage = USAGE_UNKNOWN;
     return SUCCESS;
 }
 
@@ -85,11 +90,11 @@ int32_t StartVibratorOnce(int32_t duration)
     }
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.Vibrate(DEFAULT_VIBRATOR_ID, duration, g_usage);
+    g_usage = USAGE_UNKNOWN;
     if (ret != ERR_OK) {
         MISC_HILOGE("Vibrate duration failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
-    g_usage = USAGE_UNKNOWN;
     return SUCCESS;
 }
 
@@ -113,12 +118,14 @@ int32_t PlayVibratorCustom(int32_t fd, int64_t offset, int64_t length)
         .offset = offset,
         .length = length
     };
-    int32_t ret = client.PlayVibratorCustom(DEFAULT_VIBRATOR_ID, rawFd, g_usage);
+    int32_t ret = client.PlayVibratorCustom(DEFAULT_VIBRATOR_ID, rawFd, g_usage, g_vibratorParameter);
+    g_usage = USAGE_UNKNOWN;
+    g_vibratorParameter.intensity = INTENSITY_ADJUST_MAX;
+    g_vibratorParameter.frequency = 0;
     if (ret != ERR_OK) {
         MISC_HILOGE("PlayVibratorCustom failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
-    g_usage = USAGE_UNKNOWN;
     return SUCCESS;
 #else
     MISC_HILOGE("The device does not support this operation");
@@ -200,8 +207,10 @@ int32_t GetDelayTime(int32_t &delayTime)
 int32_t PlayPattern(const VibratorPattern &pattern)
 {
     auto &client = VibratorServiceClient::GetInstance();
-    int32_t ret = client.PlayPattern(pattern, g_usage);
+    int32_t ret = client.PlayPattern(pattern, g_usage, g_vibratorParameter);
     g_usage = USAGE_UNKNOWN;
+    g_vibratorParameter.intensity = INTENSITY_ADJUST_MAX;
+    g_vibratorParameter.frequency = 0;
     if (ret != ERR_OK) {
         MISC_HILOGE("PlayPattern failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
@@ -218,6 +227,18 @@ int32_t FreeVibratorPackage(VibratorPackage &package)
         return NormalizeErrCode(ret);
     }
     return SUCCESS;
+}
+
+bool SetParameters(const VibratorParameter &parameter)
+{
+    if ((parameter.intensity < INTENSITY_ADJUST_MIN) || (parameter.intensity > INTENSITY_ADJUST_MAX) ||
+        (parameter.frequency < FREQUENCY_ADJUST_MIN) || (parameter.frequency > FREQUENCY_ADJUST_MAX)) {
+        MISC_HILOGE("Input invalid, intensity parameter is %{public}d, frequency parameter is %{public}d",
+            parameter.intensity, parameter.frequency);
+        return false;
+    }
+    g_vibratorParameter = parameter;
+    return true;
 }
 }  // namespace Sensors
 }  // namespace OHOS

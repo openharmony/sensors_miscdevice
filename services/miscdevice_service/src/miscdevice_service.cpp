@@ -41,6 +41,14 @@ auto g_miscdeviceService = MiscdeviceDelayedSpSingleton<MiscdeviceService>::GetI
 const bool G_REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(g_miscdeviceService.GetRefPtr());
 constexpr int32_t MIN_VIBRATOR_TIME = 0;
 constexpr int32_t MAX_VIBRATOR_TIME = 1800000;
+constexpr int32_t INTENSITY_MIN = 0;
+constexpr int32_t INTENSITY_MAX = 100;
+constexpr int32_t FREQUENCY_MIN = 0;
+constexpr int32_t FREQUENCY_MAX = 100;
+constexpr int32_t INTENSITY_ADJUST_MIN = 0;
+constexpr int32_t INTENSITY_ADJUST_MAX = 100;
+constexpr int32_t FREQUENCY_ADJUST_MIN = -100;
+constexpr int32_t FREQUENCY_ADJUST_MAX = 100;
 VibratorCapacity g_capacity;
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 const std::string PHONE_TYPE = "phone";
@@ -332,7 +340,8 @@ int32_t MiscdeviceService::IsSupportEffect(const std::string &effect, bool &stat
 }
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, const RawFileDescriptor &rawFd, int32_t usage)
+int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, const RawFileDescriptor &rawFd, int32_t usage,
+    const VibrateParameter &parameter)
 {
     if (OHOS::system::GetDeviceType() != PHONE_TYPE) {
         MISC_HILOGE("The device does not support this operation");
@@ -340,6 +349,12 @@ int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, const RawFileD
     }
     if ((usage >= USAGE_MAX) || (usage < 0)) {
         MISC_HILOGE("Invalid parameter, usage:%{public}d", usage);
+        return PARAMETER_ERROR;
+    }
+    if ((parameter.intensity < INTENSITY_ADJUST_MIN) || (parameter.intensity > INTENSITY_ADJUST_MAX) ||
+        (parameter.frequency < FREQUENCY_ADJUST_MIN) || (parameter.frequency > FREQUENCY_ADJUST_MAX)) {
+        MISC_HILOGE("Input invalid, intensity parameter is %{public}d, frequency parameter is %{public}d",
+            parameter.intensity, parameter.frequency);
         return PARAMETER_ERROR;
     }
     std::unique_ptr<IVibratorDecoderFactory> decoderFactory = std::make_unique<DefaultVibratorDecoderFactory>();
@@ -350,14 +365,21 @@ int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, const RawFileD
         MISC_HILOGE("Decode effect error");
         return ERROR;
     }
+    MergeVibratorParmeters(parameter, package);
+    package.Dump();
     VibrateInfo info = {
-        .mode = VIBRATE_CUSTOM_COMPOSITE_EFFECT,
         .packageName = GetPackageName(GetCallingTokenID()),
         .pid = GetCallingPid(),
         .uid = GetCallingUid(),
         .usage = usage,
         .package = package,
     };
+    g_capacity.Dump();
+    if (g_capacity.isSupportPresetMapping) {
+        info.mode = VIBRATE_CUSTOM_COMPOSITE_EFFECT;
+    } else if (g_capacity.isSupportTimeDelay) {
+        info.mode = VIBRATE_CUSTOM_COMPOSITE_TIME;
+    }
     std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
     if (ShouldIgnoreVibrate(info)) {
         MISC_HILOGE("Vibration is ignored and high priority is vibrating");
@@ -475,30 +497,19 @@ int32_t MiscdeviceService::Dump(int32_t fd, const std::vector<std::u16string> &a
     return ERR_OK;
 }
 
-int32_t MiscdeviceService::PlayPattern(const VibratePattern &pattern, int32_t usage)
+int32_t MiscdeviceService::PlayPattern(const VibratePattern &pattern, int32_t usage,
+    const VibrateParameter &parameter)
 {
     CALL_LOG_ENTER;
-    pattern.Dump();
-    g_capacity.Dump();
-    VibrateInfo info = {
-        .mode = VIBRATE_BUTT,
-        .packageName = GetPackageName(GetCallingTokenID()),
-        .pid = GetCallingPid(),
-        .uid = GetCallingUid(),
-        .usage = usage,
-    };
-    if (g_capacity.isSupportHdHaptic) {
-        std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
-        if (ShouldIgnoreVibrate(info)) {
-            MISC_HILOGE("Vibration is ignored and high priority is vibrating");
-            return ERROR;
-        }
-        StartVibrateThread(info);
-        return vibratorHdiConnection_.PlayPattern(pattern);
-    } else if (g_capacity.isSupportPresetMapping) {
-        info.mode = VIBRATE_CUSTOM_COMPOSITE_EFFECT;
-    } else if (g_capacity.isSupportTimeDelay) {
-        info.mode = VIBRATE_CUSTOM_COMPOSITE_TIME;
+    if ((usage >= USAGE_MAX) || (usage < 0)) {
+        MISC_HILOGE("Invalid parameter, usage:%{public}d", usage);
+        return PARAMETER_ERROR;
+    }
+    if ((parameter.intensity < INTENSITY_ADJUST_MIN) || (parameter.intensity > INTENSITY_ADJUST_MAX) ||
+        (parameter.frequency < FREQUENCY_ADJUST_MIN) || (parameter.frequency > FREQUENCY_ADJUST_MAX)) {
+        MISC_HILOGE("Input invalid, intensity parameter is %{public}d, frequency parameter is %{public}d",
+            parameter.intensity, parameter.frequency);
+        return PARAMETER_ERROR;
     }
     VibratePattern vibratePattern = {
         .startTime = 0,
@@ -508,6 +519,29 @@ int32_t MiscdeviceService::PlayPattern(const VibratePattern &pattern, int32_t us
     VibratePackage package = {
         .patterns = patterns
     };
+    MergeVibratorParmeters(parameter, package);
+    package.Dump();
+    VibrateInfo info = {
+        .mode = VIBRATE_BUTT,
+        .packageName = GetPackageName(GetCallingTokenID()),
+        .pid = GetCallingPid(),
+        .uid = GetCallingUid(),
+        .usage = usage,
+    };
+    g_capacity.Dump();
+    if (g_capacity.isSupportHdHaptic) {
+        std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
+        if (ShouldIgnoreVibrate(info)) {
+            MISC_HILOGE("Vibration is ignored and high priority is vibrating");
+            return ERROR;
+        }
+        StartVibrateThread(info);
+        return vibratorHdiConnection_.PlayPattern(package.patterns.front());
+    } else if (g_capacity.isSupportPresetMapping) {
+        info.mode = VIBRATE_CUSTOM_COMPOSITE_EFFECT;
+    } else if (g_capacity.isSupportTimeDelay) {
+        info.mode = VIBRATE_CUSTOM_COMPOSITE_TIME;
+    }
     info.package = package;
     std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
     if (ShouldIgnoreVibrate(info)) {
@@ -521,6 +555,33 @@ int32_t MiscdeviceService::PlayPattern(const VibratePattern &pattern, int32_t us
 int32_t MiscdeviceService::GetDelayTime(int32_t &delayTime)
 {
     return vibratorHdiConnection_.GetDelayTime(g_capacity.GetVibrateMode(), delayTime);
+}
+
+void MiscdeviceService::MergeVibratorParmeters(const VibrateParameter &parameter, VibratePackage &package)
+{
+    parameter.Dump();
+    if ((parameter.intensity == INTENSITY_ADJUST_MAX) && (parameter.frequency == 0)) {
+        MISC_HILOGI("The adjust parameter is not need to merge");
+        return;
+    }
+    for (VibratePattern &pattern : package.patterns) {
+        for (VibrateEvent &event : pattern.events) {
+            float intensityScale = static_cast<float>(parameter.intensity) / INTENSITY_ADJUST_MAX;
+            if ((event.tag == EVENT_TAG_TRANSIENT) || (event.points.empty())) {
+                event.intensity = static_cast<int32_t>(event.intensity * intensityScale);
+                event.intensity = std::max(std::min(event.intensity, INTENSITY_MAX), INTENSITY_MIN);
+                event.frequency = event.frequency + parameter.frequency;
+                event.frequency = std::max(std::min(event.frequency, FREQUENCY_MAX), FREQUENCY_MIN);
+            } else {
+                for (VibrateCurvePoint &point : event.points) {
+                    point.intensity = static_cast<int32_t>(point.intensity * intensityScale);
+                    point.intensity = std::max(std::min(point.intensity, INTENSITY_ADJUST_MAX), INTENSITY_ADJUST_MIN);
+                    point.frequency = point.frequency + parameter.frequency;
+                    point.frequency = std::max(std::min(point.frequency, FREQUENCY_ADJUST_MAX), FREQUENCY_ADJUST_MIN);
+                }
+            }
+        }
+    }
 }
 }  // namespace Sensors
 }  // namespace OHOS

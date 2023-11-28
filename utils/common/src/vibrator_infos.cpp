@@ -61,7 +61,7 @@ void VibratorCapacity::Dump() const
     std::string isSupportPresetMappingStr = isSupportPresetMapping ? "true" : "false";
     std::string isSupportTimeDelayStr = isSupportTimeDelay ? "true" : "false";
     MISC_HILOGD("SupportHdHaptic:%{public}s, SupportPresetMapping:%{public}s, "
-        "SupportPresetMapping:%{public}s", isSupportHdHapticStr.c_str(),
+        "SupportTimeDelayStr:%{public}s", isSupportHdHapticStr.c_str(),
         isSupportPresetMappingStr.c_str(), isSupportTimeDelayStr.c_str());
 }
 
@@ -200,6 +200,38 @@ std::optional<VibratePattern> VibratePattern::Unmarshalling(Parcel &data)
         }
     }
     return pattern;
+}
+
+void VibrateParameter::Dump() const
+{
+    MISC_HILOGD("intensity:%{public}d, frequency:%{public}d", intensity, frequency);
+}
+
+bool VibrateParameter::Marshalling(Parcel &parcel) const
+{
+    if (!parcel.WriteInt32(intensity)) {
+        MISC_HILOGE("Write parameter's intensity failed");
+        return false;
+    }
+    if (!parcel.WriteInt32(frequency)) {
+        MISC_HILOGE("Write parameter's frequency failed");
+        return false;
+    }
+    return true;
+}
+
+std::optional<VibrateParameter> VibrateParameter::Unmarshalling(Parcel &data)
+{
+    VibrateParameter parameter;
+    if (!(data.ReadInt32(parameter.intensity))) {
+        MISC_HILOGE("Read parameter's intensity failed");
+        return std::nullopt;
+    }
+    if (!(data.ReadInt32(parameter.frequency))) {
+        MISC_HILOGE("Read parameter's frequency failed");
+        return std::nullopt;
+    }
+    return parameter;
 }
 }  // namespace Sensors
 }  // namespace OHOS
