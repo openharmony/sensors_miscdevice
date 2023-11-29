@@ -45,7 +45,8 @@
           "//base/sensors/miscdevice/frameworks/js/napi:vibrator_js_target",
           "//base/sensors/miscdevice/frameworks/native/vibrator:vibrator_target",
           "//base/sensors/miscdevice/frameworks/native/light:light_target",
-          "//base/sensors/miscdevice/utils:miscdevice_utils_target"
+          "//base/sensors/miscdevice/utils:miscdevice_utils_target",
+          "//base/sensors/miscdevice/frameworks/capi:ohvibrator"
         ],
         "service_group": [
           "//base/sensors/miscdevice/services/miscdevice_service:miscdevice_service_target",
@@ -79,6 +80,7 @@
         "//base/sensors/miscdevice/test/fuzztest/vibrator:fuzztest",
         "//base/sensors/miscdevice/test/fuzztest/light:fuzztest",
         "//base/sensors/miscdevice/test/unittest/vibrator/native:unittest",
+        "//base/sensors/miscdevice/test/unittest/vibrator/capi:unittest",
         "//base/sensors/miscdevice/test/unittest/light:unittest",
         "//base/sensors/miscdevice/test/fuzztest/service:fuzztest"
       ]

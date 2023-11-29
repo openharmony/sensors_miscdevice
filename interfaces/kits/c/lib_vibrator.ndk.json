@@ -1,0 +1,5 @@
+[
+    { "name": "OH_Vibrator_PlayVibration" },
+    { "name": "OH_Vibrator_PlayVibrationCustom" },
+    { "name": "OH_Vibrator_Cancel" }
+]
