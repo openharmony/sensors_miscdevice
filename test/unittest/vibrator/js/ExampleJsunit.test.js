@@ -2011,7 +2011,7 @@ describe("VibratorJsTest", function () {
                 vibrator.startVibration({
                     type: "preset",
                     effectId: "haptic.clock.timer",
-                    count: 1,
+                    count: 3,
                 }, {
                     usage: "notification"
                 }, (error) => {
