@@ -84,11 +84,9 @@ void MiscdeviceService::OnStart()
     }
     if (!InitInterface()) {
         MISC_HILOGE("Init interface error");
-        return;
     }
     if (!InitLightInterface()) {
         MISC_HILOGE("InitLightInterface failed");
-        return;
     }
     if (!SystemAbility::Publish(MiscdeviceDelayedSpSingleton<MiscdeviceService>::GetInstance())) {
         MISC_HILOGE("Publish MiscdeviceService failed");
@@ -116,11 +114,9 @@ void MiscdeviceService::OnStartFuzz()
     }
     if (!InitInterface()) {
         MISC_HILOGE("Init interface error");
-        return;
     }
     if (!InitLightInterface()) {
         MISC_HILOGE("InitLightInterface failed");
-        return;
     }
     auto ret = miscDeviceIdMap_.insert(std::make_pair(MiscdeviceDeviceId::LED, lightExist_));
     if (!ret.second) {
