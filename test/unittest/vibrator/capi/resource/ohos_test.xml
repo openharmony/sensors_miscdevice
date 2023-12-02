@@ -14,9 +14,16 @@
      limitations under the License.
 -->
 <configuration ver="2.0">
-    <target name="NdkVibratorTest">
+    <target name="NativeVibratorTest">
         <preparer>
-            <option name="push" value="json_file/test_128_event.json -> /data/test/vibrator" src="res"/>
+            <option name="push" value="json_file/coin_drop.json -> /data/test/vibrator" src="res"/>
+            <option name="push" value="json_file/test_129_event.json -> /data/test/vibrator" src="res"/>
+            <option name="push" value="json_file/test_big_file_size.json -> /data/test/vibrator" src="res"/>
+            <option name="push" value="json_file/test_invalid_duration.json -> /data/test/vibrator" src="res"/>
+            <option name="push" value="json_file/test_invalid_frequency.json -> /data/test/vibrator" src="res"/>
+            <option name="push" value="json_file/test_invalid_intensity.json -> /data/test/vibrator" src="res"/>
+            <option name="push" value="json_file/test_invalid_startTime.json -> /data/test/vibrator" src="res"/>
+            <option name="push" value="json_file/test_invalid_type.json -> /data/test/vibrator" src="res"/>
         </preparer>
     </target>
 </configuration>

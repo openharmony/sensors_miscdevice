@@ -33,8 +33,8 @@ using namespace Security::AccessToken;
 using Security::AccessToken::AccessTokenID;
 
 namespace {
-uint32_t g_duration = 3000;
-std::string g_deviceType;
+uint32_t g_duration = 300;
+constexpr int32_t TIME_WAIT_FOR_OP = 2;
 constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "NativeVibratorTest" };
 PermissionDef infoManagerTestPermDef_ = {
     .permissionName = "ohos.permission.VIBRATE",
@@ -81,6 +81,18 @@ private:
     static AccessTokenID tokenID_;
 };
 
+struct FileDescriptor {
+    explicit FileDescriptor(const std::string &path)
+    {
+        fd = open(path.c_str(), O_RDONLY);
+    }
+    ~FileDescriptor()
+    {
+        close(fd);
+    }
+    int32_t fd;
+};
+
 AccessTokenID NativeVibratorTest::tokenID_ = 0;
 
 void NativeVibratorTest::SetUpTestCase()
@@ -90,8 +102,6 @@ void NativeVibratorTest::SetUpTestCase()
     tokenID_ = tokenIdEx.tokenIdExStruct.tokenID;
     ASSERT_NE(0, tokenID_);
     ASSERT_EQ(0, SetSelfTokenID(tokenID_));
-    g_deviceType = OHOS::system::GetDeviceType();
-    MISC_HILOGI("deviceType:%{public}s", g_deviceType.c_str());
 }
 
 void NativeVibratorTest::TearDownTestCase()
@@ -114,33 +124,19 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationTest_001, TestSize.Level1)
     Vibrator_Attribute vibrateAttribute;
     vibrateAttribute.usage = VIBRATOR_USAGE_ALARM;
 
-    int32_t ret = OH_Vibrator_PlayVibration(g_duration, vibrateAttribute);
-    std::this_thread::sleep_for(std::chrono::milliseconds(g_duration));
-    MISC_HILOGI("ret is %{public}d", ret);
-    ASSERT_EQ(ret, RET_SUCCESS);
+    int32_t ret = OH_Vibrator_PlayVibration(0, vibrateAttribute);
+    ASSERT_EQ(ret, PARAMETER_ERROR);
 }
 
 HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationTest_002, TestSize.Level1)
 {
     CALL_LOG_ENTER;
-    Vibrator_Attribute vibrateAttribute;
-    vibrateAttribute.usage = VIBRATOR_USAGE_ALARM;
-
-    int32_t ret = OH_Vibrator_PlayVibration(0, vibrateAttribute);
-    MISC_HILOGI("ret is %{public}d", ret);
-    ASSERT_EQ(ret, PARAMETER_ERROR);
-}
-
-HWTEST_F(NativeVibratorTest, OH_Vibrator_CancelTest_001, TestSize.Level1)
-{
-    CALL_LOG_ENTER;
-    Vibrator_Attribute vibrateAttribute;
-    vibrateAttribute.usage = VIBRATOR_USAGE_RING;
-
+    Vibrator_Attribute vibrateAttribute = {
+        .usage = VIBRATOR_USAGE_RING
+    };
     int32_t ret = OH_Vibrator_PlayVibration(g_duration, vibrateAttribute);
     ASSERT_EQ(ret, RET_SUCCESS);
     ret = OH_Vibrator_Cancel();
-    MISC_HILOGI("ret is %{public}d", ret);
     ASSERT_EQ(ret, RET_SUCCESS);
 }
 
@@ -152,5 +148,167 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_CancelTest_002, TestSize.Level1)
     ASSERT_NE(ret, RET_SUCCESS);
 }
 
+HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_001, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    FileDescriptor fileDescriptor("/data/test/vibrator/coin_drop.json");
+    MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
+    struct stat64 statbuf = { 0 };
+    if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
+        Vibrator_FileDescription fileDescription = {
+            .fd = fileDescriptor.fd,
+            .offset = 0,
+            .length = statbuf.st_size
+        };
+        Vibrator_Attribute vibrateAttribute = {
+            .usage = VIBRATOR_USAGE_RING
+        };
+        int32_t ret = OH_Vibrator_PlayVibrationCustom(fileDescription, vibrateAttribute);
+        bool isSuccess = ((ret == 0) || (ret == UNSUPPORTED));
+        ASSERT_EQ(isSuccess, true);
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    OH_Vibrator_Cancel();
+}
+
+HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_002, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    FileDescriptor fileDescriptor("/data/test/vibrator/test_invalid_type.json");
+    MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
+    struct stat64 statbuf = { 0 };
+    if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
+        Vibrator_FileDescription fileDescription = {
+            .fd = fileDescriptor.fd,
+            .offset = 0,
+            .length = statbuf.st_size
+        };
+        Vibrator_Attribute vibrateAttribute = {
+            .usage = VIBRATOR_USAGE_RING
+        };
+        int32_t ret = OH_Vibrator_PlayVibrationCustom(fileDescription, vibrateAttribute);
+        ASSERT_NE(ret, 0);
+    }
+}
+
+HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_003, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    FileDescriptor fileDescriptor("/data/test/vibrator/test_invalid_startTime.json");
+    MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
+    struct stat64 statbuf = { 0 };
+    if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
+        Vibrator_FileDescription fileDescription = {
+            .fd = fileDescriptor.fd,
+            .offset = 0,
+            .length = statbuf.st_size
+        };
+        Vibrator_Attribute vibrateAttribute = {
+            .usage = VIBRATOR_USAGE_RING
+        };
+        int32_t ret = OH_Vibrator_PlayVibrationCustom(fileDescription, vibrateAttribute);
+        ASSERT_NE(ret, 0);
+    }
+}
+
+HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_004, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    FileDescriptor fileDescriptor("/data/test/vibrator/test_invalid_duration.json");
+    MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
+    struct stat64 statbuf = { 0 };
+    if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
+        Vibrator_FileDescription fileDescription = {
+            .fd = fileDescriptor.fd,
+            .offset = 0,
+            .length = statbuf.st_size
+        };
+        Vibrator_Attribute vibrateAttribute = {
+            .usage = VIBRATOR_USAGE_RING
+        };
+        int32_t ret = OH_Vibrator_PlayVibrationCustom(fileDescription, vibrateAttribute);
+        ASSERT_NE(ret, 0);
+    }
+}
+
+HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_005, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    FileDescriptor fileDescriptor("/data/test/vibrator/test_invalid_intensity.json");
+    MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
+    struct stat64 statbuf = { 0 };
+    if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
+        Vibrator_FileDescription fileDescription = {
+            .fd = fileDescriptor.fd,
+            .offset = 0,
+            .length = statbuf.st_size
+        };
+        Vibrator_Attribute vibrateAttribute = {
+            .usage = VIBRATOR_USAGE_RING
+        };
+        int32_t ret = OH_Vibrator_PlayVibrationCustom(fileDescription, vibrateAttribute);
+        ASSERT_NE(ret, 0);
+    }
+}
+
+HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_006, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    FileDescriptor fileDescriptor("/data/test/vibrator/test_invalid_frequency.json");
+    MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
+    struct stat64 statbuf = { 0 };
+    if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
+        Vibrator_FileDescription fileDescription = {
+            .fd = fileDescriptor.fd,
+            .offset = 0,
+            .length = statbuf.st_size
+        };
+        Vibrator_Attribute vibrateAttribute = {
+            .usage = VIBRATOR_USAGE_RING
+        };
+        int32_t ret = OH_Vibrator_PlayVibrationCustom(fileDescription, vibrateAttribute);
+        ASSERT_NE(ret, 0);
+    }
+}
+
+HWTEST_F(NativeVibratorTest, PlayVibratorCustom_018, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    FileDescriptor fileDescriptor("/data/test/vibrator/test_129_event.json");
+    MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
+    struct stat64 statbuf = { 0 };
+    if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
+        Vibrator_FileDescription fileDescription = {
+            .fd = fileDescriptor.fd,
+            .offset = 0,
+            .length = statbuf.st_size
+        };
+        Vibrator_Attribute vibrateAttribute = {
+            .usage = VIBRATOR_USAGE_RING
+        };
+        int32_t ret = OH_Vibrator_PlayVibrationCustom(fileDescription, vibrateAttribute);
+        ASSERT_NE(ret, 0);
+    }
+}
+
+HWTEST_F(NativeVibratorTest, PlayVibratorCustom_019, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    FileDescriptor fileDescriptor("/data/test/vibrator/test_big_file_size.json");
+    MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
+    struct stat64 statbuf = { 0 };
+    if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
+        Vibrator_FileDescription fileDescription = {
+            .fd = fileDescriptor.fd,
+            .offset = 0,
+            .length = statbuf.st_size
+        };
+        Vibrator_Attribute vibrateAttribute = {
+            .usage = VIBRATOR_USAGE_RING
+        };
+        int32_t ret = OH_Vibrator_PlayVibrationCustom(fileDescription, vibrateAttribute);
+        ASSERT_NE(ret, 0);
+    }
+}
 }  // namespace Sensors
 }  // namespace OHOS

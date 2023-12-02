@@ -18,7 +18,7 @@ module_output_path = "miscdevice/vibrator"
 
 ###############################################################################
 
-ohos_unittest("VibratorCapiTest") {
+ohos_unittest("NativeVibratorTest") {
   module_out_path = module_output_path
 
   include_dirs = [
@@ -43,14 +43,12 @@ ohos_unittest("VibratorCapiTest") {
     "//third_party/googletest:gtest_main",
     "//third_party/googletest:gtest_main",
   ]
-  if (miscdevice_feature_vibrator_custom) {
-    resource_config_file =
-        "$SUBSYSTEM_DIR/test/unittest/vibrator/capi/resource/ohos_test.xml"
-  }
+  resource_config_file =
+      "$SUBSYSTEM_DIR/test/unittest/vibrator/capi/resource/ohos_test.xml"
 }
 
 ###############################################################################
 group("unittest") {
   testonly = true
-  deps = [ ":VibratorCapiTest" ]
+  deps = [ ":NativeVibratorTest" ]
 }

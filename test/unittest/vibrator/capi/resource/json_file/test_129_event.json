@@ -1370,6 +1370,17 @@
                             "Frequency": 50
                         }
                     }
+                },
+                {
+                    "Event": {
+                        "Type": "continuous",
+                        "StartTime": 6400,
+                        "Duration": 50,
+                        "Parameters": {
+                            "Intensity": 100,
+                            "Frequency": 50
+                        }
+                    }
                 }
             ]
         }
