@@ -50,5 +50,5 @@ ohos_unittest("NativeVibratorTest") {
 ###############################################################################
 group("unittest") {
   testonly = true
-  deps = [ ":VibratorCapiTest" ]
+  deps = [ ":NativeVibratorTest" ]
 }
