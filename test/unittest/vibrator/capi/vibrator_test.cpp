@@ -148,7 +148,7 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_CancelTest_002, TestSize.Level1)
     ASSERT_NE(ret, RET_SUCCESS);
 }
 
-HWTEST_F(VibratorAgentTest, OH_Vibrator_PlayVibrationCustom_001, TestSize.Level1)
+HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_001, TestSize.Level1)
 {
     CALL_LOG_ENTER;
     FileDescriptor fileDescriptor("/data/test/vibrator/coin_drop.json");
@@ -171,7 +171,7 @@ HWTEST_F(VibratorAgentTest, OH_Vibrator_PlayVibrationCustom_001, TestSize.Level1
     OH_Vibrator_Cancel();
 }
 
-HWTEST_F(VibratorAgentTest, OH_Vibrator_PlayVibrationCustom_002, TestSize.Level1)
+HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_002, TestSize.Level1)
 {
     CALL_LOG_ENTER;
     FileDescriptor fileDescriptor("/data/test/vibrator/test_invalid_type.json");
@@ -191,7 +191,7 @@ HWTEST_F(VibratorAgentTest, OH_Vibrator_PlayVibrationCustom_002, TestSize.Level1
     }
 }
 
-HWTEST_F(VibratorAgentTest, OH_Vibrator_PlayVibrationCustom_003, TestSize.Level1)
+HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_003, TestSize.Level1)
 {
     CALL_LOG_ENTER;
     FileDescriptor fileDescriptor("/data/test/vibrator/test_invalid_startTime.json");
@@ -211,7 +211,7 @@ HWTEST_F(VibratorAgentTest, OH_Vibrator_PlayVibrationCustom_003, TestSize.Level1
     }
 }
 
-HWTEST_F(VibratorAgentTest, OH_Vibrator_PlayVibrationCustom_004, TestSize.Level1)
+HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_004, TestSize.Level1)
 {
     CALL_LOG_ENTER;
     FileDescriptor fileDescriptor("/data/test/vibrator/test_invalid_duration.json");
@@ -231,7 +231,7 @@ HWTEST_F(VibratorAgentTest, OH_Vibrator_PlayVibrationCustom_004, TestSize.Level1
     }
 }
 
-HWTEST_F(VibratorAgentTest, OH_Vibrator_PlayVibrationCustom_005, TestSize.Level1)
+HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_005, TestSize.Level1)
 {
     CALL_LOG_ENTER;
     FileDescriptor fileDescriptor("/data/test/vibrator/test_invalid_intensity.json");
@@ -251,7 +251,7 @@ HWTEST_F(VibratorAgentTest, OH_Vibrator_PlayVibrationCustom_005, TestSize.Level1
     }
 }
 
-HWTEST_F(VibratorAgentTest, OH_Vibrator_PlayVibrationCustom_006, TestSize.Level1)
+HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_006, TestSize.Level1)
 {
     CALL_LOG_ENTER;
     FileDescriptor fileDescriptor("/data/test/vibrator/test_invalid_frequency.json");
@@ -271,7 +271,7 @@ HWTEST_F(VibratorAgentTest, OH_Vibrator_PlayVibrationCustom_006, TestSize.Level1
     }
 }
 
-HWTEST_F(VibratorAgentTest, PlayVibratorCustom_018, TestSize.Level1)
+HWTEST_F(NativeVibratorTest, PlayVibratorCustom_018, TestSize.Level1)
 {
     CALL_LOG_ENTER;
     FileDescriptor fileDescriptor("/data/test/vibrator/test_129_event.json");
@@ -291,7 +291,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_018, TestSize.Level1)
     }
 }
 
-HWTEST_F(VibratorAgentTest, PlayVibratorCustom_019, TestSize.Level1)
+HWTEST_F(NativeVibratorTest, PlayVibratorCustom_019, TestSize.Level1)
 {
     CALL_LOG_ENTER;
     FileDescriptor fileDescriptor("/data/test/vibrator/test_big_file_size.json");
