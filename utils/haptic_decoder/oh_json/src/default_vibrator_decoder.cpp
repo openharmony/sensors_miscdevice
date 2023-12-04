@@ -226,7 +226,7 @@ int32_t DefaultVibratorDecoder::ParseCurve(const JsonParser &parser, cJSON *curv
         MISC_HILOGE("The value of curve is not array");
         return ERROR;
     }
-    size_t size = parser.GetArraySize(curveItem);
+    size_t size = static_cast<size_t>(parser.GetArraySize(curveItem));
     if ((size < CURVE_POINT_MIN) || (size > CURVE_POINT_MAX)) {
         MISC_HILOGE("The size of curve point is out of bounds, size:%{public}zu", size);
         return ERROR;

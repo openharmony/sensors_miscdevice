@@ -15,6 +15,7 @@
 
 #include "vibrator_service_client.h"
 
+#include <climits>
 #include <thread>
 
 #include "hisysevent.h"
@@ -34,7 +35,6 @@ namespace {
 constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "VibratorServiceClient" };
 constexpr int32_t GET_SERVICE_MAX_COUNT = 30;
 constexpr uint32_t WAIT_MS = 200;
-constexpr int32_t PATH_MAX_LENGTH = 64;
 #ifdef __aarch64__
     static const std::string DECODER_LIBRARY_PATH = "/system/lib64/libvibrator_decoder.z.so";
 #else
@@ -230,7 +230,7 @@ int32_t VibratorServiceClient::LoadDecoderLibrary(const std::string& path)
         MISC_HILOGD("The library has already been loaded");
         return ERR_OK;
     }
-    char libRealPath[PATH_MAX_LENGTH] = {};
+    char libRealPath[PATH_MAX] = {};
     if (realpath(path.c_str(), libRealPath) == nullptr) {
         MISC_HILOGD("Get file real path fail");
         return ERROR;
@@ -248,7 +248,7 @@ int32_t VibratorServiceClient::LoadDecoderLibrary(const std::string& path)
         return ERROR;
     }
     decodeHandle_.destroy = reinterpret_cast<void (*)(IVibratorDecoder *)>
-        (dlsym(decodeHandle_.handle,"Destroy"));
+        (dlsym(decodeHandle_.handle, "Destroy"));
     if (decodeHandle_.destroy == nullptr) {
         MISC_HILOGE("dlsym destroy failed: error: %{public}s", dlerror());
         decodeHandle_.Free();
