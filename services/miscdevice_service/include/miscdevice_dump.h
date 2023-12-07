@@ -45,6 +45,7 @@ private:
     void DumpCurrentTime(std::string &startTime);
     void UpdateRecordQueue(const VibrateRecord &record);
     std::string GetUsageName(int32_t usage);
+    void RunVibratorDump(int32_t fd, int32_t optionIndex, const std::vector<std::string> &args, char **argv);
 };
 #define DumpHelper DelayedSingleton<MiscdeviceDump>::GetInstance()
 }  // namespace Sensors
