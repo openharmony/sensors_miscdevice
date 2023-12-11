@@ -90,7 +90,7 @@ int32_t VibratorHdiConnection::EnableCompositeEffect(const HdfCompositeEffect &h
 
 bool VibratorHdiConnection::IsVibratorRunning()
 {
-    CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
+    CHKPR(iVibratorHdiConnection_, false);
     return iVibratorHdiConnection_->IsVibratorRunning();
 }
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
