@@ -16,7 +16,7 @@ import("//build/ohos/ndk/ndk.gni")
 import("./../../../miscdevice.gni")
 
 ohos_ndk_headers("ndk_vibrator_header") {
-  dest_dir = "$ndk_headers_out_dir/sensors/miscdevice/vibrator"
+  dest_dir = "$ndk_headers_out_dir/sensors"
   sources = [
     "./vibrator.h",
     "./vibrator_type.h",
