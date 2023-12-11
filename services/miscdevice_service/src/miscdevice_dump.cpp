@@ -72,11 +72,6 @@ void MiscdeviceDump::ParseCommand(int32_t fd, const std::vector<std::string> &ar
         return;
     }
     int32_t optionIndex = 0;
-    struct option dumpOptions[] = {
-        {"record", no_argument, 0, 'r'},
-        {"help", no_argument, 0, 'h'},
-        {NULL, 0, 0, 0}
-    };
     char **argv = new (std::nothrow) char *[args.size()];
     CHKPV(argv);
     if (memset_s(argv, args.size() * sizeof(char *), 0, args.size() * sizeof(char *)) != EOK) {
@@ -95,6 +90,23 @@ void MiscdeviceDump::ParseCommand(int32_t fd, const std::vector<std::string> &ar
             goto RELEASE_RES;
         }
     }
+    RunVibratorDump(fd, optionIndex, args, argv);
+    RELEASE_RES:
+    for (size_t i = 0; i < args.size(); ++i) {
+        if (argv[i] != nullptr) {
+            delete[] argv[i];
+        }
+    }
+    delete[] argv;
+}
+
+void MiscdeviceDump::RunVibratorDump(int32_t fd, int32_t optionIndex, const std::vector<std::string> &args, char **argv)
+{
+    struct option dumpOptions[] = {
+        {"record", no_argument, 0, 'r'},
+        {"help", no_argument, 0, 'h'},
+        {NULL, 0, 0, 0}
+    };
     optind = 1;
     int32_t c;
     while ((c = getopt_long(args.size(), argv, "rh", dumpOptions, &optionIndex)) != -1) {
@@ -113,13 +125,6 @@ void MiscdeviceDump::ParseCommand(int32_t fd, const std::vector<std::string> &ar
             }
         }
     }
-    RELEASE_RES:
-    for (size_t i = 0; i < args.size(); ++i) {
-        if (argv[i] != nullptr) {
-            delete[] argv[i];
-        }
-    }
-    delete[] argv;
 }
 
 void MiscdeviceDump::DumpHelp(int32_t fd)
