@@ -301,10 +301,10 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_002, TestSize.Level1)
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_003, TestSize.Level1)
 {
     MISC_HILOGI("PlayVibratorCustom_003 in");
-    if (IsSupportVibratorCustom()) {
+    if (IsSupportVibratorCustom() && IsSupportEffect(VIBRATOR_TYPE_FAIL)) {
         int32_t ret = SetLoopCount(2);
         ASSERT_TRUE(ret);
-        ret = StartVibrator("haptic.clock.timer");
+        ret = StartVibrator("VIBRATOR_TYPE_FAIL");
         ASSERT_EQ(ret, 0);
         FileDescriptor fileDescriptor("/data/test/vibrator/on_carpet.json");
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
