@@ -36,6 +36,8 @@ int32_t GetFileSize(const std::string &filePath);
 int64_t GetFileSize(int32_t fd);
 std::string ReadFd(const RawFileDescriptor &rawFd);
 std::string GetFileSuffix(int32_t fd);
+std::string GetFileName(const int32_t &fd);
+std::string GetFileExtName(const int32_t &fd);
 }  // namespace Sensors
 }  // namespace OHOS
 #endif  // MISCDEVICE_FILE_UTILS_H
