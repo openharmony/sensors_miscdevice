@@ -132,8 +132,7 @@ bool IsSupportEffect(const char* effectId)
 HWTEST_F(VibratorAgentTest, StartVibratorTest_001, TestSize.Level1)
 {
     MISC_HILOGI("StartVibratorTest_001 in");
-    if (IsSupportEffect(VIBRATOR_TYPE_CLOCK_TIMER))
-    {
+    if (IsSupportEffect(VIBRATOR_TYPE_CLOCK_TIMER)) {
         int32_t ret = StartVibrator(VIBRATOR_TYPE_CLOCK_TIMER);
         ASSERT_EQ(ret, 0);
     } else {
@@ -304,7 +303,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_003, TestSize.Level1)
     if (IsSupportVibratorCustom() && IsSupportEffect(VIBRATOR_TYPE_FAIL)) {
         int32_t ret = SetLoopCount(2);
         ASSERT_TRUE(ret);
-        ret = StartVibrator("VIBRATOR_TYPE_FAIL");
+        ret = StartVibrator(VIBRATOR_TYPE_FAIL);
         ASSERT_EQ(ret, 0);
         FileDescriptor fileDescriptor("/data/test/vibrator/on_carpet.json");
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
