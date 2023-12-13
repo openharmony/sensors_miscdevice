@@ -102,7 +102,7 @@ int32_t HdiConnection::EnableCompositeEffect(const HdfCompositeEffect &hdfCompos
 bool HdiConnection::IsVibratorRunning()
 {
     bool state = false;
-    CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
+    CHKPR(vibratorInterface_, false);
     vibratorInterface_->IsVibratorRunning(state);
     return state;
 }
