@@ -125,7 +125,8 @@ void VibratorAgentTest::TearDown()
 bool IsSupportVibratorEffect(const char* effectId)
 {
     bool state { false };
-    IsSupportEffect(effectId, &state);
+    int32_t ret = IsSupportEffect(effectId, &state);
+    ASSERT_EQ(ret, 0);
     return state;
 }
 
