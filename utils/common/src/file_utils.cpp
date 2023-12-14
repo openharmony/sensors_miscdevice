@@ -127,7 +127,7 @@ std::string GetFileName(const int32_t &fd)
 std::string GetFileExtName(const int32_t &fd)
 {
     std::string fileName = GetFileName(fd);
-    return fileName.substr(fileName.find_last_of("."), 1);
+    return fileName.substr(fileName.find_last_of(".") + 1);
 }
 
 bool CheckFileDir(const std::string &filePath, const std::string &dir)

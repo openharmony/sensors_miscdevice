@@ -23,8 +23,8 @@
 namespace OHOS {
 namespace Sensors {
 enum DecoderType {
-    DECODER_TYPE_OH_JSON = 1,
-    DECODER_TYPE_HE = 2,
+    DECODER_TYPE_OH_JSON = 0,
+    DECODER_TYPE_HE = 1,
     DECODER_TYPE_BUTT = 2,
 };
 
