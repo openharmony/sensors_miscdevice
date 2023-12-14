@@ -47,7 +47,12 @@ IVibratorDecoder *VibratorDecoderCreator::CreateDecoder(const RawFileDescriptor 
 
 DecoderType VibratorDecoderCreator::GetDecoderType(const RawFileDescriptor &rawFd)
 {
-    std::string extName = GetFileExtName(rawFd.fd);
+    std::string extName = "";
+    int32_t ret = GetFileExtName(rawFd.fd, extName);
+    if (ret != SUCCESS) {
+        MISC_HILOGE("GetFileExtName failed");
+        return DECODER_TYPE_BUTT;
+    }
     if (extName == "he") {
         return DECODER_TYPE_HE;
     } else if (extName == "json") {
