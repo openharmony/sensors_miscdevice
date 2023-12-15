@@ -16,10 +16,10 @@
 
 #include <cerrno>
 #include <cinttypes>
-
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include "securec.h"
 #include "sensors_errors.h"
 
 namespace OHOS {
@@ -95,6 +95,52 @@ int64_t GetFileSize(int32_t fd)
         return INVALID_FILE_SIZE;
     }
     return statbuf.st_size;
+}
+
+int32_t GetFileName(const int32_t &fd, std::string &fileName)
+{
+    if (fd < 0) {
+        MISC_HILOGE("fd is invalid, fd:%{public}d", fd);
+        return ERROR;
+    }
+    char buf[FILE_PATH_MAX] = {'\0'};
+    char filePath[FILE_PATH_MAX] = {'\0'};
+
+    int ret = snprintf_s(buf, sizeof(buf), sizeof(buf), "/proc/self/fd/%d", fd);
+    if (ret < 0) {
+        MISC_HILOGE("snprintf failed with %{public}d", errno);
+        return ERROR;
+    }
+
+    ret = readlink(buf, filePath, FILE_PATH_MAX);
+    if (ret < 0 || ret >= FILE_PATH_MAX) {
+        MISC_HILOGE("readlink failed with %{public}d", errno);
+        return ERROR;
+    }
+
+    fileName = filePath;
+    std::size_t firstSlash = fileName.rfind("/");
+    if (firstSlash == fileName.npos) {
+        MISC_HILOGE("Get error path");
+        return ERROR;
+    }
+    fileName = fileName.substr(firstSlash + 1, fileName.size() - firstSlash);
+    return SUCCESS;
+}
+
+int32_t GetFileExtName(const int32_t &fd, std::string &extName)
+{
+    if (fd < 0) {
+        MISC_HILOGE("fd is invalid, fd:%{public}d", fd);
+        return ERROR;
+    }
+    std::string fileName = "";
+    if (GetFileName(fd, fileName) == ERROR) {
+        MISC_HILOGE("GetFileName failed");
+        return ERROR;
+    }
+    extName = fileName.substr(fileName.find_last_of(".") + 1);
+    return SUCCESS;
 }
 
 bool CheckFileDir(const std::string &filePath, const std::string &dir)

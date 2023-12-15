@@ -22,11 +22,20 @@
 
 namespace OHOS {
 namespace Sensors {
+enum DecoderType {
+    DECODER_TYPE_OH_JSON = 0,
+    DECODER_TYPE_HE = 1,
+    DECODER_TYPE_BUTT,
+};
+
 class VibratorDecoderCreator {
 public:
     VibratorDecoderCreator() = default;
     virtual ~VibratorDecoderCreator() = default;
-    IVibratorDecoder *CreateDecoder(const RawFileDescriptor &fd);
+    IVibratorDecoder *CreateDecoder(const RawFileDescriptor &rawFd);
+
+private:
+    DecoderType GetDecoderType(const RawFileDescriptor &rawFd);
 };
 }  // namespace Sensors
 }  // namespace OHOS
