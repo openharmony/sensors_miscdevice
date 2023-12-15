@@ -161,6 +161,7 @@ void VibrationPriorityManager::UpdateStatus()
 VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo,
     std::shared_ptr<VibratorThread> vibratorThread)
 {
+    UpdateStatus();
     if ((vibrateInfo.usage == USAGE_ALARM || vibrateInfo.usage == USAGE_RING || vibrateInfo.usage == USAGE_NOTIFICATION
         || vibrateInfo.usage == USAGE_COMMUNICATION) && (miscAudioRingerMode_ == 0)) {
         MISC_HILOGD("Vibration is ignored for ringer mode:%{public}d", static_cast<int32_t>(miscAudioRingerMode_));
