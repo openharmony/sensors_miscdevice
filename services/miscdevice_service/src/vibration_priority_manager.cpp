@@ -161,6 +161,10 @@ void VibrationPriorityManager::UpdateStatus()
 VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo,
     std::shared_ptr<VibratorThread> vibratorThread)
 {
+    if (vibratorThread == nullptr) {
+        MISC_HILOGD("There is no vibration, it can vibrate");
+        return VIBRATION;
+    }
     UpdateStatus();
     if ((vibrateInfo.usage == USAGE_ALARM || vibrateInfo.usage == USAGE_RING || vibrateInfo.usage == USAGE_NOTIFICATION
         || vibrateInfo.usage == USAGE_COMMUNICATION) && (miscAudioRingerMode_ == 0)) {
