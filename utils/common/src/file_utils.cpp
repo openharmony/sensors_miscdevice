@@ -135,7 +135,7 @@ int32_t GetFileExtName(const int32_t &fd, std::string &extName)
         return ERROR;
     }
     std::string fileName = "";
-    if (GetFileName(fd, fileName) != ERROR) {
+    if (GetFileName(fd, fileName) == ERROR) {
         MISC_HILOGE("GetFileName failed");
         return ERROR;
     }
