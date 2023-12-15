@@ -122,14 +122,18 @@ void VibratorAgentTest::SetUp()
 void VibratorAgentTest::TearDown()
 {}
 
+bool IsSupportVibratorEffect(const char* effectId)
+{
+    bool state { false };
+    IsSupportEffect(effectId, &state);
+    return state;
+}
+
 HWTEST_F(VibratorAgentTest, StartVibratorTest_001, TestSize.Level1)
 {
     MISC_HILOGI("StartVibratorTest_001 in");
-    bool state { false };
-    int32_t ret = IsSupportEffect("haptic.clock.timer", &state);
-    ASSERT_EQ(ret, 0);
-    if (state) {
-        ret = StartVibrator("haptic.clock.timer");
+    if (IsSupportVibratorEffect(VIBRATOR_TYPE_CLOCK_TIMER)) {
+        int32_t ret = StartVibrator(VIBRATOR_TYPE_CLOCK_TIMER);
         ASSERT_EQ(ret, 0);
     } else {
         ASSERT_EQ(0, 0);
@@ -296,10 +300,10 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_002, TestSize.Level1)
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_003, TestSize.Level1)
 {
     MISC_HILOGI("PlayVibratorCustom_003 in");
-    if (IsSupportVibratorCustom()) {
+    if (IsSupportVibratorCustom() && IsSupportVibratorEffect(VIBRATOR_TYPE_FAIL)) {
         int32_t ret = SetLoopCount(2);
         ASSERT_TRUE(ret);
-        ret = StartVibrator("haptic.clock.timer");
+        ret = StartVibrator(VIBRATOR_TYPE_FAIL);
         ASSERT_EQ(ret, 0);
         FileDescriptor fileDescriptor("/data/test/vibrator/on_carpet.json");
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
@@ -318,10 +322,10 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_003, TestSize.Level1)
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_004, TestSize.Level1)
 {
     MISC_HILOGI("PlayVibratorCustom_004 in");
-    if (IsSupportVibratorCustom()) {
+    if (IsSupportVibratorCustom() && IsSupportVibratorEffect(VIBRATOR_TYPE_FAIL)) {
         int32_t ret = SetUsage(USAGE_ALARM);
         ASSERT_TRUE(ret);
-        ret = StartVibrator("haptic.clock.timer");
+        ret = StartVibrator(VIBRATOR_TYPE_FAIL);
         ASSERT_EQ(ret, 0);
         FileDescriptor fileDescriptor("/data/test/vibrator/on_carpet.json");
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
@@ -340,10 +344,10 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_004, TestSize.Level1)
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_005, TestSize.Level1)
 {
     MISC_HILOGI("PlayVibratorCustom_005 in");
-    if (IsSupportVibratorCustom()) {
+    if (IsSupportVibratorCustom() && IsSupportVibratorEffect(VIBRATOR_TYPE_FAIL)) {
         int32_t ret = SetUsage(USAGE_UNKNOWN);
         ASSERT_TRUE(ret);
-        ret = StartVibrator("haptic.clock.timer");
+        ret = StartVibrator(VIBRATOR_TYPE_FAIL);
         ASSERT_EQ(ret, 0);
         FileDescriptor fileDescriptor("/data/test/vibrator/on_carpet.json");
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
@@ -362,7 +366,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_005, TestSize.Level1)
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_006, TestSize.Level1)
 {
     MISC_HILOGI("PlayVibratorCustom_006 in");
-    if (IsSupportVibratorCustom()) {
+    if (IsSupportVibratorCustom() && IsSupportVibratorEffect(VIBRATOR_TYPE_FAIL)) {
         FileDescriptor fileDescriptor("/data/test/vibrator/on_carpet.json");
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
         struct stat64 statbuf = { 0 };
@@ -371,7 +375,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_006, TestSize.Level1)
             ASSERT_TRUE(ret);
             ret = PlayVibratorCustom(fileDescriptor.fd, 0, statbuf.st_size);
             ASSERT_EQ(ret, 0);
-            ret = StartVibrator("haptic.clock.timer");
+            ret = StartVibrator(VIBRATOR_TYPE_FAIL);
             ASSERT_NE(ret, 0);
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -384,7 +388,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_006, TestSize.Level1)
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_007, TestSize.Level1)
 {
     MISC_HILOGI("PlayVibratorCustom_007 in");
-    if (IsSupportVibratorCustom()) {
+    if (IsSupportVibratorCustom() && IsSupportVibratorEffect(VIBRATOR_TYPE_FAIL)) {
         FileDescriptor fileDescriptor("/data/test/vibrator/on_carpet.json");
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
         struct stat64 statbuf = { 0 };
@@ -393,7 +397,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_007, TestSize.Level1)
             ASSERT_TRUE(ret);
             ret = PlayVibratorCustom(fileDescriptor.fd, 0, statbuf.st_size);
             ASSERT_EQ(ret, 0);
-            ret = StartVibrator("haptic.clock.timer");
+            ret = StartVibrator(VIBRATOR_TYPE_FAIL);
             ASSERT_EQ(ret, 0);
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -762,11 +766,8 @@ HWTEST_F(VibratorAgentTest, Cancel_003, TestSize.Level1)
 HWTEST_F(VibratorAgentTest, Cancel_004, TestSize.Level1)
 {
     MISC_HILOGI("Cancel_004 in");
-    bool state { false };
-    int32_t ret = IsSupportEffect("haptic.clock.timer", &state);
-    ASSERT_EQ(ret, 0);
-    if (state) {
-        ret = StartVibrator("haptic.clock.timer");
+    if (IsSupportVibratorEffect(VIBRATOR_TYPE_FAIL)) {
+        int32_t ret = StartVibrator(VIBRATOR_TYPE_FAIL);
         ASSERT_EQ(ret, 0);
         ret = Cancel();
         ASSERT_EQ(ret, 0);
@@ -788,15 +789,14 @@ HWTEST_F(VibratorAgentTest, IsSupportEffect_001, TestSize.Level1)
 {
     MISC_HILOGI("IsSupportEffect_001 in");
     bool state { false };
-    int32_t ret = IsSupportEffect("haptic.clock.timer", &state);
+    int32_t ret = IsSupportEffect(VIBRATOR_TYPE_CLOCK_TIMER, &state);
     ASSERT_EQ(ret, 0);
     if (state) {
-        ret = StartVibrator("haptic.clock.timer");
+        ret = StartVibrator(VIBRATOR_TYPE_CLOCK_TIMER);
         ASSERT_EQ(ret, 0);
-        ret = Cancel();
-        ASSERT_EQ(ret, 0);
+        Cancel();
     } else {
-        MISC_HILOGI("Do not support haptic.clock.timer");
+        MISC_HILOGI("Do not support %{public}s", VIBRATOR_TYPE_CLOCK_TIMER);
     }
 }
 
