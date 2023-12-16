@@ -33,6 +33,8 @@ public:
     ~JsonParser();
     int32_t ParseJsonArray(cJSON *json, const std::string &key, std::vector<std::string> &vals) const;
     int32_t ParseJsonArray(const std::string &key, std::vector<std::string> &vals) const;
+    bool HasObjectItem(cJSON *json, const std::string &key) const;
+    bool HasObjectItem(const std::string &key) const;
     cJSON *GetObjectItem(cJSON *json, const std::string &key) const;
     cJSON *GetObjectItem(const std::string &key) const;
     bool IsArray(cJSON *json) const;

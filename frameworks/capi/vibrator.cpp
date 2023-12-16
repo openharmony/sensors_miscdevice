@@ -55,7 +55,7 @@ int32_t OH_Vibrator_PlayVibrationCustom(Vibrator_FileDescription fileDescription
     Vibrator_Attribute vibrateAttribute)
 {
     if (!IsSupportVibratorCustom()) {
-        MISC_HILOGD("feature is not supported");
+        MISC_HILOGE("feature is not supported");
         return IS_NOT_SUPPORTED;
     }
     if ((fileDescription.fd < 0) || (fileDescription.offset < 0) || (fileDescription.length <= 0)) {

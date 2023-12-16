@@ -36,6 +36,7 @@ constexpr uint32_t WAIT_MS = 200;
 
 LightClient::~LightClient()
 {
+    CALL_LOG_ENTER;
     if (miscdeviceProxy_ != nullptr && serviceDeathObserver_ != nullptr) {
         auto remoteObject = miscdeviceProxy_->AsObject();
         if (remoteObject != nullptr) {
@@ -81,6 +82,7 @@ int32_t LightClient::InitLightClient()
 
 bool LightClient::IsLightIdValid(int32_t lightId)
 {
+    CALL_LOG_ENTER;
     int32_t ret = InitLightClient();
     if (ret != ERR_OK) {
         MISC_HILOGE("InitLightClient failed, ret:%{public}d", ret);
@@ -119,6 +121,7 @@ int32_t LightClient::GetLightList(LightInfo **lightInfo, int32_t &count)
 
 bool LightClient::IsLightAnimationValid(const LightAnimation &animation)
 {
+    CALL_LOG_ENTER;
     if ((animation.mode < 0) || (animation.mode >= LIGHT_MODE_BUTT)) {
         MISC_HILOGE("animation mode is invalid, mode:%{pubilc}d", animation.mode);
         return false;
@@ -175,6 +178,7 @@ void LightClient::ProcessDeathObserver(wptr<IRemoteObject> object)
 
 void LightClient::ClearLightInfos()
 {
+    CALL_LOG_ENTER;
     CHKPV(lightInfos_);
     free(lightInfos_);
     lightInfos_ = nullptr;

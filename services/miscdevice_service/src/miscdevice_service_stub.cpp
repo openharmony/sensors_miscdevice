@@ -223,7 +223,7 @@ int32_t MiscdeviceServiceStub::GetLightListStub(MessageParcel &data, MessageParc
     (void)data;
     std::vector<LightInfoIPC> lightInfos(GetLightList());
     size_t lightCount = lightInfos.size();
-    MISC_HILOGE("lightCount:%{public}zu", lightCount);
+    MISC_HILOGI("lightCount:%{public}zu", lightCount);
     if (!reply.WriteUint32(lightCount)) {
         MISC_HILOGE("Parcel write failed");
         return WRITE_MSG_ERR;

@@ -51,7 +51,6 @@ static int32_t NormalizeErrCode(int32_t code)
             return IS_NOT_SUPPORTED;
         }
         default: {
-            MISC_HILOGW("Operating the device fail");
             return DEVICE_OPERATION_FAILED;
         }
     }
@@ -143,7 +142,7 @@ int32_t StopVibrator(const char *mode)
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.StopVibrator(DEFAULT_VIBRATOR_ID, mode);
     if (ret != ERR_OK) {
-        MISC_HILOGE("StopVibrator failed, ret:%{public}d", ret);
+        MISC_HILOGE("StopVibrator by mode failed, ret:%{public}d, mode:%{public}s", ret, mode);
         return NormalizeErrCode(ret);
     }
     return SUCCESS;
@@ -176,7 +175,7 @@ int32_t IsSupportEffect(const char *effectId, bool *state)
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.IsSupportEffect(effectId, *state);
     if (ret != ERR_OK) {
-        MISC_HILOGE("Query effect support failed, ret:%{public}d", ret);
+        MISC_HILOGE("Query effect support failed, ret:%{public}d, effectId:%{public}s", ret, effectId);
         return NormalizeErrCode(ret);
     }
     return SUCCESS;

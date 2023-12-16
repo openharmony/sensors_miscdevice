@@ -174,7 +174,7 @@ bool ParseParameter(napi_env env, napi_value args[], size_t argc, VibrateInfo &i
     CHKCF((argc >= 2), "Wrong argument number");
     CHKCF(GetPropertyString(env, args[0], "type", info.type), "Get vibrate type fail");
     if (info.type == "time") {
-        CHKCF(GetPropertyInt32(env, args[0], "duration", info.duration), "Get vibrate type fail");
+        CHKCF(GetPropertyInt32(env, args[0], "duration", info.duration), "Get vibrate duration fail");
     } else if (info.type == "preset") {
         CHKCF(GetPropertyInt32(env, args[0], "count", info.count), "Get vibrate count fail");
         CHKCF(GetPropertyString(env, args[0], "effectId", info.effectId), "Get vibrate effectId fail");
