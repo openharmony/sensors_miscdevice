@@ -178,43 +178,43 @@ std::vector<VibrateCurvePoint> CustomVibrationMatcher::MergeCurve(const std::vec
     size_t i = 0;
     size_t j = 0;
     while (i < curveLeft.size() || j < curveRight.size()) {
-        if (i < curveLeft.size() && ((curveLeft[i].time < overlapLeft) || (curveLeft[i].time > overlapRight))) {
+        while (i < curveLeft.size() && ((curveLeft[i].time < overlapLeft) || (curveLeft[i].time > overlapRight))) {
             newCurve.push_back(curveLeft[i]);
             ++i;
-            continue;
         }
-        if (j < curveRight.size() && ((curveRight[j].time < overlapLeft) || (curveRight[j].time > overlapRight))) {
+        while (j < curveRight.size() && ((curveRight[j].time < overlapLeft) || (curveRight[j].time > overlapRight))) {
             newCurve.push_back(curveRight[j]);
             ++j;
-            continue;
         }
         VibrateCurvePoint newCurvePoint;
-        if (curveLeft[i].time < curveRight[j].time) {
-            int32_t intensity = Interpolation(curveRight[j - 1].time, curveRight[j].time,
-                curveRight[j - 1].intensity, curveRight[j].intensity, curveLeft[i].time);
-            int32_t frequency = Interpolation(curveRight[j - 1].time, curveRight[j].time,
-                curveRight[j - 1].frequency, curveRight[j].frequency, curveLeft[i].time);
-            newCurvePoint.time = curveLeft[i].time;
-            newCurvePoint.intensity = std::max(curveLeft[i].intensity, intensity);
-            newCurvePoint.frequency = (curveLeft[i].frequency + frequency) / 2;
-            ++i;
-        } else if (curveLeft[i].time > curveRight[j].time) {
-            int32_t intensity = Interpolation(curveLeft[i - 1].time, curveLeft[i].time,
-                curveLeft[i - 1].intensity, curveLeft[i].intensity, curveRight[j].time);
-            int32_t frequency = Interpolation(curveLeft[i - 1].time, curveLeft[i].time,
-                curveLeft[i - 1].frequency, curveLeft[i].frequency, curveRight[j].time);
-            newCurvePoint.time = curveRight[j].time;
-            newCurvePoint.intensity = std::max(curveRight[j].intensity, intensity);
-            newCurvePoint.frequency = (curveRight[j].frequency + frequency) / 2;
-            ++j;
-        } else {
-            newCurvePoint.time = curveRight[i].time;
-            newCurvePoint.intensity = std::max(curveLeft[i].intensity, curveRight[j].intensity);
-            newCurvePoint.frequency = (curveLeft[i].frequency + curveRight[j].frequency) / 2;
-            ++i;
-            ++j;
+        while (i < curveLeft.size() && j < curveRight.size()) {
+            if (curveLeft[i].time < curveRight[j].time) {
+                int32_t intensity = Interpolation(curveRight[j - 1].time, curveRight[j].time,
+                    curveRight[j - 1].intensity, curveRight[j].intensity, curveLeft[i].time);
+                int32_t frequency = Interpolation(curveRight[j - 1].time, curveRight[j].time,
+                    curveRight[j - 1].frequency, curveRight[j].frequency, curveLeft[i].time);
+                newCurvePoint.time = curveLeft[i].time;
+                newCurvePoint.intensity = std::max(curveLeft[i].intensity, intensity);
+                newCurvePoint.frequency = (curveLeft[i].frequency + frequency) / 2;
+                ++i;
+            } else if (curveLeft[i].time > curveRight[j].time) {
+                int32_t intensity = Interpolation(curveLeft[i - 1].time, curveLeft[i].time,
+                    curveLeft[i - 1].intensity, curveLeft[i].intensity, curveRight[j].time);
+                int32_t frequency = Interpolation(curveLeft[i - 1].time, curveLeft[i].time,
+                    curveLeft[i - 1].frequency, curveLeft[i].frequency, curveRight[j].time);
+                newCurvePoint.time = curveRight[j].time;
+                newCurvePoint.intensity = std::max(curveRight[j].intensity, intensity);
+                newCurvePoint.frequency = (curveRight[j].frequency + frequency) / 2;
+                ++j;
+            } else {
+                newCurvePoint.time = curveRight[i].time;
+                newCurvePoint.intensity = std::max(curveLeft[i].intensity, curveRight[j].intensity);
+                newCurvePoint.frequency = (curveLeft[i].frequency + curveRight[j].frequency) / 2;
+                ++i;
+                ++j;
+            }
+            newCurve.push_back(newCurvePoint);
         }
-        newCurve.push_back(newCurvePoint);
     }
     return newCurve;
 }
