@@ -136,8 +136,7 @@ int32_t VibrationPriorityManager::GetStringValue(const std::string &key, std::st
     return ERR_OK;
 }
 
-VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo,
-    std::shared_ptr<VibratorThread> vibratorThread)
+void VibrationPriorityManager::UpdateStatus()
 {
     if (ringerModeCB_ != nullptr) {
         int32_t ringerMode = static_cast<int32_t>(ringerModeCB_->GetAudioRingerMode());
@@ -157,6 +156,16 @@ VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &v
         }
         miscFeedback_ = feedback;
     }
+}
+
+VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo,
+    std::shared_ptr<VibratorThread> vibratorThread)
+{
+    if (vibratorThread == nullptr) {
+        MISC_HILOGD("There is no vibration, it can vibrate");
+        return VIBRATION;
+    }
+    UpdateStatus();
     if ((vibrateInfo.usage == USAGE_ALARM || vibrateInfo.usage == USAGE_RING || vibrateInfo.usage == USAGE_NOTIFICATION
         || vibrateInfo.usage == USAGE_COMMUNICATION) && (miscAudioRingerMode_ == 0)) {
         MISC_HILOGD("Vibration is ignored for ringer mode:%{public}d", static_cast<int32_t>(miscAudioRingerMode_));
