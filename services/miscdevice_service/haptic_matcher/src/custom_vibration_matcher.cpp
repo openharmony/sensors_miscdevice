@@ -178,16 +178,18 @@ std::vector<VibrateCurvePoint> CustomVibrationMatcher::MergeCurve(const std::vec
     size_t i = 0;
     size_t j = 0;
     while (i < curveLeft.size() || j < curveRight.size()) {
-        while (i < curveLeft.size() && ((curveLeft[i].time < overlapLeft) || (curveLeft[i].time > overlapRight))) {
+        if (i < curveLeft.size() && ((curveLeft[i].time < overlapLeft) || (curveLeft[i].time > overlapRight) || (j == curveRight.size()))) {
             newCurve.push_back(curveLeft[i]);
             ++i;
+            continue;
         }
-        while (j < curveRight.size() && ((curveRight[j].time < overlapLeft) || (curveRight[j].time > overlapRight))) {
+        if (j < curveRight.size() && ((curveRight[j].time < overlapLeft) || (curveRight[j].time > overlapRight) || (i == curveLeft.size()))) {
             newCurve.push_back(curveRight[j]);
             ++j;
+            continue;
         }
         VibrateCurvePoint newCurvePoint;
-        while (i < curveLeft.size() && j < curveRight.size()) {
+        if (i < curveLeft.size() && j < curveRight.size()) {
             if (curveLeft[i].time < curveRight[j].time) {
                 int32_t intensity = Interpolation(curveRight[j - 1].time, curveRight[j].time,
                     curveRight[j - 1].intensity, curveRight[j].intensity, curveLeft[i].time);
