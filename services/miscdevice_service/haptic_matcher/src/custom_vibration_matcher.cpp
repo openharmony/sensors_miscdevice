@@ -178,15 +178,13 @@ std::vector<VibrateCurvePoint> CustomVibrationMatcher::MergeCurve(const std::vec
     size_t i = 0;
     size_t j = 0;
     while (i < curveLeft.size() || j < curveRight.size()) {
-        if (i < curveLeft.size() && ((curveLeft[i].time < overlapLeft) || (curveLeft[i].time > overlapRight) || (j == curveRight.size()))) {
+        while (i < curveLeft.size() && ((curveLeft[i].time < overlapLeft) || (curveLeft[i].time > overlapRight) || (j == curveRight.size()))) {
             newCurve.push_back(curveLeft[i]);
             ++i;
-            continue;
         }
-        if (j < curveRight.size() && ((curveRight[j].time < overlapLeft) || (curveRight[j].time > overlapRight) || (i == curveLeft.size()))) {
+        while (j < curveRight.size() && ((curveRight[j].time < overlapLeft) || (curveRight[j].time > overlapRight) || (i == curveLeft.size()))) {
             newCurve.push_back(curveRight[j]);
             ++j;
-            continue;
         }
         VibrateCurvePoint newCurvePoint;
         if (i < curveLeft.size() && j < curveRight.size()) {
