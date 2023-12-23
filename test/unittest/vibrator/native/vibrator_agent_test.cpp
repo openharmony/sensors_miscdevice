@@ -301,9 +301,9 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_003, TestSize.Level1)
 {
     MISC_HILOGI("PlayVibratorCustom_003 in");
     if (IsSupportVibratorCustom() && IsSupportVibratorEffect(VIBRATOR_TYPE_FAIL)) {
-        int32_t ret = SetLoopCount(2);
-        ASSERT_TRUE(ret);
-        ret = StartVibrator(VIBRATOR_TYPE_FAIL);
+        bool flag = SetLoopCount(2);
+        ASSERT_TRUE(flag);
+        int32_t ret = StartVibrator(VIBRATOR_TYPE_FAIL);
         ASSERT_EQ(ret, 0);
         FileDescriptor fileDescriptor("/data/test/vibrator/on_carpet.json");
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
@@ -323,9 +323,9 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_004, TestSize.Level1)
 {
     MISC_HILOGI("PlayVibratorCustom_004 in");
     if (IsSupportVibratorCustom() && IsSupportVibratorEffect(VIBRATOR_TYPE_FAIL)) {
-        int32_t ret = SetUsage(USAGE_ALARM);
-        ASSERT_TRUE(ret);
-        ret = StartVibrator(VIBRATOR_TYPE_FAIL);
+        bool flag = SetUsage(USAGE_ALARM);
+        ASSERT_TRUE(flag);
+        int32_t ret = StartVibrator(VIBRATOR_TYPE_FAIL);
         ASSERT_EQ(ret, 0);
         FileDescriptor fileDescriptor("/data/test/vibrator/on_carpet.json");
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
@@ -345,9 +345,9 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_005, TestSize.Level1)
 {
     MISC_HILOGI("PlayVibratorCustom_005 in");
     if (IsSupportVibratorCustom() && IsSupportVibratorEffect(VIBRATOR_TYPE_FAIL)) {
-        int32_t ret = SetUsage(USAGE_UNKNOWN);
-        ASSERT_TRUE(ret);
-        ret = StartVibrator(VIBRATOR_TYPE_FAIL);
+        bool flag = SetUsage(USAGE_UNKNOWN);
+        ASSERT_TRUE(flag);
+        int32_t ret = StartVibrator(VIBRATOR_TYPE_FAIL);
         ASSERT_EQ(ret, 0);
         FileDescriptor fileDescriptor("/data/test/vibrator/on_carpet.json");
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
@@ -371,9 +371,9 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_006, TestSize.Level1)
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
         struct stat64 statbuf = { 0 };
         if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
-            int32_t ret = SetUsage(USAGE_ALARM);
-            ASSERT_TRUE(ret);
-            ret = PlayVibratorCustom(fileDescriptor.fd, 0, statbuf.st_size);
+            bool flag = SetUsage(USAGE_ALARM);
+            ASSERT_TRUE(flag);
+            int32_t ret = PlayVibratorCustom(fileDescriptor.fd, 0, statbuf.st_size);
             ASSERT_EQ(ret, 0);
             ret = StartVibrator(VIBRATOR_TYPE_FAIL);
             ASSERT_NE(ret, 0);
@@ -393,9 +393,9 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_007, TestSize.Level1)
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
         struct stat64 statbuf = { 0 };
         if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
-            int32_t ret = SetUsage(USAGE_UNKNOWN);
-            ASSERT_TRUE(ret);
-            ret = PlayVibratorCustom(fileDescriptor.fd, 0, statbuf.st_size);
+            bool flag = SetUsage(USAGE_UNKNOWN);
+            ASSERT_TRUE(flag);
+            int32_t ret = PlayVibratorCustom(fileDescriptor.fd, 0, statbuf.st_size);
             ASSERT_EQ(ret, 0);
             ret = StartVibrator(VIBRATOR_TYPE_FAIL);
             ASSERT_EQ(ret, 0);
@@ -411,9 +411,9 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_008, TestSize.Level1)
 {
     MISC_HILOGI("PlayVibratorCustom_008 in");
     if (IsSupportVibratorCustom()) {
-        int32_t ret = SetUsage(USAGE_ALARM);
-        ASSERT_TRUE(ret);
-        ret = StartVibratorOnce(500);
+        bool flag = SetUsage(USAGE_ALARM);
+        ASSERT_TRUE(flag);
+        int32_t ret = StartVibratorOnce(500);
         ASSERT_EQ(ret, 0);
         FileDescriptor fileDescriptor("/data/test/vibrator/on_carpet.json");
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
@@ -433,9 +433,9 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_009, TestSize.Level1)
 {
     MISC_HILOGI("PlayVibratorCustom_009 in");
     if (IsSupportVibratorCustom()) {
-        int32_t ret = SetUsage(USAGE_UNKNOWN);
-        ASSERT_TRUE(ret);
-        ret = StartVibratorOnce(500);
+        bool flag = SetUsage(USAGE_UNKNOWN);
+        ASSERT_TRUE(flag);
+        int32_t ret = StartVibratorOnce(500);
         ASSERT_EQ(ret, 0);
         FileDescriptor fileDescriptor("/data/test/vibrator/on_carpet.json");
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
@@ -459,9 +459,9 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_010, TestSize.Level1)
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
         struct stat64 statbuf = { 0 };
         if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
-            int32_t ret = SetUsage(USAGE_ALARM);
-            ASSERT_TRUE(ret);
-            ret = PlayVibratorCustom(fileDescriptor.fd, 0, statbuf.st_size);
+            bool flag = SetUsage(USAGE_ALARM);
+            ASSERT_TRUE(flag);
+            int32_t ret = PlayVibratorCustom(fileDescriptor.fd, 0, statbuf.st_size);
             ASSERT_EQ(ret, 0);
             ret = StartVibratorOnce(500);
             ASSERT_NE(ret, 0);
@@ -481,9 +481,9 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_011, TestSize.Level1)
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
         struct stat64 statbuf = { 0 };
         if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
-            int32_t ret = SetUsage(USAGE_UNKNOWN);
-            ASSERT_TRUE(ret);
-            ret = PlayVibratorCustom(fileDescriptor.fd, 0, statbuf.st_size);
+            bool flag = SetUsage(USAGE_UNKNOWN);
+            ASSERT_TRUE(flag);
+            int32_t ret = PlayVibratorCustom(fileDescriptor.fd, 0, statbuf.st_size);
             ASSERT_EQ(ret, 0);
             ret = StartVibratorOnce(500);
             ASSERT_EQ(ret, 0);
@@ -693,9 +693,9 @@ HWTEST_F(VibratorAgentTest, SetParameters_003, TestSize.Level1)
                 .intensity = 50,
                 .frequency = -15
             };
-            int32_t ret = SetParameters(parameter);
-            ASSERT_TRUE(ret);
-            ret = PlayVibratorCustom(fileDescriptor.fd, 0, statbuf.st_size);
+            bool flag = SetParameters(parameter);
+            ASSERT_TRUE(flag);
+            int32_t ret = PlayVibratorCustom(fileDescriptor.fd, 0, statbuf.st_size);
             ASSERT_EQ(ret, 0);
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -717,9 +717,9 @@ HWTEST_F(VibratorAgentTest, SetParameters_004, TestSize.Level1)
                 .intensity = 33,
                 .frequency = 55
             };
-            int32_t ret = SetParameters(parameter);
-            ASSERT_TRUE(ret);
-            ret = PlayVibratorCustom(fileDescriptor.fd, 0, statbuf.st_size);
+            bool flag = SetParameters(parameter);
+            ASSERT_TRUE(flag);
+            int32_t ret = PlayVibratorCustom(fileDescriptor.fd, 0, statbuf.st_size);
             ASSERT_EQ(ret, 0);
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -772,6 +772,7 @@ HWTEST_F(VibratorAgentTest, Cancel_004, TestSize.Level1)
         ret = Cancel();
         ASSERT_EQ(ret, 0);
     }
+    ASSERT_TRUE(true);
 }
 
 HWTEST_F(VibratorAgentTest, IsSupportVibratorCustom_001, TestSize.Level1)
