@@ -379,7 +379,7 @@ int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, const RawFileD
     MergeVibratorParmeters(parameter, package);
     package.Dump();
     VibrateInfo info = {
-        .mode = VIBRATE_CUSTOM_COMPOSITE_EFFECT;
+        .mode = VIBRATE_CUSTOM_COMPOSITE_EFFECT,
         .packageName = packageName,
         .pid = GetCallingPid(),
         .uid = GetCallingUid(),
