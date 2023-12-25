@@ -358,14 +358,8 @@ int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, const RawFileD
         MISC_HILOGE("The device does not support this operation");
         return IS_NOT_SUPPORTED;
     }
-    if ((usage >= USAGE_MAX) || (usage < 0)) {
+    if ((usage >= USAGE_MAX) || (usage < 0) || (!CheckVibratorParmeters(parameter))) {
         MISC_HILOGE("Invalid parameter, usage:%{public}d", usage);
-        return PARAMETER_ERROR;
-    }
-    if ((parameter.intensity < INTENSITY_ADJUST_MIN) || (parameter.intensity > INTENSITY_ADJUST_MAX) ||
-        (parameter.frequency < FREQUENCY_ADJUST_MIN) || (parameter.frequency > FREQUENCY_ADJUST_MAX)) {
-        MISC_HILOGE("Input invalid, intensity parameter is %{public}d, frequency parameter is %{public}d",
-            parameter.intensity, parameter.frequency);
         return PARAMETER_ERROR;
     }
     std::unique_ptr<IVibratorDecoderFactory> decoderFactory = std::make_unique<DefaultVibratorDecoderFactory>();
@@ -512,14 +506,8 @@ int32_t MiscdeviceService::PlayPattern(const VibratePattern &pattern, int32_t us
 {
     std::string packageName = GetPackageName(GetCallingTokenID());
     MISC_HILOGI("Start vibrator pattern, usage:%{public}d, package:%{public}s", usage, packageName.c_str());
-    if ((usage >= USAGE_MAX) || (usage < 0)) {
+    if ((usage >= USAGE_MAX) || (usage < 0) || (!CheckVibratorParmeters(parameter))) {
         MISC_HILOGE("Invalid parameter, usage:%{public}d", usage);
-        return PARAMETER_ERROR;
-    }
-    if ((parameter.intensity < INTENSITY_ADJUST_MIN) || (parameter.intensity > INTENSITY_ADJUST_MAX) ||
-        (parameter.frequency < FREQUENCY_ADJUST_MIN) || (parameter.frequency > FREQUENCY_ADJUST_MAX)) {
-        MISC_HILOGE("Input invalid, intensity parameter is %{public}d, frequency parameter is %{public}d",
-            parameter.intensity, parameter.frequency);
         return PARAMETER_ERROR;
     }
     VibratePattern vibratePattern = {
@@ -568,6 +556,17 @@ int32_t MiscdeviceService::GetDelayTime(int32_t &delayTime)
     std::string packageName = GetPackageName(GetCallingTokenID());
     MISC_HILOGI("GetDelayTime, package:%{public}s", packageName.c_str());
     return vibratorHdiConnection_.GetDelayTime(g_capacity.GetVibrateMode(), delayTime);
+}
+
+bool MiscdeviceService::CheckVibratorParmeters(const VibrateParameter &parameter)
+{
+    if ((parameter.intensity < INTENSITY_ADJUST_MIN) || (parameter.intensity > INTENSITY_ADJUST_MAX) ||
+        (parameter.frequency < FREQUENCY_ADJUST_MIN) || (parameter.frequency > FREQUENCY_ADJUST_MAX)) {
+        MISC_HILOGE("Input invalid, intensity parameter is %{public}d, frequency parameter is %{public}d",
+            parameter.intensity, parameter.frequency);
+        return false;
+    }
+    return true;
 }
 
 void MiscdeviceService::MergeVibratorParmeters(const VibrateParameter &parameter, VibratePackage &package)

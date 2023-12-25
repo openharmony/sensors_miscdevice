@@ -85,6 +85,7 @@ private:
     void StopVibrateThread();
     bool ShouldIgnoreVibrate(const VibrateInfo &info);
     void MergeVibratorParmeters(const VibrateParameter &parameter, VibratePackage &package);
+    bool CheckVibratorParmeters(const VibrateParameter &parameter);
     bool InitLightList();
     VibratorHdiConnection &vibratorHdiConnection_ = VibratorHdiConnection::GetInstance();
     LightHdiConnection &lightHdiConnection_ = LightHdiConnection::GetInstance();
