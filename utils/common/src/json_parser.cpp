@@ -54,6 +54,16 @@ JsonParser::~JsonParser()
     }
 }
 
+bool JsonParser::HasObjectItem(cJSON *json, const std::string &key) const
+{
+    return cJSON_HasObjectItem(json, key.c_str());
+}
+
+bool JsonParser::HasObjectItem(const std::string &key) const
+{
+    return HasObjectItem(cJson_, key.c_str());
+}
+
 cJSON *JsonParser::GetObjectItem(cJSON *json, const std::string &key) const
 {
     if (!cJSON_IsObject(json)) {

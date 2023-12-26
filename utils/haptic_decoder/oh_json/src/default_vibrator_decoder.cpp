@@ -187,8 +187,9 @@ int32_t DefaultVibratorDecoder::ParseEvent(const JsonParser &parser, cJSON *even
         MISC_HILOGE("Parameter check of vibration event failed, startTime:%{public}d", event.time);
         return ERROR;
     }
-    cJSON *curveItem = parser.GetObjectItem(eventParametersItem, "Curve");
-    if ((curType == "continuous") && (curveItem != nullptr)) {
+    if ((curType == "continuous") && parser.HasObjectItem(eventParametersItem, "Curve")) {
+        cJSON *curveItem = parser.GetObjectItem(eventParametersItem, "Curve");
+        CHKPR(curveItem, ERROR);
         int32_t ret = ParseCurve(parser, curveItem, event);
         if (ret != SUCCESS) {
             MISC_HILOGE("Parse curve fail, startTime:%{public}d", event.time);

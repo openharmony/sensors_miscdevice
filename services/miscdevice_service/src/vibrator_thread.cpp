@@ -72,7 +72,7 @@ int32_t VibratorThread::PlayOnce(const VibrateInfo &info)
     cv_.wait_for(vibrateLck, std::chrono::milliseconds(info.duration), [this] { return exitFlag_.load(); });
     VibratorDevice.Stop(HDF_VIBRATOR_MODE_ONCE);
     if (exitFlag_) {
-        MISC_HILOGI("Stop duration:%{public}d, package:%{public}s", info.duration, info.packageName.c_str());
+        MISC_HILOGD("Stop duration:%{public}d, package:%{public}s", info.duration, info.packageName.c_str());
         return SUCCESS;
     }
     return SUCCESS;
@@ -91,7 +91,7 @@ int32_t VibratorThread::PlayEffect(const VibrateInfo &info)
         cv_.wait_for(vibrateLck, std::chrono::milliseconds(info.duration), [this] { return exitFlag_.load(); });
         VibratorDevice.Stop(HDF_VIBRATOR_MODE_PRESET);
         if (exitFlag_) {
-            MISC_HILOGI("Stop effect:%{public}s, package:%{public}s", effect.c_str(), info.packageName.c_str());
+            MISC_HILOGD("Stop effect:%{public}s, package:%{public}s", effect.c_str(), info.packageName.c_str());
             return SUCCESS;
         }
     }
@@ -112,7 +112,7 @@ int32_t VibratorThread::PlayCustomByHdHptic(const VibrateInfo &info)
         }
         cv_.wait_for(vibrateLck, std::chrono::milliseconds(delayTime), [this] { return exitFlag_.load(); });
         if (exitFlag_) {
-            MISC_HILOGI("Stop hd haptic, package:%{public}s", info.packageName.c_str());
+            MISC_HILOGD("Stop hd haptic, package:%{public}s", info.packageName.c_str());
             return SUCCESS;
         }
     }
@@ -170,7 +170,7 @@ int32_t VibratorThread::PlayCompositeEffect(const VibrateInfo &info, const HdfCo
         }
         if (exitFlag_) {
             VibratorDevice.Stop(HDF_VIBRATOR_MODE_PRESET);
-            MISC_HILOGI("Stop composite effect part, package:%{public}s", info.packageName.c_str());
+            MISC_HILOGD("Stop composite effect part, package:%{public}s", info.packageName.c_str());
             return SUCCESS;
         }
     }

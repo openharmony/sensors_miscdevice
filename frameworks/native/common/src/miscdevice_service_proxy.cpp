@@ -73,7 +73,7 @@ int32_t MiscdeviceServiceProxy::StopVibrator(int32_t vibratorId)
         return WRITE_MSG_ERR;
     }
     if (!data.WriteInt32(vibratorId)) {
-        MISC_HILOGE("WriteInt32 failed");
+        MISC_HILOGE("WriteInt32 vibratorId failed");
         return WRITE_MSG_ERR;
     }
     sptr<IRemoteObject> remote = Remote();
@@ -107,7 +107,7 @@ int32_t MiscdeviceServiceProxy::PlayVibratorEffect(int32_t vibratorId, const std
         return WRITE_MSG_ERR;
     }
     if (!data.WriteInt32(loopCount)) {
-        MISC_HILOGE("WriteBool effect failed");
+        MISC_HILOGE("WriteInt32 loopCount failed");
         return WRITE_MSG_ERR;
     }
     if (!data.WriteInt32(usage)) {

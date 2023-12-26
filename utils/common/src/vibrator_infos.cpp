@@ -60,7 +60,7 @@ void VibratorCapacity::Dump() const
     std::string isSupportHdHapticStr = isSupportHdHaptic ? "true" : "false";
     std::string isSupportPresetMappingStr = isSupportPresetMapping ? "true" : "false";
     std::string isSupportTimeDelayStr = isSupportTimeDelay ? "true" : "false";
-    MISC_HILOGD("SupportHdHaptic:%{public}s, SupportPresetMapping:%{public}s, "
+    MISC_HILOGI("SupportHdHaptic:%{public}s, SupportPresetMapping:%{public}s, "
         "SupportTimeDelayStr:%{public}s", isSupportHdHapticStr.c_str(),
         isSupportPresetMappingStr.c_str(), isSupportTimeDelayStr.c_str());
 }
@@ -204,7 +204,7 @@ std::optional<VibratePattern> VibratePattern::Unmarshalling(Parcel &data)
 
 void VibrateParameter::Dump() const
 {
-    MISC_HILOGD("intensity:%{public}d, frequency:%{public}d", intensity, frequency);
+    MISC_HILOGI("intensity:%{public}d, frequency:%{public}d", intensity, frequency);
 }
 
 bool VibrateParameter::Marshalling(Parcel &parcel) const
