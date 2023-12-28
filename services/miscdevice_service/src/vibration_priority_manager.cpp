@@ -56,10 +56,16 @@ VibrationPriorityManager::VibrationPriorityManager()
     if (RegisterObserver(observer_) != ERR_OK) {
         MISC_HILOGE("RegisterObserver failed");
     }
-
     ringerModeCB_ = std::make_shared<MiscDeviceRingerModeCallback>();
-    AudioStandard::AudioSystemManager::GetInstance()->GetGroupManager(
-        AudioStandard::DEFAULT_VOLUME_GROUP_ID)->SetRingerModeCallback(IPCSkeleton::GetCallingPid(), ringerModeCB_);
+    std::shared_ptr<AudioStandard::AudioGroupManager> audioGroupManager =
+        AudioStandard::AudioSystemManager::GetInstance()->GetGroupManager(AudioStandard::DEFAULT_VOLUME_GROUP_ID);
+    if (audioGroupManager == nullptr) {
+        MISC_HILOGE("audioGroupManager is null");
+        return;
+    }
+    if (audioGroupManager->SetRingerModeCallback(IPCSkeleton::GetCallingPid(), ringerModeCB_) != ERR_OK) {
+        MISC_HILOGE("SetRingerModeCallback failed");
+    }
 }
 
 VibrationPriorityManager::~VibrationPriorityManager()

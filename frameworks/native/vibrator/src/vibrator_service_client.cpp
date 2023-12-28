@@ -33,7 +33,7 @@ using namespace OHOS::HiviewDFX;
 
 namespace {
 constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "VibratorServiceClient" };
-constexpr int32_t GET_SERVICE_MAX_COUNT = 30;
+constexpr int32_t GET_SERVICE_MAX_COUNT = 3;
 constexpr uint32_t WAIT_MS = 200;
 #ifdef __aarch64__
     static const std::string DECODER_LIBRARY_PATH = "/system/lib64/libvibrator_decoder.z.so";
