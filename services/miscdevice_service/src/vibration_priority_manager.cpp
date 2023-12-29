@@ -24,7 +24,6 @@
 
 namespace OHOS {
 namespace Sensors {
-sptr<IRemoteObject> VibrationPriorityManager::remoteObj_ { nullptr };
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "VibrationPriorityManager" };
 const std::string SETTING_COLUMN_KEYWORD = "KEYWORD";
@@ -58,8 +57,13 @@ VibrationPriorityManager::VibrationPriorityManager()
     }
 
     ringerModeCB_ = std::make_shared<MiscDeviceRingerModeCallback>();
-    AudioStandard::AudioSystemManager::GetInstance()->GetGroupManager(
-        AudioStandard::DEFAULT_VOLUME_GROUP_ID)->SetRingerModeCallback(IPCSkeleton::GetCallingPid(), ringerModeCB_);
+    auto groupManager = AudioStandard::AudioSystemManager::GetInstance()->GetGroupManager(
+        AudioStandard::DEFAULT_VOLUME_GROUP_ID);
+    if (groupManager == nullptr) {
+        MISC_HILOGE("groupManager is null");
+        return;
+    }
+    groupManager->SetRingerModeCallback(IPCSkeleton::GetCallingPid(), ringerModeCB_);
 }
 
 VibrationPriorityManager::~VibrationPriorityManager()
