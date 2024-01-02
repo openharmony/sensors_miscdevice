@@ -66,9 +66,9 @@ private:
     std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper();
     bool ReleaseDataShareHelper(std::shared_ptr<DataShare::DataShareHelper> &helper);
     sptr<MiscDeviceObserver> CreateObserver(const std::string &key, MiscDeviceObserver::UpdateFunc &func);
-    static void Initialize();
+    void Initialize();
     void UpdateStatus();
-    static sptr<IRemoteObject> remoteObj_;
+    sptr<IRemoteObject> remoteObj_ { nullptr };
     sptr<MiscDeviceObserver> observer_ { nullptr };
     std::shared_ptr<MiscDeviceRingerModeCallback> ringerModeCB_ { nullptr };
     std::atomic_int32_t miscFeedback_ { -1 };

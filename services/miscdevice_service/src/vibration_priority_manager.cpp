@@ -24,7 +24,6 @@
 
 namespace OHOS {
 namespace Sensors {
-sptr<IRemoteObject> VibrationPriorityManager::remoteObj_ { nullptr };
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "VibrationPriorityManager" };
 const std::string SETTING_COLUMN_KEYWORD = "KEYWORD";
