@@ -57,13 +57,8 @@ VibrationPriorityManager::VibrationPriorityManager()
     }
 
     ringerModeCB_ = std::make_shared<MiscDeviceRingerModeCallback>();
-    auto groupManager = AudioStandard::AudioSystemManager::GetInstance()->GetGroupManager(
-        AudioStandard::DEFAULT_VOLUME_GROUP_ID);
-    if (groupManager == nullptr) {
-        MISC_HILOGE("groupManager is null");
-        return;
-    }
-    groupManager->SetRingerModeCallback(IPCSkeleton::GetCallingPid(), ringerModeCB_);
+    AudioStandard::AudioSystemManager::GetInstance()->GetGroupManager(
+        AudioStandard::DEFAULT_VOLUME_GROUP_ID)->SetRingerModeCallback(IPCSkeleton::GetCallingPid(), ringerModeCB_);
 }
 
 VibrationPriorityManager::~VibrationPriorityManager()
