@@ -196,7 +196,7 @@ int32_t LightClient::ConvertLightInfos()
         MISC_HILOGE("The number of lights exceed the maximum value");
         return ERROR;
     }
-    lightInfos_ = (LightInfo *)malloc(sizeof(LightInfo) * count);
+    lightInfos_ = static_cast<LightInfo *>(malloc(sizeof(LightInfo) * count));
     CHKPR(lightInfos_, ERROR);
     for (size_t i = 0; i < count; ++i) {
         LightInfo *lightInfo = lightInfos_ + i;

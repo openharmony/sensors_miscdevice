@@ -356,7 +356,7 @@ int32_t VibratorServiceClient::ConvertVibratePackage(const VibratePackage& inPkg
 {
     inPkg.Dump();
     int32_t patternSize = static_cast<int32_t>(inPkg.patterns.size());
-    VibratorPattern *patterns = (VibratorPattern *)malloc(sizeof(VibratorPattern) * patternSize);
+    VibratorPattern *patterns = static_cast<VibratorPattern *>(malloc(sizeof(VibratorPattern) * patternSize));
     CHKPR(patterns, ERROR);
     outPkg.patternNum = patternSize;
     for (int32_t i = 0; i < patternSize; ++i) {
@@ -364,7 +364,7 @@ int32_t VibratorServiceClient::ConvertVibratePackage(const VibratePackage& inPkg
         auto vibrateEvents = inPkg.patterns[i].events;
         int32_t eventSize = static_cast<int32_t>(vibrateEvents.size());
         patterns[i].eventNum = eventSize;
-        VibratorEvent *events = (VibratorEvent *)malloc(sizeof(VibratorEvent) * eventSize);
+        VibratorEvent *events = static_cast<VibratorEvent *>(malloc(sizeof(VibratorEvent) * eventSize));
         if (events == nullptr) {
             free(patterns);
             patterns = nullptr;
@@ -379,7 +379,8 @@ int32_t VibratorServiceClient::ConvertVibratePackage(const VibratePackage& inPkg
             events[j].index = vibrateEvents[j].index;
             auto vibratePoints = vibrateEvents[j].points;
             events[j].pointNum = static_cast<int32_t>(vibratePoints.size());
-            VibratorCurvePoint *points = (VibratorCurvePoint *)malloc(sizeof(VibratorCurvePoint) * events[j].pointNum);
+            VibratorCurvePoint *points = 
+                static_cast<VibratorCurvePoint *>(malloc(sizeof(VibratorCurvePoint) * events[j].pointNum));
             if (points == nullptr) {
                 free(patterns);
                 patterns = nullptr;
