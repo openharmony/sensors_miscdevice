@@ -298,7 +298,7 @@ int32_t MiscdeviceServiceStub::PlayPatternStub(MessageParcel &data, MessageParce
     int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
     if (ret != PERMISSION_GRANTED) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
-            HiSysEvent::EventType::SECURITY, "PKG_NAME", "VibrateStub", "ERROR_CODE", ret);
+            HiSysEvent::EventType::SECURITY, "PKG_NAME", "PlayPatternStub", "ERROR_CODE", ret);
         MISC_HILOGE("CheckVibratePermission failed, ret:%{public}d", ret);
         return PERMISSION_DENIED;
     }
