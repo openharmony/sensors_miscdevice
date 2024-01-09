@@ -55,10 +55,16 @@ VibrationPriorityManager::VibrationPriorityManager()
     if (RegisterObserver(observer_) != ERR_OK) {
         MISC_HILOGE("RegisterObserver failed");
     }
-
     ringerModeCB_ = std::make_shared<MiscDeviceRingerModeCallback>();
-    AudioStandard::AudioSystemManager::GetInstance()->GetGroupManager(
-        AudioStandard::DEFAULT_VOLUME_GROUP_ID)->SetRingerModeCallback(IPCSkeleton::GetCallingPid(), ringerModeCB_);
+    std::shared_ptr<AudioStandard::AudioGroupManager> audioGroupManager =
+        AudioStandard::AudioSystemManager::GetInstance()->GetGroupManager(AudioStandard::DEFAULT_VOLUME_GROUP_ID);
+    if (audioGroupManager == nullptr) {
+        MISC_HILOGE("audioGroupManager is null");
+        return;
+    }
+    if (audioGroupManager->SetRingerModeCallback(IPCSkeleton::GetCallingPid(), ringerModeCB_) != ERR_OK) {
+        MISC_HILOGE("SetRingerModeCallback failed");
+    }
 }
 
 VibrationPriorityManager::~VibrationPriorityManager()
@@ -67,10 +73,14 @@ VibrationPriorityManager::~VibrationPriorityManager()
     if (UnregisterObserver(observer_) != ERR_OK) {
         MISC_HILOGE("UnregisterObserver failed");
     }
-    int32_t ret = AudioStandard::AudioSystemManager::GetInstance()->GetGroupManager(
-        AudioStandard::DEFAULT_VOLUME_GROUP_ID)->UnsetRingerModeCallback(IPCSkeleton::GetCallingPid());
-    if (ret != ERR_OK) {
-        MISC_HILOGE("UnSetRingerModeCallback failed");
+    std::shared_ptr<AudioStandard::AudioGroupManager> audioGroupManager =
+        AudioStandard::AudioSystemManager::GetInstance()->GetGroupManager(AudioStandard::DEFAULT_VOLUME_GROUP_ID);
+    if (audioGroupManager == nullptr) {
+        MISC_HILOGE("audioGroupManager is null");
+        return;
+    }
+    if (audioGroupManager->UnsetRingerModeCallback(IPCSkeleton::GetCallingPid()) != ERR_OK) {
+        MISC_HILOGE("UnsetRingerModeCallback failed");
     }
 }
 
@@ -137,23 +147,24 @@ int32_t VibrationPriorityManager::GetStringValue(const std::string &key, std::st
 
 void VibrationPriorityManager::UpdateStatus()
 {
-    if (ringerModeCB_ != nullptr) {
-        int32_t ringerMode = static_cast<int32_t>(ringerModeCB_->GetAudioRingerMode());
-        if (ringerMode != -1) {
-            miscAudioRingerMode_ = ringerMode;
-        } else {
-            miscAudioRingerMode_ = AudioStandard::AudioSystemManager::GetInstance()->GetGroupManager(
-                AudioStandard::DEFAULT_VOLUME_GROUP_ID)->GetRingerMode();
-        }
-    } else {
-        MISC_HILOGE("ringerModeCB_ is nullptr");
-    }
     if (miscFeedback_ == -1) {
         int32_t feedback = -1;
         if (GetIntValue(SETTING_SOUND_FEEDBACK_KEY, feedback) != ERR_OK) {
             MISC_HILOGD("Get feedback failed");
         }
         miscFeedback_ = feedback;
+    }
+    if (ringerModeCB_ != nullptr) {
+        int32_t ringerMode = static_cast<int32_t>(ringerModeCB_->GetAudioRingerMode());
+        if (ringerMode != -1) {
+            miscAudioRingerMode_ = ringerMode;
+            return;
+        }
+    }
+    std::shared_ptr<AudioStandard::AudioGroupManager> audioGroupManager =
+        AudioStandard::AudioSystemManager::GetInstance()->GetGroupManager(AudioStandard::DEFAULT_VOLUME_GROUP_ID);
+    if (audioGroupManager != nullptr) {
+        miscAudioRingerMode_ = audioGroupManager->GetRingerMode();
     }
 }
 
@@ -291,6 +302,10 @@ void VibrationPriorityManager::ExecRegisterCb(const sptr<MiscDeviceObserver> &ob
 
 int32_t VibrationPriorityManager::RegisterObserver(const sptr<MiscDeviceObserver> &observer)
 {
+    if (observer == nullptr) {
+        MISC_HILOGE("observer is nullptr");
+        return MISC_NO_INIT_ERR;
+    }
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
     auto uri = AssembleUri(observer->GetKey());
     auto helper = CreateDataShareHelper();
@@ -310,6 +325,10 @@ int32_t VibrationPriorityManager::RegisterObserver(const sptr<MiscDeviceObserver
 
 int32_t VibrationPriorityManager::UnregisterObserver(const sptr<MiscDeviceObserver> &observer)
 {
+    if (observer == nullptr) {
+        MISC_HILOGE("observer is nullptr");
+        return MISC_NO_INIT_ERR;
+    }
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
     auto uri = AssembleUri(observer->GetKey());
     auto helper = CreateDataShareHelper();
