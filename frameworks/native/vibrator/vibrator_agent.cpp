@@ -68,7 +68,7 @@ bool SetLoopCount(int32_t count)
 
 int32_t StartVibrator(const char *effectId)
 {
-    MISC_HILOGI("Time delay measurement:start time");
+    MISC_HILOGD("Time delay measurement:start time");
     CHKPR(effectId, PARAMETER_ERROR);
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.Vibrate(DEFAULT_VIBRATOR_ID, effectId, g_loopCount, g_usage);
@@ -105,7 +105,7 @@ bool IsSupportVibratorCustom()
 int32_t PlayVibratorCustom(int32_t fd, int64_t offset, int64_t length)
 {
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    MISC_HILOGI("Time delay measurement:start time");
+    MISC_HILOGD("Time delay measurement:start time");
     if (fd < 0 || offset < 0 || length <= 0) {
         MISC_HILOGE("Input parameter invalid, fd:%{public}d, offset:%{public}lld, length:%{public}lld",
             fd, static_cast<long long>(offset), static_cast<long long>(length));
@@ -142,7 +142,7 @@ int32_t StopVibrator(const char *mode)
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.StopVibrator(DEFAULT_VIBRATOR_ID, mode);
     if (ret != ERR_OK) {
-        MISC_HILOGE("StopVibrator by mode failed, ret:%{public}d, mode:%{public}s", ret, mode);
+        MISC_HILOGD("StopVibrator by mode failed, ret:%{public}d, mode:%{public}s", ret, mode);
         return NormalizeErrCode(ret);
     }
     return SUCCESS;
@@ -153,7 +153,7 @@ int32_t Cancel()
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.StopVibrator(DEFAULT_VIBRATOR_ID);
     if (ret != ERR_OK) {
-        MISC_HILOGE("StopVibrator failed, ret:%{public}d", ret);
+        MISC_HILOGD("StopVibrator failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
     return SUCCESS;

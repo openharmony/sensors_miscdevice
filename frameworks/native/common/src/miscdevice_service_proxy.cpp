@@ -85,7 +85,7 @@ int32_t MiscdeviceServiceProxy::StopVibrator(int32_t vibratorId)
     if (ret != NO_ERROR) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "StopVibrator", "ERROR_CODE", ret);
-        MISC_HILOGE("SendRequest failed, ret:%{public}d", ret);
+        MISC_HILOGD("SendRequest failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -152,7 +152,7 @@ int32_t MiscdeviceServiceProxy::StopVibrator(int32_t vibratorId, const std::stri
     if (ret != NO_ERROR) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "StopVibrator", "ERROR_CODE", ret);
-        MISC_HILOGE("SendRequest failed, ret:%{public}d", ret);
+        MISC_HILOGD("SendRequest failed, ret:%{public}d", ret);
     }
     return ret;
 }

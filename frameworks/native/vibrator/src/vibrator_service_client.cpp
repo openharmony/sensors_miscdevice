@@ -172,7 +172,7 @@ int32_t VibratorServiceClient::StopVibrator(int32_t vibratorId, const std::strin
     ret = miscdeviceProxy_->StopVibrator(vibratorId, mode);
     FinishTrace(HITRACE_TAG_SENSORS);
     if (ret != ERR_OK) {
-        MISC_HILOGE("StopVibrator by mode failed, ret:%{public}d, mode:%{public}s", ret, mode.c_str());
+        MISC_HILOGD("StopVibrator by mode failed, ret:%{public}d, mode:%{public}s", ret, mode.c_str());
     }
     return ret;
 }
@@ -190,7 +190,7 @@ int32_t VibratorServiceClient::StopVibrator(int32_t vibratorId)
     ret = miscdeviceProxy_->StopVibrator(vibratorId);
     FinishTrace(HITRACE_TAG_SENSORS);
     if (ret != ERR_OK) {
-        MISC_HILOGE("StopVibrator failed, ret:%{public}d", ret);
+        MISC_HILOGD("StopVibrator failed, ret:%{public}d", ret);
     }
     return ret;
 }
