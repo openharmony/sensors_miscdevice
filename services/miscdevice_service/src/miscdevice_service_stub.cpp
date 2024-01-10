@@ -294,6 +294,14 @@ int32_t MiscdeviceServiceStub::OnRemoteRequest(uint32_t code, MessageParcel &dat
 int32_t MiscdeviceServiceStub::PlayPatternStub(MessageParcel &data, MessageParcel &reply)
 {
     CALL_LOG_ENTER;
+    PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
+    int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
+    if (ret != PERMISSION_GRANTED) {
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
+            HiSysEvent::EventType::SECURITY, "PKG_NAME", "PlayPatternStub", "ERROR_CODE", ret);
+        MISC_HILOGE("CheckVibratePermission failed, ret:%{public}d", ret);
+        return PERMISSION_DENIED;
+    }
     VibratePattern vibratePattern;
     auto pattern = vibratePattern.Unmarshalling(data);
     if (!pattern.has_value()) {
