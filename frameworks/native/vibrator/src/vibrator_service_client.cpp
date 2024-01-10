@@ -379,7 +379,7 @@ int32_t VibratorServiceClient::ConvertVibratePackage(const VibratePackage& inPkg
             events[j].index = vibrateEvents[j].index;
             auto vibratePoints = vibrateEvents[j].points;
             events[j].pointNum = static_cast<int32_t>(vibratePoints.size());
-            VibratorCurvePoint *points = 
+            VibratorCurvePoint *points =
                 static_cast<VibratorCurvePoint *>(malloc(sizeof(VibratorCurvePoint) * events[j].pointNum));
             if (points == nullptr) {
                 free(patterns);
