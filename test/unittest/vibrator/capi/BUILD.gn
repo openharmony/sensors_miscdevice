@@ -34,7 +34,7 @@ ohos_unittest("NativeVibratorTest") {
     "access_token:libtoken_setproc",
     "hilog:libhilog",
     "init:libbegetutil",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
   ]
 
   deps = [
