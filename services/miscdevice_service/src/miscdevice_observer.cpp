@@ -23,21 +23,11 @@ MiscDeviceObserver::~MiscDeviceObserver() = default;
 void MiscDeviceObserver::OnChange()
 {
     if (update_ != nullptr) {
-        update_(key_);
+        update_();
     }
 }
 
-void MiscDeviceObserver::SetKey(const std::string &key)
-{
-    key_ = key;
-}
-
-const std::string& MiscDeviceObserver::GetKey()
-{
-    return key_;
-}
-
-void MiscDeviceObserver::SetUpdateFunc(UpdateFunc &func)
+void MiscDeviceObserver::SetUpdateFunc(const UpdateFunc &func)
 {
     update_ = func;
 }

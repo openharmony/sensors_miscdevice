@@ -26,13 +26,9 @@ public:
     ~MiscDeviceObserver() override;
     void OnChange() override;
 
-    void SetKey(const std::string &key);
-    const std::string& GetKey();
-
-    using UpdateFunc = std::function<void(const std::string&)>;
-    void SetUpdateFunc(UpdateFunc &func);
+    using UpdateFunc = std::function<void()>;
+    void SetUpdateFunc(const UpdateFunc &func);
 private:
-    std::string key_ {};
     UpdateFunc update_ = nullptr;
 };
 }  // namespace Sensors
