@@ -34,7 +34,7 @@ namespace {
 constexpr size_t U32_AT_SIZE = 4;
 auto g_service = MiscdeviceDelayedSpSingleton<MiscdeviceService>::GetInstance();
 const std::u16string VIBRATOR_INTERFACE_TOKEN = u"IMiscdeviceService";
-}
+} // namespace
 
 void SetUpTestCase()
 {
