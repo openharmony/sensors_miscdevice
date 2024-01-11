@@ -238,10 +238,10 @@ void CustomVibrationMatcher::ProcessContinuousEvent(const VibrateEvent &event, i
     int32_t curIntensity = curve.front().intensity;
     int32_t curFrequency = curve.front().frequency;
     int32_t nextTime = 0;
-    int32_t nextIntensity = 0;
-    int32_t nextFrequency = 0;
     int32_t i = 0;
     while (curTime < endTime) {
+        int32_t nextIntensity = 0;
+        int32_t nextFrequency = 0;
         if ((endTime - curTime) >= (2 * SLICE_STEP)) {
             nextTime = curTime + SLICE_STEP;
         } else {
