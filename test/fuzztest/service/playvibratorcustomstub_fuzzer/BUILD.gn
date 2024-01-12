@@ -57,7 +57,7 @@ ohos_fuzztest("PlayVibratorCustomStubFuzzTest") {
     "c_utils:utils",
     "drivers_interface_vibrator:libvibrator_proxy_1.1",
     "hilog:libhilog",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "samgr:samgr_proxy",
   ]
 
