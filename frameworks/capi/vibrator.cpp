@@ -21,14 +21,11 @@
 #include "vibrator_agent.h"
 #include "vibrator_type.h"
 
+#undef LOG_TAG
+#define LOG_TAG "Vibrator"
+
 namespace OHOS {
 namespace Sensors {
-using OHOS::HiviewDFX::HiLog;
-using namespace OHOS::HiviewDFX;
-
-namespace {
-constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "Vibrator" };
-} // namespace
 
 int32_t OH_Vibrator_PlayVibration(int32_t duration, Vibrator_Attribute vibrateAttribute)
 {

@@ -17,12 +17,11 @@
 
 #include "sensors_errors.h"
 
+#undef LOG_TAG
+#define LOG_TAG "LightAnimationIPC"
+
 namespace OHOS {
 namespace Sensors {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "LightAnimationIPC" };
-}  // namespace
-
 int32_t LightAnimationIPC::GetMode() const
 {
     return mode_;

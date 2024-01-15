@@ -22,10 +22,12 @@
 #include "miscdevice_log.h"
 #include "vibrator_napi_error.h"
 
+#undef LOG_TAG
+#define LOG_TAG "VibratorNapiUtils"
+
 namespace OHOS {
 namespace Sensors {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MISC_LOG_DOMAIN, "VibratorNapiUtils"};
 constexpr int32_t RESULT_LENGTH = 2;
 }  // namespace
 AsyncCallbackInfo::~AsyncCallbackInfo()

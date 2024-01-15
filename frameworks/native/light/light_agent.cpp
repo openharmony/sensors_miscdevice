@@ -17,14 +17,11 @@
 #include "light_client.h"
 #include "sensors_errors.h"
 
+#undef LOG_TAG
+#define LOG_TAG "LightNDK"
+
 namespace OHOS {
 namespace Sensors {
-using OHOS::HiviewDFX::HiLog;
-using OHOS::HiviewDFX::HiLogLabel;
-
-namespace {
-constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "LightNDK" };
-}  // namespace
 
 int32_t GetLightList(LightInfo **lightInfo, int32_t &count)
 {

@@ -20,10 +20,12 @@
 #include "custom_vibration_matcher.h"
 #include "sensors_errors.h"
 
+#undef LOG_TAG
+#define LOG_TAG "VibratorThread"
+
 namespace OHOS {
 namespace Sensors {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "VibratorThread" };
 const std::string VIBRATE_CONTROL_THREAD_NAME = "OS_VibControl";
 constexpr size_t COMPOSITE_EFFECT_PART = 128;
 }  // namespace

@@ -22,13 +22,11 @@
 #include "hdi_connection.h"
 #include "sensors_errors.h"
 
+#undef LOG_TAG
+#define LOG_TAG "VibratorHdiConnection"
+
 namespace OHOS {
 namespace Sensors {
-using namespace OHOS::HiviewDFX;
-
-namespace {
-constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "VibratorHdiConnection" };
-} // namespace
 
 int32_t VibratorHdiConnection::ConnectHdi()
 {

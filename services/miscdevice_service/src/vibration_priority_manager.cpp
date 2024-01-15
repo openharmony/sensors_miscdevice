@@ -22,10 +22,12 @@
 
 #include "sensors_errors.h"
 
+#undef LOG_TAG
+#define LOG_TAG "VibrationPriorityManager"
+
 namespace OHOS {
 namespace Sensors {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "VibrationPriorityManager" };
 const std::string SETTING_COLUMN_KEYWORD = "KEYWORD";
 const std::string SETTING_COLUMN_VALUE = "VALUE";
 const std::string SETTING_FEEDBACK_KEY = "physic_navi_haptic_feedback_enabled";

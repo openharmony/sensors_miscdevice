@@ -17,12 +17,12 @@
 #include "he_vibrator_decoder.h"
 #include "sensors_errors.h"
 
+#undef LOG_TAG
+#define LOG_TAG "HEVibratorDecoderFactory"
+
 namespace OHOS {
 namespace Sensors {
-using namespace OHOS::HiviewDFX;
-namespace {
-constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "HEVibratorDecoderFactory" };
-} // namespace
+
 IVibratorDecoder *HEVibratorDecoderFactory::CreateDecoder()
 {
     CALL_LOG_ENTER;

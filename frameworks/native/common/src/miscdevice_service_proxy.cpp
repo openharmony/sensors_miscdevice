@@ -20,12 +20,14 @@
 
 #include "sensors_errors.h"
 
+#undef LOG_TAG
+#define LOG_TAG "MiscdeviceServiceProxy"
+
 namespace OHOS {
 namespace Sensors {
 using namespace OHOS::HiviewDFX;
 
 namespace {
-constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "MiscdeviceServiceProxy" };
 constexpr int32_t MAX_LIGHT_COUNT = 0XFF;
 } // namespace
 

@@ -25,11 +25,12 @@
 #include "securec.h"
 #include "sensors_errors.h"
 
+#undef LOG_TAG
+#define LOG_TAG "MiscdeviceDump"
+
 namespace OHOS {
 namespace Sensors {
-using namespace OHOS::HiviewDFX;
 namespace {
-constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "MiscdeviceDump" };
 constexpr uint32_t MAX_DUMP_RECORD_SIZE = 30;
 constexpr uint32_t BASE_YEAR = 1900;
 constexpr uint32_t BASE_MON = 1;

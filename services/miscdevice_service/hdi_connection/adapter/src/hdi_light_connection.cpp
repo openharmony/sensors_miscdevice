@@ -24,10 +24,12 @@
 #include "v1_0/light_interface_proxy.h"
 #include "sensors_errors.h"
 
+#undef LOG_TAG
+#define LOG_TAG "HdiLightConnection"
+
 namespace OHOS {
 namespace Sensors {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "HdiLightConnection" };
 constexpr int32_t GET_HDI_SERVICE_COUNT = 10;
 constexpr uint32_t WAIT_MS = 100;
 } // namespace

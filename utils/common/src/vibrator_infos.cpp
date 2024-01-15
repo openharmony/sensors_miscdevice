@@ -22,12 +22,11 @@
 
 #include "sensors_errors.h"
 
+#undef LOG_TAG
+#define LOG_TAG "MiscdeviceVibratorInfos"
+
 namespace OHOS {
 namespace Sensors {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "MiscdeviceVibratorInfos" };
-}  // namespace
-
 void VibratePattern::Dump() const
 {
     int32_t size = static_cast<int32_t>(events.size());
