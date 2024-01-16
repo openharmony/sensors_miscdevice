@@ -16,7 +16,7 @@
 #ifndef VIBRATOR_TYPE_H
 #define VIBRATOR_TYPE_H
 
-#include <stdint.h>
+#include <cstdint>
 
 #ifdef __cplusplus
 extern "C" {
@@ -83,9 +83,8 @@ typedef struct Vibrator_FileDescription {
     /**< Total length of the custom vibration sequence. */
     int64_t length = -1;
 } Vibrator_FileDescription;
-/** @} */
 #ifdef __cplusplus
-};
+}
 #endif
 
 #endif  // endif VIBRATOR_TYPE_H

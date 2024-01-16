@@ -35,6 +35,8 @@
 
 #include "vibrator_type.h"
 
+#include <cstdint>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -83,7 +85,7 @@ int32_t OH_Vibrator_Cancel();
 } // namespace Sensors
 } // namespace OHOS
 #ifdef __cplusplus
-};
+}
 #endif
 /** @} */
 #endif // endif VIBRATOR_H
