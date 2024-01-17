@@ -35,8 +35,6 @@
 
 #include "vibrator_type.h"
 
-#include <cstdint>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
