@@ -32,11 +32,12 @@
 #include "parameters.h"
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
+#undef LOG_TAG
+#define LOG_TAG "MiscdeviceService"
+
 namespace OHOS {
 namespace Sensors {
-using namespace OHOS::HiviewDFX;
 namespace {
-constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "MiscdeviceService" };
 auto g_miscdeviceService = MiscdeviceDelayedSpSingleton<MiscdeviceService>::GetInstance();
 const bool G_REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(g_miscdeviceService.GetRefPtr());
 constexpr int32_t MIN_VIBRATOR_TIME = 0;

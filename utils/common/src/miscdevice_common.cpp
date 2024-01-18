@@ -17,12 +17,13 @@
 
 #include "sensors_errors.h"
 
+#undef LOG_TAG
+#define LOG_TAG "MiscdeviceCommon"
+
 namespace OHOS {
 namespace Sensors {
-using namespace OHOS::HiviewDFX;
 
 namespace {
-constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "MiscdeviceCommon" };
 constexpr int32_t MIN_VIBRATOR_COUNT = 0;
 constexpr int32_t MAX_VIBRATOR_COUNT = 100;
 constexpr int32_t MIN_VIBRATOR_INTENSITY = 0;

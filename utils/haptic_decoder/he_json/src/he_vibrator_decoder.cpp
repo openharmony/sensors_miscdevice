@@ -17,10 +17,11 @@
 
 #include "sensors_errors.h"
 
+#undef LOG_TAG
+#define LOG_TAG "HEVibratorDecoder"
 
 namespace OHOS {
 namespace Sensors {
-using namespace OHOS::HiviewDFX;
 namespace {
 constexpr int32_t EVENT_NUM_MAX = 16;
 constexpr int32_t SUPPORTED_HE_VERSION_1 = 1;
@@ -42,7 +43,6 @@ constexpr int32_t CURVE_INTENSITY_SCALE = 100;
 constexpr int32_t CURVE_FREQUENCY_MIN = -100;
 constexpr int32_t CURVE_FREQUENCY_MAX = 100;
 constexpr int32_t CONTINUOUS_DURATION_MAX = 5000;
-constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "HEVibratorDecoder" };
 } // namespace
 
 int32_t HEVibratorDecoder::DecodeEffect(const RawFileDescriptor &rawFd, VibratePackage &pkg)

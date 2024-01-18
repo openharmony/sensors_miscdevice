@@ -26,12 +26,14 @@
 #include "permission_util.h"
 #include "sensors_errors.h"
 
+#undef LOG_TAG
+#define LOG_TAG "MiscdeviceServiceStub"
+
 namespace OHOS {
 namespace Sensors {
 using namespace OHOS::HiviewDFX;
 
 namespace {
-constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "MiscdeviceServiceStub" };
 const std::string VIBRATE_PERMISSION = "ohos.permission.VIBRATE";
 const std::string LIGHT_PERMISSION = "ohos.permission.SYSTEM_LIGHT_CONTROL";
 }  // namespace

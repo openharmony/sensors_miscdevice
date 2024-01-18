@@ -27,12 +27,14 @@
 #include "sensors_errors.h"
 #include "vibrator_decoder_creator.h"
 
+#undef LOG_TAG
+#define LOG_TAG "VibratorServiceClient"
+
 namespace OHOS {
 namespace Sensors {
 using namespace OHOS::HiviewDFX;
 
 namespace {
-constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "VibratorServiceClient" };
 constexpr int32_t GET_SERVICE_MAX_COUNT = 3;
 constexpr uint32_t WAIT_MS = 200;
 #ifdef __aarch64__
