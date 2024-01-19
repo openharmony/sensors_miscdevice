@@ -23,13 +23,11 @@
 #include "hitrace_meter.h"
 #include "sensors_errors.h"
 
+#undef LOG_TAG
+#define LOG_TAG "LightHdiConnection"
+
 namespace OHOS {
 namespace Sensors {
-using namespace OHOS::HiviewDFX;
-
-namespace {
-constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "LightHdiConnection" };
-} // namespace
 
 int32_t LightHdiConnection::ConnectHdi()
 {

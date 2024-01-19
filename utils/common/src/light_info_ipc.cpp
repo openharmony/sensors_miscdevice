@@ -17,12 +17,11 @@
 
 #include "sensors_errors.h"
 
+#undef LOG_TAG
+#define LOG_TAG "LightInfoIPC"
+
 namespace OHOS {
 namespace Sensors {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "LightInfoIPC" };
-}  // namespace
-
 std::string LightInfoIPC::GetLightName() const
 {
     return lightName_;

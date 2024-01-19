@@ -24,11 +24,13 @@
 #include "sensors_errors.h"
 #include "system_ability_definition.h"
 
+#undef LOG_TAG
+#define LOG_TAG "LightClient"
+
 namespace OHOS {
 namespace Sensors {
 
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "LightClient" };
 constexpr int32_t GET_SERVICE_MAX_COUNT = 30;
 constexpr uint32_t MAX_LIGHT_LIST_SIZE = 0X00ff;
 constexpr uint32_t WAIT_MS = 200;

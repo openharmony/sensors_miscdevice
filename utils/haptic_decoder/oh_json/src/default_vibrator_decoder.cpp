@@ -20,9 +20,11 @@
 
 #include "sensors_errors.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DefaultVibratorDecoder"
+
 namespace OHOS {
 namespace Sensors {
-using namespace OHOS::HiviewDFX;
 namespace {
 constexpr int32_t STARTTMIE_MIN = 0;
 constexpr int32_t STARTTMIE_MAX = 1800000;
@@ -45,7 +47,6 @@ constexpr int32_t CURVE_INTENSITY_SCALE = 100;
 constexpr int32_t CURVE_FREQUENCY_MIN = -100;
 constexpr int32_t CURVE_FREQUENCY_MAX = 100;
 constexpr int32_t MAX_JSON_FILE_SIZE = 64 * 1024;
-constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "DefaultVibratorDecoder" };
 } // namespace
 
 int32_t DefaultVibratorDecoder::DecodeEffect(const RawFileDescriptor &rawFd, VibratePackage &patternPackage)

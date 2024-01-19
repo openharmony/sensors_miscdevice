@@ -20,14 +20,16 @@
 
 #include "sensors_errors.h"
 
+#undef LOG_TAG
+#define LOG_TAG "MiscdeviceServiceProxy"
+
 namespace OHOS {
 namespace Sensors {
 using namespace OHOS::HiviewDFX;
 
 namespace {
-constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "MiscdeviceServiceProxy" };
 constexpr int32_t MAX_LIGHT_COUNT = 0XFF;
-}
+} // namespace
 
 MiscdeviceServiceProxy::MiscdeviceServiceProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IMiscdeviceService>(impl)
 {}
@@ -85,7 +87,7 @@ int32_t MiscdeviceServiceProxy::StopVibrator(int32_t vibratorId)
     if (ret != NO_ERROR) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "StopVibrator", "ERROR_CODE", ret);
-        MISC_HILOGE("SendRequest failed, ret:%{public}d", ret);
+        MISC_HILOGD("SendRequest failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -152,7 +154,7 @@ int32_t MiscdeviceServiceProxy::StopVibrator(int32_t vibratorId, const std::stri
     if (ret != NO_ERROR) {
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "StopVibrator", "ERROR_CODE", ret);
-        MISC_HILOGE("SendRequest failed, ret:%{public}d", ret);
+        MISC_HILOGD("SendRequest failed, ret:%{public}d", ret);
     }
     return ret;
 }

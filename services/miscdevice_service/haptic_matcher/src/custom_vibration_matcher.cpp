@@ -20,6 +20,9 @@
 
 #include "sensors_errors.h"
 
+#undef LOG_TAG
+#define LOG_TAG "CustomVibrationMatcher"
+
 namespace OHOS {
 namespace Sensors {
 namespace {
@@ -48,7 +51,6 @@ constexpr int32_t DURATION_MAX = 1600;
 constexpr float CURVE_INTENSITY_SCALE = 100.00;
 constexpr int32_t SLICE_STEP = 50;
 constexpr int32_t CONTINUOUS_VIBRATION_DURATION_MIN = 15;
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "CustomVibrationMatcher" };
 }  // namespace
 
 int32_t CustomVibrationMatcher::TransformTime(const VibratePackage &package,
@@ -238,10 +240,10 @@ void CustomVibrationMatcher::ProcessContinuousEvent(const VibrateEvent &event, i
     int32_t curIntensity = curve.front().intensity;
     int32_t curFrequency = curve.front().frequency;
     int32_t nextTime = 0;
-    int32_t nextIntensity = 0;
-    int32_t nextFrequency = 0;
     int32_t i = 0;
     while (curTime < endTime) {
+        int32_t nextIntensity = 0;
+        int32_t nextFrequency = 0;
         if ((endTime - curTime) >= (2 * SLICE_STEP)) {
             nextTime = curTime + SLICE_STEP;
         } else {

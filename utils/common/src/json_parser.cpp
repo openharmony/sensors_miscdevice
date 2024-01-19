@@ -21,11 +21,11 @@
 #include "file_utils.h"
 #include "sensors_errors.h"
 
+#undef LOG_TAG
+#define LOG_TAG "JsonParser"
+
 namespace OHOS {
 namespace Sensors {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "JsonParser" };
-}  // namespace
 
 JsonParser::JsonParser(const std::string &filePath)
 {

@@ -18,12 +18,12 @@
 #include "default_vibrator_decoder.h"
 #include "sensors_errors.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DefaultVibratorDecoderFactory"
+
 namespace OHOS {
 namespace Sensors {
-using namespace OHOS::HiviewDFX;
-namespace {
-constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "DefaultVibratorDecoderFactory" };
-} // namespace
+
 IVibratorDecoder *DefaultVibratorDecoderFactory::CreateDecoder()
 {
     CALL_LOG_ENTER;

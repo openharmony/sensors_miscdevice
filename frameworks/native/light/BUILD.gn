@@ -61,7 +61,7 @@ ohos_shared_library("light_interface_native") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
   ]
 
   public_configs = [ ":light_config" ]
@@ -101,7 +101,7 @@ ohos_shared_library("liblight_native") {
     "c_utils:utils",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "samgr:samgr_proxy",
   ]
 

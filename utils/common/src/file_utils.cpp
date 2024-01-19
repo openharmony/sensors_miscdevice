@@ -22,10 +22,12 @@
 #include "securec.h"
 #include "sensors_errors.h"
 
+#undef LOG_TAG
+#define LOG_TAG "MiscdeviceFileUtils"
+
 namespace OHOS {
 namespace Sensors {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "MiscdeviceFileUtils" };
 const std::string CONFIG_DIR = "/vendor/etc/vibrator/";
 constexpr int32_t FILE_SIZE_MAX = 0x5000;
 constexpr int64_t READ_DATA_BUFF_SIZE = 256;

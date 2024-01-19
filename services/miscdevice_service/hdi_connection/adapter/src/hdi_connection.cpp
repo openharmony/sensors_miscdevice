@@ -20,11 +20,13 @@
 
 #include "sensors_errors.h"
 
+#undef LOG_TAG
+#define LOG_TAG "HdiConnection"
+
 namespace OHOS {
 namespace Sensors {
 using namespace OHOS::HiviewDFX;
 namespace {
-constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "HdiConnection" };
 constexpr int32_t GET_HDI_SERVICE_COUNT = 10;
 constexpr uint32_t WAIT_MS = 100;
 } // namespace
@@ -64,7 +66,7 @@ int32_t HdiConnection::StartOnce(uint32_t duration)
 
 int32_t HdiConnection::Start(const std::string &effectType)
 {
-    MISC_HILOGI("Time delay measurement:end time");
+    MISC_HILOGD("Time delay measurement:end time");
     if (effectType.empty()) {
         MISC_HILOGE("effectType is null");
         return VIBRATOR_ON_ERR;
@@ -83,7 +85,7 @@ int32_t HdiConnection::Start(const std::string &effectType)
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 int32_t HdiConnection::EnableCompositeEffect(const HdfCompositeEffect &hdfCompositeEffect)
 {
-    MISC_HILOGI("Time delay measurement:end time");
+    MISC_HILOGD("Time delay measurement:end time");
     if (hdfCompositeEffect.compositeEffects.empty()) {
         MISC_HILOGE("compositeEffects is empty");
         return VIBRATOR_ON_ERR;

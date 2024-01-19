@@ -20,12 +20,11 @@
 #include "sensors_errors.h"
 #include "miscdevice_log.h"
 
+#undef LOG_DOMAIN
+#define LOG_DOMAIN 0xD002701
 
 namespace OHOS {
 namespace Sensors {
-namespace {
-constexpr uint32_t MISC_LOG_DOMAIN = 0xD002701;
-} // namespace
 #ifndef MISC_FUNC_FMT
 #define MISC_FUNC_FMT "in %{public}s "
 #endif
@@ -35,19 +34,19 @@ constexpr uint32_t MISC_LOG_DOMAIN = 0xD002701;
 #endif
 
 #define MISC_HILOGD(fmt, ...) do { \
-    OHOS::HiviewDFX::HiLog::Debug(LABEL, MISC_FUNC_FMT fmt, MISC_FUNC_INFO, ##__VA_ARGS__); \
+    HILOG_DEBUG(LOG_CORE, MISC_FUNC_FMT fmt, MISC_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 #define MISC_HILOGI(fmt, ...) do { \
-    OHOS::HiviewDFX::HiLog::Info(LABEL, MISC_FUNC_FMT fmt, MISC_FUNC_INFO, ##__VA_ARGS__); \
+    HILOG_INFO(LOG_CORE, MISC_FUNC_FMT fmt, MISC_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 #define MISC_HILOGW(fmt, ...) do { \
-    OHOS::HiviewDFX::HiLog::Warn(LABEL, MISC_FUNC_FMT fmt, MISC_FUNC_INFO, ##__VA_ARGS__); \
+    HILOG_WARN(LOG_CORE, MISC_FUNC_FMT fmt, MISC_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 #define MISC_HILOGE(fmt, ...) do { \
-    OHOS::HiviewDFX::HiLog::Error(LABEL, MISC_FUNC_FMT fmt, MISC_FUNC_INFO, ##__VA_ARGS__); \
+    HILOG_ERROR(LOG_CORE, MISC_FUNC_FMT fmt, MISC_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 #define MISC_LOGF(fmt, ...) do { \
-    OHOS::HiviewDFX::HiLog::Fatal(LABEL, MISC_FUNC_FMT fmt, MISC_FUNC_INFO, ##__VA_ARGS__); \
+    HILOG_FATAL(LOG_CORE, MISC_FUNC_FMT fmt, MISC_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 } // namespace Sensors
 } // namespace OHOS

@@ -28,10 +28,12 @@
 #include "vibrator_napi_error.h"
 #include "vibrator_napi_utils.h"
 
+#undef LOG_TAG
+#define LOG_TAG "VibratorJs"
+
 namespace OHOS {
 namespace Sensors {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "VibratorJs" };
 constexpr int32_t VIBRATE_SHORT_DURATION = 35;
 constexpr int32_t VIBRATE_LONG_DURATION = 1000;
 }  // namespace

@@ -22,16 +22,17 @@
 #include "light_agent.h"
 #include "sensors_errors.h"
 
+#undef LOG_TAG
+#define LOG_TAG "LightAgentTest"
+
 namespace OHOS {
 namespace Sensors {
 using namespace testing::ext;
-using namespace OHOS::HiviewDFX;
 using namespace Security::AccessToken;
 using Security::AccessToken::AccessTokenID;
 
 namespace {
 constexpr int32_t TIME_WAIT_FOR_OP = 2;
-constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "LightAgentTest" };
 PermissionDef g_infoManagerTestPermDef = {
     .permissionName = "ohos.permission.SYSTEM_LIGHT_CONTROL",
     .bundleName = "accesstoken_test",

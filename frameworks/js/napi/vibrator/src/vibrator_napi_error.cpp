@@ -17,11 +17,11 @@
 
 #include <optional>
 
+#undef LOG_TAG
+#define LOG_TAG "VibratorNapiError"
+
 namespace OHOS {
 namespace Sensors {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MISC_LOG_DOMAIN, "VibratorNapiError"};
-}  // namespace
 napi_value CreateBusinessError(const napi_env &env, const int32_t errCode, const std::string &errMessage)
 {
     napi_value businessError = nullptr;

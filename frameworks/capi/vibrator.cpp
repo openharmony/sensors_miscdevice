@@ -21,7 +21,8 @@
 #include "vibrator_agent.h"
 #include "vibrator_type.h"
 
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, OHOS::Sensors::MISC_LOG_DOMAIN, "VIBRATOR" };
+#undef LOG_TAG
+#define LOG_TAG "Vibrator"
 
 int32_t OH_Vibrator_PlayVibration(int32_t duration, Vibrator_Attribute vibrateAttribute)
 {

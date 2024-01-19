@@ -26,10 +26,12 @@
 #include "sensors_errors.h"
 #include "vibrator_agent.h"
 
+#undef LOG_TAG
+#define LOG_TAG "VibratorAgentTest"
+
 namespace OHOS {
 namespace Sensors {
 using namespace testing::ext;
-using namespace OHOS::HiviewDFX;
 using namespace Security::AccessToken;
 using Security::AccessToken::AccessTokenID;
 
@@ -37,7 +39,6 @@ namespace {
 constexpr int32_t TIME_WAIT_FOR_OP = 2;
 const std::string PHONE_TYPE = "phone";
 std::string g_deviceType;
-constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "VibratorAgentTest" };
 PermissionDef g_infoManagerTestPermDef = {
     .permissionName = "ohos.permission.VIBRATE",
     .bundleName = "accesstoken_test",

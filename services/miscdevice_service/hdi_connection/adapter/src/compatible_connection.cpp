@@ -22,11 +22,12 @@
 
 #include "sensors_errors.h"
 
+#undef LOG_TAG
+#define LOG_TAG "CompatibleConnection"
+
 namespace OHOS {
 namespace Sensors {
-using namespace OHOS::HiviewDFX;
 namespace {
-constexpr HiLogLabel LABEL = { LOG_CORE, MISC_LOG_DOMAIN, "CompatibleConnection" };
 const std::string VIBRATE_MOCK_THREAD_NAME = "OS_VibMock";
 std::unordered_map<std::string, int32_t> g_vibratorEffect = {
     {"haptic.clock.timer", 2000},

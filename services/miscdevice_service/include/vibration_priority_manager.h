@@ -25,8 +25,6 @@
 #include "iremote_object.h"
 #include "singleton.h"
 
-#include "json_parser.h"
-#include "miscdevice_ringer_mode_callback.h"
 #include "miscdevice_observer.h"
 #include "vibrator_infos.h"
 #include "vibrator_thread.h"
@@ -46,33 +44,45 @@ enum VibrateStatus {
     IGNORE_FEEDBACK = 9,
 };
 
+enum RingerMode {
+    RINGER_MODE_INVALID = -1,
+    RINGER_MODE_SILENT = 0,
+    RINGER_MODE_VIBRATE = 1,
+    RINGER_MODE_NORMAL = 2
+};
+
+enum FeedbackMode {
+    FEEDBACK_MODE_INVALID = -1,
+    FEEDBACK_MODE_OFF = 0,
+    FEEDBACK_MODE_ON = 1
+};
+
 class VibrationPriorityManager {
     DECLARE_DELAYED_SINGLETON(VibrationPriorityManager);
 public:
     DISALLOW_COPY_AND_MOVE(VibrationPriorityManager);
     VibrateStatus ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo, std::shared_ptr<VibratorThread> vibratorThread);
-    static void ExecRegisterCb(const sptr<MiscDeviceObserver> &observer);
-    int32_t RegisterObserver(const sptr<MiscDeviceObserver> &observer);
-    int32_t UnregisterObserver(const sptr<MiscDeviceObserver> &observer);
 
 private:
     bool IsCurrentVibrate(std::shared_ptr<VibratorThread> vibratorThread) const;
     bool IsLoopVibrate(const VibrateInfo &vibrateInfo) const;
     VibrateStatus ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo, VibrateInfo currentVibrateInfo) const;
+    static void ExecRegisterCb(const sptr<MiscDeviceObserver> &observer);
+    int32_t RegisterObserver(const sptr<MiscDeviceObserver> &observer);
+    int32_t UnregisterObserver(const sptr<MiscDeviceObserver> &observer);
     int32_t GetIntValue(const std::string &key, int32_t &value);
     int32_t GetLongValue(const std::string &key, int64_t &value);
     int32_t GetStringValue(const std::string &key, std::string &value);
     Uri AssembleUri(const std::string &key);
     std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper();
     bool ReleaseDataShareHelper(std::shared_ptr<DataShare::DataShareHelper> &helper);
-    sptr<MiscDeviceObserver> CreateObserver(const std::string &key, MiscDeviceObserver::UpdateFunc &func);
+    sptr<MiscDeviceObserver> CreateObserver(const MiscDeviceObserver::UpdateFunc &func);
     void Initialize();
     void UpdateStatus();
     sptr<IRemoteObject> remoteObj_ { nullptr };
     sptr<MiscDeviceObserver> observer_ { nullptr };
-    std::shared_ptr<MiscDeviceRingerModeCallback> ringerModeCB_ { nullptr };
-    std::atomic_int32_t miscFeedback_ { -1 };
-    std::atomic_int32_t miscAudioRingerMode_ { -1 };
+    std::atomic_int32_t miscFeedback_ = FEEDBACK_MODE_INVALID;
+    std::atomic_int32_t miscAudioRingerMode_ = RINGER_MODE_INVALID;
 };
 #define PriorityManager DelayedSingleton<VibrationPriorityManager>::GetInstance()
 }  // namespace Sensors

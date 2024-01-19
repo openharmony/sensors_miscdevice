@@ -19,7 +19,6 @@
 
 namespace OHOS {
 namespace Sensors {
-using namespace OHOS::HiviewDFX;
 
 int32_t PermissionUtil::CheckVibratePermission(AccessTokenID callerToken, const std::string &permissionName)
 {
