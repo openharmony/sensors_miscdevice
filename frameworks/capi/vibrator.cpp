@@ -24,9 +24,6 @@
 #undef LOG_TAG
 #define LOG_TAG "Vibrator"
 
-namespace OHOS {
-namespace Sensors {
-
 int32_t OH_Vibrator_PlayVibration(int32_t duration, Vibrator_Attribute vibrateAttribute)
 {
     if (duration <= 0) {
@@ -37,11 +34,11 @@ int32_t OH_Vibrator_PlayVibration(int32_t duration, Vibrator_Attribute vibrateAt
         MISC_HILOGE("vibrate attribute value is is %{public}d", vibrateAttribute.usage);
         return PARAMETER_ERROR;
     }
-    if (!SetUsage(vibrateAttribute.usage)) {
+    if (!OHOS::Sensors::SetUsage(vibrateAttribute.usage)) {
         MISC_HILOGE("SetUsage failed");
         return PARAMETER_ERROR;
     }
-    int32_t ret = StartVibratorOnce(duration);
+    int32_t ret = OHOS::Sensors::StartVibratorOnce(duration);
     if (ret != OHOS::ERR_OK) {
         MISC_HILOGE("start Vibrator failed, ret is %{public}d", ret);
     }
@@ -51,9 +48,9 @@ int32_t OH_Vibrator_PlayVibration(int32_t duration, Vibrator_Attribute vibrateAt
 int32_t OH_Vibrator_PlayVibrationCustom(Vibrator_FileDescription fileDescription,
     Vibrator_Attribute vibrateAttribute)
 {
-    if (!IsSupportVibratorCustom()) {
+    if (!OHOS::Sensors::IsSupportVibratorCustom()) {
         MISC_HILOGE("feature is not supported");
-        return IS_NOT_SUPPORTED;
+        return UNSUPPORTED;
     }
     if ((fileDescription.fd < 0) || (fileDescription.offset < 0) || (fileDescription.length <= 0)) {
         MISC_HILOGE("fileDescription is invalid");
@@ -63,11 +60,11 @@ int32_t OH_Vibrator_PlayVibrationCustom(Vibrator_FileDescription fileDescription
         MISC_HILOGE("vibrate attribute value is invalid");
         return PARAMETER_ERROR;
     }
-    if (!SetUsage(vibrateAttribute.usage)) {
+    if (!OHOS::Sensors::SetUsage(vibrateAttribute.usage)) {
         MISC_HILOGE("SetUsage failed");
         return PARAMETER_ERROR;
     }
-    int32_t ret = PlayVibratorCustom(fileDescription.fd, fileDescription.offset, fileDescription.length);
+    int32_t ret = OHOS::Sensors::PlayVibratorCustom(fileDescription.fd, fileDescription.offset, fileDescription.length);
     if (ret != OHOS::ERR_OK) {
         MISC_HILOGE("play vibrator custom failed, ret is %{public}d", ret);
     }
@@ -76,11 +73,9 @@ int32_t OH_Vibrator_PlayVibrationCustom(Vibrator_FileDescription fileDescription
 
 int32_t OH_Vibrator_Cancel()
 {
-    int32_t ret = Cancel();
+    int32_t ret = OHOS::Sensors::Cancel();
     if (ret != OHOS::ERR_OK) {
         MISC_HILOGE("cancel Vibrator failed, ret is %{public}d", ret);
     }
     return ret;
 }
-} // namespace Sensors
-} // namespace OHOS
