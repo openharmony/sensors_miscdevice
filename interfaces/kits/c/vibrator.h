@@ -79,7 +79,7 @@ int32_t OH_Vibrator_PlayVibrationCustom(Vibrator_FileDescription fileDescription
  */
 int32_t OH_Vibrator_Cancel();
 #ifdef __cplusplus
-};
+}
 #endif
 /** @} */
 #endif // endif VIBRATOR_H
