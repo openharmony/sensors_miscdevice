@@ -208,7 +208,7 @@ bool MiscdeviceService::ShouldIgnoreVibrate(const VibrateInfo &info)
 int32_t MiscdeviceService::Vibrate(int32_t vibratorId, int32_t timeOut, int32_t usage)
 {
     std::string packageName = GetPackageName(GetCallingTokenID());
-    MISC_HILOGI("Start vibrator time, time:%{public}d, usage:%{public}d, package:%{public}s",
+    MISC_HILOGD("Start vibrator time, time:%{public}d, usage:%{public}d, package:%{public}s",
         timeOut, usage, packageName.c_str());
     if ((timeOut <= MIN_VIBRATOR_TIME) || (timeOut > MAX_VIBRATOR_TIME)
         || (usage >= USAGE_MAX) || (usage < 0)) {
@@ -235,12 +235,12 @@ int32_t MiscdeviceService::Vibrate(int32_t vibratorId, int32_t timeOut, int32_t 
 int32_t MiscdeviceService::StopVibrator(int32_t vibratorId)
 {
     std::string packageName = GetPackageName(GetCallingTokenID());
-    MISC_HILOGI("Stop vibrator, package:%{public}s", packageName.c_str());
+    MISC_HILOGD("Stop vibrator, package:%{public}s", packageName.c_str());
     std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     if ((vibratorThread_ == nullptr) || (!vibratorThread_->IsRunning() &&
         !vibratorHdiConnection_.IsVibratorRunning())) {
-        MISC_HILOGE("No vibration, no need to stop");
+        MISC_HILOGD("No vibration, no need to stop");
         return ERROR;
     }
     while (vibratorHdiConnection_.IsVibratorRunning()) {
@@ -248,7 +248,7 @@ int32_t MiscdeviceService::StopVibrator(int32_t vibratorId)
     }
 #else
     if ((vibratorThread_ == nullptr) || (!vibratorThread_->IsRunning())) {
-        MISC_HILOGE("No vibration, no need to stop");
+        MISC_HILOGD("No vibration, no need to stop");
         return ERROR;
     }
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
@@ -260,7 +260,7 @@ int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::str
     int32_t count, int32_t usage)
 {
     std::string packageName = GetPackageName(GetCallingTokenID());
-    MISC_HILOGI("Start vibrator effect, effect:%{public}s, count:%{public}d, usage:%{public}d, package:%{public}s",
+    MISC_HILOGD("Start vibrator effect, effect:%{public}s, count:%{public}d, usage:%{public}d, package:%{public}s",
         effect.c_str(), count, usage, packageName.c_str());
     if ((count < MIN_VIBRATOR_COUNT) || (count > MAX_VIBRATOR_COUNT) || (usage >= USAGE_MAX) || (usage < 0)) {
         MISC_HILOGE("Invalid parameter");
@@ -323,15 +323,15 @@ void MiscdeviceService::StopVibrateThread()
 int32_t MiscdeviceService::StopVibrator(int32_t vibratorId, const std::string &mode)
 {
     std::string packageName = GetPackageName(GetCallingTokenID());
-    MISC_HILOGI("Stop vibrator, mode:%{public}s, package:%{public}s", mode.c_str(), packageName.c_str());
+    MISC_HILOGD("Stop vibrator, mode:%{public}s, package:%{public}s", mode.c_str(), packageName.c_str());
     std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
     if ((vibratorThread_ == nullptr) || (!vibratorThread_->IsRunning())) {
-        MISC_HILOGE("No vibration, no need to stop");
+        MISC_HILOGD("No vibration, no need to stop");
         return ERROR;
     }
     const VibrateInfo info = vibratorThread_->GetCurrentVibrateInfo();
     if (info.mode != mode) {
-        MISC_HILOGE("Stop vibration information mismatch");
+        MISC_HILOGD("Stop vibration information mismatch");
         return ERROR;
     }
     StopVibrateThread();
@@ -354,7 +354,7 @@ int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, const RawFileD
     const VibrateParameter &parameter)
 {
     std::string packageName = GetPackageName(GetCallingTokenID());
-    MISC_HILOGI("Start vibrator custom, usage:%{public}d, package:%{public}s", usage, packageName.c_str());
+    MISC_HILOGD("Start vibrator custom, usage:%{public}d, package:%{public}s", usage, packageName.c_str());
     if (OHOS::system::GetDeviceType() != PHONE_TYPE) {
         MISC_HILOGE("The device does not support this operation");
         return IS_NOT_SUPPORTED;
@@ -506,7 +506,7 @@ int32_t MiscdeviceService::PlayPattern(const VibratePattern &pattern, int32_t us
     const VibrateParameter &parameter)
 {
     std::string packageName = GetPackageName(GetCallingTokenID());
-    MISC_HILOGI("Start vibrator pattern, usage:%{public}d, package:%{public}s", usage, packageName.c_str());
+    MISC_HILOGD("Start vibrator pattern, usage:%{public}d, package:%{public}s", usage, packageName.c_str());
     if ((usage >= USAGE_MAX) || (usage < 0) || (!CheckVibratorParmeters(parameter))) {
         MISC_HILOGE("Invalid parameter, usage:%{public}d", usage);
         return PARAMETER_ERROR;
@@ -555,7 +555,7 @@ int32_t MiscdeviceService::PlayPattern(const VibratePattern &pattern, int32_t us
 int32_t MiscdeviceService::GetDelayTime(int32_t &delayTime)
 {
     std::string packageName = GetPackageName(GetCallingTokenID());
-    MISC_HILOGI("GetDelayTime, package:%{public}s", packageName.c_str());
+    MISC_HILOGD("GetDelayTime, package:%{public}s", packageName.c_str());
     return vibratorHdiConnection_.GetDelayTime(g_capacity.GetVibrateMode(), delayTime);
 }
 
@@ -572,11 +572,11 @@ bool MiscdeviceService::CheckVibratorParmeters(const VibrateParameter &parameter
 
 void MiscdeviceService::MergeVibratorParmeters(const VibrateParameter &parameter, VibratePackage &package)
 {
-    parameter.Dump();
     if ((parameter.intensity == INTENSITY_ADJUST_MAX) && (parameter.frequency == 0)) {
-        MISC_HILOGI("The adjust parameter is not need to merge");
+        MISC_HILOGD("The adjust parameter is not need to merge");
         return;
     }
+    parameter.Dump();
     for (VibratePattern &pattern : package.patterns) {
         for (VibrateEvent &event : pattern.events) {
             float intensityScale = static_cast<float>(parameter.intensity) / INTENSITY_ADJUST_MAX;
