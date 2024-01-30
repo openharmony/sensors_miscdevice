@@ -59,7 +59,7 @@ void VibratorCapacity::Dump() const
     std::string isSupportHdHapticStr = isSupportHdHaptic ? "true" : "false";
     std::string isSupportPresetMappingStr = isSupportPresetMapping ? "true" : "false";
     std::string isSupportTimeDelayStr = isSupportTimeDelay ? "true" : "false";
-    MISC_HILOGI("SupportHdHaptic:%{public}s, SupportPresetMapping:%{public}s, "
+    MISC_HILOGD("SupportHdHaptic:%{public}s, SupportPresetMapping:%{public}s, "
         "SupportTimeDelayStr:%{public}s", isSupportHdHapticStr.c_str(),
         isSupportPresetMappingStr.c_str(), isSupportTimeDelayStr.c_str());
 }
