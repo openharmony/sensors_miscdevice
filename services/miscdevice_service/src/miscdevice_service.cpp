@@ -301,7 +301,7 @@ void MiscdeviceService::StartVibrateThread(VibrateInfo info)
     }
     StopVibrateThread();
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    while (vibratorHdiConnection_.IsVibratorRunning()) {
+    if (vibratorHdiConnection_.IsVibratorRunning()) {
         vibratorHdiConnection_.Stop(HDF_VIBRATOR_MODE_PRESET);
     }
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
