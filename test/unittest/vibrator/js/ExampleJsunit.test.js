@@ -27,9 +27,19 @@ describe("VibratorJsTest", function () {
          * @tc.setup: setup invoked before all testcases
          */
         console.info('beforeAll called')
-        if (deviceInfo.deviceType != "phone") {
-            g_execute = false;
-        }
+        vibrator.isSupportEffect(EFFECT_ID).then((state) => {
+            expect(true).assertTrue();
+            g_execute = state;
+            if (g_execute) {
+                console.info('this device is supportEffect')
+            } else {
+                console.info('this device is not supportEffect')
+            }
+            resolve();
+        }, (error) => {
+            expect(false).assertTrue();
+            reject(error);
+        });
     })
     
     afterAll(function() {
