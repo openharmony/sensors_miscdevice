@@ -96,20 +96,29 @@ enum {
 
 class InnerFunctionTracer {
 public:
-    InnerFunctionTracer(const char *func)
-        : func_ { func }
+    InnerFunctionTracer(const char *func, const char *tag)
+        : func_ { func }, tag_ { tag }
     {
-        HILOG_DEBUG(LOG_CORE, "in %{public}s, enter", func_);
+        if (HiLogIsLoggable(LOG_DOMAIN, tag_, LOG_DEBUG)) {
+            if (func_ != nullptr && tag_ != nullptr) {
+                HILOG_IMPL(LOG_CORE, LOG_DEBUG, LOG_DOMAIN, tag_, "in %{public}s, enter", func_);
+            }
+        }
     }
     ~InnerFunctionTracer()
     {
-        HILOG_DEBUG(LOG_CORE, "in %{public}s, leave", func_);
+        if (HiLogIsLoggable(LOG_DOMAIN, tag_, LOG_DEBUG)) {
+            if (func_ != nullptr && tag_ != nullptr) {
+                HILOG_IMPL(LOG_CORE, LOG_DEBUG, LOG_DOMAIN, tag_, "in %{public}s, leave", func_);
+            }
+        }
     }
 private:
     const char *func_ { nullptr };
+    const char *tag_ { nullptr };
 };
 
-#define CALL_LOG_ENTER   InnerFunctionTracer ___innerFuncTracer___ { __FUNCTION__ }
+#define CALL_LOG_ENTER   InnerFunctionTracer ___innerFuncTracer___ { __FUNCTION__, LOG_TAG }
 
 #ifdef DEBUG_CODE_TEST
 #define CHKPL(cond, ...) \
