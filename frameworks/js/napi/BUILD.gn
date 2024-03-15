@@ -19,7 +19,6 @@ ohos_shared_library("vibrator") {
     "$SUBSYSTEM_DIR/interfaces/inner_api/vibrator",
     "$SUBSYSTEM_DIR/frameworks/js/napi/vibrator/include",
     "$SUBSYSTEM_DIR/utils/common/include",
-    "//third_party/node/src",
   ]
   defines = [
     "APP_LOG_TAG = \"vibratorJs\"",

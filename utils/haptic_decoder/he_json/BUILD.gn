@@ -34,12 +34,12 @@ ohos_shared_library("libhe_vibrator_decoder") {
     "include",
     "$SUBSYSTEM_DIR/utils/common/include",
     "$SUBSYSTEM_DIR/utils/haptic_decoder/interface",
-    "//third_party/cJSON",
+    "$THERD_PARTY_CJSON",
   ]
 
   deps = [
     "$SUBSYSTEM_DIR/utils/common:libmiscdevice_utils",
-    "//third_party/cJSON:cjson",
+    "$THERD_PARTY_CJSON:cjson",
   ]
 
   external_deps = [
