@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -59,6 +59,7 @@ public:
     bool IsValid(int32_t lightId);
     bool IsLightAnimationValid(const LightAnimationIPC &animation);
     int32_t Dump(int32_t fd, const std::vector<std::u16string> &args) override;
+    void ProcessDeathObserver(const wptr<IRemoteObject> &object);
     virtual int32_t Vibrate(int32_t vibratorId, int32_t timeOut, int32_t usage) override;
     virtual int32_t PlayVibratorEffect(int32_t vibratorId, const std::string &effect,
                                        int32_t loopCount, int32_t usage) override;
@@ -75,6 +76,7 @@ public:
     virtual int32_t PlayPattern(const VibratePattern &pattern, int32_t usage,
         const VibrateParameter &parameter) override;
     virtual int32_t GetDelayTime(int32_t &delayTime) override;
+    virtual int32_t TransferClientRemoteObject(const sptr<IRemoteObject> &vibratorServiceClient) override;
 
 private:
     DISALLOW_COPY_AND_MOVE(MiscdeviceService);
@@ -87,6 +89,11 @@ private:
     void MergeVibratorParmeters(const VibrateParameter &parameter, VibratePackage &package);
     bool CheckVibratorParmeters(const VibrateParameter &parameter);
     bool InitLightList();
+    void RegisterClientDeathRecipient(sptr<IRemoteObject> vibratorServiceClient, int32_t pid);
+    void UnregisterClientDeathRecipient(sptr<IRemoteObject> vibratorServiceClient);
+    void SaveClientPid(const sptr<IRemoteObject> &vibratorServiceClient, int32_t pid);
+    int32_t FindClientPid(const sptr<IRemoteObject> &vibratorServiceClient);
+    void DestroyClientPid(const sptr<IRemoteObject> &vibratorServiceClient);
     VibratorHdiConnection &vibratorHdiConnection_ = VibratorHdiConnection::GetInstance();
     LightHdiConnection &lightHdiConnection_ = LightHdiConnection::GetInstance();
     bool lightExist_;
@@ -96,6 +103,10 @@ private:
     MiscdeviceServiceState state_;
     std::shared_ptr<VibratorThread> vibratorThread_ = nullptr;
     std::mutex vibratorThreadMutex_;
+    sptr<IRemoteObject::DeathRecipient> clientDeathObserver_ = nullptr;
+    std::mutex clientDeathObserverMutex_;
+    std::map<sptr<IRemoteObject>, int32_t> clientPidMap_;
+    std::mutex clientPidMapMutex_;
 };
 }  // namespace Sensors
 }  // namespace OHOS

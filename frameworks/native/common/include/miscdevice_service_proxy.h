@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -43,6 +43,7 @@ public:
     virtual int32_t GetDelayTime(int32_t &delayTime) override;
     virtual int32_t PlayPattern(const VibratePattern &pattern, int32_t usage,
         const VibrateParameter &parameter) override;
+    virtual int32_t TransferClientRemoteObject(const sptr<IRemoteObject> &vibratorClient) override;
 
 private:
     DISALLOW_COPY_AND_MOVE(MiscdeviceServiceProxy);

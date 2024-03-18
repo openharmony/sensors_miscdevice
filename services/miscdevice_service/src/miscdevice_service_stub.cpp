@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -64,6 +64,8 @@ MiscdeviceServiceStub::MiscdeviceServiceStub()
         &MiscdeviceServiceStub::PlayPatternStub;
     baseFuncs_[static_cast<uint32_t>(MiscdeviceInterfaceCode::GET_DELAY_TIME)] =
         &MiscdeviceServiceStub::GetDelayTimeStub;
+    baseFuncs_[static_cast<uint32_t>(MiscdeviceInterfaceCode::TRANSFER_CLIENT_REMOTE_OBJECT)] =
+        &MiscdeviceServiceStub::TransferClientRemoteObjectStub;
 }
 
 MiscdeviceServiceStub::~MiscdeviceServiceStub()
@@ -337,6 +339,17 @@ int32_t MiscdeviceServiceStub::GetDelayTimeStub(MessageParcel &data, MessageParc
         return ERROR;
     }
     return NO_ERROR;
+}
+
+int32_t MiscdeviceServiceStub::TransferClientRemoteObjectStub(MessageParcel &data, MessageParcel &reply)
+{
+    CALL_LOG_ENTER;
+    sptr<IRemoteObject> vibratorServiceClient = data.ReadRemoteObject();
+    if (vibratorServiceClient == nullptr) {
+        MISC_HILOGE("vibratorServiceClient is null");
+        return ERROR;
+    }
+    return TransferClientRemoteObject(vibratorServiceClient);
 }
 }  // namespace Sensors
 }  // namespace OHOS
