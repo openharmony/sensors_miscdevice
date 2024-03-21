@@ -33,16 +33,6 @@ using Security::AccessToken::AccessTokenID;
 
 namespace {
 constexpr int32_t TIME_WAIT_FOR_OP = 2;
-PermissionDef g_infoManagerTestPermDef = {
-    .permissionName = "ohos.permission.SYSTEM_LIGHT_CONTROL",
-    .bundleName = "accesstoken_test",
-    .grantMode = 1,
-    .label = "label",
-    .labelId = 1,
-    .description = "test light agent",
-    .descriptionId = 1,
-    .availableLevel = APL_NORMAL
-};
 
 PermissionStateFull g_infoManagerTestState = {
     .grantFlags = {1},
@@ -55,7 +45,7 @@ PermissionStateFull g_infoManagerTestState = {
 HapPolicyParams g_infoManagerTestPolicyPrams = {
     .apl = APL_NORMAL,
     .domain = "test.domain",
-    .permList = {g_infoManagerTestPermDef},
+    .permList = {},
     .permStateList = {g_infoManagerTestState}
 };
 
