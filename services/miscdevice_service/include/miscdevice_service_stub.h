@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -58,6 +58,7 @@ private:
     bool CheckVibratePermission();
     int32_t PlayPatternStub(MessageParcel &data, MessageParcel &reply);
     int32_t GetDelayTimeStub(MessageParcel &data, MessageParcel &reply);
+    int32_t TransferClientRemoteObjectStub(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, MiscBaseFunc> baseFuncs_;
 };
 }  // namespace Sensors

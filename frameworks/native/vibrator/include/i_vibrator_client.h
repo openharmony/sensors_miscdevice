@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,28 +13,19 @@
  * limitations under the License.
  */
 
-#ifndef SENSORS_IPC_INTERFACE_CODE_H
-#define SENSORS_IPC_INTERFACE_CODE_H
+#ifndef I_VIBRATOR_CLIENT_H
+#define I_VIBRATOR_CLIENT_H
 
-/* SAID:3602 */
+#include "iremote_broker.h"
+
 namespace OHOS {
 namespace Sensors {
-enum class MiscdeviceInterfaceCode {
-    VIBRATE = 0,
-    PLAY_VIBRATOR_EFFECT,
-#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    PLAY_VIBRATOR_CUSTOM,
-#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    STOP_VIBRATOR_ALL,
-    STOP_VIBRATOR_BY_MODE,
-    IS_SUPPORT_EFFECT,
-    GET_LIGHT_LIST,
-    TURN_ON,
-    TURN_OFF,
-    PlAY_PATTERN,
-    GET_DELAY_TIME,
-    TRANSFER_CLIENT_REMOTE_OBJECT,
+class IVibratorClient : public IRemoteBroker {
+public:
+    IVibratorClient() = default;
+    virtual ~IVibratorClient() = default;
+    DECLARE_INTERFACE_DESCRIPTOR(u"IVibratorClient");
 };
 }  // namespace Sensors
 }  // namespace OHOS
-#endif  // SENSORS_IPC_INTERFACE_CODE_H
+#endif // I_VIBRATOR_CLIENT_H

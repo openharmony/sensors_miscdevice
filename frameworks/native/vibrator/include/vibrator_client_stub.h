@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,28 +13,22 @@
  * limitations under the License.
  */
 
-#ifndef SENSORS_IPC_INTERFACE_CODE_H
-#define SENSORS_IPC_INTERFACE_CODE_H
+#ifndef VIBRATOR_CLIENT_STUB_H
+#define VIBRATOR_CLIENT_STUB_H
 
-/* SAID:3602 */
+#include "message_parcel.h"
+#include "iremote_stub.h"
+#include "i_vibrator_client.h"
+
 namespace OHOS {
 namespace Sensors {
-enum class MiscdeviceInterfaceCode {
-    VIBRATE = 0,
-    PLAY_VIBRATOR_EFFECT,
-#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    PLAY_VIBRATOR_CUSTOM,
-#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    STOP_VIBRATOR_ALL,
-    STOP_VIBRATOR_BY_MODE,
-    IS_SUPPORT_EFFECT,
-    GET_LIGHT_LIST,
-    TURN_ON,
-    TURN_OFF,
-    PlAY_PATTERN,
-    GET_DELAY_TIME,
-    TRANSFER_CLIENT_REMOTE_OBJECT,
+class VibratorClientStub : public IRemoteStub<IVibratorClient> {
+public:
+    VibratorClientStub() = default;
+    virtual ~VibratorClientStub() = default;
+    virtual int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
+        MessageOption &option) override;
 };
 }  // namespace Sensors
 }  // namespace OHOS
-#endif  // SENSORS_IPC_INTERFACE_CODE_H
+#endif // VIBRATOR_CLIENT_STUB_H
