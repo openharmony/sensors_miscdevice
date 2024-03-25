@@ -248,7 +248,7 @@ int32_t MiscdeviceService::StopVibrator(int32_t vibratorId)
         MISC_HILOGD("No vibration, no need to stop");
         return ERROR;
     }
-    while (vibratorHdiConnection_.IsVibratorRunning()) {
+    if (vibratorHdiConnection_.IsVibratorRunning()) {
         vibratorHdiConnection_.Stop(HDF_VIBRATOR_MODE_PRESET);
     }
 #else
