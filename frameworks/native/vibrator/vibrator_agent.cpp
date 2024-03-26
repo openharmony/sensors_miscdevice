@@ -239,5 +239,19 @@ bool SetParameters(const VibratorParameter &parameter)
     g_vibratorParameter = parameter;
     return true;
 }
+
+int32_t PlayPrimitiveEffect(const char *effectId, int32_t intensity)
+{
+    MISC_HILOGD("Time delay measurement:start time");
+    CHKPR(effectId, PARAMETER_ERROR);
+    auto &client = VibratorServiceClient::GetInstance();
+    int32_t ret = client.Vibrate(DEFAULT_VIBRATOR_ID, effectId, intensity, g_usage);
+    g_usage = USAGE_UNKNOWN;
+    if (ret != ERR_OK) {
+        MISC_HILOGE("Play primitive effect failed, ret:%{public}d", ret);
+        return NormalizeErrCode(ret);
+    }
+    return SUCCESS;
+}
 }  // namespace Sensors
 }  // namespace OHOS

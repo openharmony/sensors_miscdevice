@@ -40,6 +40,7 @@ public:
     int32_t GetVibratorCapacity(VibratorCapacity &capacity) override;
     int32_t PlayPattern(const VibratePattern &pattern) override;
     int32_t DestroyHdiConnection() override;
+    int32_t StartByIntensity(const std::string &effect, int32_t intensity) override;
 
 private:
     DISALLOW_COPY_AND_MOVE(CompatibleConnection);

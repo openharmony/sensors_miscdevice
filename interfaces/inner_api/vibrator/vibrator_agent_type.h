@@ -77,6 +77,27 @@ const char *VIBRATOR_TYPE_SLIDE_LIGHT = "haptic.slide.light";
 const char *VIBRATOR_TYPE_THRESHOID = "haptic.threshold";
 
 /**
+ * @brief Describes the hard vibration effect of the vibrator.
+ *
+ * @since 12
+ */
+const char *VIBRATOR_TYPE_HARD = "haptic.effect.hard";
+
+/**
+ * @brief Describes the soft vibration effect of the vibrator.
+ *
+ * @since 12
+ */
+const char *VIBRATOR_TYPE_SOFT = "haptic.effect.soft";
+
+/**
+ * @brief Describes the sharp vibration effect of the vibrator.
+ *
+ * @since 12
+ */
+const char *VIBRATOR_TYPE_SHARP = "haptic.effect.sharp";
+
+/**
  * @brief Enumerates vibration usages.
  *
  * @since 9

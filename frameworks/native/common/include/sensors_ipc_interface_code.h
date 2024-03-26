@@ -34,6 +34,7 @@ enum class MiscdeviceInterfaceCode {
     PlAY_PATTERN,
     GET_DELAY_TIME,
     TRANSFER_CLIENT_REMOTE_OBJECT,
+    PLAY_PRIMITIVE_EFFECT,
 };
 }  // namespace Sensors
 }  // namespace OHOS

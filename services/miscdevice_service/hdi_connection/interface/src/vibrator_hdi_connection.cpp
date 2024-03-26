@@ -146,5 +146,18 @@ int32_t VibratorHdiConnection::DestroyHdiConnection()
     }
     return ERR_OK;
 }
+
+int32_t VibratorHdiConnection::StartByIntensity(const std::string &effect, int32_t intensity)
+{
+    CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
+    StartTrace(HITRACE_TAG_SENSORS, "StartByIntensity");
+    int32_t ret = iVibratorHdiConnection_->StartByIntensity(effect, intensity);
+    FinishTrace(HITRACE_TAG_SENSORS);
+    if (ret != 0) {
+        MISC_HILOGE("StartByIntensity failed");
+        return VIBRATOR_ON_ERR;
+    }
+    return ERR_OK;
+}
 }  // namespace Sensors
 }  // namespace OHOS

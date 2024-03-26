@@ -63,6 +63,7 @@ public:
     virtual int32_t GetDelayTime(int32_t mode, int32_t &delayTime) = 0;
     virtual int32_t GetVibratorCapacity(VibratorCapacity &capacity) = 0;
     virtual int32_t PlayPattern(const VibratePattern &pattern) = 0;
+    virtual int32_t StartByIntensity(const std::string &effect, int32_t intensity) = 0;
 
 private:
     DISALLOW_COPY_AND_MOVE(IVibratorHdiConnection);
