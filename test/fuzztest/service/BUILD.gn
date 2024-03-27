@@ -25,13 +25,11 @@ group("fuzztest") {
     "playvibratoreffectstub_fuzzer:fuzztest",
     "stopvibratorallstub_fuzzer:fuzztest",
     "stopvibratorbymodestub_fuzzer:fuzztest",
+    "transferclientremoteobjectstub_fuzzer:fuzztest",
     "turnoffstub_fuzzer:fuzztest",
     "turnonstub_fuzzer:fuzztest",
     "vibratestub_fuzzer:fuzztest",
     "vibratoronremoterequest_fuzzer:fuzztest",
-    "vibratestub_fuzzer:fuzztest",
-    "vibratoronremoterequest_fuzzer:fuzztest",
-    "transferclientremoteobjectstub_fuzzer:fuzztest",
   ]
 
   if (miscdevice_feature_vibrator_custom) {
