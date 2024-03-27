@@ -34,10 +34,10 @@ ohos_shared_library("libmiscdevice_utils") {
 
   include_dirs = [
     "include",
-    "//third_party/cJSON",
+    "$THERD_PARTY_CJSON",
   ]
 
-  deps = [ "//third_party/cJSON:cjson" ]
+  deps = [ "$THERD_PARTY_CJSON:cjson" ]
 
   external_deps = [
     "access_token:libaccesstoken_sdk",

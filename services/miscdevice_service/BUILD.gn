@@ -39,7 +39,7 @@ ohos_shared_library("libmiscdevice_service") {
     "$SUBSYSTEM_DIR/utils/common/include",
     "$SUBSYSTEM_DIR/utils/haptic_decoder/interface",
     "$SUBSYSTEM_DIR/utils/haptic_decoder/oh_json/include",
-    "//third_party/cJSON",
+    "$THERD_PARTY_CJSON",
   ]
 
   if (miscdevice_build_eng) {
@@ -115,7 +115,7 @@ ohos_shared_library("libmiscdevice_service_static") {
     "$SUBSYSTEM_DIR/utils/common/include",
     "$SUBSYSTEM_DIR/utils/haptic_decoder/interface",
     "$SUBSYSTEM_DIR/utils/haptic_decoder/oh_json/include",
-    "//third_party/cJSON",
+    "$THERD_PARTY_CJSON",
   ]
 
   if (miscdevice_build_eng) {
