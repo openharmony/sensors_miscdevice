@@ -29,6 +29,9 @@ group("fuzztest") {
     "turnonstub_fuzzer:fuzztest",
     "vibratestub_fuzzer:fuzztest",
     "vibratoronremoterequest_fuzzer:fuzztest",
+    "vibratestub_fuzzer:fuzztest",
+    "vibratoronremoterequest_fuzzer:fuzztest",
+    "transferclientremoteobjectstub_fuzzer:fuzztest",
   ]
 
   if (miscdevice_feature_vibrator_custom) {
