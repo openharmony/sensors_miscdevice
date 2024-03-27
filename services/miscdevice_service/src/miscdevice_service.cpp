@@ -180,11 +180,11 @@ bool MiscdeviceService::IsLightAnimationValid(const LightAnimationIPC &animation
     int32_t onTime = animation.GetOnTime();
     int32_t offTime = animation.GetOffTime();
     if ((mode < 0) || (mode >= LIGHT_MODE_BUTT)) {
-        MISC_HILOGE("animation mode is invalid, mode:%{pubilc}d", mode);
+        MISC_HILOGE("animation mode is invalid, mode:%{public}d", mode);
         return false;
     }
     if ((onTime < 0) || (offTime < 0)) {
-        MISC_HILOGE("animation onTime or offTime is invalid, onTime:%{pubilc}d, offTime:%{pubilc}d",
+        MISC_HILOGE("animation onTime or offTime is invalid, onTime:%{public}d, offTime:%{public}d",
             onTime,  offTime);
         return false;
     }
@@ -454,7 +454,7 @@ int32_t MiscdeviceService::TurnOn(int32_t lightId, const LightColor &color, cons
     std::string packageName = GetPackageName(GetCallingTokenID());
     MISC_HILOGI("TurnOn, package:%{public}s", packageName.c_str());
     if (!IsValid(lightId)) {
-        MISC_HILOGE("lightId is invalid, lightId:%{pubilc}d", lightId);
+        MISC_HILOGE("lightId is invalid, lightId:%{public}d", lightId);
         return MISCDEVICE_NATIVE_SAM_ERR;
     }
     if (!IsLightAnimationValid(animation)) {
@@ -474,7 +474,7 @@ int32_t MiscdeviceService::TurnOff(int32_t lightId)
     std::string packageName = GetPackageName(GetCallingTokenID());
     MISC_HILOGI("TurnOff, package:%{public}s", packageName.c_str());
     if (!IsValid(lightId)) {
-        MISC_HILOGE("lightId is invalid, lightId:%{pubilc}d", lightId);
+        MISC_HILOGE("lightId is invalid, lightId:%{public}d", lightId);
         return MISCDEVICE_NATIVE_SAM_ERR;
     }
     int32_t ret = lightHdiConnection_.TurnOff(lightId);

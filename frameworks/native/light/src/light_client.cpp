@@ -125,11 +125,11 @@ bool LightClient::IsLightAnimationValid(const LightAnimation &animation)
 {
     CALL_LOG_ENTER;
     if ((animation.mode < 0) || (animation.mode >= LIGHT_MODE_BUTT)) {
-        MISC_HILOGE("animation mode is invalid, mode:%{pubilc}d", animation.mode);
+        MISC_HILOGE("animation mode is invalid, mode:%{public}d", animation.mode);
         return false;
     }
     if ((animation.onTime < 0) || (animation.offTime < 0)) {
-        MISC_HILOGE("animation onTime or offTime is invalid, onTime:%{pubilc}d, offTime:%{pubilc}d",
+        MISC_HILOGE("animation onTime or offTime is invalid, onTime:%{public}d, offTime:%{public}d",
             animation.onTime, animation.offTime);
         return false;
     }
@@ -140,7 +140,7 @@ int32_t LightClient::TurnOn(int32_t lightId, const LightColor &color, const Ligh
 {
     CALL_LOG_ENTER;
     if (!IsLightIdValid(lightId)) {
-        MISC_HILOGE("lightId is invalid, lightId:%{pubilc}d", lightId);
+        MISC_HILOGE("lightId is invalid, lightId:%{public}d", lightId);
         return PARAMETER_ERROR;
     }
     if (!IsLightAnimationValid(animation)) {
@@ -159,7 +159,7 @@ int32_t LightClient::TurnOff(int32_t lightId)
 {
     CALL_LOG_ENTER;
     if (!IsLightIdValid(lightId)) {
-        MISC_HILOGE("lightId is invalid, lightId:%{pubilc}d", lightId);
+        MISC_HILOGE("lightId is invalid, lightId:%{public}d", lightId);
         return LIGHT_ID_NOT_SUPPORT;
     }
     CHKPR(miscdeviceProxy_, ERROR);
