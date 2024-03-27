@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "vibratestub_fuzzer.h"
+#include "transferclientremoteobjectstub_fuzzer.h"
 
 #include <cstddef>
 #include <cstdint>
