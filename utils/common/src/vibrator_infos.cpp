@@ -147,6 +147,10 @@ std::optional<VibratePattern> VibratePattern::Unmarshalling(Parcel &data)
         MISC_HILOGE("Read eventSize failed");
         return std::nullopt;
     }
+    if (eventSize > MAX_EVENT_SIZE) {
+        MISC_HILOGE("eventSize exceed the maximum");
+        return std::nullopt;
+    }
     for (int32_t i = 0; i < eventSize; ++i) {
         VibrateEvent event;
         int32_t tag { -1 };
@@ -178,6 +182,10 @@ std::optional<VibratePattern> VibratePattern::Unmarshalling(Parcel &data)
         int32_t pointSize { 0 };
         if (!data.ReadInt32(pointSize)) {
             MISC_HILOGE("Read pointSize failed");
+            return std::nullopt;
+        }
+        if (pointSize > MAX_POINT_SIZE) {
+            MISC_HILOGE("pointSize exceed the maximum");
             return std::nullopt;
         }
         pattern.events.emplace_back(event);

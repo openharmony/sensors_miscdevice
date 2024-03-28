@@ -23,6 +23,8 @@
 #include "parcel.h"
 namespace OHOS {
 namespace Sensors {
+constexpr int32_t MAX_EVENT_SIZE = 16;
+constexpr int32_t MAX_POINT_SIZE = 16;
 const std::string VIBRATE_BUTT = "butt";
 const std::string VIBRATE_TIME = "time";
 const std::string VIBRATE_PRESET = "preset";

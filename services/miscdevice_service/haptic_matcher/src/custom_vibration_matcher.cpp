@@ -51,6 +51,7 @@ constexpr int32_t DURATION_MAX = 1600;
 constexpr float CURVE_INTENSITY_SCALE = 100.00;
 constexpr int32_t SLICE_STEP = 50;
 constexpr int32_t CONTINUOUS_VIBRATION_DURATION_MIN = 15;
+constexpr int32_t INDEX_MIN_RESTRICT = 1;
 }  // namespace
 
 int32_t CustomVibrationMatcher::TransformTime(const VibratePackage &package,
@@ -251,6 +252,10 @@ void CustomVibrationMatcher::ProcessContinuousEvent(const VibrateEvent &event, i
         }
         while (curve[i].time < nextTime) {
             ++i;
+        }
+        if (i < INDEX_MIN_RESTRICT) {
+            curTime = nextTime;
+            continue;
         }
         nextIntensity = Interpolation(curve[i - 1].time, curve[i].time, curve[i - 1].intensity, curve[i].intensity,
             nextTime);
