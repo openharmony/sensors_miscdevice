@@ -26,6 +26,8 @@ group("fuzztest") {
     "stopvibratorallstub_fuzzer:fuzztest",
     "stopvibratorbymodestub_fuzzer:fuzztest",
     "transferclientremoteobjectstub_fuzzer:fuzztest",
+    "getdelaytimestub_fuzzer:fuzztest",
+    "playpatternstub_fuzzer:fuzztest",
     "turnoffstub_fuzzer:fuzztest",
     "turnonstub_fuzzer:fuzztest",
     "vibratestub_fuzzer:fuzztest",
