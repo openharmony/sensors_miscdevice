@@ -37,16 +37,6 @@ using Security::AccessToken::AccessTokenID;
 namespace {
 uint32_t g_duration = 300;
 constexpr int32_t TIME_WAIT_FOR_OP = 2;
-PermissionDef infoManagerTestPermDef_ = {
-    .permissionName = "ohos.permission.VIBRATE",
-    .bundleName = "accesstoken_test",
-    .grantMode = 1,
-    .label = "label",
-    .labelId = 1,
-    .description = "native vibrator test",
-    .descriptionId = 1,
-    .availableLevel = APL_NORMAL
-};
 
 PermissionStateFull infoManagerTestState_ = {
     .grantFlags = {1},
@@ -59,7 +49,7 @@ PermissionStateFull infoManagerTestState_ = {
 HapPolicyParams infoManagerTestPolicyPrams_ = {
     .apl = APL_NORMAL,
     .domain = "test.domain",
-    .permList = {infoManagerTestPermDef_},
+    .permList = {},
     .permStateList = {infoManagerTestState_}
 };
 
