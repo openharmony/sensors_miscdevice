@@ -364,10 +364,10 @@ int32_t MiscdeviceServiceStub::PlayPrimitiveEffectStub(MessageParcel &data, Mess
         MISC_HILOGE("CheckVibratePermission failed, ret:%{public}d", ret);
         return PERMISSION_DENIED;
     }
-    int32_t vibratorId;
+    int32_t vibratorId = 0;
     std::string effect;
-    int32_t intensity;
-    int32_t usage;
+    int32_t intensity = 0;
+    int32_t usage = 0;
     if ((!data.ReadInt32(vibratorId)) || (!data.ReadString(effect)) ||
         (!data.ReadInt32(intensity)) || (!data.ReadInt32(usage))) {
         MISC_HILOGE("Parcel read failed");
