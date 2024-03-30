@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -238,6 +238,20 @@ bool SetParameters(const VibratorParameter &parameter)
     }
     g_vibratorParameter = parameter;
     return true;
+}
+
+int32_t PlayPrimitiveEffect(const char *effectId, int32_t intensity)
+{
+    MISC_HILOGD("Time delay measurement:start time");
+    CHKPR(effectId, PARAMETER_ERROR);
+    auto &client = VibratorServiceClient::GetInstance();
+    int32_t ret = client.Vibrate(DEFAULT_VIBRATOR_ID, effectId, intensity, g_usage);
+    g_usage = USAGE_UNKNOWN;
+    if (ret != ERR_OK) {
+        MISC_HILOGE("Play primitive effect failed, ret:%{public}d", ret);
+        return NormalizeErrCode(ret);
+    }
+    return SUCCESS;
 }
 }  // namespace Sensors
 }  // namespace OHOS

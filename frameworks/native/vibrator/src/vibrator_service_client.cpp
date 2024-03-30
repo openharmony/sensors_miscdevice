@@ -449,5 +449,26 @@ int32_t VibratorServiceClient::FreeVibratorPackage(VibratorPackage &package)
     patterns = nullptr;
     return ERR_OK;
 }
+
+int32_t VibratorServiceClient::PlayPrimitiveEffect(int32_t vibratorId, const std::string &effect, int32_t intensity,
+    int32_t usage)
+{
+    MISC_HILOGD("Vibrate begin, effect:%{public}s, intensity:%{public}d, usage:%{public}d",
+        effect.c_str(), intensity, usage);
+    int32_t ret = InitServiceClient();
+    if (ret != ERR_OK) {
+        MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
+        return MISC_NATIVE_GET_SERVICE_ERR;
+    }
+    CHKPR(miscdeviceProxy_, ERROR);
+    StartTrace(HITRACE_TAG_SENSORS, "PlayPrimitiveEffect");
+    ret = miscdeviceProxy_->PlayPrimitiveEffect(vibratorId, effect, intensity, usage);
+    FinishTrace(HITRACE_TAG_SENSORS);
+    if (ret != ERR_OK) {
+        MISC_HILOGE("Play primitive effect failed, ret:%{public}d, effect:%{public}s, intensity:%{public}d,"
+            "usage:%{public}d", ret, effect.c_str(), intensity, usage);
+    }
+    return ret;
+}
 }  // namespace Sensors
 }  // namespace OHOS

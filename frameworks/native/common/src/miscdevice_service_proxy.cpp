@@ -416,5 +416,43 @@ int32_t MiscdeviceServiceProxy::TransferClientRemoteObject(const sptr<IRemoteObj
     }
     return ret;
 }
+
+int32_t MiscdeviceServiceProxy::PlayPrimitiveEffect(int32_t vibratorId, const std::string &effect, int32_t intensity,
+    int32_t usage)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MiscdeviceServiceProxy::GetDescriptor())) {
+        MISC_HILOGE("Write descriptor failed");
+        return WRITE_MSG_ERR;
+    }
+    if (!data.WriteInt32(vibratorId)) {
+        MISC_HILOGE("WriteInt32 vibratorId failed");
+        return WRITE_MSG_ERR;
+    }
+    if (!data.WriteString(effect)) {
+        MISC_HILOGE("WriteString effect failed");
+        return WRITE_MSG_ERR;
+    }
+    if (!data.WriteInt32(intensity)) {
+        MISC_HILOGE("WriteInt32 intensity failed");
+        return WRITE_MSG_ERR;
+    }
+    if (!data.WriteInt32(usage)) {
+        MISC_HILOGE("Writeint32 usage failed");
+        return WRITE_MSG_ERR;
+    }
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, ERROR);
+    MessageParcel reply;
+    MessageOption option;
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MiscdeviceInterfaceCode::PLAY_PRIMITIVE_EFFECT),
+        data, reply, option);
+    if (ret != NO_ERROR) {
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "PlayPrimitiveEffect", "ERROR_CODE", ret);
+        MISC_HILOGE("SendRequest failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
 }  // namespace Sensors
 }  // namespace OHOS

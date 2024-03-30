@@ -707,5 +707,41 @@ void MiscdeviceService::DestroyClientPid(const sptr<IRemoteObject> &vibratorServ
     }
     clientPidMap_.erase(it);
 }
+
+int32_t MiscdeviceService::PlayPrimitiveEffect(int32_t vibratorId, const std::string &effect,
+    int32_t intensity, int32_t usage)
+{
+    std::string packageName = GetPackageName(GetCallingTokenID());
+    MISC_HILOGD("Start vibrator effect, effect:%{public}s, intensity:%{public}d, usage:%{public}d, package:%{public}s",
+        effect.c_str(), intensity, usage, packageName.c_str());
+    if ((intensity <= INTENSITY_MIN) || (intensity > INTENSITY_MAX) || (usage >= USAGE_MAX) || (usage < 0)) {
+        MISC_HILOGE("Invalid parameter");
+        return PARAMETER_ERROR;
+    }
+    std::optional<HdfEffectInfo> effectInfo = vibratorHdiConnection_.GetEffectInfo(effect);
+    if (!effectInfo) {
+        MISC_HILOGE("GetEffectInfo fail");
+        return ERROR;
+    }
+    if (!(effectInfo->isSupportEffect)) {
+        MISC_HILOGE("Effect not supported");
+        return PARAMETER_ERROR;
+    }
+    VibrateInfo info = {
+        .mode = VIBRATE_BUTT,
+        .packageName = packageName,
+        .pid = GetCallingPid(),
+        .uid = GetCallingUid(),
+        .usage = usage,
+        .effect = effect,
+    };
+    std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
+    if (ShouldIgnoreVibrate(info)) {
+        MISC_HILOGE("Vibration is ignored and high priority is vibrating");
+        return ERROR;
+    }
+    StartVibrateThread(info);
+    return vibratorHdiConnection_.StartByIntensity(effect, intensity);
+}
 }  // namespace Sensors
 }  // namespace OHOS

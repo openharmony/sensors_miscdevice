@@ -66,6 +66,8 @@ MiscdeviceServiceStub::MiscdeviceServiceStub()
         &MiscdeviceServiceStub::GetDelayTimeStub;
     baseFuncs_[static_cast<uint32_t>(MiscdeviceInterfaceCode::TRANSFER_CLIENT_REMOTE_OBJECT)] =
         &MiscdeviceServiceStub::TransferClientRemoteObjectStub;
+    baseFuncs_[static_cast<uint32_t>(MiscdeviceInterfaceCode::PLAY_PRIMITIVE_EFFECT)] =
+        &MiscdeviceServiceStub::PlayPrimitiveEffectStub;
 }
 
 MiscdeviceServiceStub::~MiscdeviceServiceStub()
@@ -350,6 +352,28 @@ int32_t MiscdeviceServiceStub::TransferClientRemoteObjectStub(MessageParcel &dat
         return ERROR;
     }
     return TransferClientRemoteObject(vibratorServiceClient);
+}
+
+int32_t MiscdeviceServiceStub::PlayPrimitiveEffectStub(MessageParcel &data, MessageParcel &reply)
+{
+    PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
+    int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
+    if (ret != PERMISSION_GRANTED) {
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
+            HiSysEvent::EventType::SECURITY, "PKG_NAME", "PlayPrimitiveEffectStub", "ERROR_CODE", ret);
+        MISC_HILOGE("CheckVibratePermission failed, ret:%{public}d", ret);
+        return PERMISSION_DENIED;
+    }
+    int32_t vibratorId = 0;
+    std::string effect;
+    int32_t intensity = 0;
+    int32_t usage = 0;
+    if ((!data.ReadInt32(vibratorId)) || (!data.ReadString(effect)) ||
+        (!data.ReadInt32(intensity)) || (!data.ReadInt32(usage))) {
+        MISC_HILOGE("Parcel read failed");
+        return ERROR;
+    }
+    return PlayPrimitiveEffect(vibratorId, effect, intensity, usage);
 }
 }  // namespace Sensors
 }  // namespace OHOS

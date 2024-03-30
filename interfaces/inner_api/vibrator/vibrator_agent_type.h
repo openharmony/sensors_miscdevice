@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -75,6 +75,27 @@ const char *VIBRATOR_TYPE_SLIDE_LIGHT = "haptic.slide.light";
  * @since 11
  */
 const char *VIBRATOR_TYPE_THRESHOID = "haptic.threshold";
+
+/**
+ * @brief Describes the hard vibration effect of the vibrator.
+ *
+ * @since 12
+ */
+const char *VIBRATOR_TYPE_HARD = "haptic.effect.hard";
+
+/**
+ * @brief Describes the soft vibration effect of the vibrator.
+ *
+ * @since 12
+ */
+const char *VIBRATOR_TYPE_SOFT = "haptic.effect.soft";
+
+/**
+ * @brief Describes the sharp vibration effect of the vibrator.
+ *
+ * @since 12
+ */
+const char *VIBRATOR_TYPE_SHARP = "haptic.effect.sharp";
 
 /**
  * @brief Enumerates vibration usages.

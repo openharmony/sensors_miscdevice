@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -188,6 +188,19 @@ int32_t PlayPattern(const VibratorPattern &pattern);
  * @since 11
  */
 bool SetParameters(const VibratorParameter &parameter);
+
+/**
+ * @brief Control the vibrator to perform vibration with a preset vibration effect at a certain intensity.
+ *
+ * @param effectId Indicates the preset vibration effect, which is described in {@link vibrator_agent_type.h}, for
+ * example:
+ * {@link VIBRATOR_TYPE_HARD}: Describes the hard vibration effect of the vibrator.
+ * @param intensity Indicates the intensity of vibration, ranging from 1 to 100.
+ * @return Returns <b>0</b> if the vibrator vibrates as expected; otherwise indicates failure.
+ *
+ * @since 12
+ */
+int32_t PlayPrimitiveEffect(const char *effectId, int32_t intensity);
 } // namespace Sensors
 } // namespace OHOS
 #ifdef __cplusplus

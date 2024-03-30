@@ -44,6 +44,8 @@ public:
     virtual int32_t PlayPattern(const VibratePattern &pattern, int32_t usage,
         const VibrateParameter &parameter) override;
     virtual int32_t TransferClientRemoteObject(const sptr<IRemoteObject> &vibratorClient) override;
+    virtual int32_t PlayPrimitiveEffect(int32_t vibratorId, const std::string &effect, int32_t intensity,
+        int32_t usage) override;
 
 private:
     DISALLOW_COPY_AND_MOVE(MiscdeviceServiceProxy);

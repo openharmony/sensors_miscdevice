@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,7 +38,10 @@ std::unordered_map<std::string, int32_t> g_vibratorEffect = {
     {"haptic.slide.light", 10},
     {"haptic.long_press.light", 80},
     {"haptic.long_press.medium", 80},
-    {"haptic.long_press.heavy", 80}
+    {"haptic.long_press.heavy", 80},
+    {"haptic.effect.hard", 50},
+    {"haptic.effect.soft", 30},
+    {"haptic.effect.sharp", 20}
 };
 HdfVibratorMode g_vibrateMode;
 constexpr int32_t VIBRATE_DELAY_TIME = 10;
@@ -185,6 +188,23 @@ void CompatibleConnection::VibrateProcess()
     }
     isStop_ = true;
     return;
+}
+
+int32_t CompatibleConnection::StartByIntensity(const std::string &effect, int32_t intensity)
+{
+    CALL_LOG_ENTER;
+    if (g_vibratorEffect.find(effect) == g_vibratorEffect.end()) {
+        MISC_HILOGE("Do not support effectType:%{public}s", effect.c_str());
+        return VIBRATOR_ON_ERR;
+    }
+    duration_ = g_vibratorEffect[effect];
+    if (!vibrateThread_.joinable()) {
+        std::thread senocdDataThread(CompatibleConnection::VibrateProcess);
+        vibrateThread_ = std::move(senocdDataThread);
+        isStop_ = false;
+    }
+    g_vibrateMode = HDF_VIBRATOR_MODE_PRESET;
+    return ERR_OK;
 }
 }  // namespace Sensors
 }  // namespace OHOS

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -63,6 +63,7 @@ public:
     virtual int32_t GetDelayTime(int32_t mode, int32_t &delayTime) = 0;
     virtual int32_t GetVibratorCapacity(VibratorCapacity &capacity) = 0;
     virtual int32_t PlayPattern(const VibratePattern &pattern) = 0;
+    virtual int32_t StartByIntensity(const std::string &effect, int32_t intensity) = 0;
 
 private:
     DISALLOW_COPY_AND_MOVE(IVibratorHdiConnection);

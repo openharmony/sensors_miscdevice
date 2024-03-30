@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -257,6 +257,24 @@ void HdiConnection::Reconnect()
             HiSysEvent::EventType::FAULT, "PKG_NAME", "Reconnect", "ERROR_CODE", ret);
         MISC_HILOGE("Connect hdi fail");
     }
+}
+
+int32_t HdiConnection::StartByIntensity(const std::string &effect, int32_t intensity)
+{
+    MISC_HILOGD("Time delay measurement:end time, effect:%{public}s, intensity:%{public}d", effect.c_str(), intensity);
+    if (effect.empty()) {
+        MISC_HILOGE("effect is null");
+        return VIBRATOR_ON_ERR;
+    }
+    CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
+    int32_t ret = vibratorInterface_->StartByIntensity(effect, intensity);
+    if (ret < 0) {
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "StartByIntensity", "ERROR_CODE", ret);
+        MISC_HILOGE("StartByIntensity failed");
+        return ret;
+    }
+    return ERR_OK;
 }
 }  // namespace Sensors
 }  // namespace OHOS
