@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Huawei Device Co., Ltd.
+# Copyright (c) 2023-2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -20,11 +20,14 @@ group("fuzztest") {
   testonly = true
   deps = []
   deps += [
+    "getdelaytimestub_fuzzer:fuzztest",
     "getlightliststub_fuzzer:fuzztest",
     "issupporteffectstub_fuzzer:fuzztest",
+    "playpatternstub_fuzzer:fuzztest",
     "playvibratoreffectstub_fuzzer:fuzztest",
     "stopvibratorallstub_fuzzer:fuzztest",
     "stopvibratorbymodestub_fuzzer:fuzztest",
+    "transferclientremoteobjectstub_fuzzer:fuzztest",
     "turnoffstub_fuzzer:fuzztest",
     "turnonstub_fuzzer:fuzztest",
     "vibratestub_fuzzer:fuzztest",
