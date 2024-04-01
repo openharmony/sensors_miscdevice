@@ -24,8 +24,6 @@ SUBSYSTEM_DIR = "//base/sensors/miscdevice"
 
 FUZZ_MODULE_OUT_PATH = "miscdevice/miscdevice"
 
-THERD_PARTY_CJSON = "//third_party/cJSON"
-
 miscdevice_default_defines = []
 
 if (miscdevice_feature_vibrator_custom) {
