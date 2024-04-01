@@ -68,17 +68,20 @@ public:
     int32_t GetDelayTime(int32_t &delayTime);
     int32_t PlayPattern(const VibratorPattern &pattern, int32_t usage, const VibratorParameter &parameter);
     int32_t FreeVibratorPackage(VibratorPackage &package);
-    int32_t TransferClientRemoteObject();
     int32_t PlayPrimitiveEffect(int32_t vibratorId, const std::string &effect, int32_t intensity, int32_t usage);
+    bool IsSupportVibratorCustom();
 
 private:
     int32_t InitServiceClient();
     int32_t LoadDecoderLibrary(const std::string& path);
     int32_t ConvertVibratePackage(const VibratePackage& inPkg, VibratorPackage &outPkg);
+    int32_t TransferClientRemoteObject();
+    int32_t GetVibratorCapacity();
     sptr<IRemoteObject::DeathRecipient> serviceDeathObserver_ = nullptr;
     sptr<IMiscdeviceService> miscdeviceProxy_ = nullptr;
     sptr<VibratorClientStub> vibratorClient_ = nullptr;
     VibratorDecodeHandle decodeHandle_;
+    VibratorCapacity capacity_;
     std::mutex clientMutex_;
     std::mutex decodeMutex_;
 };

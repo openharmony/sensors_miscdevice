@@ -60,6 +60,7 @@ private:
     int32_t GetDelayTimeStub(MessageParcel &data, MessageParcel &reply);
     int32_t TransferClientRemoteObjectStub(MessageParcel &data, MessageParcel &reply);
     int32_t PlayPrimitiveEffectStub(MessageParcel &data, MessageParcel &reply);
+    int32_t GetVibratorCapacityStub(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, MiscBaseFunc> baseFuncs_;
 };
 }  // namespace Sensors

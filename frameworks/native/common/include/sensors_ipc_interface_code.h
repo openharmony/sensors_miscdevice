@@ -35,6 +35,7 @@ enum class MiscdeviceInterfaceCode {
     GET_DELAY_TIME,
     TRANSFER_CLIENT_REMOTE_OBJECT,
     PLAY_PRIMITIVE_EFFECT,
+    GET_VIBRATOR_CAPACITY,
 };
 }  // namespace Sensors
 }  // namespace OHOS

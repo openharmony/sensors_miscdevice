@@ -454,5 +454,33 @@ int32_t MiscdeviceServiceProxy::PlayPrimitiveEffect(int32_t vibratorId, const st
     }
     return ret;
 }
+
+int32_t MiscdeviceServiceProxy::GetVibratorCapacity(VibratorCapacity &capacity)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MiscdeviceServiceProxy::GetDescriptor())) {
+        MISC_HILOGE("Write descriptor failed");
+        return WRITE_MSG_ERR;
+    }
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, ERROR);
+    MessageParcel reply;
+    MessageOption option;
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MiscdeviceInterfaceCode::GET_VIBRATOR_CAPACITY),
+        data, reply, option);
+    if (ret != NO_ERROR) {
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "GetVibratorCapacity", "ERROR_CODE", ret);
+        MISC_HILOGE("SendRequest failed, ret:%{public}d", ret);
+        return ret;
+    }
+    auto vibratorCapacity = capacity.Unmarshalling(reply);
+    if (!vibratorCapacity.has_value()) {
+        MISC_HILOGE("VibratorCapacity Unmarshalling failed");
+        return ERROR;
+    }
+    capacity = vibratorCapacity.value();
+    return ret;
+}
 }  // namespace Sensors
 }  // namespace OHOS
