@@ -86,6 +86,7 @@ struct VibratePattern {
         return startTime < rhs.startTime;
     }
     int32_t startTime = 0;
+    int32_t patternDuration = 0;
     std::vector<VibrateEvent> events;
     void Dump() const;
     bool Marshalling(Parcel &parcel) const;
@@ -94,6 +95,7 @@ struct VibratePattern {
 
 struct VibratePackage {
     std::vector<VibratePattern> patterns;
+    int32_t packageDuration = 0;
     void Dump() const;
 };
 

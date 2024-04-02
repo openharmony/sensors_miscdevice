@@ -172,6 +172,7 @@ typedef struct VibratorEvent {
 typedef struct VibratorPattern {
     int32_t time = -1;
     int32_t eventNum = 0;
+    int32_t patternDuration = 0;
     VibratorEvent *events = nullptr;
 } VibratorPattern;
 
@@ -182,6 +183,7 @@ typedef struct VibratorPattern {
  */
 typedef struct VibratorPackage {
     int32_t patternNum = 0; // pattern
+    int32_t packageDuration = 0;
     VibratorPattern *patterns = nullptr;
 } VibratorPackage;
 
