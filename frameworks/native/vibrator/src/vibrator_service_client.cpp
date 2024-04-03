@@ -359,6 +359,7 @@ int32_t VibratorServiceClient::PlayPattern(const VibratorPattern &pattern, int32
             event.points.emplace_back(point);
         }
         vibratePattern.events.emplace_back(event);
+        vibratePattern.patternDuration = pattern.patternDuration;
     }
     VibrateParameter vibateParameter = {
         .intensity = parameter.intensity,
@@ -380,6 +381,7 @@ int32_t VibratorServiceClient::ConvertVibratePackage(const VibratePackage& inPkg
     VibratorPattern *patterns = (VibratorPattern *)malloc(sizeof(VibratorPattern) * patternSize);
     CHKPR(patterns, ERROR);
     outPkg.patternNum = patternSize;
+    int32_t clientPatternDuration = 0;
     for (int32_t i = 0; i < patternSize; ++i) {
         patterns[i].time = inPkg.patterns[i].startTime;
         auto vibrateEvents = inPkg.patterns[i].events;
@@ -414,10 +416,13 @@ int32_t VibratorServiceClient::ConvertVibratePackage(const VibratePackage& inPkg
                 points[k].frequency  = vibratePoints[k].frequency;
             }
             events[j].points = points;
+            clientPatternDuration += events[j].duration;
         }
         patterns[i].events = events;
+        patterns[i].patternDuration = clientPatternDuration;
     }
     outPkg.patterns = patterns;
+    outPkg.packageDuration = inPkg.packageDuration;
     return ERR_OK;
 }
 

@@ -84,6 +84,10 @@ bool VibratePattern::Marshalling(Parcel &parcel) const
         MISC_HILOGE("Write pattern's startTime failed");
         return false;
     }
+    if (!parcel.WriteInt32(patternDuration)) {
+        MISC_HILOGE("Write patternDuration failed");
+        return false;
+    }
     if (!parcel.WriteInt32(static_cast<int32_t>(events.size()))) {
         MISC_HILOGE("Write events's size failed");
         return false;
@@ -140,6 +144,10 @@ std::optional<VibratePattern> VibratePattern::Unmarshalling(Parcel &data)
     VibratePattern pattern;
     if (!(data.ReadInt32(pattern.startTime))) {
         MISC_HILOGE("Read time failed");
+        return std::nullopt;
+    }
+    if (!(data.ReadInt32(pattern.patternDuration))) {
+        MISC_HILOGE("Read duration failed");
         return std::nullopt;
     }
     int32_t eventSize { 0 };

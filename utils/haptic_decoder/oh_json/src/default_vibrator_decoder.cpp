@@ -63,11 +63,12 @@ int32_t DefaultVibratorDecoder::DecodeEffect(const RawFileDescriptor &rawFd, Vib
         return ret;
     }
     VibratePattern originPattern;
-    ret = ParseChannel(parser, originPattern);
+    ret = ParseChannel(parser, originPattern, patternPackage);
     if (ret != SUCCESS) {
         MISC_HILOGE("Parse channel fail");
         return ret;
     }
+    MISC_HILOGD("packageDuration:%{public}d", patternPackage.packageDuration);
     PatternSplit(originPattern, patternPackage);
     return SUCCESS;
 }
@@ -93,7 +94,8 @@ int32_t DefaultVibratorDecoder::CheckMetadata(const JsonParser &parser)
     return SUCCESS;
 }
 
-int32_t DefaultVibratorDecoder::ParseChannel(const JsonParser &parser, VibratePattern &originPattern)
+int32_t DefaultVibratorDecoder::ParseChannel(const JsonParser &parser, VibratePattern &originPattern,
+    VibratePackage &patternPackage)
 {
     cJSON *channelsItem = parser.GetObjectItem("Channels");
     CHKPR(channelsItem, ERROR);
@@ -106,6 +108,7 @@ int32_t DefaultVibratorDecoder::ParseChannel(const JsonParser &parser, VibratePa
         MISC_HILOGE("The size of channels conflicts with channelNumber, size:%{public}d", size);
         return ERROR;
     }
+    int32_t parseDuration = 0;
     for (int32_t i = 0; i < size; i++) {
         cJSON *channelItem = parser.GetArrayItem(channelsItem, i);
         CHKPR(channelItem, ERROR);
@@ -116,8 +119,10 @@ int32_t DefaultVibratorDecoder::ParseChannel(const JsonParser &parser, VibratePa
         cJSON *patternItem = parser.GetObjectItem(channelItem, "Pattern");
         CHKPR(patternItem, ERROR);
         ret = ParsePattern(parser, patternItem, originPattern);
+        parseDuration += originPattern.patternDuration;
         CHKCR((ret == SUCCESS), ERROR, "parse pattern fail");
     }
+    patternPackage.packageDuration = parseDuration;
     std::sort(originPattern.events.begin(), originPattern.events.end());
     return SUCCESS;
 }
@@ -143,6 +148,7 @@ int32_t DefaultVibratorDecoder::ParsePattern(const JsonParser &parser, cJSON *pa
         MISC_HILOGE("The size of pattern is out of bounds, size:%{public}d", size);
         return ERROR;
     }
+    int32_t vibratorDuration = 0;
     for (int32_t i = 0; i < size; i++) {
         cJSON *item = parser.GetArrayItem(patternItem, i);
         CHKPR(item, ERROR);
@@ -151,8 +157,10 @@ int32_t DefaultVibratorDecoder::ParsePattern(const JsonParser &parser, cJSON *pa
         VibrateEvent event;
         int32_t ret = ParseEvent(parser, eventItem, event);
         CHKCR((ret == SUCCESS), ERROR, "parse event fail");
+        vibratorDuration += event.duration;
         originPattern.events.emplace_back(event);
     }
+    originPattern.patternDuration = vibratorDuration;
     return SUCCESS;
 }
 
