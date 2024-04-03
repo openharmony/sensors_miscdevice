@@ -85,7 +85,7 @@ bool VibratePattern::Marshalling(Parcel &parcel) const
         return false;
     }
     if (!parcel.WriteInt32(patternDuration)) {
-        MISC_HILOGE("Write pattern's patternDuration failed");
+        MISC_HILOGE("Write patternDuration failed");
         return false;
     }
     if (!parcel.WriteInt32(static_cast<int32_t>(events.size()))) {

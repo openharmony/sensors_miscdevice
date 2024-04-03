@@ -57,8 +57,8 @@ constexpr int32_t FREQUENCY_ADJUST_MIN = -100;
 constexpr int32_t FREQUENCY_ADJUST_MAX = 100;
 constexpr int32_t INVALID_PID = -1;
 constexpr int32_t VIBRATOR_ID = 0;
-constexpr uint32_t BASE_YEAR = 1900;
-constexpr uint32_t BASE_MON = 1;
+constexpr int32_t BASE_YEAR = 1900;
+constexpr int32_t BASE_MON = 1;
 constexpr int32_t CONVERSION_RATE = 1000;
 VibratorCapacity g_capacity;
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
@@ -238,9 +238,9 @@ int32_t MiscdeviceService::Vibrate(int32_t vibratorId, int32_t timeOut, int32_t 
     }
     std::string curVibrateTime;
     StartVibrateThread(info);
-    VibratorCurrentTime(curVibrateTime);
-    MISC_HILOGI("Vibrate currentTime:%{public}s, uid:%{public}d, pid:%{public}d, vibratorId:%{public}d,"
-        "duration:%{public}d, package:%{public}s", curVibrateTime.c_str(), info.uid, info.pid, vibratorId,
+    VibrateCurrentTime(curVibrateTime);
+    MISC_HILOGI("Vibrate currentTime:%{public}s, pid:%{public}d, vibratorId:%{public}d,"
+        "duration:%{public}d, package:%{public}s", curVibrateTime.c_str(), info.pid, vibratorId,
         info.duration, packageName.c_str());
     return NO_ERROR;
 }
@@ -304,10 +304,10 @@ int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::str
         return ERROR;
     }
     std::string curEffectTime;
-    VibratorCurrentTime(curEffectTime);
+    VibrateCurrentTime(curEffectTime);
     StartVibrateThread(info);
-    MISC_HILOGI("PlayVibratorEffect currentTime:%{public}s, uid:%{public}d, pid:%{public}d, duration:%{public}d,"
-        "package:%{public}s", curEffectTime.c_str(), info.uid, info.pid, info.duration, packageName.c_str());
+    MISC_HILOGI("PlayVibratorEffect currentTime:%{public}s, pid:%{public}d, duration:%{public}d,"
+        "package:%{public}s", curEffectTime.c_str(), info.pid, info.duration, packageName.c_str());
     return NO_ERROR;
 }
 
@@ -333,9 +333,9 @@ void MiscdeviceService::StopVibrateThread()
     MISC_HILOGD("Stop vibrator,package:%{public}s", packageName.c_str());
     if ((vibratorThread_ != nullptr) && (vibratorThread_->IsRunning())) {
         std::string curStopTime;
-        VibratorCurrentTime(curStopTime);
-        MISC_HILOGI("StopVibrateThread currentTime:%{public}s, uid:%{public}d, pid:%{public}d, package:%{public}s",
-            curStopTime.c_str(), GetCallingUid(), GetCallingPid(), packageName.c_str());
+        VibrateCurrentTime(curStopTime);
+        MISC_HILOGI("StopVibrateThread currentTime:%{public}s, pid:%{public}d, package:%{public}s",
+            curStopTime.c_str(), GetCallingPid(), packageName.c_str());
         vibratorThread_->SetExitStatus(true);
         vibratorThread_->WakeUp();
         vibratorThread_->NotifyExitSync();
@@ -372,7 +372,7 @@ int32_t MiscdeviceService::IsSupportEffect(const std::string &effect, bool &stat
     return NO_ERROR;
 }
 
-void MiscdeviceService::VibratorCurrentTime(std::string &startTime)
+void MiscdeviceService::VibrateCurrentTime(cstd::string &startTime)
 {
     timespec curTime;
     clock_gettime(CLOCK_REALTIME, &curTime);
@@ -423,10 +423,10 @@ int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, const RawFileD
         return ERROR;
     }
     std::string curCustomTime;
-    VibratorCurrentTime(curCustomTime);
+    VibrateCurrentTime(curCustomTime);
     StartVibrateThread(info);
-    MISC_HILOGI("PlayVibratorCustom currentTime:%{public}s, uid:%{public}d, pid:%{public}d, duration:%{public}d,"
-        "package:%{public}s", curCustomTime.c_str(), info.uid, info.pid, package.packageDuration, packageName.c_str());
+    MISC_HILOGI("PlayVibratorCustom currentTime:%{public}s, pid:%{public}d, duration:%{public}d,"
+        "package:%{public}s", curCustomTime.c_str(), info.pid, package.packageDuration, packageName.c_str());
     return NO_ERROR;
 }
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
@@ -588,10 +588,10 @@ int32_t MiscdeviceService::PlayPattern(const VibratePattern &pattern, int32_t us
         return ERROR;
     }
     std::string curPatternTime;
-    VibratorCurrentTime(curPatternTime);
+    VibrateCurrentTime(curPatternTime);
     StartVibrateThread(info);
-    MISC_HILOGI("PlayVibratorCustom currentTime:%{public}s, uid:%{public}d, pid:%{public}d, duration:%{public}d,"
-        "package:%{public}s", curPatternTime.c_str(), info.uid, info.pid, pattern.patternDuration, packageName.c_str());
+    MISC_HILOGI("PlayVibratorCustom currentTime:%{public}s, pid:%{public}d, duration:%{public}d,"
+        "package:%{public}s", curPatternTime.c_str(), info.pid, pattern.patternDuration, packageName.c_str());
     return ERR_OK;
 }
 

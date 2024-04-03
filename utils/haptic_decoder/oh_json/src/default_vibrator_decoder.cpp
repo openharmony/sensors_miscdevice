@@ -108,7 +108,7 @@ int32_t DefaultVibratorDecoder::ParseChannel(const JsonParser &parser, VibratePa
         MISC_HILOGE("The size of channels conflicts with channelNumber, size:%{public}d", size);
         return ERROR;
     }
-    int parseDuration = 0;
+    int32_t parseDuration = 0;
     for (int32_t i = 0; i < size; i++) {
         cJSON *channelItem = parser.GetArrayItem(channelsItem, i);
         CHKPR(channelItem, ERROR);
