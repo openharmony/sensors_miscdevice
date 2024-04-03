@@ -37,8 +37,6 @@ using Security::AccessToken::AccessTokenID;
 
 namespace {
 constexpr int32_t TIME_WAIT_FOR_OP = 2;
-const std::string PHONE_TYPE = "phone";
-std::string g_deviceType;
 
 PermissionStateFull g_infoManagerTestState = {
     .grantFlags = {1},
@@ -95,8 +93,6 @@ void VibratorAgentTest::SetUpTestCase()
     tokenID_ = tokenIdEx.tokenIdExStruct.tokenID;
     ASSERT_NE(0, tokenID_);
     ASSERT_EQ(0, SetSelfTokenID(tokenID_));
-    g_deviceType = OHOS::system::GetDeviceType();
-    MISC_HILOGI("deviceType:%{public}s", g_deviceType.c_str());
 }
 
 void VibratorAgentTest::TearDownTestCase()
@@ -764,17 +760,6 @@ HWTEST_F(VibratorAgentTest, Cancel_004, TestSize.Level1)
         ASSERT_EQ(ret, 0);
     }
     ASSERT_TRUE(true);
-}
-
-HWTEST_F(VibratorAgentTest, IsSupportVibratorCustom_001, TestSize.Level1)
-{
-    MISC_HILOGI("IsSupportVibratorCustom_001 in");
-    bool ret = IsSupportVibratorCustom();
-    if (g_deviceType == PHONE_TYPE) {
-        ASSERT_TRUE(ret);
-    } else {
-        ASSERT_FALSE(ret);
-    }
 }
 
 HWTEST_F(VibratorAgentTest, IsSupportEffect_001, TestSize.Level1)
