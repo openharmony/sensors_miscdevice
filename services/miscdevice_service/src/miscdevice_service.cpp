@@ -372,7 +372,7 @@ int32_t MiscdeviceService::IsSupportEffect(const std::string &effect, bool &stat
     return NO_ERROR;
 }
 
-void MiscdeviceService::VibrateCurrentTime(cstd::string &startTime)
+void MiscdeviceService::VibrateCurrentTime(std::string &startTime)
 {
     timespec curTime;
     clock_gettime(CLOCK_REALTIME, &curTime);
