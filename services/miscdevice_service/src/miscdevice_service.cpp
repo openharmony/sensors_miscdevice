@@ -391,7 +391,7 @@ int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, const RawFileD
 {
     std::string packageName = GetPackageName(GetCallingTokenID());
     MISC_HILOGD("Start vibrator custom, usage:%{public}d, package:%{public}s", usage, packageName.c_str());
-    if (OHOS::system::GetDeviceType() != PHONE_TYPE) {
+    if (!(g_capacity.isSupportHdHaptic || g_capacity.isSupportPresetMapping || g_capacity.isSupportTimeDelay)) {
         MISC_HILOGE("The device does not support this operation");
         return IS_NOT_SUPPORTED;
     }
@@ -780,6 +780,12 @@ int32_t MiscdeviceService::PlayPrimitiveEffect(int32_t vibratorId, const std::st
     }
     StartVibrateThread(info);
     return vibratorHdiConnection_.StartByIntensity(effect, intensity);
+}
+
+int32_t MiscdeviceService::GetVibratorCapacity(VibratorCapacity &capacity)
+{
+    capacity = g_capacity;
+    return ERR_OK;
 }
 }  // namespace Sensors
 }  // namespace OHOS

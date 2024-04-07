@@ -68,6 +68,8 @@ MiscdeviceServiceStub::MiscdeviceServiceStub()
         &MiscdeviceServiceStub::TransferClientRemoteObjectStub;
     baseFuncs_[static_cast<uint32_t>(MiscdeviceInterfaceCode::PLAY_PRIMITIVE_EFFECT)] =
         &MiscdeviceServiceStub::PlayPrimitiveEffectStub;
+    baseFuncs_[static_cast<uint32_t>(MiscdeviceInterfaceCode::GET_VIBRATOR_CAPACITY)] =
+        &MiscdeviceServiceStub::GetVibratorCapacityStub;
 }
 
 MiscdeviceServiceStub::~MiscdeviceServiceStub()
@@ -374,6 +376,21 @@ int32_t MiscdeviceServiceStub::PlayPrimitiveEffectStub(MessageParcel &data, Mess
         return ERROR;
     }
     return PlayPrimitiveEffect(vibratorId, effect, intensity, usage);
+}
+
+int32_t MiscdeviceServiceStub::GetVibratorCapacityStub(MessageParcel &data, MessageParcel &reply)
+{
+    VibratorCapacity capacity;
+    int32_t ret = GetVibratorCapacity(capacity);
+    if (ret != NO_ERROR) {
+        MISC_HILOGE("Query support custom vibration failed");
+        return ret;
+    }
+    if (!capacity.Marshalling(reply)) {
+        MISC_HILOGE("VibratorCapacity marshalling failed");
+        return WRITE_MSG_ERR;
+    }
+    return ret;
 }
 }  // namespace Sensors
 }  // namespace OHOS

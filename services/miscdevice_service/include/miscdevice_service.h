@@ -79,6 +79,7 @@ public:
     virtual int32_t TransferClientRemoteObject(const sptr<IRemoteObject> &vibratorServiceClient) override;
     virtual int32_t PlayPrimitiveEffect(int32_t vibratorId, const std::string &effect, int32_t intensity,
                                         int32_t usage) override;
+    virtual int32_t GetVibratorCapacity(VibratorCapacity &capacity) override;
 
 private:
     DISALLOW_COPY_AND_MOVE(MiscdeviceService);

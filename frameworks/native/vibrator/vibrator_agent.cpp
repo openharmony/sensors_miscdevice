@@ -99,7 +99,8 @@ int32_t StartVibratorOnce(int32_t duration)
 
 bool IsSupportVibratorCustom()
 {
-    return (OHOS::system::GetDeviceType() == PHONE_TYPE);
+    auto &client = VibratorServiceClient::GetInstance();
+    return client.IsSupportVibratorCustom();
 }
 
 int32_t PlayVibratorCustom(int32_t fd, int64_t offset, int64_t length)

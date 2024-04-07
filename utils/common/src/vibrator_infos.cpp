@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -76,6 +76,41 @@ int32_t VibratorCapacity::GetVibrateMode()
         return VIBRATE_MODE_TIMES;
     }
     return -1;
+}
+
+bool VibratorCapacity::Marshalling(Parcel &parcel) const
+{
+    if (!parcel.WriteBool(isSupportHdHaptic)) {
+        MISC_HILOGE("Write isSupportHdHaptic failed");
+        return false;
+    }
+    if (!parcel.WriteBool(isSupportPresetMapping)) {
+        MISC_HILOGE("Write isSupportPresetMapping failed");
+        return false;
+    }
+    if (!parcel.WriteBool(isSupportTimeDelay)) {
+        MISC_HILOGE("Write isSupportTimeDelay failed");
+        return false;
+    }
+    return true;
+}
+
+std::optional<VibratorCapacity> VibratorCapacity::Unmarshalling(Parcel &data)
+{
+    VibratorCapacity capacity;
+    if (!(data.ReadBool(capacity.isSupportHdHaptic))) {
+        MISC_HILOGE("Read isSupportHdHaptic failed");
+        return std::nullopt;
+    }
+    if (!(data.ReadBool(capacity.isSupportPresetMapping))) {
+        MISC_HILOGE("Read isSupportPresetMapping failed");
+        return std::nullopt;
+    }
+    if (!(data.ReadBool(capacity.isSupportTimeDelay))) {
+        MISC_HILOGE("Read isSupportTimeDelay failed");
+        return std::nullopt;
+    }
+    return capacity;
 }
 
 bool VibratePattern::Marshalling(Parcel &parcel) const

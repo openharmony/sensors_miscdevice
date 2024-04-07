@@ -92,6 +92,11 @@ int32_t VibratorServiceClient::InitServiceClient()
                 MISC_HILOGE("TransferClientRemoteObject failed, ret:%{public}d", ret);
                 return ERROR;
             }
+            ret = GetVibratorCapacity();
+            if (ret != ERR_OK) {
+                MISC_HILOGE("GetVibratorCapacity failed, ret:%{public}d", ret);
+                return ERROR;
+            }
             return ERR_OK;
         }
         MISC_HILOGW("Get service failed, retry:%{public}d", retry);
@@ -474,6 +479,25 @@ int32_t VibratorServiceClient::PlayPrimitiveEffect(int32_t vibratorId, const std
             "usage:%{public}d", ret, effect.c_str(), intensity, usage);
     }
     return ret;
+}
+
+int32_t VibratorServiceClient::GetVibratorCapacity()
+{
+    CHKPR(miscdeviceProxy_, ERROR);
+    StartTrace(HITRACE_TAG_SENSORS, "GetVibratorCapacity");
+    int32_t ret = miscdeviceProxy_->GetVibratorCapacity(capacity_);
+    FinishTrace(HITRACE_TAG_SENSORS);
+    capacity_.Dump();
+    return ret;
+}
+
+bool VibratorServiceClient::IsSupportVibratorCustom()
+{
+    int32_t ret = InitServiceClient();
+    if (ret != ERR_OK) {
+        MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
+    }
+    return (capacity_.isSupportHdHaptic || capacity_.isSupportPresetMapping || capacity_.isSupportTimeDelay);
 }
 }  // namespace Sensors
 }  // namespace OHOS
