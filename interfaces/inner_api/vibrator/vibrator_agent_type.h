@@ -98,6 +98,13 @@ const char *VIBRATOR_TYPE_SOFT = "haptic.effect.soft";
 const char *VIBRATOR_TYPE_SHARP = "haptic.effect.sharp";
 
 /**
+ * @brief Describes the vibration effect of the vibrator when slide.
+ *
+ * @since 12
+ */
+const char *VIBRATOR_TYPE_SLIDE = "haptic.slide";
+
+/**
  * @brief Enumerates vibration usages.
  *
  * @since 9
