@@ -133,6 +133,15 @@ int32_t Cancel();
 bool SetUsage(int32_t usage);
 
 /**
+ * @brief Query whether the HdHaptic is supported.
+ *
+ * @return Returning true indicates support; otherwise, it indicates no support.
+ *
+ * @since 12
+ */
+bool IsHdHapticSupported();
+
+/**
  * @brief Query whether a vibration effect is supported.
  *
  * @param effectId Indicates the preset vibration effect, which is described in {@link vibrator_agent_type.h}, for

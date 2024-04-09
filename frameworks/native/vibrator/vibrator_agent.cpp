@@ -170,6 +170,12 @@ bool SetUsage(int32_t usage)
     return true;
 }
 
+bool IsHdHapticSupported()
+{
+    auto &client = VibratorServiceClient::GetInstance();
+    return client.IsHdHapticSupported();
+}
+
 int32_t IsSupportEffect(const char *effectId, bool *state)
 {
     CHKPR(effectId, PARAMETER_ERROR);

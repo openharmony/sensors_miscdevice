@@ -221,6 +221,12 @@ int32_t VibratorServiceClient::StopVibrator(int32_t vibratorId)
     return ret;
 }
 
+bool VibratorServiceClient::IsHdHapticSupported()
+{
+    CALL_LOG_ENTER;
+    return capacity_.isSupportHdHaptic;
+}
+
 int32_t VibratorServiceClient::IsSupportEffect(const std::string &effect, bool &state)
 {
     MISC_HILOGD("IsSupportEffect begin, effect:%{public}s", effect.c_str());

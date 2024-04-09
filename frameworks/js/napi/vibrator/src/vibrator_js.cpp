@@ -362,6 +362,24 @@ static napi_value IsSupportEffect(napi_env env, napi_callback_info info)
     return EmitAsyncWork(nullptr, asyncCallbackInfo);
 }
 
+static napi_value IsHdHapticSupportedSync(napi_env env, napi_callback_info info)
+{
+    napi_value result = nullptr;
+    napi_get_undefined(env, &result);
+    napi_value thisArg = nullptr;
+    size_t argc = 0;
+    napi_status status = napi_get_cb_info(env, info, &argc, nullptr, &thisArg, nullptr);
+    if (status != napi_ok) {
+        ThrowErr(env, PARAMETER_ERROR, "Get the parameter info fail");
+        return result;
+    }
+    status= napi_get_boolean(env, IsHdHapticSupported(), &result);
+    if (status != napi_ok) {
+        ThrowErr(env, PARAMETER_ERROR, "Get the value of boolean fail");
+    }
+    return result;
+}
+
 static napi_value EnumClassConstructor(const napi_env env, const napi_callback_info info)
 {
     size_t argc = 0;
@@ -411,6 +429,7 @@ static napi_value Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("stop", Stop),
         DECLARE_NAPI_FUNCTION("startVibration", StartVibrate),
         DECLARE_NAPI_FUNCTION("stopVibration", Stop),
+        DECLARE_NAPI_FUNCTION("isHdHapticSupportedSync", IsHdHapticSupportedSync),
         DECLARE_NAPI_FUNCTION("isSupportEffect", IsSupportEffect),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(napi_property_descriptor), desc));

@@ -3144,4 +3144,20 @@ describe("VibratorJsTest", function () {
             done();
         }
     })
+
+    /*
+     * @tc.name:VibrateTest037
+     * @tc.desc:verify the isHdHapticSupportedSync interface
+     * @tc.type: FUNC
+     * @tc.require: I6HLLL
+     * @tc.number: VibrateTest037
+     */
+    it("VibrateTest037", 0, function () {
+        try {
+            expect(typeof(vibrator.isHdHapticSupportedSync())).assertEqual("boolean");
+        } catch (error) {
+            console.info("VibrateTest037 exception in, err:" + error);
+            expect(true).assertEqual(false);
+        }
+    })
 })
