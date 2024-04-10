@@ -36,7 +36,11 @@ using namespace Security::AccessToken;
 using Security::AccessToken::AccessTokenID;
 
 namespace {
-constexpr int32_t TIME_WAIT_FOR_OP = 2;
+constexpr int32_t TIME_WAIT_FOR_OP = 500;
+constexpr int32_t INTENSITY_HIGH = 100;
+constexpr int32_t INTENSITY_MEDIUM = 50;
+constexpr int32_t INTENSITY_LOW = 20;
+constexpr int32_t INTENSITY_INVALID = -1;
 
 PermissionStateFull g_infoManagerTestState = {
     .grantFlags = {1},
@@ -1171,8 +1175,78 @@ HWTEST_F(VibratorAgentTest, PlayPattern_001, TestSize.Level1)
         }
         ret = FreeVibratorPackage(package);
         ASSERT_EQ(ret, 0);
+        Cancel();
     } else {
         ASSERT_EQ(0, 0);
+    }
+}
+
+HWTEST_F(VibratorAgentTest, PlayPrimitiveEffect_001, TestSize.Level1)
+{
+    MISC_HILOGI("PlayPrimitiveEffect_001 in");
+    int32_t ret = PlayPrimitiveEffect(nullptr, INTENSITY_HIGH);
+    ASSERT_EQ(ret, PARAMETER_ERROR);
+}
+
+HWTEST_F(VibratorAgentTest, PlayPrimitiveEffect_002, TestSize.Level1)
+{
+    MISC_HILOGI("PlayPrimitiveEffect_002 in");
+    bool state { false };
+    int32_t ret = IsSupportEffect(VIBRATOR_TYPE_SLIDE, &state);
+    ASSERT_EQ(ret, 0);
+    if (state) {
+        ret = PlayPrimitiveEffect(VIBRATOR_TYPE_SLIDE, INTENSITY_INVALID);
+        ASSERT_EQ(ret, PARAMETER_ERROR);
+    } else {
+        MISC_HILOGI("Do not support %{public}s", VIBRATOR_TYPE_SLIDE);
+    }
+}
+
+HWTEST_F(VibratorAgentTest, PlayPrimitiveEffect_003, TestSize.Level1)
+{
+    MISC_HILOGI("PlayPrimitiveEffect_003 in");
+    bool state { false };
+    int32_t ret = IsSupportEffect(VIBRATOR_TYPE_SLIDE, &state);
+    ASSERT_EQ(ret, 0);
+    if (state) {
+        ret = PlayPrimitiveEffect(VIBRATOR_TYPE_SLIDE, INTENSITY_LOW);
+        ASSERT_EQ(ret, 0);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+        Cancel();
+    } else {
+        MISC_HILOGI("Do not support %{public}s", VIBRATOR_TYPE_SLIDE);
+    }
+}
+
+HWTEST_F(VibratorAgentTest, PlayPrimitiveEffect_004, TestSize.Level1)
+{
+    MISC_HILOGI("PlayPrimitiveEffect_004 in");
+    bool state { false };
+    int32_t ret = IsSupportEffect(VIBRATOR_TYPE_SLIDE, &state);
+    ASSERT_EQ(ret, 0);
+    if (state) {
+        ret = PlayPrimitiveEffect(VIBRATOR_TYPE_SLIDE, INTENSITY_MEDIUM);
+        ASSERT_EQ(ret, 0);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+        Cancel();
+    } else {
+        MISC_HILOGI("Do not support %{public}s", VIBRATOR_TYPE_SLIDE);
+    }
+}
+
+HWTEST_F(VibratorAgentTest, PlayPrimitiveEffect_005, TestSize.Level1)
+{
+    MISC_HILOGI("PlayPrimitiveEffect_005 in");
+    bool state { false };
+    int32_t ret = IsSupportEffect(VIBRATOR_TYPE_SLIDE, &state);
+    ASSERT_EQ(ret, 0);
+    if (state) {
+        ret = PlayPrimitiveEffect(VIBRATOR_TYPE_SLIDE, INTENSITY_HIGH);
+        ASSERT_EQ(ret, 0);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+        Cancel();
+    } else {
+        MISC_HILOGI("Do not support %{public}s", VIBRATOR_TYPE_SLIDE);
     }
 }
 }  // namespace Sensors
