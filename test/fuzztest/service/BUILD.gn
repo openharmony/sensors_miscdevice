@@ -22,8 +22,10 @@ group("fuzztest") {
   deps += [
     "getdelaytimestub_fuzzer:fuzztest",
     "getlightliststub_fuzzer:fuzztest",
+    "getvibratorcapacitystub_fuzzer:fuzztest",
     "issupporteffectstub_fuzzer:fuzztest",
     "playpatternstub_fuzzer:fuzztest",
+    "playprimitiveeffectstub_fuzzer:fuzztest",
     "playvibratoreffectstub_fuzzer:fuzztest",
     "stopvibratorallstub_fuzzer:fuzztest",
     "stopvibratorbymodestub_fuzzer:fuzztest",
