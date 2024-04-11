@@ -50,7 +50,7 @@ void SetUpTestCase()
         .dcaps = nullptr,
         .perms = perms,
         .acls = nullptr,
-        .processName = "PlayPatternStubFuzzTest",
+        .processName = "PlayPrimitiveEffectStubFuzzTest",
         .aplStr = "system_core",
     };
     uint64_t tokenId = GetAccessTokenId(&infoInstance);
@@ -69,7 +69,7 @@ bool OnRemoteRequestFuzzTest(const uint8_t *data, size_t size)
     MessageParcel reply;
     MessageOption option;
     g_service->OnStartFuzz();
-    g_service->OnRemoteRequest(static_cast<uint32_t>(MiscdeviceInterfaceCode::PlAY_PATTERN),
+    g_service->OnRemoteRequest(static_cast<uint32_t>(MiscdeviceInterfaceCode::PLAY_PRIMITIVE_EFFECT),
         datas, reply, option);
     return true;
 }
