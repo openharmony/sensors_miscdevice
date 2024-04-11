@@ -32,15 +32,13 @@ ohos_shared_library("libmiscdevice_utils") {
     debug = false
   }
 
-  include_dirs = [
-    "include",
-    "$THERD_PARTY_CJSON",
-  ]
+  include_dirs = [ "include" ]
 
-  deps = [ "$THERD_PARTY_CJSON:cjson" ]
+  deps = []
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
+    "cJSON:cjson",
     "c_utils:utils",
     "hilog:libhilog",
   ]

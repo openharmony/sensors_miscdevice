@@ -36,17 +36,16 @@ ohos_shared_library("libvibrator_decoder") {
     "$SUBSYSTEM_DIR/utils/common/include",
     "$SUBSYSTEM_DIR/utils/haptic_decoder/interface",
     "$SUBSYSTEM_DIR/utils/haptic_decoder/he_json/include/",
-    "$THERD_PARTY_CJSON",
   ]
 
   deps = [
     "$SUBSYSTEM_DIR/utils/common:libmiscdevice_utils",
     "$SUBSYSTEM_DIR/utils/haptic_decoder/he_json:libhe_vibrator_decoder",
-    "$THERD_PARTY_CJSON:cjson",
   ]
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
+    "cJSON:cjson",
     "c_utils:utils",
     "hilog:libhilog",
   ]

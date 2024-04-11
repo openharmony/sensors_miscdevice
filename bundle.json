@@ -36,10 +36,10 @@
         "init",
         "napi",
         "safwk",
-        "samgr"
+        "samgr",
+        "cJSON"
       ],
       "third_party": [
-        "cJSON"
       ]
     },
     "build": {
