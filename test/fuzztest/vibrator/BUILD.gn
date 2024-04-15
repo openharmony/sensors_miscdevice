@@ -19,7 +19,10 @@ group("fuzztest") {
   testonly = true
   deps = []
   deps += [
+    "freevibratorpackage_fuzzer:fuzztest",
+    "getdelaytime_fuzzer:fuzztest",
     "issupporteffect_fuzzer:fuzztest",
+    "playprimitiveeffect_fuzzer:fuzztest",
     "playvibratorcustom_fuzzer:fuzztest",
     "setloopcount_fuzzer:fuzztest",
     "setusage_fuzzer:fuzztest",
