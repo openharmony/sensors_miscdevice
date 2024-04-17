@@ -56,8 +56,8 @@ const char *VIBRATOR_STOP_MODE_PRESET = "preset";
  * @brief Controls this vibrator to perform a vibration with a preset vibration effect.
  *
  * @param effectId Indicates the preset vibration effect, which is described in {@link vibrator_agent_type.h}, for
- * example:
- * {@link VIBRATOR_TYPE_CLOCK_TIMER}: Describes the vibration effect of the vibrator when a user adjusts the timer.
+ * example:{@link VIBRATOR_TYPE_CLOCK_TIMER}: Describes the vibration effect of the vibrator when a user adjusts the
+ * timer.
  * @return Returns <b>0</b> if the vibrator vibrates as expected; returns <b>-1</b> otherwise, for example, the preset
  * vibration effect is not supported.
  *

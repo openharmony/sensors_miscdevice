@@ -29,6 +29,7 @@ constexpr int32_t MAX_VIBRATOR_COUNT = 100;
 constexpr int32_t MIN_VIBRATOR_INTENSITY = 0;
 constexpr int32_t MAX_VIBRATOR_INTENSITY = 255;
 constexpr int32_t HALF_AN_HOUR = 1800000;  // ms
+constexpr int32_t TIME_STEP = 2;
 }  // namespace
 
 bool MiscdeviceCommon::CheckCustomVibratorEffect(const std::vector<int32_t> &timing,
@@ -43,7 +44,7 @@ bool MiscdeviceCommon::CheckCustomVibratorEffect(const std::vector<int32_t> &tim
         return false;
     }
     int32_t totalTime = 0;
-    for (uint32_t i = 0; i < timing.size(); i = i + 2) {
+    for (uint32_t i = 0; i < timing.size(); i = i + TIME_STEP) {
         totalTime += timing[i];
     }
     if (totalTime > HALF_AN_HOUR) {
