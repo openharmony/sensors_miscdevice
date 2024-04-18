@@ -38,9 +38,9 @@ namespace {
 constexpr int32_t GET_SERVICE_MAX_COUNT = 3;
 constexpr uint32_t WAIT_MS = 200;
 #ifdef __aarch64__
-    static const std::string DECODER_LIBRARY_PATH = "/system/lib64/libvibrator_decoder.z.so";
+    static const std::string DECODER_LIBRARY_PATH = "/system/lib64/platformsdk/libvibrator_decoder.z.so";
 #else
-    static const std::string DECODER_LIBRARY_PATH = "/system/lib/libvibrator_decoder.z.so";
+    static const std::string DECODER_LIBRARY_PATH = "/system/lib/platformsdk/libvibrator_decoder.z.so";
 #endif
 }  // namespace
 
