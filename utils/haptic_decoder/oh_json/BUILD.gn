@@ -50,6 +50,7 @@ ohos_shared_library("libvibrator_decoder") {
     "hilog:libhilog",
   ]
 
+  innerapi_tags = [ "platformsdk" ]
   part_name = "miscdevice"
   subsystem_name = "sensors"
 }
