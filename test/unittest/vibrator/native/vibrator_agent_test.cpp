@@ -1249,5 +1249,12 @@ HWTEST_F(VibratorAgentTest, PlayPrimitiveEffect_005, TestSize.Level1)
         MISC_HILOGI("Do not support %{public}s", VIBRATOR_TYPE_SLIDE);
     }
 }
+
+HWTEST_F(VibratorAgentTest, IsHdHapticSupported_001, TestSize.Level1)
+{
+    MISC_HILOGI("IsHdHapticSupported_001 in");
+    bool ret = IsHdHapticSupported();
+    MISC_HILOGI("IsHdHapticSupported:%{public}s", ret ? "true" : "false");
+}
 }  // namespace Sensors
 }  // namespace OHOS
