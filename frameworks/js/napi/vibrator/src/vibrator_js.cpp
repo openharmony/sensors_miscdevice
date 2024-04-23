@@ -350,7 +350,7 @@ static napi_value StopVibrationSync(napi_env env, napi_callback_info info)
     }
     int32_t ret = Cancel();
     if (ret != SUCCESS) {
-        MISC_HILOGE("Cancel execution failed");
+        ThrowErr(env, ret, "Cancel execution failel");
     }
     return result;
 }
@@ -416,8 +416,9 @@ static napi_value IsSupportEffectSync(napi_env env, napi_callback_info info)
         return result;
     }
     bool isSupportEffect = false;
-    if (IsSupportEffect(effectId.c_str(), &isSupportEffect) != SUCCESS) {
-        MISC_HILOGE("IsSupportEffect execution failed");
+    int32_t ret = IsSupportEffect(effectId.c_str(), &isSupportEffect);
+    if (ret != SUCCESS) {
+        ThrowErr(env, ret, "IsSupportEffect execution failed");
         return result;
     }
     status= napi_get_boolean(env, isSupportEffect, &result);
