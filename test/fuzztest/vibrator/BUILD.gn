@@ -25,6 +25,7 @@ group("fuzztest") {
     "playpattern_fuzzer:fuzztest",
     "playprimitiveeffect_fuzzer:fuzztest",
     "playvibratorcustom_fuzzer:fuzztest",
+    "preprocess_fuzzer:fuzztest",
     "setloopcount_fuzzer:fuzztest",
     "setparameters_fuzzer:fuzztest",
     "setusage_fuzzer:fuzztest",
