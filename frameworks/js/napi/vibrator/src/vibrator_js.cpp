@@ -36,6 +36,8 @@ namespace Sensors {
 namespace {
 constexpr int32_t VIBRATE_SHORT_DURATION = 35;
 constexpr int32_t VIBRATE_LONG_DURATION = 1000;
+constexpr int32_t PARAMETER_TWO = 2;
+constexpr int32_t PARAMETER_THREE = 3;
 }  // namespace
 
 static std::map<std::string, int32_t> g_usageType = {
@@ -94,7 +96,7 @@ static napi_value VibrateTime(napi_env env, napi_value args[], size_t argc)
     sptr<AsyncCallbackInfo> asyncCallbackInfo = new (std::nothrow) AsyncCallbackInfo(env);
     CHKPP(asyncCallbackInfo);
     asyncCallbackInfo->error.code = StartVibratorOnce(duration);
-    if (argc >= 2 && IsMatchType(env, args[1], napi_function)) {
+    if (argc >= PARAMETER_TWO && IsMatchType(env, args[1], napi_function)) {
         return EmitAsyncWork(args[1], asyncCallbackInfo);
     }
     return EmitAsyncWork(nullptr, asyncCallbackInfo);
@@ -108,7 +110,7 @@ static napi_value VibrateEffectId(napi_env env, napi_value args[], size_t argc)
     sptr<AsyncCallbackInfo> asyncCallbackInfo = new (std::nothrow) AsyncCallbackInfo(env);
     CHKPP(asyncCallbackInfo);
     asyncCallbackInfo->error.code = StartVibrator(effectId.c_str());
-    if (argc >= 2 && IsMatchType(env, args[1], napi_function)) {
+    if (argc >= PARAMETER_TWO && IsMatchType(env, args[1], napi_function)) {
         return EmitAsyncWork(args[1], asyncCallbackInfo);
     }
     return EmitAsyncWork(nullptr, asyncCallbackInfo);
@@ -173,7 +175,7 @@ static napi_value VibrateMode(napi_env env, napi_value args[], size_t argc)
 
 bool ParseParameter(napi_env env, napi_value args[], size_t argc, VibrateInfo &info)
 {
-    CHKCF((argc >= 2), "Wrong argument number");
+    CHKCF((argc >= PARAMETER_TWO), "Wrong argument number");
     CHKCF(GetPropertyString(env, args[0], "type", info.type), "Get vibrate type fail");
     if (info.type == "time") {
         CHKCF(GetPropertyInt32(env, args[0], "duration", info.duration), "Get vibrate duration fail");
@@ -240,7 +242,7 @@ static napi_value VibrateEffect(napi_env env, napi_value args[], size_t argc)
         ThrowErr(env, PARAMETER_ERROR, "parameters invalid");
         return nullptr;
     }
-    if (argc >= 3 && IsMatchType(env, args[2], napi_function)) {
+    if (argc >= PARAMETER_THREE && IsMatchType(env, args[2], napi_function)) {
         return EmitAsyncWork(args[2], asyncCallbackInfo);
     }
     return EmitAsyncWork(nullptr, asyncCallbackInfo);
@@ -254,7 +256,7 @@ static napi_value StartVibrate(napi_env env, napi_callback_info info)
     napi_value args[3] = {};
     napi_value thisArg = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, args, &thisArg, nullptr);
-    if (status != napi_ok || argc < 2) {
+    if (status != napi_ok || argc < PARAMETER_TWO) {
         ThrowErr(env, PARAMETER_ERROR, "napi_get_cb_info fail or number of parameter invalid");
         return nullptr;
     }
@@ -328,7 +330,7 @@ static napi_value Stop(napi_env env, napi_callback_info info)
             ThrowErr(env, PARAMETER_ERROR, "Parameters invalid");
             return nullptr;
         }
-        if (argc >= 2 && IsMatchType(env, args[1], napi_function)) {
+        if (argc >= PARAMETER_TWO && IsMatchType(env, args[1], napi_function)) {
             return EmitAsyncWork(args[1], asyncCallbackInfo);
         }
         return EmitAsyncWork(nullptr, asyncCallbackInfo);
@@ -350,7 +352,7 @@ static napi_value StopVibrationSync(napi_env env, napi_callback_info info)
     }
     int32_t ret = Cancel();
     if (ret != SUCCESS) {
-        ThrowErr(env, ret, "Cancel execution failel");
+        ThrowErr(env, ret, "Cancel execution fail");
     }
     return result;
 }
