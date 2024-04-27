@@ -3120,13 +3120,13 @@ describe("VibratorJsTest", function () {
     })
 
     /*
-     * @tc.name:VibrateTest036
+     * @tc.name:VibrateTest048
      * @tc.desc:verify the startVibration interface
      * @tc.type: FUNC
      * @tc.require: I6HLLL
-     * @tc.number: VibrateTest036
+     * @tc.number: VibrateTest048
      */
-    it("VibrateTest036", 0, async function (done) {
+    it("VibrateTest048", 0, async function (done) {
         try {
             vibrator.startVibration({
                 type: "file",
@@ -3146,18 +3146,72 @@ describe("VibratorJsTest", function () {
     })
 
     /*
-     * @tc.name:VibrateTest037
+     * @tc.name:VibrateTest049
      * @tc.desc:verify the isHdHapticSupported interface
      * @tc.type: FUNC
      * @tc.require: I6HLLL
-     * @tc.number: VibrateTest037
+     * @tc.number: VibrateTest049
      */
-    it("VibrateTest037", 0, function () {
+    it("VibrateTest049", 0, function () {
         try {
             expect(typeof(vibrator.isHdHapticSupported())).assertEqual("boolean");
         } catch (error) {
             console.info("VibrateTest037 exception in, err:" + error);
             expect(true).assertEqual(false);
         }
+    })
+
+    /*
+     * @tc.name:VibrateTest050
+     * @tc.desc:verify the synchronous interface
+     * @tc.type: FUNC
+     * @tc.require: I6HLLL
+     * @tc.number: VibrateTest050
+     */
+    it("VibrateTest050", 0, async function () {
+        console.info("VibrateTest050 in");
+        await vibrator.startVibration({
+            type: "time",
+            duration: 500
+        }, {
+            usage: "alarm"
+        }, (error) => {
+            if (error) {
+                console.info("startVibration error: " + JSON.stringify(error));
+                expect(false).assertTrue();
+            } else {
+                console.info("startVibration success");
+                expect(true).assertTrue();
+            }
+            done();
+        });
+        try {
+            vibrator.stopVibrationSync();
+            console.info("stopVibrationSync success");
+            expect(true).assertTrue();
+        } catch (error) {
+            console.info("stopVibrationSync error: " + JSON.stringify(error));
+            expect(false).assertTrue();
+        }
+        console.info("VibrateTest050 end");
+    })
+
+    /*
+     * @tc.name:VibrateTest051
+     * @tc.desc:verify the synchronous interface
+     * @tc.type: FUNC
+     * @tc.require: I6HLLL
+     * @tc.number: VibrateTest051
+     */
+    it("VibrateTest051", 0, async function () {
+        console.info("VibrateTest051 in");
+        try {
+            let ret = vibrator.isSupportEffectSync(INVALID_EFFECT_ID);
+            expect(ret).assertEqual(false);
+        } catch (error) {
+            console.info("isSupportEffectSync error: " + JSON.stringify(error));
+            expect(false).assertTrue();
+        }
+        console.info("VibrateTest051 end");
     })
 })
