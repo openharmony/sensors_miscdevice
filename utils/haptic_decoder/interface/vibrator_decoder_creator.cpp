@@ -27,21 +27,33 @@
 
 namespace OHOS {
 namespace Sensors {
-
+namespace {
+const std::string HE_TAG = "Metadata";
+} // namespace
 IVibratorDecoder *VibratorDecoderCreator::CreateDecoder(const RawFileDescriptor &fd)
 {
     CALL_LOG_ENTER;
     DecoderType type = GetDecoderType(fd);
     if (type == DECODER_TYPE_HE) {
-        MISC_HILOGD("Get he decoder");
+        MISC_HILOGD("Get he type");
         HEVibratorDecoderFactory factory;
         return factory.CreateDecoder();
     } else if (type == DECODER_TYPE_OH_JSON) {
-        MISC_HILOGD("Get oh_json decoder");
+        MISC_HILOGD("Get oh_json type");
         DefaultVibratorDecoderFactory factory;
         return factory.CreateDecoder();
     }
-    MISC_HILOGE("Invalid decoder type");
+    JsonParser parser(fd);
+    if (CheckHeMetadata(parser)) {
+        MISC_HILOGD("Get he tag");
+        HEVibratorDecoderFactory factory;
+        return factory.CreateDecoder();
+    } else {
+        MISC_HILOGD("Get oh_json tag");
+        DefaultVibratorDecoderFactory factory;
+        return factory.CreateDecoder();
+    }
+    MISC_HILOGE("Create decoder fail");
     return nullptr;
 }
 
@@ -61,6 +73,12 @@ DecoderType VibratorDecoderCreator::GetDecoderType(const RawFileDescriptor &rawF
         MISC_HILOGE("Invalid decoder extend name");
         return DECODER_TYPE_BUTT;
     }
+}
+
+bool VibratorDecoderCreator::CheckHeMetadata(const JsonParser &parser)
+{
+    cJSON *metadataItem = parser.GetObjectItem(HE_TAG);
+    return metadataItem != nullptr;
 }
 
 extern "C" IVibratorDecoder *Create(const RawFileDescriptor &rawFd)
