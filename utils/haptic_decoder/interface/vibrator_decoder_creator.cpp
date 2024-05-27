@@ -28,7 +28,7 @@
 namespace OHOS {
 namespace Sensors {
 namespace {
-const std::string HE_TAG = "Metadata";
+const std::string JSON_TAG = "Channels";
 } // namespace
 IVibratorDecoder *VibratorDecoderCreator::CreateDecoder(const RawFileDescriptor &fd)
 {
@@ -44,13 +44,13 @@ IVibratorDecoder *VibratorDecoderCreator::CreateDecoder(const RawFileDescriptor 
         return factory.CreateDecoder();
     }
     JsonParser parser(fd);
-    if (CheckHeMetadata(parser)) {
-        MISC_HILOGD("Get he tag");
-        HEVibratorDecoderFactory factory;
-        return factory.CreateDecoder();
-    } else {
+    if (CheckJsonMetadata(parser)) {
         MISC_HILOGD("Get oh_json tag");
         DefaultVibratorDecoderFactory factory;
+        return factory.CreateDecoder();
+    } else {
+        MISC_HILOGD("Get he tag");
+        HEVibratorDecoderFactory factory;
         return factory.CreateDecoder();
     }
     MISC_HILOGE("Create decoder fail");
@@ -75,10 +75,10 @@ DecoderType VibratorDecoderCreator::GetDecoderType(const RawFileDescriptor &rawF
     }
 }
 
-bool VibratorDecoderCreator::CheckHeMetadata(const JsonParser &parser)
+bool VibratorDecoderCreator::CheckJsonMetadata(const JsonParser &parser)
 {
-    cJSON *metadataItem = parser.GetObjectItem(HE_TAG);
-    return metadataItem != nullptr;
+    cJSON *channelItem = parser.GetObjectItem(JSON_TAG);
+    return channelItem != nullptr;
 }
 
 extern "C" IVibratorDecoder *Create(const RawFileDescriptor &rawFd)

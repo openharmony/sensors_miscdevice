@@ -36,7 +36,7 @@ public:
     IVibratorDecoder *CreateDecoder(const RawFileDescriptor &rawFd);
 
 private:
-    bool CheckHeMetadata(const JsonParser &parser);
+    bool CheckJsonMetadata(const JsonParser &parser);
     DecoderType GetDecoderType(const RawFileDescriptor &rawFd);
 };
 }  // namespace Sensors
