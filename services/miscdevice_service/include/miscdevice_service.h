@@ -99,6 +99,9 @@ private:
     int32_t FindClientPid(const sptr<IRemoteObject> &vibratorServiceClient);
     void DestroyClientPid(const sptr<IRemoteObject> &vibratorServiceClient);
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+    int32_t SubscribeCommonEvent(const std::string &eventName, EventReceiver receiver);
+    void OnReceiveEvent(const EventFwk::CommonEventData &data);
+    bool isVibrationPriorityReady_ = false;
     VibratorHdiConnection &vibratorHdiConnection_ = VibratorHdiConnection::GetInstance();
     LightHdiConnection &lightHdiConnection_ = LightHdiConnection::GetInstance();
     bool lightExist_;

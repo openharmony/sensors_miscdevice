@@ -62,6 +62,7 @@ ohos_shared_library("libmiscdevice_service") {
     "access_token:libprivacy_sdk",
     "cJSON:cjson",
     "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
     "data_share:datashare_consumer",
     "drivers_interface_vibrator:libvibrator_proxy_1.1",
     "drivers_interface_vibrator:libvibrator_proxy_1.2",

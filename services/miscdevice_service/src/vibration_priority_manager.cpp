@@ -35,11 +35,32 @@ const std::string SETTING_RINGER_MODE_KEY = "ringer_mode";
 const std::string SETTING_URI_PROXY = "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
 constexpr const char *SETTINGS_DATA_EXT_URI = "datashare:///com.ohos.settingsdata.DataAbility";
 constexpr int32_t DECEM_BASE = 10;
+constexpr int32_t DATA_SHARE_READY = 0;
+constexpr int32_t DATA_SHARE_NOT_READY = 1055;
 }  // namespace
 
-VibrationPriorityManager::VibrationPriorityManager()
+VibrationPriorityManager::VibrationPriorityManager() {}
+
+VibrationPriorityManager::~VibrationPriorityManager()
 {
-    Initialize();
+    remoteObj_ = nullptr;
+    if (UnregisterObserver(observer_) != ERR_OK) {
+        MISC_HILOGE("UnregisterObserver failed");
+    }
+}
+
+bool VibrationPriorityManager::Init()
+{
+    auto sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (sm == nullptr) {
+        MISC_HILOGE("sm cannot be nullptr");
+        return false;
+    }
+    auto remoteObj_ = sm->GetSystemAbility(MISCDEVICE_SERVICE_ABILITY_ID);
+    if (remoteObj_ == nullptr) {
+        MISC_HILOGE("GetSystemAbility return nullptr");
+        return false;
+    }
     MiscDeviceObserver::UpdateFunc updateFunc = [&]() {
         int32_t feedback = miscFeedback_;
         if (GetIntValue(SETTING_FEEDBACK_KEY, feedback) != ERR_OK) {
@@ -54,23 +75,16 @@ VibrationPriorityManager::VibrationPriorityManager()
         miscAudioRingerMode_ = ringerMode;
         MISC_HILOGI("ringerMode:%{public}d", ringerMode);
     };
-    auto observer = CreateObserver(updateFunc);
-    if (observer == nullptr) {
+    auto observer_ = CreateObserver(updateFunc);
+    if (observer_ == nullptr) {
         MISC_HILOGE("observer is null");
-        return;
+        return false;
     }
-    observer_ = observer;
     if (RegisterObserver(observer_) != ERR_OK) {
         MISC_HILOGE("RegisterObserver failed");
+        return false;
     }
-}
-
-VibrationPriorityManager::~VibrationPriorityManager()
-{
-    remoteObj_ = nullptr;
-    if (UnregisterObserver(observer_) != ERR_OK) {
-        MISC_HILOGE("UnregisterObserver failed");
-    }
+    return true;
 }
 
 int32_t VibrationPriorityManager::GetIntValue(const std::string &key, int32_t &value)
@@ -231,21 +245,6 @@ sptr<MiscDeviceObserver> VibrationPriorityManager::CreateObserver(const MiscDevi
     return observer;
 }
 
-void VibrationPriorityManager::Initialize()
-{
-    auto sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (sm == nullptr) {
-        MISC_HILOGE("sm cannot be nullptr");
-        return;
-    }
-    auto remoteObj = sm->GetSystemAbility(MISCDEVICE_SERVICE_ABILITY_ID);
-    if (remoteObj == nullptr) {
-        MISC_HILOGE("GetSystemAbility return nullptr");
-        return;
-    }
-    remoteObj_ = remoteObj;
-}
-
 Uri VibrationPriorityManager::AssembleUri(const std::string &key)
 {
     Uri uri(SETTING_URI_PROXY + "&key=" + key);
@@ -258,12 +257,15 @@ std::shared_ptr<DataShare::DataShareHelper> VibrationPriorityManager::CreateData
         MISC_HILOGE("remoteObj_ is nullptr");
         return nullptr;
     }
-    auto helper = DataShare::DataShareHelper::Creator(remoteObj_, SETTING_URI_PROXY, SETTINGS_DATA_EXT_URI);
-    if (helper == nullptr) {
-        MISC_HILOGW("helper is nullptr, uri proxy:%{public}s", SETTING_URI_PROXY.c_str());
+    auto [ret, helper] = DataShare::DataShareHelper::Create(remoteObj_, SETTING_URI_PROXY, SETTINGS_DATA_EXT_URI);
+    if (ret == DATA_SHARE_READY) {
+        return helper;
+    } else if (ret == DATA_SHARE_NOT_READY) {
+        MISC_HILOGE("create data_share helper failed, uri proxy:%{public}s", SETTING_URI_PROXY.c_str());
         return nullptr;
     }
-    return helper;
+    MISC_HILOGI("data_share unknown");
+    return nullptr;
 }
 
 bool VibrationPriorityManager::ReleaseDataShareHelper(std::shared_ptr<DataShare::DataShareHelper> &helper)
