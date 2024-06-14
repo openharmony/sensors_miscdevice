@@ -21,6 +21,7 @@ ohos_shared_library("libmiscdevice_service") {
     "hdi_connection/adapter/src/hdi_connection.cpp",
     "hdi_connection/interface/src/light_hdi_connection.cpp",
     "hdi_connection/interface/src/vibrator_hdi_connection.cpp",
+    "src/miscdevice_common_event_subscriber.cpp",
     "src/miscdevice_dump.cpp",
     "src/miscdevice_observer.cpp",
     "src/miscdevice_service.cpp",
@@ -56,6 +57,7 @@ ohos_shared_library("libmiscdevice_service") {
   deps = [ "$SUBSYSTEM_DIR/utils:miscdevice_utils_target" ]
 
   external_deps = [
+    "ability_base:want",
     "ability_base:zuri",
     "ability_runtime:dataobs_manager",
     "access_token:libaccesstoken_sdk",
@@ -101,6 +103,7 @@ ohos_static_library("libmiscdevice_service_static") {
     "hdi_connection/adapter/src/hdi_connection.cpp",
     "hdi_connection/interface/src/light_hdi_connection.cpp",
     "hdi_connection/interface/src/vibrator_hdi_connection.cpp",
+    "src/miscdevice_common_event_subscriber.cpp",
     "src/miscdevice_dump.cpp",
     "src/miscdevice_observer.cpp",
     "src/miscdevice_service.cpp",
@@ -136,12 +139,14 @@ ohos_static_library("libmiscdevice_service_static") {
   deps = [ "$SUBSYSTEM_DIR/utils:miscdevice_utils_target" ]
 
   external_deps = [
+    "ability_base:want",
     "ability_base:zuri",
     "ability_runtime:dataobs_manager",
     "access_token:libaccesstoken_sdk",
     "access_token:libprivacy_sdk",
     "cJSON:cjson",
     "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
     "data_share:datashare_consumer",
     "drivers_interface_vibrator:libvibrator_proxy_1.1",
     "drivers_interface_vibrator:libvibrator_proxy_1.2",

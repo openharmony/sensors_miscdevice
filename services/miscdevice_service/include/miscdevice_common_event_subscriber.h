@@ -16,14 +16,14 @@
 #ifndef MISCDEVICE_COMMON_EVENT_SUBSCRIBER_H
 #define MISCDEVICE_COMMON_EVENT_SUBSCRIBER_H
 
+#include "common_event_data.h"
 #include "common_event_subscriber.h"
 
 #include <functional>
 
-using EventReceiver = std::function<void (const EventFwk::CommonEventData&);
-
 namespace OHOS {
 namespace Sensors {
+using EventReceiver = std::function<void(const EventFwk::CommonEventData&)>;
 class MiscdeviceCommonEventSubscriber : public EventFwk::CommonEventSubscriber {
 public:
     MiscdeviceCommonEventSubscriber(const EventFwk::CommonEventSubscribeInfo &subscribeInfo, EventReceiver receiver);

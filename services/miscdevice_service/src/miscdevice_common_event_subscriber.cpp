@@ -15,13 +15,18 @@
 
 #include "miscdevice_common_event_subscriber.h"
 
+#include "sensors_errors.h"
+
+#undef LOG_TAG
+#define LOG_TAG "MiscdeviceCommonEventSubscriber"
+
 namespace OHOS {
 namespace Sensors {
 MiscdeviceCommonEventSubscriber::MiscdeviceCommonEventSubscriber(
     const EventFwk::CommonEventSubscribeInfo &subscribeInfo, EventReceiver receiver)
-    : EventFwk::CommonEventSubscribeInfo(subscribeInfo), eventReceiver_(receiver) {}
+    : EventFwk::CommonEventSubscriber(subscribeInfo), eventReceiver_(receiver) {}
 
-void MiscdeviceCommonEventSubscriber::OnReceiveEvent(const CommonEventData &data)
+void MiscdeviceCommonEventSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &data)
 {
     if (eventReceiver_ == nullptr) {
         MISC_HILOGE("eventReceiver_ is nullptr");

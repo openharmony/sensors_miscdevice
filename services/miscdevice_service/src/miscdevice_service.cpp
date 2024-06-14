@@ -25,7 +25,6 @@
 #include "mem_mgr_proxy.h"
 #include "system_ability_definition.h"
 
-#include "miscdevice_common_event_subscriber.h"
 #include "sensors_errors.h"
 #include "vibration_priority_manager.h"
 
@@ -116,12 +115,13 @@ void MiscdeviceService::OnAddSystemAbility(int32_t systemAbilityId, const std::s
 {
     MISC_HILOGI("OnAddSystemAbility systemAbilityId:%{public}d", systemAbilityId);
     switch (systemAbilityId) {
-        case MEMORY_MANAGER_SA_ID:
+        case MEMORY_MANAGER_SA_ID: {
             MISC_HILOGI("memory manager service start");
             Memory::MemMgrClient::GetInstance().NotifyProcessStatus(getpid(),
                 SYSTEM_PROCESS_TYPE, SYSTEM_STATUS_START, SA_ID);
             break;
-        case COMMON_EVENT_SERVICE_ID:
+        }
+        case COMMON_EVENT_SERVICE_ID: {
             MISC_HILOGI("common event service start");
             int32_t ret = SubscribeCommonEvent("usual.event.data_share_ready",
                 std::bind(&MiscdeviceService::OnReceiveEvent, this, std::placeholders::_1));
@@ -129,18 +129,22 @@ void MiscdeviceService::OnAddSystemAbility(int32_t systemAbilityId, const std::s
                 MISC_HILOGE("Subscribe usual.event.data_share_ready fail");
             }
             break;
-        case DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID:
+        }
+        case DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID: {
             MISC_HILOGI("distributed kv data service start");
+            std::lock_guard<std::mutex> lock(isVibrationPriorityReadyMutex_);
             if (PriorityManager->Init()) {
                 MISC_HILOGI("PriorityManager init");
                 isVibrationPriorityReady_ = true;
             } else {
-                MISC_HILOGI("PriorityManager init fail");
+                MISC_HILOGE("PriorityManager init fail");
             }
             break;
-        default:
+        }
+        default: {
             MISC_HILOGI("unknown service");
             break;
+        }
     }
 }
 
@@ -150,15 +154,16 @@ void MiscdeviceService::OnReceiveEvent(const EventFwk::CommonEventData &data)
     std::string action = want.GetAction();
     if (action == "usual.event.data_share_ready") {
         MISC_HILOGI("on receive usual.event.data_share_ready");
-        if (!isVibrationPriorityReady_) {
-            if (PriorityManager->Init()) {
-                MISC_HILOGI("PriorityManager init");
-                isVibrationPriorityReady_ = true;
-            } else {
-                MISC_HILOGI("PriorityManager init fail");
-            }
-        } else {
+        std::lock_guard<std::mutex> lock(isVibrationPriorityReadyMutex_);
+        if (isVibrationPriorityReady_) {
             MISC_HILOGI("PriorityManager already init");
+            return;
+        }
+        if (PriorityManager->Init()) {
+            MISC_HILOGI("PriorityManager init");
+            isVibrationPriorityReady_ = true;
+        } else {
+            MISC_HILOGE("PriorityManager init fail");
         }
     }
 }
@@ -292,6 +297,11 @@ void MiscdeviceService::OnStop()
 
 bool MiscdeviceService::ShouldIgnoreVibrate(const VibrateInfo &info)
 {
+    std::lock_guard<std::mutex> lock(isVibrationPriorityReadyMutex_);
+    if (!isVibrationPriorityReady_) {
+        MISC_HILOGE("Vibraion priority manager not ready");
+        return VIBRATION;
+    }
     return (PriorityManager->ShouldIgnoreVibrate(info, vibratorThread_) != VIBRATION);
 }
 

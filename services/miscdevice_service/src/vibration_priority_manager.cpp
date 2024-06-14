@@ -264,7 +264,7 @@ std::shared_ptr<DataShare::DataShareHelper> VibrationPriorityManager::CreateData
         MISC_HILOGE("create data_share helper failed, uri proxy:%{public}s", SETTING_URI_PROXY.c_str());
         return nullptr;
     }
-    MISC_HILOGI("data_share unknown");
+    MISC_HILOGI("data_share create unknown");
     return nullptr;
 }
 
