@@ -27,8 +27,6 @@ ohos_unittest("LightAgentTest") {
   deps = [
     "$SUBSYSTEM_DIR/frameworks/native/light:light_interface_native",
     "$SUBSYSTEM_DIR/utils/common:libmiscdevice_utils",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
   external_deps = [
     "access_token:libaccesstoken_sdk",
@@ -38,6 +36,8 @@ ohos_unittest("LightAgentTest") {
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "googletest:gmock",
+    "googletest:gtest_main",
   ]
 }
 
