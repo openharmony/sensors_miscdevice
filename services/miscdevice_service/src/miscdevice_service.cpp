@@ -74,6 +74,8 @@ const std::string PHONE_TYPE = "phone";
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 }  // namespace
 
+bool MiscdeviceService::isVibrationPriorityReady_ = false;
+
 MiscdeviceService::MiscdeviceService()
     : SystemAbility(MISCDEVICE_SERVICE_ABILITY_ID, true),
       lightExist_(false),
@@ -123,11 +125,12 @@ void MiscdeviceService::OnAddSystemAbility(int32_t systemAbilityId, const std::s
         }
         case COMMON_EVENT_SERVICE_ID: {
             MISC_HILOGI("common event service start");
-            int32_t ret = SubscribeCommonEvent("usual.event.data_share_ready",
+            int32_t ret = SubscribeCommonEvent("usual.event.DATA_SHARE_READY",
                 std::bind(&MiscdeviceService::OnReceiveEvent, this, std::placeholders::_1));
             if (ret != ERR_OK) {
-                MISC_HILOGE("Subscribe usual.event.data_share_ready fail");
+                MISC_HILOGE("Subscribe usual.event.DATA_SHARE_READY fail");
             }
+            AddSystemAbilityListener(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
             break;
         }
         case DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID: {
@@ -152,8 +155,8 @@ void MiscdeviceService::OnReceiveEvent(const EventFwk::CommonEventData &data)
 {
     const auto &want = data.GetWant();
     std::string action = want.GetAction();
-    if (action == "usual.event.data_share_ready") {
-        MISC_HILOGI("on receive usual.event.data_share_ready");
+    if (action == "usual.event.DATA_SHARE_READY") {
+        MISC_HILOGI("on receive usual.event.DATA_SHARE_READY");
         std::lock_guard<std::mutex> lock(isVibrationPriorityReadyMutex_);
         if (isVibrationPriorityReady_) {
             MISC_HILOGI("PriorityManager already init");
@@ -198,7 +201,6 @@ void MiscdeviceService::OnStart()
     state_ = MiscdeviceServiceState::STATE_RUNNING;
     AddSystemAbilityListener(MEMORY_MANAGER_SA_ID);
     AddSystemAbilityListener(COMMON_EVENT_SERVICE_ID);
-    AddSystemAbilityListener(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
 }
 
 void MiscdeviceService::OnStartFuzz()

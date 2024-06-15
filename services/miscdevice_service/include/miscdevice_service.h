@@ -105,7 +105,7 @@ private:
     int32_t SubscribeCommonEvent(const std::string &eventName, EventReceiver receiver);
     void OnReceiveEvent(const EventFwk::CommonEventData &data);
     std::mutex isVibrationPriorityReadyMutex_;
-    bool isVibrationPriorityReady_ = false;
+    static bool isVibrationPriorityReady_;
     VibratorHdiConnection &vibratorHdiConnection_ = VibratorHdiConnection::GetInstance();
     LightHdiConnection &lightHdiConnection_ = LightHdiConnection::GetInstance();
     bool lightExist_;

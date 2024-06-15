@@ -56,7 +56,7 @@ bool VibrationPriorityManager::Init()
         MISC_HILOGE("sm cannot be nullptr");
         return false;
     }
-    auto remoteObj_ = sm->GetSystemAbility(MISCDEVICE_SERVICE_ABILITY_ID);
+    remoteObj_ = sm->GetSystemAbility(MISCDEVICE_SERVICE_ABILITY_ID);
     if (remoteObj_ == nullptr) {
         MISC_HILOGE("GetSystemAbility return nullptr");
         return false;

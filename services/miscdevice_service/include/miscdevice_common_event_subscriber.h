@@ -16,10 +16,10 @@
 #ifndef MISCDEVICE_COMMON_EVENT_SUBSCRIBER_H
 #define MISCDEVICE_COMMON_EVENT_SUBSCRIBER_H
 
+#include <functional>
+
 #include "common_event_data.h"
 #include "common_event_subscriber.h"
-
-#include <functional>
 
 namespace OHOS {
 namespace Sensors {
