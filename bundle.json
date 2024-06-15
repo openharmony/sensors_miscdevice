@@ -35,6 +35,7 @@
         "hitrace",
         "ipc",
         "init",
+        "json",
         "memmgr",
         "napi",
         "safwk",
