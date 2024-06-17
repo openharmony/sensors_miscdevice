@@ -34,5 +34,5 @@ void MiscdeviceCommonEventSubscriber::OnReceiveEvent(const EventFwk::CommonEvent
     }
     eventReceiver_(data);
 }
-}  // namespace Sensors
-}  // namespace OHOS
+} // namespace Sensors
+} // namespace OHOS

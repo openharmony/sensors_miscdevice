@@ -261,17 +261,17 @@ std::shared_ptr<DataShare::DataShareHelper> VibrationPriorityManager::CreateData
     if (ret == DATA_SHARE_READY) {
         return helper;
     } else if (ret == DATA_SHARE_NOT_READY) {
-        MISC_HILOGE("create data_share helper failed, uri proxy:%{public}s", SETTING_URI_PROXY.c_str());
+        MISC_HILOGE("Create data_share helper failed, uri proxy:%{public}s", SETTING_URI_PROXY.c_str());
         return nullptr;
     }
-    MISC_HILOGI("data_share create unknown");
+    MISC_HILOGI("Data_share create unknown");
     return nullptr;
 }
 
 bool VibrationPriorityManager::ReleaseDataShareHelper(std::shared_ptr<DataShare::DataShareHelper> &helper)
 {
     if (!helper->Release()) {
-        MISC_HILOGW("release helper fail");
+        MISC_HILOGW("Release helper fail");
         return false;
     }
     return true;
@@ -308,7 +308,7 @@ int32_t VibrationPriorityManager::RegisterObserver(const sptr<MiscDeviceObserver
     execCb.detach();
     ReleaseDataShareHelper(helper);
     IPCSkeleton::SetCallingIdentity(callingIdentity);
-    MISC_HILOGD("succeed to register observer of uri");
+    MISC_HILOGI("Succeed to register observer of uri");
     return ERR_OK;
 }
 
@@ -330,7 +330,7 @@ int32_t VibrationPriorityManager::UnregisterObserver(const sptr<MiscDeviceObserv
     helper->UnregisterObserver(uriRingerMode, observer);
     ReleaseDataShareHelper(helper);
     IPCSkeleton::SetCallingIdentity(callingIdentity);
-    MISC_HILOGD("succeed to unregister observer");
+    MISC_HILOGI("Succeed to unregister observer");
     return ERR_OK;
 }
 }  // namespace Sensors

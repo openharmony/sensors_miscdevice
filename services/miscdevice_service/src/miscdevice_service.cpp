@@ -98,14 +98,14 @@ void MiscdeviceService::OnDump()
 
 int32_t MiscdeviceService::SubscribeCommonEvent(const std::string &eventName, EventReceiver receiver)
 {
+    if (receiver == nullptr) {
+        MISC_HILOGE("receiver is nullptr");
+        return ERROR;
+    }
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(eventName);
     EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
     auto subscribePtr = std::make_shared<MiscdeviceCommonEventSubscriber>(subscribeInfo, receiver);
-    if (subscribePtr == nullptr) {
-        MISC_HILOGE("subscribePtr is nallptr");
-        return ERROR;
-    }
     if (!EventFwk::CommonEventManager::SubscribeCommonEvent(subscribePtr)) {
         MISC_HILOGE("Subscribe common event fail");
         return ERROR;
@@ -118,13 +118,13 @@ void MiscdeviceService::OnAddSystemAbility(int32_t systemAbilityId, const std::s
     MISC_HILOGI("OnAddSystemAbility systemAbilityId:%{public}d", systemAbilityId);
     switch (systemAbilityId) {
         case MEMORY_MANAGER_SA_ID: {
-            MISC_HILOGI("memory manager service start");
+            MISC_HILOGI("Memory manager service start");
             Memory::MemMgrClient::GetInstance().NotifyProcessStatus(getpid(),
                 SYSTEM_PROCESS_TYPE, SYSTEM_STATUS_START, SA_ID);
             break;
         }
         case COMMON_EVENT_SERVICE_ID: {
-            MISC_HILOGI("common event service start");
+            MISC_HILOGI("Common event service start");
             int32_t ret = SubscribeCommonEvent("usual.event.DATA_SHARE_READY",
                 std::bind(&MiscdeviceService::OnReceiveEvent, this, std::placeholders::_1));
             if (ret != ERR_OK) {
@@ -134,7 +134,7 @@ void MiscdeviceService::OnAddSystemAbility(int32_t systemAbilityId, const std::s
             break;
         }
         case DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID: {
-            MISC_HILOGI("distributed kv data service start");
+            MISC_HILOGI("Distributed kv data service start");
             std::lock_guard<std::mutex> lock(isVibrationPriorityReadyMutex_);
             if (PriorityManager->Init()) {
                 MISC_HILOGI("PriorityManager init");
@@ -145,7 +145,7 @@ void MiscdeviceService::OnAddSystemAbility(int32_t systemAbilityId, const std::s
             break;
         }
         default: {
-            MISC_HILOGI("unknown service");
+            MISC_HILOGI("Unknown service, systemAbilityId:%{public}d", systemAbilityId);
             break;
         }
     }
@@ -156,7 +156,7 @@ void MiscdeviceService::OnReceiveEvent(const EventFwk::CommonEventData &data)
     const auto &want = data.GetWant();
     std::string action = want.GetAction();
     if (action == "usual.event.DATA_SHARE_READY") {
-        MISC_HILOGI("on receive usual.event.DATA_SHARE_READY");
+        MISC_HILOGI("On receive usual.event.DATA_SHARE_READY");
         std::lock_guard<std::mutex> lock(isVibrationPriorityReadyMutex_);
         if (isVibrationPriorityReady_) {
             MISC_HILOGI("PriorityManager already init");

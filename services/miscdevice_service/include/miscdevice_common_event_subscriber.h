@@ -32,6 +32,6 @@ public:
 private:
     EventReceiver eventReceiver_;
 };
-}  // namespace Sensors
-}  // namespace OHOS
-#endif  // MISCDEVICE_COMMON_EVENT_SUBSCRIBER_H
+} // namespace Sensors
+} // namespace OHOS
+#endif // MISCDEVICE_COMMON_EVENT_SUBSCRIBER_H
