@@ -302,10 +302,11 @@ int32_t VibratorServiceClient::PreProcess(const VibratorFileDescription &fd, Vib
         .offset = fd.offset,
         .length = fd.length
     };
-    decodeHandle_.decoder = decodeHandle_.create(rawFd);
+    JsonParser parser(rawFd);
+    decodeHandle_.decoder = decodeHandle_.create(rawFd, parser);
     CHKPR(decodeHandle_.decoder, ERROR);
     VibratePackage pkg = {};
-    if (decodeHandle_.decoder->DecodeEffect(rawFd, pkg) != 0) {
+    if (decodeHandle_.decoder->DecodeEffect(parser, pkg) != 0) {
         MISC_HILOGE("DecodeEffect fail");
         decodeHandle_.destroy(decodeHandle_.decoder);
         decodeHandle_.decoder = nullptr;
