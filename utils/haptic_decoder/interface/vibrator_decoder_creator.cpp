@@ -80,10 +80,10 @@ bool VibratorDecoderCreator::CheckJsonMetadata(const JsonParser &parser)
     return channelItem != nullptr;
 }
 
-extern "C" IVibratorDecoder *Create(const RawFileDescriptor &rawFd)
+extern "C" IVibratorDecoder *Create(const RawFileDescriptor &rawFd, const JsonParser &parser)
 {
     VibratorDecoderCreator creator;
-    return creator.CreateDecoder(rawFd);
+    return creator.CreateDecoder(rawFd, parser);
 }
 
 extern "C" void Destroy(IVibratorDecoder *decoder)

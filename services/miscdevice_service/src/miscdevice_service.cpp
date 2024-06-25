@@ -495,7 +495,7 @@ int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, const RawFileD
     std::unique_ptr<IVibratorDecoder> decoder(creator.CreateDecoder(rawFd, parser));
     CHKPR(decoder, ERROR);
     VibratePackage package;
-    int32_t ret = decoder->DecodeEffect(parser, package);
+    int32_t ret = decoder->DecodeEffect(rawFd, parser, package);
     if (ret != SUCCESS || package.patterns.empty()) {
         MISC_HILOGE("Decode effect error");
         return ERROR;

@@ -49,7 +49,8 @@ constexpr int32_t CURVE_FREQUENCY_MAX = 100;
 constexpr int32_t MAX_JSON_FILE_SIZE = 64 * 1024;
 } // namespace
 
-int32_t DefaultVibratorDecoder::DecodeEffect(const JsonParser &parser, VibratePackage &patternPackage)
+int32_t DefaultVibratorDecoder::DecodeEffect(const RawFileDescriptor &rawFd, const JsonParser &parser,
+    VibratePackage &patternPackage)
 {
     if ((rawFd.fd < 0) || (rawFd.offset < 0) || (rawFd.length <= 0) || (rawFd.length > MAX_JSON_FILE_SIZE)) {
         MISC_HILOGE("Invalid file descriptor, fd:%{public}d, offset:%{public}" PRId64 ", length:%{public}" PRId64,
