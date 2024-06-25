@@ -33,7 +33,7 @@ class VibratorDecoderCreator {
 public:
     VibratorDecoderCreator() = default;
     virtual ~VibratorDecoderCreator() = default;
-    IVibratorDecoder *CreateDecoder(const RawFileDescriptor &rawFd);
+    IVibratorDecoder *CreateDecoder(const RawFileDescriptor &rawFd, const JsonParser &parser);
 
 private:
     bool CheckJsonMetadata(const JsonParser &parser);

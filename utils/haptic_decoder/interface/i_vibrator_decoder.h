@@ -25,7 +25,7 @@ class IVibratorDecoder {
 public:
     IVibratorDecoder() = default;
     virtual ~IVibratorDecoder() = default;
-    virtual int32_t DecodeEffect(const RawFileDescriptor &rawFd, VibratePackage &patternPackage) = 0;
+    virtual int32_t DecodeEffect(const JsonParser &parser, VibratePackage &patternPackage) = 0;
 };
 }  // namespace Sensors
 }  // namespace OHOS

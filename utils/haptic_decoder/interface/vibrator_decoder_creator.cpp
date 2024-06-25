@@ -30,7 +30,7 @@ namespace Sensors {
 namespace {
 const std::string JSON_TAG = "Channels";
 } // namespace
-IVibratorDecoder *VibratorDecoderCreator::CreateDecoder(const RawFileDescriptor &fd)
+IVibratorDecoder *VibratorDecoderCreator::CreateDecoder(const RawFileDescriptor &fd, const JsonParser &parser)
 {
     CALL_LOG_ENTER;
     DecoderType type = GetDecoderType(fd);
@@ -43,7 +43,6 @@ IVibratorDecoder *VibratorDecoderCreator::CreateDecoder(const RawFileDescriptor 
         DefaultVibratorDecoderFactory factory;
         return factory.CreateDecoder();
     }
-    JsonParser parser(fd);
     if (CheckJsonMetadata(parser)) {
         MISC_HILOGD("Get oh_json tag");
         DefaultVibratorDecoderFactory factory;
