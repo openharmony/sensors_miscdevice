@@ -166,8 +166,9 @@ int32_t HEVibratorDecoder::ParseEvent(const JsonParser &parser, cJSON *eventJSON
         MISC_HILOGE("Unknown event type %{public}s", type.c_str());
         return ERROR;
     }
-    cJSON *indexJSON = parser.GetObjectItem(eventJSON, "Index");
-    if (indexJSON != NULL) {
+    if (parser.HasObjectItem(eventJSON, "Index")) {
+        cJSON *indexJSON = parser.GetObjectItem(eventJSON, "Index");
+        CHKPR(indexJSON, ERROR);
         event.index = cJSON_IsNumber(indexJSON) ? indexJSON->valueint : -1;
     } else {
         event.index = 0;

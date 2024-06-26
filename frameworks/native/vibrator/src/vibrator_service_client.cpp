@@ -274,7 +274,7 @@ int32_t VibratorServiceClient::LoadDecoderLibrary(const std::string& path)
         MISC_HILOGE("dlopen failed, reason:%{public}s", dlerror());
         return ERROR;
     }
-    decodeHandle_.create = reinterpret_cast<IVibratorDecoder *(*)(const RawFileDescriptor &, const JsonParser &)>(
+    decodeHandle_.create = reinterpret_cast<IVibratorDecoder *(*)(const JsonParser &)>(
         dlsym(decodeHandle_.handle, "Create"));
     if (decodeHandle_.create == nullptr) {
         MISC_HILOGE("dlsym create failed: error: %{public}s", dlerror());
@@ -303,7 +303,7 @@ int32_t VibratorServiceClient::PreProcess(const VibratorFileDescription &fd, Vib
         .length = fd.length
     };
     JsonParser parser(rawFd);
-    decodeHandle_.decoder = decodeHandle_.create(rawFd, parser);
+    decodeHandle_.decoder = decodeHandle_.create(parser);
     CHKPR(decodeHandle_.decoder, ERROR);
     VibratePackage pkg = {};
     if (decodeHandle_.decoder->DecodeEffect(rawFd, parser, pkg) != 0) {

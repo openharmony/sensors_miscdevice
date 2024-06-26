@@ -492,7 +492,7 @@ int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, const RawFileD
     }
     JsonParser parser(rawFd);
     VibratorDecoderCreator creator;
-    std::unique_ptr<IVibratorDecoder> decoder(creator.CreateDecoder(rawFd, parser));
+    std::unique_ptr<IVibratorDecoder> decoder(creator.CreateDecoder(parser));
     CHKPR(decoder, ERROR);
     VibratePackage package;
     int32_t ret = decoder->DecodeEffect(rawFd, parser, package);
