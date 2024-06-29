@@ -243,7 +243,7 @@ int32_t MiscdeviceServiceStub::TurnOffStub(MessageParcel &data, MessageParcel &r
     return TurnOff(lightId);
 }
 
-int32_t MiscdeviceServiceStub::BypassOnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
+int32_t MiscdeviceServiceStub::ProcessRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
     switch (code) {
@@ -295,6 +295,7 @@ int32_t MiscdeviceServiceStub::BypassOnRemoteRequest(uint32_t code, MessageParce
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
         }
     }
+    MISC_HILOGD("Remoterequest no member function default process");
 }
 
 int32_t MiscdeviceServiceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
@@ -307,8 +308,7 @@ int32_t MiscdeviceServiceStub::OnRemoteRequest(uint32_t code, MessageParcel &dat
         MISC_HILOGE("Client and service descriptors are inconsistent");
         return OBJECT_NULL;
     }
-    MISC_HILOGD("Remoterequest no member function default process");
-    return BypassOnRemoteRequest(code, data, reply, option);
+    return ProcessRemoteRequest(code, data, reply, option);
 }
 
 int32_t MiscdeviceServiceStub::PlayPatternStub(MessageParcel &data, MessageParcel &reply)

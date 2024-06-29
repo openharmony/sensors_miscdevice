@@ -55,7 +55,7 @@ private:
     int32_t TurnOnStub(MessageParcel &data, MessageParcel &reply);
     int32_t TurnOffStub(MessageParcel &data, MessageParcel &reply);
     bool CheckVibratePermission();
-    int32_t BypassCfiProtection(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    int32_t ProcessRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     int32_t PlayPatternStub(MessageParcel &data, MessageParcel &reply);
     int32_t GetDelayTimeStub(MessageParcel &data, MessageParcel &reply);
     int32_t TransferClientRemoteObjectStub(MessageParcel &data, MessageParcel &reply);
