@@ -292,10 +292,10 @@ int32_t MiscdeviceServiceStub::ProcessRemoteRequest(uint32_t code, MessageParcel
             return GetVibratorCapacityStub(data, reply);
         }
         default: {
+            MISC_HILOGD("Remoterequest no member function default process");
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
         }
     }
-    MISC_HILOGD("Remoterequest no member function default process");
 }
 
 int32_t MiscdeviceServiceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
