@@ -37,7 +37,6 @@ public:
 
 private:
     DISALLOW_COPY_AND_MOVE(MiscdeviceServiceStub);
-    using MiscBaseFunc = int32_t (MiscdeviceServiceStub::*)(MessageParcel &data, MessageParcel &reply);
 
     int32_t IsAbilityAvailableStub(MessageParcel &data, MessageParcel &reply);
     int32_t IsVibratorEffectAvailableStub(MessageParcel &data, MessageParcel &reply);
