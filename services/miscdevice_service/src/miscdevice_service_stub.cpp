@@ -332,6 +332,7 @@ int32_t MiscdeviceServiceStub::BypassCfiProtection(uint32_t code, MessageParcel 
     }
     return ERR_OK;
 }
+
 int32_t MiscdeviceServiceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
                                                MessageOption &option)
 {
