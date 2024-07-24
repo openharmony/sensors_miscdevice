@@ -63,6 +63,7 @@ public:
     DISALLOW_COPY_AND_MOVE(VibrationPriorityManager);
     bool Init();
     VibrateStatus ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo, std::shared_ptr<VibratorThread> vibratorThread);
+    bool ShouldIgnoreSwitch(const VibrateInfo &info);
 
 private:
     bool IsCurrentVibrate(std::shared_ptr<VibratorThread> vibratorThread) const;

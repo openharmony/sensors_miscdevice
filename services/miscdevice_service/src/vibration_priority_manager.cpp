@@ -15,6 +15,7 @@
 
 #include "vibration_priority_manager.h"
 
+#include "app_mgr_client.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
@@ -166,6 +167,17 @@ void VibrationPriorityManager::UpdateStatus()
         }
         miscAudioRingerMode_ = ringerMode;
     }
+}
+
+bool VibrationPriorityManager::ShouldIgnoreSwitch(const VibrateInfo &info)
+{
+    int32_t pid = info.pid;
+    AppExecfwk::RunningProcessInfo processinfo{};
+    DelayedSingleton<AppExecfwk::AppMgrClient>::GetInstance()->AppExecfwk::AppMgrClient::GetRunningProcessInfoByPid(pid, processinfo);
+    if (processinfo.extensionType_ == AppExecfwk::ExtensionAbilityType::INPUTMETHOD) {
+        return true;
+    }
+    return false;
 }
 
 VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo,
