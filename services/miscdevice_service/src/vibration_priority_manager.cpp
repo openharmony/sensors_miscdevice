@@ -169,12 +169,13 @@ void VibrationPriorityManager::UpdateStatus()
     }
 }
 
-bool VibrationPriorityManager::ShouldIgnoreSwitch(const VibrateInfo &info)
+bool VibrationPriorityManager::ShouldIgnoreSwitch(const VibrateInfo &vibrateInfo)
 {
-    int32_t pid = info.pid;
-    AppExecfwk::RunningProcessInfo processinfo{};
-    DelayedSingleton<AppExecfwk::AppMgrClient>::GetInstance()->AppExecfwk::AppMgrClient::GetRunningProcessInfoByPid(pid, processinfo);
-    if (processinfo.extensionType_ == AppExecfwk::ExtensionAbilityType::INPUTMETHOD) {
+    int32_t pid = vibrateInfo.pid;
+    AppExecFwk::RunningProcessInfo processinfo{};
+    DelayedSingleton<AppExecFwk::AppMgrClient>::GetInstance()->
+        AppExecFwk::AppMgrClient::GetRunningProcessInfoByPid(pid, processinfo);
+    if (processinfo.extensionType_ == AppExecFwk::ExtensionAbilityType::INPUTMETHOD) {
         return true;
     }
     return false;
@@ -188,16 +189,19 @@ VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &v
         return VIBRATION;
     }
     UpdateStatus();
-    if ((vibrateInfo.usage == USAGE_ALARM || vibrateInfo.usage == USAGE_RING || vibrateInfo.usage == USAGE_NOTIFICATION
-        || vibrateInfo.usage == USAGE_COMMUNICATION) && (miscAudioRingerMode_ == RINGER_MODE_SILENT)) {
-        MISC_HILOGD("Vibration is ignored for ringer mode:%{public}d", static_cast<int32_t>(miscAudioRingerMode_));
-        return IGNORE_RINGER_MODE;
-    }
-    if ((vibrateInfo.usage == USAGE_TOUCH || vibrateInfo.usage == USAGE_MEDIA || vibrateInfo.usage == USAGE_UNKNOWN
-        || vibrateInfo.usage == USAGE_PHYSICAL_FEEDBACK || vibrateInfo.usage == USAGE_SIMULATE_REALITY)
-        && (miscFeedback_ == FEEDBACK_MODE_OFF)) {
-        MISC_HILOGD("Vibration is ignored for feedback:%{public}d", static_cast<int32_t>(miscFeedback_));
-        return IGNORE_FEEDBACK;
+    if (!ShouldIgnoreSwitch(vibrateInfo)) {
+        if ((vibrateInfo.usage == USAGE_ALARM || vibrateInfo.usage == USAGE_RING ||
+            vibrateInfo.usage == USAGE_NOTIFICATION
+            || vibrateInfo.usage == USAGE_COMMUNICATION) && (miscAudioRingerMode_ == RINGER_MODE_SILENT)) {
+            MISC_HILOGD("Vibration is ignored for ringer mode:%{public}d", static_cast<int32_t>(miscAudioRingerMode_));
+            return IGNORE_RINGER_MODE;
+        }
+        if ((vibrateInfo.usage == USAGE_TOUCH || vibrateInfo.usage == USAGE_MEDIA || vibrateInfo.usage == USAGE_UNKNOWN
+            || vibrateInfo.usage == USAGE_PHYSICAL_FEEDBACK || vibrateInfo.usage == USAGE_SIMULATE_REALITY)
+            && (miscFeedback_ == FEEDBACK_MODE_OFF)) {
+            MISC_HILOGD("Vibration is ignored for feedback:%{public}d", static_cast<int32_t>(miscFeedback_));
+            return IGNORE_FEEDBACK;
+        }
     }
     if (vibratorThread == nullptr) {
         MISC_HILOGD("There is no vibration, it can vibrate");
