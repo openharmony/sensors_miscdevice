@@ -21,6 +21,7 @@
 #include <memory>
 #include <vector>
 
+#include "app_mgr_client.h"
 #include "datashare_helper.h"
 #include "iremote_object.h"
 #include "singleton.h"
@@ -63,11 +64,11 @@ public:
     DISALLOW_COPY_AND_MOVE(VibrationPriorityManager);
     bool Init();
     VibrateStatus ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo, std::shared_ptr<VibratorThread> vibratorThread);
-    bool ShouldIgnoreSwitch(const VibrateInfo &vibrateInfo);
 
 private:
     bool IsCurrentVibrate(std::shared_ptr<VibratorThread> vibratorThread) const;
     bool IsLoopVibrate(const VibrateInfo &vibrateInfo) const;
+    bool ShouldIgnoreSwitch(const VibrateInfo &vibrateInfo);
     VibrateStatus ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo, VibrateInfo currentVibrateInfo) const;
     static void ExecRegisterCb(const sptr<MiscDeviceObserver> &observer);
     int32_t RegisterObserver(const sptr<MiscDeviceObserver> &observer);
@@ -82,6 +83,7 @@ private:
     void UpdateStatus();
     sptr<IRemoteObject> remoteObj_ { nullptr };
     sptr<MiscDeviceObserver> observer_ { nullptr };
+    std::shared_ptr<AppExecFwk::AppMgrClient> appMgrClientPtr_ {nullptr};
     std::atomic_int32_t miscFeedback_ = FEEDBACK_MODE_INVALID;
     std::atomic_int32_t miscAudioRingerMode_ = RINGER_MODE_INVALID;
 };

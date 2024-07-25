@@ -15,7 +15,6 @@
 
 #include "vibration_priority_manager.h"
 
-#include "app_mgr_client.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
@@ -173,8 +172,12 @@ bool VibrationPriorityManager::ShouldIgnoreSwitch(const VibrateInfo &vibrateInfo
 {
     int32_t pid = vibrateInfo.pid;
     AppExecFwk::RunningProcessInfo processinfo{};
-    DelayedSingleton<AppExecFwk::AppMgrClient>::GetInstance()->
-        AppExecFwk::AppMgrClient::GetRunningProcessInfoByPid(pid, processinfo);
+    appMgrClientPtr_ = DelayedSingleton<AppExecFwk::AppMgrClient>::GetInstance();
+    if (appMgrClientPtr_ == nullptr) {
+        MISC_HILOGD("appMgrClientPtr is nullptr");
+        return false;
+    }
+    appMgrClientPtr_->AppExecFwk::AppMgrClient::GetRunningProcessInfoByPid(pid, processinfo);
     if (processinfo.extensionType_ == AppExecFwk::ExtensionAbilityType::INPUTMETHOD) {
         return true;
     }
