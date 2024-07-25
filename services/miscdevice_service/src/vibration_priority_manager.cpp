@@ -177,7 +177,11 @@ bool VibrationPriorityManager::ShouldIgnoreSwitch(const VibrateInfo &vibrateInfo
         MISC_HILOGD("appMgrClientPtr is nullptr");
         return false;
     }
-    appMgrClientPtr_->AppExecFwk::AppMgrClient::GetRunningProcessInfoByPid(pid, processinfo);
+    int32_t ret = appMgrClientPtr_->AppExecFwk::AppMgrClient::GetRunningProcessInfoByPid(pid, processinfo);
+    if (ret != ERR_OK) {
+        MISC_HILOGD("Getrunningprocessinfobypid failed");
+        return false;
+    }
     if (processinfo.extensionType_ == AppExecFwk::ExtensionAbilityType::INPUTMETHOD) {
         return true;
     }
