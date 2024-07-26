@@ -74,9 +74,9 @@ ohos_shared_library("libmiscdevice_service") {
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
-    "os_account:os_account_innerkits",
     "ipc:ipc_single",
     "json:nlohmann_json_static",
+    "os_account:os_account_innerkits",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
