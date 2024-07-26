@@ -188,18 +188,18 @@ bool VibrationPriorityManager::ShouldIgnoreInputManager(const VibrateInfo &vibra
     if (processinfo.extensionType_ == AppExecFwk::ExtensionAbilityType::INPUTMETHOD) {
         return true;
     }
+    std::vector<int32_t> activeUserIds;
+    int retId = AccountSA::OsAccountManager::QueryActiveOsAccountIds(activeUserIds);
+    if (retId != 0) {
+        MISC_HILOGE("QueryActiveOsAccountIds failed %{public}d", retId);
+        return false;
+    }
+    if (activeUserIds.empty()) {
+        MISC_HILOGE("activeUserId empty");
+        return false;
+    }
     for (const auto &bundleName : processinfo.bundleNames) {
         MISC_HILOGD("bundleName = %{public}s", bundleName.c_str());
-        std::vector<int32_t> activeUserIds;
-        int ret = AccountSA::OsAccountManager::QueryActiveOsAccountIds(activeUserIds);
-        if (ret != 0) {
-            MISC_HILOGD("QueryActiveOsAccountIds failed %{public}d", ret);
-            return false;
-        }
-        if (activeUserIds.empty()) {
-            MISC_HILOGD("activeUserId empty");
-            return false;
-        }
         AppExecFwk::BundleMgrClient bundleMgrClient;
         AppExecFwk::BundleInfo bundleInfo;
         auto res = bundleMgrClient.AppExecFwk::BundleMgrClient::GetBundleInfo(bundleName,
