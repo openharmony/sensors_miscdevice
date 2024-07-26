@@ -68,8 +68,8 @@ public:
 private:
     bool IsCurrentVibrate(std::shared_ptr<VibratorThread> vibratorThread) const;
     bool IsLoopVibrate(const VibrateInfo &vibrateInfo) const;
-    bool ShouldIgnoreSwitch(const VibrateInfo &vibrateInfo);
     VibrateStatus ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo, VibrateInfo currentVibrateInfo) const;
+    bool ShouldIgnoreInputManager(const VibrateInfo &vibrateInfo);
     static void ExecRegisterCb(const sptr<MiscDeviceObserver> &observer);
     int32_t RegisterObserver(const sptr<MiscDeviceObserver> &observer);
     int32_t UnregisterObserver(const sptr<MiscDeviceObserver> &observer);

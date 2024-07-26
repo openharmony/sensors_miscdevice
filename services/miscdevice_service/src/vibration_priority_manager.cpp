@@ -15,8 +15,11 @@
 
 #include "vibration_priority_manager.h"
 
+#include "bundle_mgr_client.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
+#include "os_account_manager.h"
+#include "running_process_info.h"
 #include "system_ability_definition.h"
 #include "uri.h"
 
@@ -168,7 +171,7 @@ void VibrationPriorityManager::UpdateStatus()
     }
 }
 
-bool VibrationPriorityManager::ShouldIgnoreSwitch(const VibrateInfo &vibrateInfo)
+bool VibrationPriorityManager::ShouldIgnoreInputManager(const VibrateInfo &vibrateInfo)
 {
     int32_t pid = vibrateInfo.pid;
     AppExecFwk::RunningProcessInfo processinfo{};
@@ -185,6 +188,33 @@ bool VibrationPriorityManager::ShouldIgnoreSwitch(const VibrateInfo &vibrateInfo
     if (processinfo.extensionType_ == AppExecFwk::ExtensionAbilityType::INPUTMETHOD) {
         return true;
     }
+    for (const auto &bundleName : processinfo.bundleNames) {
+        MISC_HILOGD("bundleName = %{public}s", bundleName.c_str());
+        std::vector<int32_t> activeUserIds;
+        int ret = AccountSA::OsAccountManager::QueryActiveOsAccountIds(activeUserIds);
+        if (ret != 0) {
+            MISC_HILOGD("QueryActiveOsAccountIds failed %{public}d", ret);
+            return false;
+        }
+        if (activeUserIds.empty()) {
+            MISC_HILOGD("activeUserId empty");
+            return false;
+        }
+        AppExecFwk::BundleMgrClient bundleMgrClient;
+        AppExecFwk::BundleInfo bundleInfo;
+        auto res = bundleMgrClient.AppExecFwk::BundleMgrClient::GetBundleInfo(bundleName,
+            AppExecFwk::BundleFlag::GET_BUNDLE_WITH_EXTENSION_INFO, bundleInfo, activeUserIds[0]);
+        if (!res) {
+            MISC_HILOGE("Getbundleinfo fail, res = %{public}d", res);
+            return false;
+        }
+        for (const auto &extensionInfo : bundleInfo.extensionInfos) {
+            if (extensionInfo.type == AppExecFwk::ExtensionAbilityType::INPUTMETHOD) {
+                MISC_HILOGE("extensioninfo type is %{public}d", extensionInfo.type);
+                return true;
+            }
+        }
+   }
     return false;
 }
 
@@ -196,19 +226,17 @@ VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &v
         return VIBRATION;
     }
     UpdateStatus();
-    if (!ShouldIgnoreSwitch(vibrateInfo)) {
-        if ((vibrateInfo.usage == USAGE_ALARM || vibrateInfo.usage == USAGE_RING ||
-            vibrateInfo.usage == USAGE_NOTIFICATION
-            || vibrateInfo.usage == USAGE_COMMUNICATION) && (miscAudioRingerMode_ == RINGER_MODE_SILENT)) {
-            MISC_HILOGD("Vibration is ignored for ringer mode:%{public}d", static_cast<int32_t>(miscAudioRingerMode_));
-            return IGNORE_RINGER_MODE;
-        }
-        if ((vibrateInfo.usage == USAGE_TOUCH || vibrateInfo.usage == USAGE_MEDIA || vibrateInfo.usage == USAGE_UNKNOWN
-            || vibrateInfo.usage == USAGE_PHYSICAL_FEEDBACK || vibrateInfo.usage == USAGE_SIMULATE_REALITY)
-            && (miscFeedback_ == FEEDBACK_MODE_OFF)) {
-            MISC_HILOGD("Vibration is ignored for feedback:%{public}d", static_cast<int32_t>(miscFeedback_));
-            return IGNORE_FEEDBACK;
-        }
+    if ((vibrateInfo.usage == USAGE_ALARM || vibrateInfo.usage == USAGE_RING ||
+        vibrateInfo.usage == USAGE_NOTIFICATION
+        || vibrateInfo.usage == USAGE_COMMUNICATION) && (miscAudioRingerMode_ == RINGER_MODE_SILENT)) {
+        MISC_HILOGD("Vibration is ignored for ringer mode:%{public}d", static_cast<int32_t>(miscAudioRingerMode_));
+        return IGNORE_RINGER_MODE;
+    }
+    if (((vibrateInfo.usage == USAGE_TOUCH || vibrateInfo.usage == USAGE_MEDIA || vibrateInfo.usage == USAGE_UNKNOWN
+        || vibrateInfo.usage == USAGE_PHYSICAL_FEEDBACK || vibrateInfo.usage == USAGE_SIMULATE_REALITY)
+        && (miscFeedback_ == FEEDBACK_MODE_OFF)) && !ShouldIgnoreSwitch(vibrateInfo)) {
+        MISC_HILOGD("Vibration is ignored for feedback:%{public}d", static_cast<int32_t>(miscFeedback_));
+        return IGNORE_FEEDBACK;
     }
     if (vibratorThread == nullptr) {
         MISC_HILOGD("There is no vibration, it can vibrate");
