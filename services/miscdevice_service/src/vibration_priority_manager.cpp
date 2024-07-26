@@ -171,7 +171,7 @@ void VibrationPriorityManager::UpdateStatus()
     }
 }
 
-bool VibrationPriorityManager::ShouldIgnoreInputManager(const VibrateInfo &vibrateInfo)
+bool VibrationPriorityManager::ShouldIgnoreInputMethod(const VibrateInfo &vibrateInfo)
 {
     int32_t pid = vibrateInfo.pid;
     AppExecFwk::RunningProcessInfo processinfo{};
@@ -205,16 +205,16 @@ bool VibrationPriorityManager::ShouldIgnoreInputManager(const VibrateInfo &vibra
         auto res = bundleMgrClient.AppExecFwk::BundleMgrClient::GetBundleInfo(bundleName,
             AppExecFwk::BundleFlag::GET_BUNDLE_WITH_EXTENSION_INFO, bundleInfo, activeUserIds[0]);
         if (!res) {
-            MISC_HILOGE("Getbundleinfo fail, res = %{public}d", res);
+            MISC_HILOGE("Getbundleinfo fail");
             return false;
         }
         for (const auto &extensionInfo : bundleInfo.extensionInfos) {
             if (extensionInfo.type == AppExecFwk::ExtensionAbilityType::INPUTMETHOD) {
-                MISC_HILOGE("extensioninfo type is %{public}d", extensionInfo.type);
+                MISC_HILOGD("extensioninfo type is %{public}d", extensionInfo.type);
                 return true;
             }
         }
-   }
+    }
     return false;
 }
 
@@ -234,7 +234,7 @@ VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &v
     }
     if (((vibrateInfo.usage == USAGE_TOUCH || vibrateInfo.usage == USAGE_MEDIA || vibrateInfo.usage == USAGE_UNKNOWN
         || vibrateInfo.usage == USAGE_PHYSICAL_FEEDBACK || vibrateInfo.usage == USAGE_SIMULATE_REALITY)
-        && (miscFeedback_ == FEEDBACK_MODE_OFF)) && !ShouldIgnoreSwitch(vibrateInfo)) {
+        && (miscFeedback_ == FEEDBACK_MODE_OFF)) && !ShouldIgnoreInputMethod(vibrateInfo)) {
         MISC_HILOGD("Vibration is ignored for feedback:%{public}d", static_cast<int32_t>(miscFeedback_));
         return IGNORE_FEEDBACK;
     }
