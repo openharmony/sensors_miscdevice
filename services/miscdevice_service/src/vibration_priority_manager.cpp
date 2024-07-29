@@ -15,6 +15,8 @@
 
 #include "vibration_priority_manager.h"
 
+#include <tokenid_kit.h>
+
 #include "accesstoken_kit.h"
 #include "bundle_mgr_client.h"
 #include "ipc_skeleton.h"
@@ -259,6 +261,7 @@ VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &v
             MISC_HILOGD("Vibration is ignored for feedback:%{public}d", static_cast<int32_t>(miscFeedback_));
             return IGNORE_FEEDBACK;
         }
+    }
     if (vibratorThread == nullptr) {
         MISC_HILOGD("There is no vibration, it can vibrate");
         return VIBRATION;
