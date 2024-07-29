@@ -258,7 +258,8 @@ int32_t PlayPrimitiveEffect(const char *effectId, int32_t intensity)
     MISC_HILOGD("Time delay measurement:start time");
     CHKPR(effectId, PARAMETER_ERROR);
     auto &client = VibratorServiceClient::GetInstance();
-    int32_t ret = client.PlayPrimitiveEffect(DEFAULT_VIBRATOR_ID, effectId, intensity, g_usage, g_systemUsage, g_loopCount);
+    int32_t ret = client.PlayPrimitiveEffect(DEFAULT_VIBRATOR_ID, effectId, intensity,
+        g_usage, g_systemUsage, g_loopCount);
     g_loopCount = 1;
     g_usage = USAGE_UNKNOWN;
     g_systemUsage = false;

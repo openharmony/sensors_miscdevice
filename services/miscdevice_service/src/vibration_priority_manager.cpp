@@ -247,8 +247,9 @@ VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &v
     }
     UpdateStatus();
     if (!IsSystemCalling() || vibrateInfo.systemUsage == false) {
-        if ((vibrateInfo.usage == USAGE_ALARM || vibrateInfo.usage == USAGE_RING || vibrateInfo.usage == USAGE_NOTIFICATION
-            || vibrateInfo.usage == USAGE_COMMUNICATION) && (miscAudioRingerMode_ == RINGER_MODE_SILENT)) {
+        if ((vibrateInfo.usage == USAGE_ALARM || vibrateInfo.usage == USAGE_RING
+            || vibrateInfo.usage == USAGE_NOTIFICATION || vibrateInfo.usage == USAGE_COMMUNICATION)
+            && (miscAudioRingerMode_ == RINGER_MODE_SILENT)) {
             MISC_HILOGD("Vibration is ignored for ringer mode:%{public}d", static_cast<int32_t>(miscAudioRingerMode_));
             return IGNORE_RINGER_MODE;
         }

@@ -50,7 +50,8 @@ public:
     virtual int32_t TurnOn(int32_t lightId, const LightColor &color, const LightAnimationIPC &animation) = 0;
     virtual int32_t TurnOff(int32_t lightId) = 0;
     virtual int32_t GetDelayTime(int32_t &delayTime) = 0;
-    virtual int32_t PlayPattern(const VibratePattern &pattern, int32_t usage, bool systemUsage, const VibrateParameter &parameter) = 0;
+    virtual int32_t PlayPattern(const VibratePattern &pattern, int32_t usage, bool systemUsage,
+        const VibrateParameter &parameter) = 0;
     virtual int32_t TransferClientRemoteObject(const sptr<IRemoteObject> &vibratorClient) = 0;
     virtual int32_t PlayPrimitiveEffect(int32_t vibratorId, const std::string &effect, int32_t intensity,
         int32_t usage, bool systemUsage, int32_t count) = 0;
