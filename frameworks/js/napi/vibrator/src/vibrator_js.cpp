@@ -447,22 +447,23 @@ bool ParseParameter(napi_env env, napi_value args[], size_t argc, VibrateInfo &i
         CHKCF(CheckVibratorPatternParameter(info.vibratorPattern), "CheckVibratorPatternParameter fail");
     }
     CHKCF(GetPropertyString(env, args[1], "usage", info.usage), "Get vibrate usage fail");
+    CHKCF(GetPropertyBool(env, args[1], "systemUsage", info.systemUsage), "Get vibrate systemUsage fail");
     return true;
 }
 
-bool SetUsage(const std::string &usage)
+bool SetUsage(const std::string &usage, bool systemUsage)
 {
     if (auto iter = g_usageType.find(usage); iter == g_usageType.end()) {
         MISC_HILOGE("Wrong usage type");
         return false;
     }
-    return SetUsage(g_usageType[usage]);
+    return SetUsage(g_usageType[usage], systemUsage);
 }
 
 int32_t StartVibrate(const VibrateInfo &info)
 {
     CALL_LOG_ENTER;
-    if (!SetUsage(info.usage)) {
+    if (!SetUsage(info.usage, info.systemUsage)) {
         MISC_HILOGE("SetUsage fail");
         return PARAMETER_ERROR;
     }
