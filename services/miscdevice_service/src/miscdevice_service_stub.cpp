@@ -352,7 +352,7 @@ int32_t MiscdeviceServiceStub::PlayPatternStub(MessageParcel &data, MessageParce
         MISC_HILOGE("Parameter Unmarshalling failed");
         return ERROR;
     }
-    return PlayPattern(pattern.value(), usage, parameter.value());
+    return PlayPattern(pattern.value(), usage, systemUsage, parameter.value());
 }
 
 int32_t MiscdeviceServiceStub::GetDelayTimeStub(MessageParcel &data, MessageParcel &reply)
@@ -403,7 +403,7 @@ int32_t MiscdeviceServiceStub::PlayPrimitiveEffectStub(MessageParcel &data, Mess
         MISC_HILOGE("Parcel read failed");
         return ERROR;
     }
-    return PlayPrimitiveEffect(vibratorId, effect, intensity, usage, count);
+    return PlayPrimitiveEffect(vibratorId, effect, intensity, usage, systemUsage, count);
 }
 
 int32_t MiscdeviceServiceStub::GetVibratorCapacityStub(MessageParcel &data, MessageParcel &reply)
