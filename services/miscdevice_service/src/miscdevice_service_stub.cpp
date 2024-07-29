@@ -164,15 +164,15 @@ int32_t MiscdeviceServiceStub::PlayVibratorCustomStub(MessageParcel &data, Messa
         MISC_HILOGE("Parcel read usage failed");
         return ERROR;
     }
+    bool systemUsage;
+    if (!data.ReadBool(systemUsage)) {
+        MISC_HILOGE("Parcel read systemUsage failed");
+        return ERROR;
+    }
     VibrateParameter vibrateParameter;
     auto parameter = vibrateParameter.Unmarshalling(data);
     if (!parameter.has_value()) {
         MISC_HILOGE("Parameter Unmarshalling failed");
-        return ERROR;
-    }
-    bool systemUsage;
-    if (!data.ReadBool(systemUsage)) {
-        MISC_HILOGE("Parcel read systemUsage failed");
         return ERROR;
     }
     RawFileDescriptor rawFd;
