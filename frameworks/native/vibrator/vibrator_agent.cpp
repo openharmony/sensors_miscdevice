@@ -164,7 +164,7 @@ int32_t Cancel()
     return SUCCESS;
 }
 
-bool SetUsage(int32_t usage)
+bool SetUsage(int32_t usage, bool systemUsage)
 {
     if ((usage < 0) || (usage >= USAGE_MAX)) {
         MISC_HILOGE("Input invalid, usage is %{public}d", usage);

@@ -73,6 +73,7 @@ static std::set<std::string> g_allowedTypes = {"time", "preset", "file", "patter
 struct VibrateInfo {
     std::string type;
     std::string usage;
+    bool systemUsage;
     int32_t duration = 0;
     std::string effectId;
     int32_t count = 0;
