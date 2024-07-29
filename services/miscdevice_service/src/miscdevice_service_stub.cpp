@@ -160,13 +160,9 @@ int32_t MiscdeviceServiceStub::PlayVibratorCustomStub(MessageParcel &data, Messa
         return ERROR;
     }
     int32_t usage;
-    if (!data.ReadInt32(usage)) {
-        MISC_HILOGE("Parcel read usage failed");
-        return ERROR;
-    }
     bool systemUsage;
-    if (!data.ReadBool(systemUsage)) {
-        MISC_HILOGE("Parcel read systemUsage failed");
+    if (!data.ReadInt32(usage) || !data.ReadBool(systemUsage)) {
+        MISC_HILOGE("Parcel read failed");
         return ERROR;
     }
     VibrateParameter vibrateParameter;
