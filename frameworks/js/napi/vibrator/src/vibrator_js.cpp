@@ -448,7 +448,9 @@ bool ParseParameter(napi_env env, napi_value args[], size_t argc, VibrateInfo &i
         CHKCF(CheckVibratorPatternParameter(info.vibratorPattern), "CheckVibratorPatternParameter fail");
     }
     CHKCF(GetPropertyString(env, args[1], "usage", info.usage), "Get vibrate usage fail");
-    CHKCF(GetPropertyBool(env, args[1], "systemUsage", info.systemUsage), "Get vibrate systemUsage fail");
+    if (!GetPropertyBool(env, args[1], "systemUsage", info.systemUsage)) {
+        info.systemUsage = false;
+    }
     return true;
 }
 
