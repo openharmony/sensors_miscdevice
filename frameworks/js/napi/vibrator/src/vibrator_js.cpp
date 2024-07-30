@@ -449,6 +449,7 @@ bool ParseParameter(napi_env env, napi_value args[], size_t argc, VibrateInfo &i
     }
     CHKCF(GetPropertyString(env, args[1], "usage", info.usage), "Get vibrate usage fail");
     if (!GetPropertyBool(env, args[1], "systemUsage", info.systemUsage)) {
+        MISC_HILOGE("Get vibrate bool fail");
         info.systemUsage = false;
     }
     return true;
