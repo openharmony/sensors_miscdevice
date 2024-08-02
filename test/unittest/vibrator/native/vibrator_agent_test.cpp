@@ -652,6 +652,41 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_021, TestSize.Level1)
     }
     Cancel();
 }
+HWTEST_F(VibratorAgentTest, PlayVibratorCustom_022, TestSize.Level1)
+{
+    MISC_HILOGI("PlayVibratorCustom_001 in");
+    if (IsSupportVibratorCustom()) {
+        FileDescriptor fileDescriptor("/data/test/vibrator/Jet_N2O.he");
+        MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
+        struct stat64 statbuf = { 0 };
+        if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
+            int32_t ret = PlayVibratorCustom(fileDescriptor.fd, 0, statbuf.st_size);
+            ASSERT_EQ(ret, 0);
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    } else {
+        ASSERT_EQ(0, 0);
+    }
+    Cancel();
+}
+
+HWTEST_F(VibratorAgentTest, PlayVibratorCustom_023, TestSize.Level1)
+{
+    MISC_HILOGI("PlayVibratorCustom_002 in");
+    if (IsSupportVibratorCustom()) {
+        FileDescriptor fileDescriptor("/data/test/vibrator/Racing_Start.he");
+        MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
+        struct stat64 statbuf = { 0 };
+        if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
+            int32_t ret = PlayVibratorCustom(fileDescriptor.fd, 0, statbuf.st_size);
+            ASSERT_EQ(ret, 0);
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    } else {
+        ASSERT_EQ(0, 0);
+    }
+    Cancel();
+}
 
 HWTEST_F(VibratorAgentTest, SetParameters_001, TestSize.Level1)
 {

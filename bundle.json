@@ -89,7 +89,6 @@
         "//base/sensors/miscdevice/test/fuzztest/vibrator:fuzztest",
         "//base/sensors/miscdevice/test/fuzztest/light:fuzztest",
         "//base/sensors/miscdevice/test/unittest/vibrator/native:unittest",
-        "//base/sensors/miscdevice/test/unittest/utils:unittest",
         "//base/sensors/miscdevice/test/unittest/vibrator/capi:unittest",
         "//base/sensors/miscdevice/test/unittest/light:unittest",
         "//base/sensors/miscdevice/test/fuzztest/service:fuzztest"
