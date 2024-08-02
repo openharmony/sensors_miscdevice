@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -654,7 +654,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_021, TestSize.Level1)
 }
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_022, TestSize.Level1)
 {
-    MISC_HILOGI("PlayVibratorCustom_001 in");
+    MISC_HILOGI("PlayVibratorCustom_022 in");
     if (IsSupportVibratorCustom()) {
         FileDescriptor fileDescriptor("/data/test/vibrator/Jet_N2O.he");
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
@@ -672,7 +672,7 @@ HWTEST_F(VibratorAgentTest, PlayVibratorCustom_022, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, PlayVibratorCustom_023, TestSize.Level1)
 {
-    MISC_HILOGI("PlayVibratorCustom_002 in");
+    MISC_HILOGI("PlayVibratorCustom_023 in");
     if (IsSupportVibratorCustom()) {
         FileDescriptor fileDescriptor("/data/test/vibrator/Racing_Start.he");
         MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
