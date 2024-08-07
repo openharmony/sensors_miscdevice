@@ -356,7 +356,7 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_020, TestSize.Level
             .length = statbuf.st_size
         };
         Vibrator_Attribute vibrateAttribute = {
-            .usage = VIBRATOR_USAGE_UNKNOWN
+            .usage = VIBRATOR_USAGE_MAX
         };
         int32_t ret = OH_Vibrator_PlayVibrationCustom(fileDescription, vibrateAttribute);
         bool isSuccess = ((ret == 0) || (ret == UNSUPPORTED));
