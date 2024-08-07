@@ -41,8 +41,8 @@ ohos_unittest("NativeVibratorTest") {
   ]
 
   deps = [
+    "$SUBSYSTEM_DIR/frameworks/capi:ohvibrator",
     "$SUBSYSTEM_DIR/frameworks/native/vibrator:vibrator_target",
-    "$SUBSYSTEM_DIR/frameworks/capi:ohvibrator"
   ]
   resource_config_file =
       "$SUBSYSTEM_DIR/test/unittest/vibrator/capi/resource/ohos_test.xml"
