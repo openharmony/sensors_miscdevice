@@ -360,7 +360,7 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_020, TestSize.Level
         };
         int32_t ret = OH_Vibrator_PlayVibrationCustom(fileDescription, vibrateAttribute);
         bool isSuccess = ((ret == 0) || (ret == UNSUPPORTED));
-        ASSERT_EQ(isSuccess, true);
+        ASSERT_FALSE(isSuccess);
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     OH_Vibrator_Cancel();
@@ -383,7 +383,7 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_021, TestSize.Level
         };
         int32_t ret = OH_Vibrator_PlayVibrationCustom(fileDescription, vibrateAttribute);
         bool isSuccess = ((ret == 0) || (ret == UNSUPPORTED));
-        ASSERT_EQ(isSuccess, true);
+        ASSERT_FALSE(isSuccess);
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     OH_Vibrator_Cancel();
@@ -406,7 +406,7 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_022, TestSize.Level
         };
         int32_t ret = OH_Vibrator_PlayVibrationCustom(fileDescription, vibrateAttribute);
         bool isSuccess = ((ret == 0) || (ret == UNSUPPORTED));
-        ASSERT_EQ(isSuccess, true);
+        ASSERT_FALSE(isSuccess);
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     OH_Vibrator_Cancel();
@@ -428,7 +428,7 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_023, TestSize.Level
         };
         int32_t ret = OH_Vibrator_PlayVibrationCustom(fileDescription, vibrateAttribute);
         bool isSuccess = ((ret == 0) || (ret == UNSUPPORTED));
-        ASSERT_EQ(isSuccess, true);
+        ASSERT_FALSE(isSuccess);
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     OH_Vibrator_Cancel();
@@ -451,7 +451,7 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_024, TestSize.Level
         };
         int32_t ret = OH_Vibrator_PlayVibrationCustom(fileDescription, vibrateAttribute);
         bool isSuccess = ((ret == 0) || (ret == UNSUPPORTED));
-        ASSERT_EQ(isSuccess, true);
+        ASSERT_FALSE(isSuccess);
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     OH_Vibrator_Cancel();
