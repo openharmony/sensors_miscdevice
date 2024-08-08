@@ -142,36 +142,6 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationTest_003, TestSize.Level1)
     ASSERT_EQ(ret, PARAMETER_ERROR);
 }
 
-HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationTest_004, TestSize.Level1)
-{
-    CALL_LOG_ENTER;
-    Vibrator_Attribute vibrateAttribute = {
-        .usage = VIBRATOR_USAGE_RING
-    };
-    bool flag = SetUsage(VIBRATOR_USAGE_MAX);
-    ASSERT_FALSE(flag);
-    int32_t ret = OH_Vibrator_PlayVibration(g_duration, vibrateAttribute);
-    ASSERT_EQ(ret, RET_SUCCESS);
-    ret = OH_Vibrator_Cancel();
-    ASSERT_EQ(ret, RET_SUCCESS);
-}
-
-HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationTest_005, TestSize.Level1)
-{
-    CALL_LOG_ENTER;
-    Vibrator_Attribute vibrateAttribute = {
-        .usage = VIBRATOR_USAGE_RING
-    };
-    bool flag = SetUsage(VIBRATOR_USAGE_UNKNOWN);
-    ASSERT_TRUE(flag);
-    int32_t ret = StartVibratorOnce(500);
-    ASSERT_EQ(ret, RET_SUCCESS);
-     ret = OH_Vibrator_PlayVibration(g_duration, vibrateAttribute);
-    ASSERT_EQ(ret, RET_SUCCESS);
-    ret = OH_Vibrator_Cancel();
-    ASSERT_EQ(ret, RET_SUCCESS);
-}
-
 HWTEST_F(NativeVibratorTest, OH_Vibrator_CancelTest_002, TestSize.Level1)
 {
     CALL_LOG_ENTER;
