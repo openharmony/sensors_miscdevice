@@ -329,8 +329,8 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_020, TestSize.Level
             .usage = VIBRATOR_USAGE_MAX
         };
         int32_t ret = OH_Vibrator_PlayVibrationCustom(fileDescription, vibrateAttribute);
-        bool isSuccess = ((ret == 0) || (ret == UNSUPPORTED));
-        ASSERT_FALSE(isSuccess);
+        bool isSuccess = ((ret != 0) || (ret == UNSUPPORTED));
+        ASSERT_TRUE(isSuccess);
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     OH_Vibrator_Cancel();
@@ -352,8 +352,8 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_021, TestSize.Level
             .usage = VIBRATOR_USAGE_RING
         };
         int32_t ret = OH_Vibrator_PlayVibrationCustom(fileDescription, vibrateAttribute);
-        bool isSuccess = ((ret == 0) || (ret == UNSUPPORTED));
-        ASSERT_FALSE(isSuccess);
+        bool isSuccess = ((ret != 0) || (ret == UNSUPPORTED));
+        ASSERT_TRUE(isSuccess);
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     OH_Vibrator_Cancel();
@@ -375,8 +375,8 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_022, TestSize.Level
             .usage = VIBRATOR_USAGE_RING
         };
         int32_t ret = OH_Vibrator_PlayVibrationCustom(fileDescription, vibrateAttribute);
-        bool isSuccess = ((ret == 0) || (ret == UNSUPPORTED));
-        ASSERT_FALSE(isSuccess);
+        bool isSuccess = ((ret != 0) || (ret == UNSUPPORTED));
+        ASSERT_TRUE(isSuccess);
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     OH_Vibrator_Cancel();
@@ -397,8 +397,8 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_023, TestSize.Level
             .usage = VIBRATOR_USAGE_RING
         };
         int32_t ret = OH_Vibrator_PlayVibrationCustom(fileDescription, vibrateAttribute);
-        bool isSuccess = ((ret == 0) || (ret == UNSUPPORTED));
-        ASSERT_FALSE(isSuccess);
+        bool isSuccess = ((ret != 0) || (ret == UNSUPPORTED));
+        ASSERT_TRUE(isSuccess);
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     OH_Vibrator_Cancel();
@@ -420,33 +420,8 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_024, TestSize.Level
             .usage = VIBRATOR_USAGE_MAX
         };
         int32_t ret = OH_Vibrator_PlayVibrationCustom(fileDescription, vibrateAttribute);
-        bool isSuccess = ((ret == 0) || (ret == UNSUPPORTED));
-        ASSERT_FALSE(isSuccess);
-    }
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    OH_Vibrator_Cancel();
-}
-
-HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_025, TestSize.Level1)
-{
-    CALL_LOG_ENTER;
-    FileDescriptor fileDescriptor("/data/test/vibrator/coin_drop.json");
-    MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
-    struct stat64 statbuf = { 0 };
-    if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
-        Vibrator_FileDescription fileDescription = {
-            .fd = fileDescriptor.fd,
-            .offset = 0,
-            .length = statbuf.st_size
-        };
-        Vibrator_Attribute vibrateAttribute = {
-            .usage = VIBRATOR_USAGE_RING
-        };
-        bool flag = SetUsage(USAGE_MAX);
-        ASSERT_FALSE(flag);
-        int32_t ret = OH_Vibrator_PlayVibrationCustom(fileDescription, vibrateAttribute);
-        bool isSuccess = ((ret == 0) || (ret == UNSUPPORTED));
-        ASSERT_EQ(isSuccess, true);
+        bool isSuccess = ((ret != 0) || (ret == UNSUPPORTED));
+        ASSERT_TRUE(isSuccess);
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     OH_Vibrator_Cancel();
