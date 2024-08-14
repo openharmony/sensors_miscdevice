@@ -39,6 +39,7 @@ const std::string SETTING_COLUMN_VALUE = "VALUE";
 const std::string SETTING_FEEDBACK_KEY = "physic_navi_haptic_feedback_enabled";
 const std::string SETTING_RINGER_MODE_KEY = "ringer_mode";
 const std::string SETTING_URI_PROXY = "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
+const std::string SCENEBOARD_BUNDLENAME = "com.ohos.sceneboard";
 constexpr const char *SETTINGS_DATA_EXT_URI = "datashare:///com.ohos.settingsdata.DataAbility";
 constexpr int32_t DECEM_BASE = 10;
 constexpr int32_t DATA_SHARE_READY = 0;
@@ -222,6 +223,10 @@ bool VibrationPriorityManager::ShouldIgnoreInputMethod(const VibrateInfo &vibrat
     }
     for (const auto &bundleName : processinfo.bundleNames) {
         MISC_HILOGD("bundleName = %{public}s", bundleName.c_str());
+        if (bundleName == SCENEBOARD_BUNDLENAME) {
+            MISC_HILOGD("Can not ignore for %{public}s", bundleName.c_str());
+            return false;
+        }
         AppExecFwk::BundleMgrClient bundleMgrClient;
         AppExecFwk::BundleInfo bundleInfo;
         auto res = bundleMgrClient.AppExecFwk::BundleMgrClient::GetBundleInfo(bundleName,
