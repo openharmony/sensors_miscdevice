@@ -27,12 +27,14 @@ namespace OHOS {
 namespace Sensors {
 class CustomVibrationMatcher {
 public:
-    CustomVibrationMatcher() = default;
     ~CustomVibrationMatcher() = default;
+    static CustomVibrationMatcher &GetInstance();
     int32_t TransformTime(const VibratePackage &package, std::vector<CompositeEffect> &compositeEffects);
     int32_t TransformEffect(const VibratePackage &package, std::vector<CompositeEffect> &compositeEffects);
 
 private:
+    DISALLOW_COPY_AND_MOVE(CustomVibrationMatcher);
+    CustomVibrationMatcher();
     static int32_t Interpolation(int32_t x1, int32_t x2, int32_t y1, int32_t y2, int32_t x);
     VibratePattern MixedWaveProcess(const VibratePackage &package);
     void PreProcessEvent(VibrateEvent &event);
@@ -44,7 +46,9 @@ private:
         std::vector<CompositeEffect> &compositeEffects);
     void ProcessTransientEvent(const VibrateEvent &event, int32_t &preStartTime, int32_t &preDuration,
         std::vector<CompositeEffect> &compositeEffects);
+
+    std::vector<HdfWaveInformation> waveInfos_;
 };
-}  // namespace Sensors
-}  // namespace OHOS
+} // namespace Sensors
+} // namespace OHOS
 #endif // CUSTOM_VIBRATION_MATCHER_H

@@ -206,5 +206,11 @@ int32_t CompatibleConnection::StartByIntensity(const std::string &effect, int32_
     g_vibrateMode = HDF_VIBRATOR_MODE_PRESET;
     return ERR_OK;
 }
+
+int32_t CompatibleConnection::GetAllWaveInfo(std::vector<HdfWaveInformation> &waveInfos)
+{
+    return ERR_OK;
+}
+
 }  // namespace Sensors
 }  // namespace OHOS

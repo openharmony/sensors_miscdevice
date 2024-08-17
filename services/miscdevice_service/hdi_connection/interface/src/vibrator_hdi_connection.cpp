@@ -159,5 +159,12 @@ int32_t VibratorHdiConnection::StartByIntensity(const std::string &effect, int32
     }
     return ERR_OK;
 }
+
+int32_t VibratorHdiConnection::GetAllWaveInfo(std::vector<HdfWaveInformation> &waveInfos)
+{
+    CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
+    return iVibratorHdiConnection_->GetAllWaveInfo(waveInfos);
+}
+
 }  // namespace Sensors
 }  // namespace OHOS
