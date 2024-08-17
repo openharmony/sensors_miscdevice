@@ -93,8 +93,7 @@ void MiscdeviceService::OnDump()
     MISC_HILOGI("Ondump is invoked");
 }
 
-int32_t MiscdeviceService::SubscribeCommonEvent(const std::string &eventName,
-    EventReceiver receiver) __attribute__((no_sanitize("cfi")))
+int32_t MiscdeviceService::SubscribeCommonEvent(const std::string &eventName, EventReceiver receiver)
 {
     if (receiver == nullptr) {
         MISC_HILOGE("receiver is nullptr");
