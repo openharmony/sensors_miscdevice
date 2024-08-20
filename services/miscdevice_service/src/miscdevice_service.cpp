@@ -93,7 +93,8 @@ void MiscdeviceService::OnDump()
     MISC_HILOGI("Ondump is invoked");
 }
 
-int32_t MiscdeviceService::SubscribeCommonEvent(const std::string &eventName, EventReceiver receiver)
+int32_t MiscdeviceService::SubscribeCommonEvent(const std::string &eventName,
+    EventReceiver receiver) __attribute__((no_sanitize("cfi")))
 {
     if (receiver == nullptr) {
         MISC_HILOGE("receiver is nullptr");
@@ -110,8 +111,7 @@ int32_t MiscdeviceService::SubscribeCommonEvent(const std::string &eventName, Ev
     return ERR_OK;
 }
 
-void MiscdeviceService::OnAddSystemAbility(int32_t systemAbilityId,
-    const std::string &deviceId) __attribute__((no_sanitize("cfi")))
+void MiscdeviceService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
 {
     MISC_HILOGI("OnAddSystemAbility systemAbilityId:%{public}d", systemAbilityId);
     switch (systemAbilityId) {
