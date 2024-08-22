@@ -19,7 +19,9 @@
 #include <thread>
 
 #include "death_recipient_template.h"
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
 #include "hisysevent.h"
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
 #include "iservice_registry.h"
 #include "sensors_errors.h"
 #include "system_ability_definition.h"
@@ -75,9 +77,11 @@ int32_t LightClient::InitLightClient()
         std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_MS));
         retry++;
     }
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
     HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_EXCEPTION",
         HiviewDFX::HiSysEvent::EventType::FAULT, "PKG_NAME", "InitLightClient", "ERROR_CODE",
         MISC_NATIVE_GET_SERVICE_ERR);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
     MISC_HILOGE("Get service failed");
     return MISC_NATIVE_GET_SERVICE_ERR;
 }

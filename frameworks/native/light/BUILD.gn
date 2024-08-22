@@ -100,10 +100,13 @@ ohos_shared_library("liblight_native") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
-    "hisysevent:libhisysevent",
     "ipc:ipc_single",
     "samgr:samgr_proxy",
   ]
+
+  if (hiviewdfx_hisysevent) {
+    external_deps += [ "hisysevent:libhisysevent" ]
+  }
 
   defines = miscdevice_default_defines
 

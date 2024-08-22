@@ -16,7 +16,9 @@
 
 #include <thread>
 
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
 #include "hisysevent.h"
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
 
 #include "sensors_errors.h"
 
@@ -45,8 +47,10 @@ int32_t HdiConnection::ConnectHdi()
         MISC_HILOGW("Connect hdi service failed, retry:%{public}d", retry);
         std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_MS));
     }
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
     HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
         HiSysEvent::EventType::FAULT, "PKG_NAME", "ConnectHdi", "ERROR_CODE", VIBRATOR_HDF_CONNECT_ERR);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
     MISC_HILOGE("Vibrator interface initialization failed");
     return ERR_INVALID_VALUE;
 }
@@ -56,8 +60,10 @@ int32_t HdiConnection::StartOnce(uint32_t duration)
     CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
     int32_t ret = vibratorInterface_->StartOnce(duration);
     if (ret < 0) {
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "StartOnce", "ERROR_CODE", ret);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
         MISC_HILOGE("StartOnce failed");
         return ret;
     }
@@ -74,8 +80,10 @@ int32_t HdiConnection::Start(const std::string &effectType)
     CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
     int32_t ret = vibratorInterface_->Start(effectType);
     if (ret < 0) {
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "Start", "ERROR_CODE", ret);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
         MISC_HILOGE("Start failed");
         return ret;
     }
@@ -93,8 +101,10 @@ int32_t HdiConnection::EnableCompositeEffect(const HdfCompositeEffect &hdfCompos
     CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
     int32_t ret = vibratorInterface_->EnableCompositeEffect(hdfCompositeEffect);
     if (ret < 0) {
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "EnableCompositeEffect", "ERROR_CODE", ret);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
         MISC_HILOGE("EnableCompositeEffect failed");
         return ret;
     }
@@ -119,8 +129,10 @@ std::optional<HdfEffectInfo> HdiConnection::GetEffectInfo(const std::string &eff
     HdfEffectInfo effectInfo;
     int32_t ret = vibratorInterface_->GetEffectInfo(effect, effectInfo);
     if (ret < 0) {
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "GetEffectInfo", "ERROR_CODE", ret);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
         MISC_HILOGE("GetEffectInfo failed");
         return std::nullopt;
     }
@@ -132,8 +144,10 @@ int32_t HdiConnection::Stop(HdfVibratorModeV1_2 mode)
     CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
     int32_t ret = vibratorInterface_->StopV1_2(mode);
     if (ret < 0) {
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "Stop", "ERROR_CODE", ret);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
         MISC_HILOGE("Stop failed");
         return ret;
     }
@@ -145,8 +159,10 @@ int32_t HdiConnection::GetDelayTime(int32_t mode, int32_t &delayTime)
     CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
     int32_t ret = vibratorInterface_->GetHapticStartUpTime(mode, delayTime);
     if (ret < 0) {
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "GetDelayTime", "ERROR_CODE", ret);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
         MISC_HILOGE("GetDelayTime failed");
         return ret;
     }
@@ -159,8 +175,10 @@ int32_t HdiConnection::GetVibratorCapacity(VibratorCapacity &capacity)
     HapticCapacity hapticCapacity;
     int32_t ret = vibratorInterface_->GetHapticCapacity(hapticCapacity);
     if (ret < 0) {
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "GetVibratorCapacity", "ERROR_CODE", ret);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
         MISC_HILOGE("GetVibratorCapacity failed");
         return ret;
     }
@@ -199,8 +217,10 @@ int32_t HdiConnection::PlayPattern(const VibratePattern &pattern)
     }
     int32_t ret = vibratorInterface_->PlayHapticPattern(packet);
     if (ret < 0) {
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "PlayHapticPattern", "ERROR_CODE", ret);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
         MISC_HILOGE("PlayHapticPattern failed");
         return ret;
     }
@@ -253,8 +273,10 @@ void HdiConnection::Reconnect()
 {
     int32_t ret = ConnectHdi();
     if (ret != ERR_OK) {
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "Reconnect", "ERROR_CODE", ret);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
         MISC_HILOGE("Connect hdi fail");
     }
 }
@@ -269,8 +291,10 @@ int32_t HdiConnection::StartByIntensity(const std::string &effect, int32_t inten
     CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
     int32_t ret = vibratorInterface_->StartByIntensity(effect, intensity);
     if (ret < 0) {
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "StartByIntensity", "ERROR_CODE", ret);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
         MISC_HILOGE("StartByIntensity failed");
         return ret;
     }
