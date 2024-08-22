@@ -110,7 +110,7 @@ ohos_shared_library("libvibrator_native") {
     "samgr:samgr_proxy",
   ]
 
-  if (hiviewdfx_hisysevent) {
+  if (miscdevice_feature_hiviewdfx_hisysevent) {
     external_deps += [ "hisysevent:libhisysevent" ]
   }
 

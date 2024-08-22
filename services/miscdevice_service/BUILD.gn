@@ -98,7 +98,7 @@ ohos_shared_library("libmiscdevice_service") {
     external_deps += [ "drivers_interface_light:liblight_proxy_1.0" ]
   }
 
-  if (hiviewdfx_hisysevent) {
+  if (miscdevice_feature_hiviewdfx_hisysevent) {
     external_deps += [ "hisysevent:libhisysevent" ]
   }
 
@@ -192,7 +192,7 @@ ohos_static_library("libmiscdevice_service_static") {
     external_deps += [ "drivers_interface_light:liblight_proxy_1.0" ]
   }
 
-  if (hiviewdfx_hisysevent) {
+  if (miscdevice_feature_hiviewdfx_hisysevent) {
     external_deps += [ "hisysevent:libhisysevent" ]
   }
 

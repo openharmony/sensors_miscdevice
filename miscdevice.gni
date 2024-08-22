@@ -55,8 +55,8 @@ if (build_variant == "root") {
 
 if (!defined(global_parts_info) ||
     defined(global_parts_info.hiviewdfx_hisysevent)) {
-  hiviewdfx_hisysevent = true
+  miscdevice_feature_hiviewdfx_hisysevent = true
   miscdevice_default_defines += [ "HIVIEWDFX_HISYSEVENT_ENABLE" ]
 } else {
-  hiviewdfx_hisysevent = false
+  miscdevice_feature_hiviewdfx_hisysevent = false
 }
