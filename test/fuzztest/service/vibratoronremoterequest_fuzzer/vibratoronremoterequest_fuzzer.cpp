@@ -84,8 +84,8 @@ bool OnRemoteRequestFuzzTest(const uint8_t *data, size_t size)
     g_service->OnRemoteRequest(code, datas, reply, option);
     return true;
 }
-}  // namespace Sensors
-}  // namespace OHOS
+} // namespace Sensors
+} // namespace OHOS
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
