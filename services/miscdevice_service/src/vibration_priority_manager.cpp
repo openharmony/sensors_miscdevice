@@ -196,6 +196,10 @@ bool VibrationPriorityManager::IsSystemCalling()
 
 bool VibrationPriorityManager::ShouldIgnoreInputMethod(const VibrateInfo &vibrateInfo)
 {
+    if (vibrateInfo.packageName == SCENEBOARD_BUNDLENAME) {
+        MISC_HILOGD("Can not ignore for %{public}s", vibrateInfo.packageName.c_str());
+        return false;
+    }
     int32_t pid = vibrateInfo.pid;
     AppExecFwk::RunningProcessInfo processinfo{};
     appMgrClientPtr_ = DelayedSingleton<AppExecFwk::AppMgrClient>::GetInstance();
@@ -223,10 +227,6 @@ bool VibrationPriorityManager::ShouldIgnoreInputMethod(const VibrateInfo &vibrat
     }
     for (const auto &bundleName : processinfo.bundleNames) {
         MISC_HILOGD("bundleName = %{public}s", bundleName.c_str());
-        if (bundleName == SCENEBOARD_BUNDLENAME) {
-            MISC_HILOGD("Can not ignore for %{public}s", bundleName.c_str());
-            return false;
-        }
         AppExecFwk::BundleMgrClient bundleMgrClient;
         AppExecFwk::BundleInfo bundleInfo;
         auto res = bundleMgrClient.AppExecFwk::BundleMgrClient::GetBundleInfo(bundleName,
