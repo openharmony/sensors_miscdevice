@@ -47,6 +47,6 @@ private:
     std::vector<LightInfoIPC> lightInfoList_;
     std::mutex clientMutex_;
 };
-}  // namespace Sensors
-}  // namespace OHOS
-#endif  // LIGHT_CLIENT_H
+} // namespace Sensors
+} // namespace OHOS
+#endif // LIGHT_CLIENT_H

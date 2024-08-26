@@ -42,7 +42,7 @@ constexpr uint32_t WAIT_MS = 200;
 #else
     static const std::string DECODER_LIBRARY_PATH = "/system/lib/platformsdk/libvibrator_decoder.z.so";
 #endif
-}  // namespace
+} // namespace
 
 VibratorServiceClient::~VibratorServiceClient()
 {
@@ -506,5 +506,5 @@ bool VibratorServiceClient::IsSupportVibratorCustom()
     }
     return (capacity_.isSupportHdHaptic || capacity_.isSupportPresetMapping || capacity_.isSupportTimeDelay);
 }
-}  // namespace Sensors
-}  // namespace OHOS
+} // namespace Sensors
+} // namespace OHOS

@@ -409,5 +409,5 @@ napi_value VibratorPatternBuilder::Build(napi_env env, napi_callback_info info)
     }
     return result;
 }
-}  // namespace Sensors
-}  // namespace OHOS
+} // namespace Sensors
+} // namespace OHOS

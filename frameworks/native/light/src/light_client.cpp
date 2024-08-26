@@ -34,7 +34,7 @@ namespace {
 constexpr int32_t GET_SERVICE_MAX_COUNT = 30;
 constexpr uint32_t MAX_LIGHT_LIST_SIZE = 0X00ff;
 constexpr uint32_t WAIT_MS = 200;
-}  // namespace
+} // namespace
 
 LightClient::~LightClient()
 {
@@ -212,5 +212,5 @@ int32_t LightClient::ConvertLightInfos()
     lightInfoCount_ = static_cast<int32_t>(count);
     return SUCCESS;
 }
-}  // namespace Sensors
-}  // namespace OHOS
+} // namespace Sensors
+} // namespace OHOS

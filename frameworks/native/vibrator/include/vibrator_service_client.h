@@ -88,6 +88,6 @@ private:
     std::mutex clientMutex_;
     std::mutex decodeMutex_;
 };
-}  // namespace Sensors
-}  // namespace OHOS
-#endif  // VIBRATOR_SERVICE_CLIENT_H
+} // namespace Sensors
+} // namespace OHOS
+#endif // VIBRATOR_SERVICE_CLIENT_H

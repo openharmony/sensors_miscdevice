@@ -269,5 +269,5 @@ int32_t PlayPrimitiveEffect(const char *effectId, int32_t intensity)
     }
     return SUCCESS;
 }
-}  // namespace Sensors
-}  // namespace OHOS
+} // namespace Sensors
+} // namespace OHOS
