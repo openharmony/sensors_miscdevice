@@ -129,7 +129,7 @@ int32_t VibratorThread::PlayCustomByHdHptic(const VibrateInfo &info)
 
 int32_t VibratorThread::PlayCustomByCompositeEffect(const VibrateInfo &info)
 {
-    CustomVibrationMatcher matcher;
+    auto &matcher = CustomVibrationMatcher::GetInstance();
     HdfCompositeEffect hdfCompositeEffect;
     if (info.mode == VIBRATE_CUSTOM_COMPOSITE_EFFECT) {
         hdfCompositeEffect.type = HDF_EFFECT_TYPE_PRIMITIVE;

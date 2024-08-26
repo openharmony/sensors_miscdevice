@@ -19,6 +19,7 @@
 #include <map>
 
 #include "sensors_errors.h"
+#include "vibrator_hdi_connection.h"
 
 #undef LOG_TAG
 #define LOG_TAG "CustomVibrationMatcher"
@@ -53,6 +54,28 @@ constexpr int32_t SLICE_STEP = 50;
 constexpr int32_t CONTINUOUS_VIBRATION_DURATION_MIN = 15;
 constexpr int32_t INDEX_MIN_RESTRICT = 1;
 }  // namespace
+
+CustomVibrationMatcher::CustomVibrationMatcher()
+{
+    auto &VibratorDevice = VibratorHdiConnection::GetInstance();
+    int32_t ret = VibratorDevice.GetAllWaveInfo(waveInfos_);
+    if (ret != ERR_OK) {
+        MISC_HILOGE("GetAllWaveInfo failed infoSize:%{public}zu", waveInfos_.size());
+        return;
+    }
+    if (!waveInfos_.empty()) {
+        for (auto it = waveInfos_.begin(); it != waveInfos_.end(); ++it) {
+            MISC_HILOGD("waveId:%{public}d,intensity:%{public}f, frequency:%{public}f,duration:%{public}d",
+                        it->waveId, it->intensity, it->frequency, it->duration);
+        }
+    }
+}
+
+CustomVibrationMatcher &CustomVibrationMatcher::GetInstance()
+{
+    static CustomVibrationMatcher instance;
+    return instance;
+}
 
 int32_t CustomVibrationMatcher::TransformTime(const VibratePackage &package,
     std::vector<CompositeEffect> &compositeEffects)
