@@ -186,7 +186,6 @@ int32_t MiscdeviceServiceStub::PlayVibratorCustomStub(MessageParcel &data, Messa
         return ERROR;
     }
     ret = PlayVibratorCustom(vibratorId, rawFd, usage, systemUsage, parameter.value());
-    close(rawFd.fd);
     if (ret != ERR_OK) {
         MISC_HILOGD("PlayVibratorCustom failed, ret:%{public}d", ret);
         return ret;
