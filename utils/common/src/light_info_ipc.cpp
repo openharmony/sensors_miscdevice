@@ -98,5 +98,5 @@ bool LightInfoIPC::ReadFromParcel(Parcel &parcel)
     return (parcel.ReadString(lightName_)) && (parcel.ReadInt32(lightId_)) &&
         (parcel.ReadInt32(lightNumber_)) && (parcel.ReadInt32(lightType_));
 }
-}  // namespace Sensors
-}  // namespace OHOS
+} // namespace Sensors
+} // namespace OHOS

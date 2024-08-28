@@ -33,6 +33,6 @@ public:
 private:
     T &privateData_;
 };
-}  // namespace Sensors
-}  // namespace OHOS
-#endif  // DEATH_RECIPIENT_TEMPLATE_H
+} // namespace Sensors
+} // namespace OHOS
+#endif // DEATH_RECIPIENT_TEMPLATE_H

@@ -39,6 +39,6 @@ private:
     int32_t onTime_ = 0;
     int32_t offTime_ = 0;
 };
-}  // namespace Sensors
-}  // namespace OHOS
-#endif  // LIGHT_ANIMATION_IPC_H
+} // namespace Sensors
+} // namespace OHOS
+#endif // LIGHT_ANIMATION_IPC_H

@@ -283,5 +283,5 @@ std::optional<VibrateParameter> VibrateParameter::Unmarshalling(Parcel &data)
     }
     return parameter;
 }
-}  // namespace Sensors
-}  // namespace OHOS
+} // namespace Sensors
+} // namespace OHOS

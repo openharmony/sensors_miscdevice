@@ -83,5 +83,5 @@ bool LightAnimationIPC::ReadFromParcel(Parcel &parcel)
 {
     return (parcel.ReadInt32(mode_)) && (parcel.ReadInt32(onTime_)) && (parcel.ReadInt32(offTime_));
 }
-}  // namespace Sensors
-}  // namespace OHOS
+} // namespace Sensors
+} // namespace OHOS

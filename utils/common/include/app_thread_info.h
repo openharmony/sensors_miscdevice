@@ -23,6 +23,6 @@ struct AppThreadInfo {
     int32_t uid;
     AppThreadInfo() : pid(0), uid(0) {};
 };
-}  // namespace Sensors
-}  // namespace OHOS
-#endif  // APP_THREAD_INFO_H
+} // namespace Sensors
+} // namespace OHOS
+#endif // APP_THREAD_INFO_H

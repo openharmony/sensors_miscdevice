@@ -24,5 +24,5 @@ int32_t PermissionUtil::CheckVibratePermission(AccessTokenID callerToken, const 
 {
     return AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
 }
-}  // namespace Sensors
-}  // namespace OHOS
+} // namespace Sensors
+} // namespace OHOS

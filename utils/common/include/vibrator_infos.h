@@ -140,6 +140,6 @@ struct VibrateParameter {
     bool Marshalling(Parcel &parcel) const;
     std::optional<VibrateParameter> Unmarshalling(Parcel &data);
 };
-}  // namespace Sensors
-}  // namespace OHOS
-#endif  // VIBRATOR_INFOS_H
+} // namespace Sensors
+} // namespace OHOS
+#endif // VIBRATOR_INFOS_H

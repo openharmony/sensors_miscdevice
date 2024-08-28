@@ -39,6 +39,6 @@ public:
     MiscdeviceCommon() = default;
     ~MiscdeviceCommon() = default;
 };
-}  // namespace Sensors
-}  // namespace OHOS
-#endif  // MISCDEVICE_COMMON_H
+} // namespace Sensors
+} // namespace OHOS
+#endif // MISCDEVICE_COMMON_H

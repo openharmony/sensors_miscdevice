@@ -47,6 +47,6 @@ public:
 private:
     cJSON *cJson_ = nullptr;
 };
-}  // namespace Sensors
-}  // namespace OHOS
-#endif  // MISCDEVICE_JSON_PARSER_H
+} // namespace Sensors
+} // namespace OHOS
+#endif // MISCDEVICE_JSON_PARSER_H
