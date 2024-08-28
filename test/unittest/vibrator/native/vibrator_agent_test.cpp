@@ -1291,8 +1291,19 @@ HWTEST_F(VibratorAgentTest, PlayPrimitiveEffect_005, TestSize.Level1)
 HWTEST_F(VibratorAgentTest, IsHdHapticSupported_001, TestSize.Level1)
 {
     MISC_HILOGI("IsHdHapticSupported_001 in");
-    bool ret = IsHdHapticSupported();
-    MISC_HILOGI("IsHdHapticSupported:%{public}s", ret ? "true" : "false");
+    if (IsSupportVibratorCustom() && IsHdHapticSupported()) {
+        FileDescriptor fileDescriptor("/data/test/vibrator/coin_drop.json");
+        MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
+        struct stat64 statbuf = { 0 };
+        if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
+            int32_t ret = PlayVibratorCustom(fileDescriptor.fd, 0, statbuf.st_size);
+            ASSERT_EQ(ret, 0);
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    } else {
+        ASSERT_EQ(0, 0);
+    }
+    Cancel();
 }
 }  // namespace Sensors
 }  // namespace OHOS
