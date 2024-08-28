@@ -29,6 +29,6 @@ public:
     virtual int32_t DecodeEffect(const RawFileDescriptor &rawFd, const JsonParser &parser,
         VibratePackage &patternPackage) = 0;
 };
-}  // namespace Sensors
-}  // namespace OHOS
-#endif  // VIBRATOR_DECODER_H
+} // namespace Sensors
+} // namespace OHOS
+#endif // VIBRATOR_DECODER_H

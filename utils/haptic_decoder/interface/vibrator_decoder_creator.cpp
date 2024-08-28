@@ -64,5 +64,5 @@ extern "C" void Destroy(IVibratorDecoder *decoder)
         decoder = nullptr;
     }
 }
-}  // namespace Sensors
-}  // namespace OHOS
+} // namespace Sensors
+} // namespace OHOS

@@ -29,5 +29,5 @@ IVibratorDecoder *DefaultVibratorDecoderFactory::CreateDecoder()
     CALL_LOG_ENTER;
     return new DefaultVibratorDecoder();
 }
-}  // namespace Sensors
-}  // namespace OHOS
+} // namespace Sensors
+} // namespace OHOS

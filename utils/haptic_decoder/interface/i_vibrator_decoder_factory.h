@@ -26,6 +26,6 @@ public:
     virtual ~IVibratorDecoderFactory() = default;
     virtual IVibratorDecoder *CreateDecoder() = 0;
 };
-}  // namespace Sensors
-}  // namespace OHOS
-#endif  // VIBRATOR_DECODER_FACTORY_H
+} // namespace Sensors
+} // namespace OHOS
+#endif // VIBRATOR_DECODER_FACTORY_H

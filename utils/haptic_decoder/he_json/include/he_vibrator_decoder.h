@@ -41,6 +41,6 @@ private:
     bool CheckTransientParameters(const VibrateEvent& event);
     bool CheckContinuousParameters(const VibrateEvent& event);
 };
-}  // namespace Sensors
-}  // namespace OHOS
-#endif  // HE_VIBRATOR_DECODER_H
+} // namespace Sensors
+} // namespace OHOS
+#endif // HE_VIBRATOR_DECODER_H

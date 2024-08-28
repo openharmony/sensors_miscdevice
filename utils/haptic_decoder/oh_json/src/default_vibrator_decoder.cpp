@@ -291,5 +291,5 @@ void DefaultVibratorDecoder::PatternSplit(VibratePattern &originPattern, Vibrate
         }
     }
 }
-}  // namespace Sensors
-}  // namespace OHOS
+} // namespace Sensors
+} // namespace OHOS
