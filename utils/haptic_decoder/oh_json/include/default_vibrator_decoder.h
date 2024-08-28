@@ -43,6 +43,6 @@ private:
     int32_t channelNumber_ = 0;
     double version_ = 0.0;
 };
-}  // namespace Sensors
-}  // namespace OHOS
-#endif  // VIBRATOR_DECODER_H
+} // namespace Sensors
+} // namespace OHOS
+#endif // VIBRATOR_DECODER_H

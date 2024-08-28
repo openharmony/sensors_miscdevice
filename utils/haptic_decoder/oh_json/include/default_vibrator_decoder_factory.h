@@ -26,6 +26,6 @@ public:
     ~DefaultVibratorDecoderFactory() = default;
     IVibratorDecoder *CreateDecoder() override;
 };
-}  // namespace Sensors
-}  // namespace OHOS
-#endif  // DEFAULT_VIBRATOR_DECODER_FACTORY_H
+} // namespace Sensors
+} // namespace OHOS
+#endif // DEFAULT_VIBRATOR_DECODER_FACTORY_H

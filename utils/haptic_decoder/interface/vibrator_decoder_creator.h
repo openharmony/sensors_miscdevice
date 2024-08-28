@@ -33,6 +33,6 @@ public:
 private:
     bool CheckJsonMetadata(const JsonParser &parser);
 };
-}  // namespace Sensors
-}  // namespace OHOS
-#endif  // VIBRATOR_DECODER_MANAGER_H
+} // namespace Sensors
+} // namespace OHOS
+#endif // VIBRATOR_DECODER_MANAGER_H
