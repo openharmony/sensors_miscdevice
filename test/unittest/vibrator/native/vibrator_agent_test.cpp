@@ -64,7 +64,7 @@ HapInfoParams g_infoManagerTestInfoParms = {
     .instIndex = 0,
     .appIDDesc = "vibratorAgentTest"
 };
-}  // namespace
+} // namespace
 
 class VibratorAgentTest : public testing::Test {
 public:
@@ -1305,5 +1305,5 @@ HWTEST_F(VibratorAgentTest, IsHdHapticSupported_001, TestSize.Level1)
     }
     Cancel();
 }
-}  // namespace Sensors
-}  // namespace OHOS
+} // namespace Sensors
+} // namespace OHOS

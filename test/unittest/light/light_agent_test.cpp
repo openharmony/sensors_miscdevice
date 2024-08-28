@@ -55,7 +55,7 @@ HapInfoParams g_infoManagerTestInfoParms = {
     .instIndex = 0,
     .appIDDesc = "LightAgentTest"
 };
-}  // namespace
+} // namespace
 
 class LightAgentTest : public testing::Test {
 public:
@@ -346,5 +346,5 @@ HWTEST_F(LightAgentTest, StartLightTest_011, TestSize.Level1)
     int32_t ret = TurnOff(g_invalidLightId);
     ASSERT_EQ(ret, -1);
 }
-}  // namespace Sensors
-}  // namespace OHOS
+} // namespace Sensors
+} // namespace OHOS

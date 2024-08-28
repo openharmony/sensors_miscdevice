@@ -60,7 +60,7 @@ HapInfoParams infoManagerTestInfoParms_ = {
     .instIndex = 0,
     .appIDDesc = "NativeVibratorTest"
 };
-}  // namespace
+} // namespace
 
 class NativeVibratorTest : public testing::Test {
 public:
@@ -426,5 +426,5 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_024, TestSize.Level
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     OH_Vibrator_Cancel();
 }
-}  // namespace Sensors
-}  // namespace OHOS
+} // namespace Sensors
+} // namespace OHOS
