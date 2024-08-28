@@ -25,6 +25,6 @@ struct RawFileDescriptor {
     int64_t offset = 0;
     int64_t length = -1;
 };
-}  // namespace Sensors
-}  // namespace OHOS
-#endif  // RAW_FILE_DESCRIPTOR
+} // namespace Sensors
+} // namespace OHOS
+#endif // RAW_FILE_DESCRIPTOR

@@ -145,5 +145,5 @@ std::string JsonParser::GetStringValue(cJSON *json) const
     }
     return json->valuestring;
 }
-}  // namespace Sensors
-}  // namespace OHOS
+} // namespace Sensors
+} // namespace OHOS

@@ -33,7 +33,7 @@ constexpr int32_t FILE_SIZE_MAX = 0x5000;
 constexpr int64_t READ_DATA_BUFF_SIZE = 256;
 constexpr int32_t INVALID_FILE_SIZE = -1;
 constexpr int32_t FILE_PATH_MAX = 1024;
-}  // namespace
+} // namespace
 
 std::string ReadJsonFile(const std::string &filePath)
 {
@@ -235,5 +235,5 @@ std::string GetFileSuffix(int32_t fd)
     }
     return fileAbsolutePath.substr(pos + 1);
 }
-}  // namespace Sensors
-}  // namespace OHOS
+} // namespace Sensors
+} // namespace OHOS

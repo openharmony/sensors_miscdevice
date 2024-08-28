@@ -32,6 +32,6 @@ public:
     virtual ~PermissionUtil() {};
     int32_t CheckVibratePermission(AccessTokenID callerToken, const std::string &permissionName);
 };
-}  // namespace Sensors
-}  // namespace OHOS
-#endif  // PERMISSION_UTIL_H
+} // namespace Sensors
+} // namespace OHOS
+#endif // PERMISSION_UTIL_H

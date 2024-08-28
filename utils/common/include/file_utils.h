@@ -38,6 +38,6 @@ std::string ReadFd(const RawFileDescriptor &rawFd);
 std::string GetFileSuffix(int32_t fd);
 int32_t GetFileName(const int32_t &fd, std::string &fileName);
 int32_t GetFileExtName(const int32_t &fd, std::string &extName);
-}  // namespace Sensors
-}  // namespace OHOS
-#endif  // MISCDEVICE_FILE_UTILS_H
+} // namespace Sensors
+} // namespace OHOS
+#endif // MISCDEVICE_FILE_UTILS_H

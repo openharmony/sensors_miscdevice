@@ -68,6 +68,6 @@ void MiscdeviceDelayedSpSingleton<T>::DestroyInstance()
         instance_ = nullptr;
     }
 }
-}  // namespace Sensors
-}  // namespace OHOS
-#endif  // MISCDEVICE_DELAYED_SP_SINGLETON_H
+} // namespace Sensors
+} // namespace OHOS
+#endif // MISCDEVICE_DELAYED_SP_SINGLETON_H

@@ -44,6 +44,6 @@ private:
     int32_t lightNumber_ = 0;
     int32_t lightType_ = 0;
 };
-}  // namespace Sensors
-}  // namespace OHOS
-#endif  // LIGHT_INFO_IPC_H
+} // namespace Sensors
+} // namespace OHOS
+#endif // LIGHT_INFO_IPC_H
