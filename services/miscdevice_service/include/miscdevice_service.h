@@ -119,6 +119,7 @@ private:
     std::mutex clientDeathObserverMutex_;
     std::map<sptr<IRemoteObject>, int32_t> clientPidMap_;
     std::mutex clientPidMapMutex_;
+    std::mutex miscDeviceIdMapMutex_;
 };
 }  // namespace Sensors
 }  // namespace OHOS
