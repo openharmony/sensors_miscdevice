@@ -105,11 +105,14 @@ ohos_shared_library("libvibrator_native") {
     "cJSON:cjson",
     "c_utils:utils",
     "hilog:libhilog",
-    "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "ipc:ipc_single",
     "samgr:samgr_proxy",
   ]
+
+  if (miscdevice_feature_hiviewdfx_hisysevent) {
+    external_deps += [ "hisysevent:libhisysevent" ]
+  }
 
   defines = miscdevice_default_defines
 

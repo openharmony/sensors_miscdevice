@@ -15,6 +15,7 @@ import("//build/ohos.gni")
 
 declare_args() {
   miscdevice_feature_vibrator_custom = true
+  miscdevice_feature_hiviewdfx_hisysevent = true
 }
 
 print(
@@ -50,4 +51,12 @@ if (build_variant == "root") {
   miscdevice_build_eng = true
 } else {
   miscdevice_build_eng = false
+}
+
+if (!defined(global_parts_info) ||
+    defined(global_parts_info.hiviewdfx_hisysevent)) {
+  miscdevice_feature_hiviewdfx_hisysevent = true
+  miscdevice_default_defines += [ "HIVIEWDFX_HISYSEVENT_ENABLE" ]
+} else {
+  miscdevice_feature_hiviewdfx_hisysevent = false
 }

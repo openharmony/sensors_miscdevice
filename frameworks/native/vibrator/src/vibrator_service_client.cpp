@@ -18,7 +18,9 @@
 #include <climits>
 #include <thread>
 
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
 #include "hisysevent.h"
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
 #include "hitrace_meter.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
@@ -103,8 +105,10 @@ int32_t VibratorServiceClient::InitServiceClient()
         std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_MS));
         retry++;
     }
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
     HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_EXCEPTION",
         HiSysEvent::EventType::FAULT, "PKG_NAME", "InitServiceClient", "ERROR_CODE", MISC_NATIVE_GET_SERVICE_ERR);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
     MISC_HILOGE("Get service failed");
     return MISC_NATIVE_GET_SERVICE_ERR;
 }
