@@ -36,5 +36,5 @@ int32_t VibratorClientStub::OnRemoteRequest(uint32_t code, MessageParcel &data, 
     MISC_HILOGD("Begin, cmd:%{public}u", code);
     return NO_ERROR;
 }
-}  // namespace Sensors
-}  // namespace OHOS
+} // namespace Sensors
+} // namespace OHOS

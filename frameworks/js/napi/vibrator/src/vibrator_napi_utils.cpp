@@ -29,7 +29,7 @@ namespace OHOS {
 namespace Sensors {
 namespace {
 constexpr int32_t RESULT_LENGTH = 2;
-}  // namespace
+} // namespace
 AsyncCallbackInfo::~AsyncCallbackInfo()
 {
     CALL_LOG_ENTER;

@@ -54,7 +54,7 @@ constexpr int32_t CURVE_FREQUENCY_MIN = -100;
 constexpr int32_t CURVE_FREQUENCY_MAX = 100;
 constexpr int32_t CONTINUOUS_DURATION_MAX = 5000;
 constexpr int32_t EVENT_INDEX_MAX = 2;
-}  // namespace
+} // namespace
 
 static std::map<std::string, int32_t> g_usageType = {
     {"unknown", USAGE_UNKNOWN},

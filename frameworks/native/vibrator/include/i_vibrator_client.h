@@ -26,6 +26,6 @@ public:
     virtual ~IVibratorClient() = default;
     DECLARE_INTERFACE_DESCRIPTOR(u"IVibratorClient");
 };
-}  // namespace Sensors
-}  // namespace OHOS
+} // namespace Sensors
+} // namespace OHOS
 #endif // I_VIBRATOR_CLIENT_H
