@@ -114,6 +114,10 @@ ohos_shared_library("libvibrator_native") {
     external_deps += [ "hisysevent:libhisysevent" ]
   }
 
+  if (miscdevice_feature_hiviewdfx_hitrace) {
+    external_deps += [ "hitrace:hitrace_meter" ]
+  }
+
   defines = miscdevice_default_defines
 
   innerapi_tags = [ "platformsdk_indirect" ]

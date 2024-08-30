@@ -14,7 +14,9 @@
  */
 #include "vibrator_hdi_connection.h"
 
+#ifdef HIVIEWDFX_HITRACE_ENABLE
 #include "hitrace_meter.h"
+#endif // HIVIEWDFX_HITRACE_ENABLE
 
 #ifdef BUILD_VARIANT_ENG
 #include "compatible_connection.h"
@@ -49,9 +51,13 @@ int32_t VibratorHdiConnection::ConnectHdi()
 int32_t VibratorHdiConnection::StartOnce(uint32_t duration)
 {
     CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
+#ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "StartOnce");
+#endif // HIVIEWDFX_HITRACE_ENABLE
     int32_t ret = iVibratorHdiConnection_->StartOnce(duration);
+#ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
+#endif // HIVIEWDFX_HITRACE_ENABLE
     if (ret != 0) {
         MISC_HILOGE("StartOnce failed");
         return VIBRATOR_ON_ERR;
@@ -62,9 +68,13 @@ int32_t VibratorHdiConnection::StartOnce(uint32_t duration)
 int32_t VibratorHdiConnection::Start(const std::string &effectType)
 {
     CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
+#ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "Start");
+#endif // HIVIEWDFX_HITRACE_ENABLE
     int32_t ret = iVibratorHdiConnection_->Start(effectType);
+#ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
+#endif // HIVIEWDFX_HITRACE_ENABLE
     if (ret != 0) {
         MISC_HILOGE("Start failed");
         return VIBRATOR_ON_ERR;
@@ -76,9 +86,13 @@ int32_t VibratorHdiConnection::Start(const std::string &effectType)
 int32_t VibratorHdiConnection::EnableCompositeEffect(const HdfCompositeEffect &hdfCompositeEffect)
 {
     CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
+#ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "EnableCompositeEffect");
+#endif // HIVIEWDFX_HITRACE_ENABLE
     int32_t ret = iVibratorHdiConnection_->EnableCompositeEffect(hdfCompositeEffect);
+#ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
+#endif // HIVIEWDFX_HITRACE_ENABLE
     if (ret != 0) {
         MISC_HILOGE("EnableCompositeEffect failed");
         return VIBRATOR_ON_ERR;
@@ -99,18 +113,26 @@ std::optional<HdfEffectInfo> VibratorHdiConnection::GetEffectInfo(const std::str
         MISC_HILOGE("Connect hdi failed");
         return std::nullopt;
     }
+#ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "GetEffectInfo");
+#endif // HIVIEWDFX_HITRACE_ENABLE
     std::optional<HdfEffectInfo> ret = iVibratorHdiConnection_->GetEffectInfo(effect);
+#ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
+#endif // HIVIEWDFX_HITRACE_ENABLE
     return ret;
 }
 
 int32_t VibratorHdiConnection::Stop(HdfVibratorModeV1_2 mode)
 {
     CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
+#ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "Stop");
+#endif // HIVIEWDFX_HITRACE_ENABLE
     int32_t ret = iVibratorHdiConnection_->Stop(mode);
+#ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
+#endif // HIVIEWDFX_HITRACE_ENABLE
     if (ret != 0) {
         MISC_HILOGE("Stop failed");
         return VIBRATOR_OFF_ERR;
@@ -150,9 +172,13 @@ int32_t VibratorHdiConnection::DestroyHdiConnection()
 int32_t VibratorHdiConnection::StartByIntensity(const std::string &effect, int32_t intensity)
 {
     CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
+#ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "StartByIntensity");
+#endif // HIVIEWDFX_HITRACE_ENABLE
     int32_t ret = iVibratorHdiConnection_->StartByIntensity(effect, intensity);
+#ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
+#endif // HIVIEWDFX_HITRACE_ENABLE
     if (ret != 0) {
         MISC_HILOGE("StartByIntensity failed");
         return VIBRATOR_ON_ERR;

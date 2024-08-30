@@ -73,7 +73,6 @@ ohos_shared_library("libmiscdevice_service") {
     "drivers_interface_vibrator:libvibrator_proxy_1.2",
     "drivers_interface_vibrator:libvibrator_proxy_1.3",
     "hilog:libhilog",
-    "hitrace:hitrace_meter",
     "ipc:ipc_single",
     "json:nlohmann_json_static",
     "os_account:os_account_innerkits",
@@ -100,6 +99,10 @@ ohos_shared_library("libmiscdevice_service") {
 
   if (miscdevice_feature_hiviewdfx_hisysevent) {
     external_deps += [ "hisysevent:libhisysevent" ]
+  }
+
+  if (miscdevice_feature_hiviewdfx_hitrace) {
+    external_deps += [ "hitrace:hitrace_meter" ]
   }
 
   shlib_type = "sa"
@@ -167,7 +170,6 @@ ohos_static_library("libmiscdevice_service_static") {
     "drivers_interface_vibrator:libvibrator_proxy_1.2",
     "drivers_interface_vibrator:libvibrator_proxy_1.3",
     "hilog:libhilog",
-    "hitrace:hitrace_meter",
     "ipc:ipc_single",
     "json:nlohmann_json_static",
     "os_account:os_account_innerkits",
@@ -194,6 +196,10 @@ ohos_static_library("libmiscdevice_service_static") {
 
   if (miscdevice_feature_hiviewdfx_hisysevent) {
     external_deps += [ "hisysevent:libhisysevent" ]
+  }
+
+  if (miscdevice_feature_hiviewdfx_hitrace) {
+    external_deps += [ "hitrace:hitrace_meter" ]
   }
 
   part_name = "miscdevice"
