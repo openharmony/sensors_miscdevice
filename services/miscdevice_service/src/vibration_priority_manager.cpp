@@ -39,6 +39,7 @@ const std::string SETTING_COLUMN_VALUE = "VALUE";
 const std::string SETTING_FEEDBACK_KEY = "physic_navi_haptic_feedback_enabled";
 const std::string SETTING_RINGER_MODE_KEY = "ringer_mode";
 const std::string SETTING_URI_PROXY = "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
+const std::string SCENEBOARD_BUNDLENAME = "com.ohos.sceneboard";
 constexpr const char *SETTINGS_DATA_EXT_URI = "datashare:///com.ohos.settingsdata.DataAbility";
 constexpr int32_t DECEM_BASE = 10;
 constexpr int32_t DATA_SHARE_READY = 0;
@@ -195,6 +196,10 @@ bool VibrationPriorityManager::IsSystemCalling()
 
 bool VibrationPriorityManager::ShouldIgnoreInputMethod(const VibrateInfo &vibrateInfo)
 {
+    if (vibrateInfo.packageName == SCENEBOARD_BUNDLENAME) {
+        MISC_HILOGD("Can not ignore for %{public}s", vibrateInfo.packageName.c_str());
+        return false;
+    }
     int32_t pid = vibrateInfo.pid;
     AppExecFwk::RunningProcessInfo processinfo{};
     appMgrClientPtr_ = DelayedSingleton<AppExecFwk::AppMgrClient>::GetInstance();

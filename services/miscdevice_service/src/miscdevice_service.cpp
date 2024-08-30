@@ -110,7 +110,8 @@ int32_t MiscdeviceService::SubscribeCommonEvent(const std::string &eventName, Ev
     return ERR_OK;
 }
 
-void MiscdeviceService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
+void MiscdeviceService::OnAddSystemAbility(int32_t systemAbilityId,
+    const std::string &deviceId) __attribute__((no_sanitize("cfi")))
 {
     MISC_HILOGI("OnAddSystemAbility systemAbilityId:%{public}d", systemAbilityId);
     switch (systemAbilityId) {
