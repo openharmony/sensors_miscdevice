@@ -69,6 +69,8 @@ public:
     int32_t GetDelayTime(int32_t &delayTime);
     int32_t InitPlayPattern(const VibratorPattern &pattern, int32_t usage, bool systemUsage,
         const VibratorParameter &parameter);
+    int32_t InitPlayPattern(const VibratorPattern &pattern, int32_t usage, bool systemUsage,
+        const VibratorParameter &parameter);
     int32_t PlayPattern(const VibratorPattern &pattern, int32_t usage, bool systemUsage,
         const VibratorParameter &parameter);
     int32_t FreeVibratorPackage(VibratorPackage &package);
