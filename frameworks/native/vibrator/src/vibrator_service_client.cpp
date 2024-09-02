@@ -372,19 +372,9 @@ int32_t VibratorServiceClient::GetDelayTime(int32_t &delayTime)
     return ret;
 }
 
-int32_t VibratorServiceClient::PlayPattern(const VibratorPattern &pattern, int32_t usage,
+int32_t VibratorServiceClient::InitPlayPattern(const VibratorPattern &pattern, int32_t usage,
     bool systemUsage, const VibratorParameter &parameter)
 {
-    MISC_HILOGD("Vibrate begin, usage:%{public}d", usage);
-    int32_t ret = InitServiceClient();
-    if (ret != ERR_OK) {
-        MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
-        return MISC_NATIVE_GET_SERVICE_ERR;
-    }
-    CHKPR(miscdeviceProxy_, ERROR);
-#ifdef HIVIEWDFX_HITRACE_ENABLE
-    StartTrace(HITRACE_TAG_SENSORS, "PlayPattern");
-#endif // HIVIEWDFX_HITRACE_ENABLE
     VibratePattern vibratePattern = {};
     vibratePattern.startTime = pattern.time;
     for (int32_t i = 0; i < pattern.eventNum; ++i) {
@@ -417,7 +407,23 @@ int32_t VibratorServiceClient::PlayPattern(const VibratorPattern &pattern, int32
         .intensity = parameter.intensity,
         .frequency = parameter.frequency
     };
-    ret = miscdeviceProxy_->PlayPattern(vibratePattern, usage, systemUsage, vibateParameter);
+    return miscdeviceProxy_->PlayPattern(vibratePattern, usage, systemUsage, vibateParameter);
+}
+
+int32_t VibratorServiceClient::PlayPattern(const VibratorPattern &pattern, int32_t usage,
+    bool systemUsage, const VibratorParameter &parameter)
+{
+    MISC_HILOGD("Vibrate begin, usage:%{public}d", usage);
+    int32_t ret = InitServiceClient();
+    if (ret != ERR_OK) {
+        MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
+        return MISC_NATIVE_GET_SERVICE_ERR;
+    }
+    CHKPR(miscdeviceProxy_, ERROR);
+#ifdef HIVIEWDFX_HITRACE_ENABLE
+    StartTrace(HITRACE_TAG_SENSORS, "PlayPattern");
+#endif // HIVIEWDFX_HITRACE_ENABLE
+    ret = InitPlayPattern(pattern, usage, systemUsage, parameter);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
 #endif // HIVIEWDFX_HITRACE_ENABLE
