@@ -20,7 +20,9 @@
 #ifdef HDF_DRIVERS_INTERFACE_LIGHT
 #include "hdi_light_connection.h"
 #endif // HDF_DRIVERS_INTERFACE_LIGHT
+#ifdef HIVIEWDFX_HITRACE_ENABLE
 #include "hitrace_meter.h"
+#endif // HIVIEWDFX_HITRACE_ENABLE
 #include "sensors_errors.h"
 
 #undef LOG_TAG

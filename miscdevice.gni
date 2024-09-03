@@ -60,3 +60,11 @@ if (!defined(global_parts_info) ||
 } else {
   miscdevice_feature_hiviewdfx_hisysevent = false
 }
+
+if (!defined(global_parts_info) ||
+    defined(global_parts_info.hiviewdfx_hitrace)) {
+  miscdevice_feature_hiviewdfx_hitrace = true
+  miscdevice_default_defines += [ "HIVIEWDFX_HITRACE_ENABLE" ]
+} else {
+  miscdevice_feature_hiviewdfx_hitrace = false
+}
