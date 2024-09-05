@@ -21,12 +21,15 @@
 #include <string>
 
 #include <nocopyable.h>
+#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
 #include "v1_2/vibrator_types.h"
 #include "v1_3/ivibrator_interface.h"
+#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
 #include "vibrator_infos.h"
 
 namespace OHOS {
 namespace Sensors {
+#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
 using OHOS::HDI::Vibrator::V1_2::HdfVibratorModeV1_2;
 using OHOS::HDI::Vibrator::V1_2::HDF_VIBRATOR_MODE_ONCE;
 using OHOS::HDI::Vibrator::V1_2::HDF_VIBRATOR_MODE_PRESET;
@@ -49,6 +52,7 @@ using OHOS::HDI::Vibrator::V1_1::PrimitiveEffect;
 using OHOS::HDI::Vibrator::V1_1::CompositeEffect;
 using OHOS::HDI::Vibrator::V1_1::HdfCompositeEffect;
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
 class IVibratorHdiConnection {
 public:
     IVibratorHdiConnection() = default;
@@ -56,18 +60,22 @@ public:
     virtual int32_t ConnectHdi() = 0;
     virtual int32_t StartOnce(uint32_t duration) = 0;
     virtual int32_t Start(const std::string &effectType) = 0;
+#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     virtual int32_t EnableCompositeEffect(const HdfCompositeEffect &hdfCompositeEffect) = 0;
     virtual bool IsVibratorRunning() = 0;
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     virtual std::optional<HdfEffectInfo> GetEffectInfo(const std::string &effect) = 0;
     virtual int32_t Stop(HdfVibratorModeV1_2 mode) = 0;
+#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
     virtual int32_t DestroyHdiConnection() = 0;
     virtual int32_t GetDelayTime(int32_t mode, int32_t &delayTime) = 0;
     virtual int32_t GetVibratorCapacity(VibratorCapacity &capacity) = 0;
     virtual int32_t PlayPattern(const VibratePattern &pattern) = 0;
     virtual int32_t StartByIntensity(const std::string &effect, int32_t intensity) = 0;
+#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
     virtual int32_t GetAllWaveInfo(std::vector<HdfWaveInformation> &waveInfos) = 0;
+#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
 
 private:
     DISALLOW_COPY_AND_MOVE(IVibratorHdiConnection);

@@ -54,6 +54,15 @@ if (build_variant == "root") {
 }
 
 if (!defined(global_parts_info) ||
+    defined(global_parts_info.hdf_drivers_interface_vibrator)) {
+  miscdevice_feature_hdf_drivers_interface_vibrator = false
+  # miscdevice_feature_hdf_drivers_interface_vibrator = true
+  # miscdevice_default_defines += [ "HDF_DRIVERS_INTERFACE_VIBRATOR" ]
+} else {
+  miscdevice_feature_hdf_drivers_interface_vibrator = false
+}
+
+if (!defined(global_parts_info) ||
     defined(global_parts_info.hiviewdfx_hisysevent)) {
   miscdevice_feature_hiviewdfx_hisysevent = true
   miscdevice_default_defines += [ "HIVIEWDFX_HISYSEVENT_ENABLE" ]

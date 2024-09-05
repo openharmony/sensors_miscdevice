@@ -37,6 +37,7 @@ constexpr int32_t FREQUENCY_MIN = 0;
 constexpr int32_t FREQUENCY_MAX = 100;
 constexpr int32_t INTENSITY_MIN = 0;
 constexpr int32_t INTENSITY_MAX = 100;
+#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
 constexpr int32_t TRANSIENT_GRADE_NUM = 4;
 constexpr int32_t CONTINUOUS_GRADE_NUM = 8;
 constexpr int32_t CONTINUOUS_GRADE_MASK = 100;
@@ -49,14 +50,18 @@ constexpr float WEIGHT_SUM_INIT = 100;
 constexpr int32_t STOP_WAVEFORM = 0;
 constexpr int32_t EFFECT_ID_BOUNDARY = 1000;
 constexpr int32_t DURATION_MAX = 1600;
+#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
 constexpr float CURVE_INTENSITY_SCALE = 100.00;
+#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
 constexpr int32_t SLICE_STEP = 50;
 constexpr int32_t CONTINUOUS_VIBRATION_DURATION_MIN = 15;
 constexpr int32_t INDEX_MIN_RESTRICT = 1;
+#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
 }  // namespace
 
 CustomVibrationMatcher::CustomVibrationMatcher()
 {
+#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
     auto &VibratorDevice = VibratorHdiConnection::GetInstance();
     int32_t ret = VibratorDevice.GetAllWaveInfo(waveInfos_);
     if (ret != ERR_OK) {
@@ -69,6 +74,7 @@ CustomVibrationMatcher::CustomVibrationMatcher()
                         it->waveId, it->intensity, it->frequency, it->duration);
         }
     }
+#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
 }
 
 CustomVibrationMatcher &CustomVibrationMatcher::GetInstance()
@@ -77,6 +83,7 @@ CustomVibrationMatcher &CustomVibrationMatcher::GetInstance()
     return instance;
 }
 
+#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
 int32_t CustomVibrationMatcher::TransformTime(const VibratePackage &package,
     std::vector<CompositeEffect> &compositeEffects)
 {
@@ -134,6 +141,7 @@ int32_t CustomVibrationMatcher::TransformEffect(const VibratePackage &package,
     compositeEffects.push_back(compositeEffect);
     return SUCCESS;
 }
+#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
 
 VibratePattern CustomVibrationMatcher::MixedWaveProcess(const VibratePackage &package)
 {
@@ -183,7 +191,9 @@ void CustomVibrationMatcher::PreProcessEvent(VibrateEvent &event)
         };
         event.points.push_back(endPoint);
     }
+#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
     event.duration = std::max(event.duration, CONTINUOUS_VIBRATION_DURATION_MIN);
+#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
     for (VibrateCurvePoint &curvePoint : event.points) {
         curvePoint.time += event.time;
         curvePoint.intensity *= (event.intensity / CURVE_INTENSITY_SCALE);
@@ -253,6 +263,7 @@ std::vector<VibrateCurvePoint> CustomVibrationMatcher::MergeCurve(const std::vec
     return newCurve;
 }
 
+#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
 void CustomVibrationMatcher::ProcessContinuousEvent(const VibrateEvent &event, int32_t &preStartTime,
     int32_t &preDuration, std::vector<CompositeEffect> &compositeEffects)
 {
@@ -362,6 +373,7 @@ void CustomVibrationMatcher::ProcessTransientEvent(const VibrateEvent &event, in
     preStartTime = event.time;
     preDuration = event.duration;
 }
+#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
 
 int32_t CustomVibrationMatcher::Interpolation(int32_t x1, int32_t x2, int32_t y1, int32_t y2, int32_t x)
 {

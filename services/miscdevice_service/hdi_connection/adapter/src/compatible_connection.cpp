@@ -43,7 +43,9 @@ std::unordered_map<std::string, int32_t> g_vibratorEffect = {
     {"haptic.effect.soft", 30},
     {"haptic.effect.sharp", 20}
 };
+#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
 HdfVibratorModeV1_2 g_vibrateMode;
+#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
 constexpr int32_t VIBRATE_DELAY_TIME = 10;
 } // namespace
 int32_t CompatibleConnection::duration_ = 0;
@@ -64,7 +66,9 @@ int32_t CompatibleConnection::StartOnce(uint32_t duration)
         vibrateThread_ = std::move(senocdDataThread);
         isStop_ = false;
     }
+#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
     g_vibrateMode = HDF_VIBRATOR_MODE_ONCE;
+#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
     return ERR_OK;
 }
 
@@ -81,10 +85,14 @@ int32_t CompatibleConnection::Start(const std::string &effectType)
         vibrateThread_ = std::move(senocdDataThread);
         isStop_ = false;
     }
+#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
     g_vibrateMode = HDF_VIBRATOR_MODE_PRESET;
+#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
     return ERR_OK;
 }
 
+
+#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 int32_t CompatibleConnection::EnableCompositeEffect(const HdfCompositeEffect &hdfCompositeEffect)
 {
@@ -151,6 +159,7 @@ int32_t CompatibleConnection::Stop(HdfVibratorModeV1_2 mode)
     }
     return ERR_OK;
 }
+#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
 
 int32_t CompatibleConnection::GetDelayTime(int32_t mode, int32_t &delayTime)
 {
@@ -203,14 +212,18 @@ int32_t CompatibleConnection::StartByIntensity(const std::string &effect, int32_
         vibrateThread_ = std::move(senocdDataThread);
         isStop_ = false;
     }
+#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
     g_vibrateMode = HDF_VIBRATOR_MODE_PRESET;
+#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
     return ERR_OK;
 }
 
+#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
 int32_t CompatibleConnection::GetAllWaveInfo(std::vector<HdfWaveInformation> &waveInfos)
 {
     return ERR_OK;
 }
+#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
 
 }  // namespace Sensors
 }  // namespace OHOS
