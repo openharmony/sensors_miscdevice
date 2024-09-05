@@ -138,6 +138,7 @@ int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, int32_t timeOut, int3
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
+    std::lock_guard<std::mutex> clientLock(clientMutex_);
     CHKPR(miscdeviceProxy_, ERROR);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "VibrateTime");
@@ -162,6 +163,7 @@ int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, const std::string &ef
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
+    std::lock_guard<std::mutex> clientLock(clientMutex_);
     CHKPR(miscdeviceProxy_, ERROR);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "VibrateEffect");
@@ -188,6 +190,7 @@ int32_t VibratorServiceClient::PlayVibratorCustom(int32_t vibratorId, const RawF
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
+    std::lock_guard<std::mutex> clientLock(clientMutex_);
     CHKPR(miscdeviceProxy_, ERROR);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "PlayVibratorCustom");
@@ -215,6 +218,7 @@ int32_t VibratorServiceClient::StopVibrator(int32_t vibratorId, const std::strin
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
+    std::lock_guard<std::mutex> clientLock(clientMutex_);
     CHKPR(miscdeviceProxy_, ERROR);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "StopVibratorByMode");
@@ -237,6 +241,7 @@ int32_t VibratorServiceClient::StopVibrator(int32_t vibratorId)
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
+    std::lock_guard<std::mutex> clientLock(clientMutex_);
     CHKPR(miscdeviceProxy_, ERROR);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "StopVibratorAll");
@@ -254,6 +259,11 @@ int32_t VibratorServiceClient::StopVibrator(int32_t vibratorId)
 bool VibratorServiceClient::IsHdHapticSupported()
 {
     CALL_LOG_ENTER;
+    int32_t ret = InitServiceClient();
+    if (ret != ERR_OK) {
+        MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
+        return MISC_NATIVE_GET_SERVICE_ERR;
+    }
     return capacity_.isSupportHdHaptic;
 }
 
@@ -265,6 +275,7 @@ int32_t VibratorServiceClient::IsSupportEffect(const std::string &effect, bool &
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
+    std::lock_guard<std::mutex> clientLock(clientMutex_);
     CHKPR(miscdeviceProxy_, ERROR);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "VibrateEffect");
@@ -283,7 +294,10 @@ void VibratorServiceClient::ProcessDeathObserver(const wptr<IRemoteObject> &obje
 {
     CALL_LOG_ENTER;
     (void)object;
-    miscdeviceProxy_ = nullptr;
+    {
+        std::lock_guard<std::mutex> clientLock(clientMutex_);
+        miscdeviceProxy_ = nullptr;
+    }
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
@@ -358,6 +372,7 @@ int32_t VibratorServiceClient::GetDelayTime(int32_t &delayTime)
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
+    std::lock_guard<std::mutex> clientLock(clientMutex_);
     CHKPR(miscdeviceProxy_, ERROR);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "GetDelayTime");
@@ -407,6 +422,8 @@ int32_t VibratorServiceClient::InitPlayPattern(const VibratorPattern &pattern, i
         .intensity = parameter.intensity,
         .frequency = parameter.frequency
     };
+    std::lock_guard<std::mutex> clientLock(clientMutex_);
+    CHKPR(miscdeviceProxy_, ERROR);
     return miscdeviceProxy_->PlayPattern(vibratePattern, usage, systemUsage, vibateParameter);
 }
 
@@ -419,7 +436,6 @@ int32_t VibratorServiceClient::PlayPattern(const VibratorPattern &pattern, int32
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
-    CHKPR(miscdeviceProxy_, ERROR);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "PlayPattern");
 #endif // HIVIEWDFX_HITRACE_ENABLE
@@ -525,6 +541,7 @@ int32_t VibratorServiceClient::PlayPrimitiveEffect(int32_t vibratorId, const std
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
+    std::lock_guard<std::mutex> clientLock(clientMutex_);
     CHKPR(miscdeviceProxy_, ERROR);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "PlayPrimitiveEffect");
