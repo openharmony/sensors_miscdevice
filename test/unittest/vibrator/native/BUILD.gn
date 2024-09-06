@@ -28,7 +28,7 @@ ohos_unittest("VibratorAgentTest") {
     "$SUBSYSTEM_DIR/frameworks/native/vibrator:vibrator_target",
     "$SUBSYSTEM_DIR/utils/common:libmiscdevice_utils",
     "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main"
+    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
