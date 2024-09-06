@@ -16,6 +16,7 @@
 #ifndef CUSTOM_VIBRATION_MATCHER_H
 #define CUSTOM_VIBRATION_MATCHER_H
 
+#include <map>
 #include <set>
 #include <string>
 #include <vector>
@@ -35,6 +36,7 @@ public:
 private:
     DISALLOW_COPY_AND_MOVE(CustomVibrationMatcher);
     CustomVibrationMatcher();
+    void NormalizedWaveInfo();
     static int32_t Interpolation(int32_t x1, int32_t x2, int32_t y1, int32_t y2, int32_t x);
     VibratePattern MixedWaveProcess(const VibratePackage &package);
     void PreProcessEvent(VibrateEvent &event);
@@ -47,7 +49,8 @@ private:
     void ProcessTransientEvent(const VibrateEvent &event, int32_t &preStartTime, int32_t &preDuration,
         std::vector<CompositeEffect> &compositeEffects);
 
-    std::vector<HdfWaveInformation> waveInfos_;
+    std::vector<HdfWaveInformation> hdfWaveInfos_;
+    std::map<int32_t, std::vector<int32_t>> waveInfos_;
 };
 } // namespace Sensors
 } // namespace OHOS
