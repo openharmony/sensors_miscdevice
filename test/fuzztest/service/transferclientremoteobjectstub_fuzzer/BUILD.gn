@@ -22,6 +22,7 @@ ohos_fuzztest("TransferClientRemoteObjectStubFuzzTest") {
   fuzz_config_file = "$SUBSYSTEM_DIR/test/fuzztest/service/transferclientremoteobjectstub_fuzzer"
 
   include_dirs = [
+    "//third_party/cJSON",
     "$SUBSYSTEM_DIR/interfaces/inner_api/vibrator",
     "$SUBSYSTEM_DIR/frameworks/native/common/include",
     "$SUBSYSTEM_DIR/interfaces/inner_api/light",

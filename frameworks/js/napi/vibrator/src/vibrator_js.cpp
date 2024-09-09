@@ -219,12 +219,11 @@ bool SetUsage(const std::string &usage, bool systemUsage)
 
 int32_t StartVibrate(const VibrateInfo &info)
 {
-    CALL_LOG_ENTER;
     if (!SetUsage(info.usage, info.systemUsage)) {
         MISC_HILOGE("SetUsage fail");
         return PARAMETER_ERROR;
     }
-    if (info.type != "time" && info.type != "preset" && info.type != "file") {
+    if ((info.type != "time") && (info.type != "preset") && (info.type != "file")) {
         MISC_HILOGE("Invalid vibrate type, type:%{public}s", info.type.c_str());
         return PARAMETER_ERROR;
     }
