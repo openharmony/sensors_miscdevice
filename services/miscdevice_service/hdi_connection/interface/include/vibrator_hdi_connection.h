@@ -29,18 +29,22 @@ public:
     int32_t ConnectHdi() override;
     int32_t StartOnce(uint32_t duration) override;
     int32_t Start(const std::string &effectType) override;
+#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     int32_t EnableCompositeEffect(const HdfCompositeEffect &hdfCompositeEffect) override;
     bool IsVibratorRunning() override;
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     std::optional<HdfEffectInfo> GetEffectInfo(const std::string &effect) override;
     int32_t Stop(HdfVibratorModeV1_2 mode) override;
+#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
     int32_t DestroyHdiConnection() override;
     int32_t GetDelayTime(int32_t mode, int32_t &delayTime) override;
     int32_t GetVibratorCapacity(VibratorCapacity &capacity) override;
     int32_t PlayPattern(const VibratePattern &pattern) override;
     int32_t StartByIntensity(const std::string &effect, int32_t intensity) override;
+#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
     int32_t GetAllWaveInfo(std::vector<HdfWaveInformation> &waveInfos) override;
+#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
 
 private:
     DISALLOW_COPY_AND_MOVE(VibratorHdiConnection);

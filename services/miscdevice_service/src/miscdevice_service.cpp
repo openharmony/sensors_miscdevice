@@ -345,7 +345,7 @@ int32_t MiscdeviceService::Vibrate(int32_t vibratorId, int32_t timeOut, int32_t 
 int32_t MiscdeviceService::StopVibrator(int32_t vibratorId)
 {
     std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
-#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+#if defined (OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM) && defined (HDF_DRIVERS_INTERFACE_VIBRATOR)
     if ((vibratorThread_ == nullptr) || (!vibratorThread_->IsRunning() &&
         !vibratorHdiConnection_.IsVibratorRunning())) {
         MISC_HILOGD("No vibration, no need to stop");
@@ -360,7 +360,7 @@ int32_t MiscdeviceService::StopVibrator(int32_t vibratorId)
         MISC_HILOGD("No vibration, no need to stop");
         return ERROR;
     }
-#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM && HDF_DRIVERS_INTERFACE_VIBRATOR
     StopVibrateThread();
     std::string packageName = GetPackageName(GetCallingTokenID());
     std::string curVibrateTime = GetCurrentTime();
@@ -376,6 +376,7 @@ int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::str
         MISC_HILOGE("Invalid parameter");
         return PARAMETER_ERROR;
     }
+#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
     std::optional<HdfEffectInfo> effectInfo = vibratorHdiConnection_.GetEffectInfo(effect);
     if (!effectInfo) {
         MISC_HILOGE("GetEffectInfo fail");
@@ -385,6 +386,7 @@ int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::str
         MISC_HILOGE("Effect not supported");
         return PARAMETER_ERROR;
     }
+#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
     VibrateInfo info = {
         .mode = VIBRATE_PRESET,
         .packageName = GetPackageName(GetCallingTokenID()),
@@ -392,7 +394,9 @@ int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::str
         .uid = GetCallingUid(),
         .usage = usage,
         .systemUsage = systemUsage,
+#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
         .duration = effectInfo->duration,
+#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
         .effect = effect,
         .count = count,
         .intensity = INTENSITY_ADJUST_MAX
@@ -416,12 +420,12 @@ void MiscdeviceService::StartVibrateThread(VibrateInfo info)
         vibratorThread_ = std::make_shared<VibratorThread>();
     }
     StopVibrateThread();
-#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+#if defined (OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM) && defined (HDF_DRIVERS_INTERFACE_VIBRATOR)
     if (vibratorHdiConnection_.IsVibratorRunning()) {
         vibratorHdiConnection_.Stop(HDF_VIBRATOR_MODE_PRESET);
         vibratorHdiConnection_.Stop(HDF_VIBRATOR_MODE_HDHAPTIC);
     }
-#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM && HDF_DRIVERS_INTERFACE_VIBRATOR
     vibratorThread_->UpdateVibratorEffect(info);
     vibratorThread_->Start("VibratorThread");
     DumpHelper->SaveVibrateRecord(info);
@@ -459,12 +463,14 @@ int32_t MiscdeviceService::StopVibrator(int32_t vibratorId, const std::string &m
 
 int32_t MiscdeviceService::IsSupportEffect(const std::string &effect, bool &state)
 {
+#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
     std::optional<HdfEffectInfo> effectInfo = vibratorHdiConnection_.GetEffectInfo(effect);
     if (!effectInfo) {
         MISC_HILOGE("GetEffectInfo fail");
         return ERROR;
     }
     state = effectInfo->isSupportEffect;
+#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
     return NO_ERROR;
 }
 
@@ -861,6 +867,7 @@ int32_t MiscdeviceService::PlayPrimitiveEffect(int32_t vibratorId, const std::st
         MISC_HILOGE("Invalid parameter");
         return PARAMETER_ERROR;
     }
+#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
     std::optional<HdfEffectInfo> effectInfo = vibratorHdiConnection_.GetEffectInfo(effect);
     if (!effectInfo) {
         MISC_HILOGE("GetEffectInfo fail");
@@ -870,6 +877,7 @@ int32_t MiscdeviceService::PlayPrimitiveEffect(int32_t vibratorId, const std::st
         MISC_HILOGE("Effect not supported");
         return PARAMETER_ERROR;
     }
+#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
     VibrateInfo info = {
         .mode = VIBRATE_PRESET,
         .packageName = GetPackageName(GetCallingTokenID()),
@@ -877,7 +885,9 @@ int32_t MiscdeviceService::PlayPrimitiveEffect(int32_t vibratorId, const std::st
         .uid = GetCallingUid(),
         .usage = usage,
         .systemUsage = systemUsage,
+#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
         .duration = effectInfo->duration,
+#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
         .effect = effect,
         .count = count,
         .intensity = intensity

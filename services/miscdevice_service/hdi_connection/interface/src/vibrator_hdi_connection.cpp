@@ -32,7 +32,9 @@ namespace Sensors {
 
 int32_t VibratorHdiConnection::ConnectHdi()
 {
+#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
     iVibratorHdiConnection_ = std::make_unique<HdiConnection>();
+#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
     int32_t ret = iVibratorHdiConnection_->ConnectHdi();
 #ifdef BUILD_VARIANT_ENG
     if (ret != ERR_OK) {
@@ -82,6 +84,7 @@ int32_t VibratorHdiConnection::Start(const std::string &effectType)
     return ERR_OK;
 }
 
+#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 int32_t VibratorHdiConnection::EnableCompositeEffect(const HdfCompositeEffect &hdfCompositeEffect)
 {
@@ -139,6 +142,7 @@ int32_t VibratorHdiConnection::Stop(HdfVibratorModeV1_2 mode)
     }
     return ERR_OK;
 }
+#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
 
 int32_t VibratorHdiConnection::GetDelayTime(int32_t mode, int32_t &delayTime)
 {
@@ -186,11 +190,13 @@ int32_t VibratorHdiConnection::StartByIntensity(const std::string &effect, int32
     return ERR_OK;
 }
 
+#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
 int32_t VibratorHdiConnection::GetAllWaveInfo(std::vector<HdfWaveInformation> &waveInfos)
 {
     CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
     return iVibratorHdiConnection_->GetAllWaveInfo(waveInfos);
 }
+#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
 
 }  // namespace Sensors
 }  // namespace OHOS

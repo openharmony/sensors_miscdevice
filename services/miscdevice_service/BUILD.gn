@@ -18,7 +18,6 @@ ohos_shared_library("libmiscdevice_service") {
   sources = [
     "haptic_matcher/src/custom_vibration_matcher.cpp",
     "hdi_connection/adapter/src/compatible_light_connection.cpp",
-    "hdi_connection/adapter/src/hdi_connection.cpp",
     "hdi_connection/interface/src/light_hdi_connection.cpp",
     "hdi_connection/interface/src/vibrator_hdi_connection.cpp",
     "src/miscdevice_common_event_subscriber.cpp",
@@ -69,9 +68,6 @@ ohos_shared_library("libmiscdevice_service") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "data_share:datashare_consumer",
-    "drivers_interface_vibrator:libvibrator_proxy_1.1",
-    "drivers_interface_vibrator:libvibrator_proxy_1.2",
-    "drivers_interface_vibrator:libvibrator_proxy_1.3",
     "hilog:libhilog",
     "ipc:ipc_single",
     "json:nlohmann_json_static",
@@ -89,6 +85,16 @@ ohos_shared_library("libmiscdevice_service") {
 
   if (miscdevice_feature_vibrator_custom) {
     external_deps += [ "init:libbegetutil" ]
+  }
+
+  if (miscdevice_feature_hdf_drivers_interface_vibrator) {
+    sources += [ "hdi_connection/adapter/src/hdi_connection.cpp" ]
+
+    external_deps += [
+      "drivers_interface_vibrator:libvibrator_proxy_1.1",
+      "drivers_interface_vibrator:libvibrator_proxy_1.2",
+      "drivers_interface_vibrator:libvibrator_proxy_1.3",
+    ]
   }
 
   if (hdf_drivers_interface_light) {
@@ -115,7 +121,6 @@ ohos_static_library("libmiscdevice_service_static") {
   sources = [
     "haptic_matcher/src/custom_vibration_matcher.cpp",
     "hdi_connection/adapter/src/compatible_light_connection.cpp",
-    "hdi_connection/adapter/src/hdi_connection.cpp",
     "hdi_connection/interface/src/light_hdi_connection.cpp",
     "hdi_connection/interface/src/vibrator_hdi_connection.cpp",
     "src/miscdevice_common_event_subscriber.cpp",
@@ -166,9 +171,6 @@ ohos_static_library("libmiscdevice_service_static") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "data_share:datashare_consumer",
-    "drivers_interface_vibrator:libvibrator_proxy_1.1",
-    "drivers_interface_vibrator:libvibrator_proxy_1.2",
-    "drivers_interface_vibrator:libvibrator_proxy_1.3",
     "hilog:libhilog",
     "ipc:ipc_single",
     "json:nlohmann_json_static",
@@ -186,6 +188,16 @@ ohos_static_library("libmiscdevice_service_static") {
 
   if (miscdevice_feature_vibrator_custom) {
     external_deps += [ "init:libbegetutil" ]
+  }
+
+  if (miscdevice_feature_hdf_drivers_interface_vibrator) {
+    sources += [ "hdi_connection/adapter/src/hdi_connection.cpp" ]
+
+    external_deps += [
+      "drivers_interface_vibrator:libvibrator_proxy_1.1",
+      "drivers_interface_vibrator:libvibrator_proxy_1.2",
+      "drivers_interface_vibrator:libvibrator_proxy_1.3",
+    ]
   }
 
   if (hdf_drivers_interface_light) {
