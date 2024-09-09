@@ -37,7 +37,7 @@ using Security::AccessToken::AccessTokenID;
 
 namespace {
 constexpr int32_t TIME_WAIT_FOR_OP = 500;
-constexpr int32_t TIME_WAIT_FOR_OP_TWO_HUNDRED = 200;
+constexpr int32_t TIME_WAIT_FOR_OP_EACH_CASE = 200;
 constexpr int32_t INTENSITY_HIGH = 100;
 constexpr int32_t INTENSITY_MEDIUM = 50;
 constexpr int32_t INTENSITY_LOW = 20;
@@ -113,7 +113,7 @@ void VibratorAgentTest::SetUp()
 
 void VibratorAgentTest::TearDown()
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_TWO_HUNDRED));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_EACH_CASE));
 }
 
 bool IsSupportVibratorEffect(const char* effectId)

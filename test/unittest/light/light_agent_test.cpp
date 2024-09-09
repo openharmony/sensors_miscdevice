@@ -17,10 +17,10 @@
 #include <thread>
 
 #include "accesstoken_kit.h"
-#include "nativetoken_kit.h"
-#include "token_setproc.h"
 #include "light_agent.h"
+#include "nativetoken_kit.h"
 #include "sensors_errors.h"
+#include "token_setproc.h"
 
 #undef LOG_TAG
 #define LOG_TAG "LightAgentTest"
