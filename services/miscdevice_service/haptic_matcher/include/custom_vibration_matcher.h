@@ -30,8 +30,10 @@ class CustomVibrationMatcher {
 public:
     ~CustomVibrationMatcher() = default;
     static CustomVibrationMatcher &GetInstance();
+#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
     int32_t TransformTime(const VibratePackage &package, std::vector<CompositeEffect> &compositeEffects);
     int32_t TransformEffect(const VibratePackage &package, std::vector<CompositeEffect> &compositeEffects);
+#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
 
 private:
     DISALLOW_COPY_AND_MOVE(CustomVibrationMatcher);
@@ -42,6 +44,7 @@ private:
     void PreProcessEvent(VibrateEvent &event);
     std::vector<VibrateCurvePoint> MergeCurve(const std::vector<VibrateCurvePoint> &curveLeft,
         const std::vector<VibrateCurvePoint> &curveRight);
+#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
     void ProcessContinuousEvent(const VibrateEvent &event, int32_t &preStartTime,
         int32_t &preDuration, std::vector<CompositeEffect> &compositeEffects);
     void ProcessContinuousEventSlice(const VibrateSlice &slice, int32_t &preStartTime, int32_t &preDuration,
@@ -51,6 +54,7 @@ private:
 
     std::vector<HdfWaveInformation> hdfWaveInfos_;
     std::map<int32_t, std::vector<int32_t>> waveInfos_;
+#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
 };
 } // namespace Sensors
 } // namespace OHOS

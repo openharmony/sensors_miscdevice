@@ -105,7 +105,6 @@ ohos_shared_library("libvibrator_native") {
     "cJSON:cjson",
     "c_utils:utils",
     "hilog:libhilog",
-    "hitrace:hitrace_meter",
     "ipc:ipc_single",
     "samgr:samgr_proxy",
   ]
