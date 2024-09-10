@@ -72,9 +72,10 @@ CustomVibrationMatcher::CustomVibrationMatcher()
 void CustomVibrationMatcher::NormalizedWaveInfo()
 {
     CALL_LOG_ENTER;
-    float maxIntensity = hdfWaveInfos_.begin()->intensity;
-    float minFrequency = hdfWaveInfos_.begin()->frequency;
-    float maxFrequency = hdfWaveInfos_.begin()->frequency;
+    auto firstIt = hdfWaveInfos_.begin();
+    float maxIntensity = firstIt->intensity;
+    float minFrequency = firstIt->frequency;
+    float maxFrequency = firstIt->frequency;
     for (auto it = hdfWaveInfos_.begin(); it != hdfWaveInfos_.end(); ++it) {
         maxIntensity = (maxIntensity > it->intensity) ? maxIntensity : it->intensity;
         minFrequency = (minFrequency < it->frequency) ? minFrequency : it->frequency;
@@ -83,6 +84,10 @@ void CustomVibrationMatcher::NormalizedWaveInfo()
 
     float intensityEqualValue = maxIntensity / INTENSITY_MAX;
     float frequencyEqualValue = (maxFrequency - minFrequency) / FREQUENCY_MAX;
+    if ((intensityEqualValue == 0) || (frequencyEqualValue == 0)) {
+        MISC_HILOGE("The equal value of intensity or frequency is zero");
+        return;
+    }
     for (auto it = hdfWaveInfos_.begin(); it != hdfWaveInfos_.end(); ++it) {
         std::vector<int32_t> normalizedValue;
         normalizedValue.push_back(static_cast<int32_t>(it->intensity / intensityEqualValue));
@@ -148,7 +153,7 @@ int32_t CustomVibrationMatcher::TransformEffect(const VibratePackage &package,
     int32_t preStartTime = flatPattern.startTime;
     int32_t preDuration = 0;
     for (const VibrateEvent &event : flatPattern.events) {
-        if ((event.tag == EVENT_TAG_CONTINUOUS) || hdfWaveInfos_.empty()) {
+        if ((event.tag == EVENT_TAG_CONTINUOUS) || waveInfos_.empty()) {
             PrimitiveEffect primitiveEffect;
             primitiveEffect.delay = event.time - preStartTime;
             primitiveEffect.effectId = event.duration;
