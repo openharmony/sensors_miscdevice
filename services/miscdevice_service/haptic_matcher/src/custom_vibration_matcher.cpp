@@ -30,6 +30,7 @@ constexpr int32_t FREQUENCY_MIN = 0;
 constexpr int32_t FREQUENCY_MAX = 100;
 constexpr int32_t INTENSITY_MIN = 0;
 constexpr int32_t INTENSITY_MAX = 100;
+constexpr int32_t VIBRATOR_DELAY = 20;
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
 constexpr int32_t CONTINUOUS_GRADE_NUM = 8;
 constexpr int32_t CONTINUOUS_GRADE_MASK = 100;
@@ -183,9 +184,12 @@ VibratePattern CustomVibrationMatcher::MixedWaveProcess(const VibratePackage &pa
         for (VibrateEvent event : pattern.events) {
             event.time += pattern.startTime;
             PreProcessEvent(event);
-            if ((outputEvents.empty()) ||
-                (event.time >= (outputEvents.back().time + outputEvents.back().duration)) ||
-                (outputEvents.back().tag == EVENT_TAG_TRANSIENT)) {
+            if ((outputEvents.empty()) || (outputEvents.back().tag == EVENT_TAG_TRANSIENT)) {
+                outputEvents.emplace_back(event);
+            } else if ((event.time >= (outputEvents.back().time + outputEvents.back().duration))) {
+                int32_t diffTime = event.time - outputEvents.back().time - outputEvents.back().duration;
+                outputEvents.back().duration += ((diffTime < VIBRATOR_DELAY) ? (diffTime - VIBRATOR_DELAY) : 0);
+                outputEvents.back().duration = std::max(outputEvents.back().duration, 0);
                 outputEvents.emplace_back(event);
             } else {
                 VibrateEvent &lastEvent = outputEvents.back();

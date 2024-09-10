@@ -38,13 +38,13 @@ public:
 private:
     DISALLOW_COPY_AND_MOVE(CustomVibrationMatcher);
     CustomVibrationMatcher();
-    void NormalizedWaveInfo();
     static int32_t Interpolation(int32_t x1, int32_t x2, int32_t y1, int32_t y2, int32_t x);
     VibratePattern MixedWaveProcess(const VibratePackage &package);
     void PreProcessEvent(VibrateEvent &event);
     std::vector<VibrateCurvePoint> MergeCurve(const std::vector<VibrateCurvePoint> &curveLeft,
         const std::vector<VibrateCurvePoint> &curveRight);
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
+    void NormalizedWaveInfo();
     void ProcessContinuousEvent(const VibrateEvent &event, int32_t &preStartTime,
         int32_t &preDuration, std::vector<CompositeEffect> &compositeEffects);
     void ProcessContinuousEventSlice(const VibrateSlice &slice, int32_t &preStartTime, int32_t &preDuration,
