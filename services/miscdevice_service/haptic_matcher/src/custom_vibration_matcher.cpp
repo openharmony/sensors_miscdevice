@@ -43,6 +43,7 @@ constexpr int32_t EFFECT_ID_BOUNDARY = 1000;
 constexpr int32_t DURATION_MAX = 1600;
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
 constexpr float CURVE_INTENSITY_SCALE = 100.00;
+const float EPSILON = 0.00001;
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
 constexpr int32_t SLICE_STEP = 50;
 constexpr int32_t CONTINUOUS_VIBRATION_DURATION_MIN = 15;
@@ -84,7 +85,7 @@ void CustomVibrationMatcher::NormalizedWaveInfo()
 
     float intensityEqualValue = maxIntensity / INTENSITY_MAX;
     float frequencyEqualValue = (maxFrequency - minFrequency) / FREQUENCY_MAX;
-    if ((intensityEqualValue == 0) || (frequencyEqualValue == 0)) {
+    if ((std::abs(intensityEqualValue) <= EPSILON) || (std::abs(frequencyEqualValue) <= EPSILON)) {
         MISC_HILOGE("The equal value of intensity or frequency is zero");
         return;
     }
