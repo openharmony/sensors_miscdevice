@@ -16,6 +16,7 @@
 #ifndef CUSTOM_VIBRATION_MATCHER_H
 #define CUSTOM_VIBRATION_MATCHER_H
 
+#include <map>
 #include <set>
 #include <string>
 #include <vector>
@@ -43,6 +44,7 @@ private:
     std::vector<VibrateCurvePoint> MergeCurve(const std::vector<VibrateCurvePoint> &curveLeft,
         const std::vector<VibrateCurvePoint> &curveRight);
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
+    void NormalizedWaveInfo();
     void ProcessContinuousEvent(const VibrateEvent &event, int32_t &preStartTime,
         int32_t &preDuration, std::vector<CompositeEffect> &compositeEffects);
     void ProcessContinuousEventSlice(const VibrateSlice &slice, int32_t &preStartTime, int32_t &preDuration,
@@ -50,7 +52,8 @@ private:
     void ProcessTransientEvent(const VibrateEvent &event, int32_t &preStartTime, int32_t &preDuration,
         std::vector<CompositeEffect> &compositeEffects);
 
-    std::vector<HdfWaveInformation> waveInfos_;
+    std::vector<HdfWaveInformation> hdfWaveInfos_;
+    std::map<int32_t, std::vector<int32_t>> waveInfos_;
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
 };
 } // namespace Sensors
