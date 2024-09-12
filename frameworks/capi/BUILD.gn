@@ -33,10 +33,7 @@ ohos_shared_library("ohvibrator") {
   deps =
       [ "$SUBSYSTEM_DIR/frameworks/native/vibrator:vibrator_interface_native" ]
 
-  external_deps = [
-    "c_utils:utils",
-    "hilog:libhilog",
-  ]
+  external_deps = [ "hilog:libhilog" ]
 
   relative_install_dir = "ndk"
   part_name = "miscdevice"

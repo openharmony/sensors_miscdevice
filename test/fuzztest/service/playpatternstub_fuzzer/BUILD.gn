@@ -23,6 +23,7 @@ ohos_fuzztest("PlayPatternStubFuzzTest") {
       "$SUBSYSTEM_DIR/test/fuzztest/service/playpatternstub_fuzzer"
 
   include_dirs = [
+    "//third_party/cJSON",
     "$SUBSYSTEM_DIR/interfaces/inner_api/vibrator",
     "$SUBSYSTEM_DIR/frameworks/native/common/include",
     "$SUBSYSTEM_DIR/interfaces/inner_api/light",

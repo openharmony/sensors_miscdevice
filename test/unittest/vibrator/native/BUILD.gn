@@ -27,6 +27,8 @@ ohos_unittest("VibratorAgentTest") {
   deps = [
     "$SUBSYSTEM_DIR/frameworks/native/vibrator:vibrator_target",
     "$SUBSYSTEM_DIR/utils/common:libmiscdevice_utils",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -34,8 +36,6 @@ ohos_unittest("VibratorAgentTest") {
     "access_token:libnativetoken_shared",
     "access_token:libtokensetproc_shared",
     "c_utils:utils",
-    "googletest:gmock",
-    "googletest:gtest_main",
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",

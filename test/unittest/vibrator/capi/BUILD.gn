@@ -39,7 +39,11 @@ ohos_unittest("NativeVibratorTest") {
     "ipc:ipc_single",
   ]
 
-  deps = [ "$SUBSYSTEM_DIR/frameworks/capi:ohvibrator" ]
+  deps = [
+    "$SUBSYSTEM_DIR/frameworks/capi:ohvibrator",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
   resource_config_file =
       "$SUBSYSTEM_DIR/test/unittest/vibrator/capi/resource/ohos_test.xml"
 }
