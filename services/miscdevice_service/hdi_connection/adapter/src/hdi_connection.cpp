@@ -276,5 +276,17 @@ int32_t HdiConnection::StartByIntensity(const std::string &effect, int32_t inten
     }
     return ERR_OK;
 }
+
+int32_t HdiConnection::GetAllWaveInfo(std::vector<HdfWaveInformation> &waveInfos)
+{
+    CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
+    int32_t vibratorId = 1;
+    int32_t ret = vibratorInterface_->GetAllWaveInfo(vibratorId, waveInfos);
+    if (ret != ERR_OK) {
+        MISC_HILOGE("GetAllWaveInfo failed");
+    }
+    return ret;
+}
+
 }  // namespace Sensors
 }  // namespace OHOS
