@@ -147,6 +147,7 @@ int32_t LightClient::TurnOn(int32_t lightId, const LightColor &color, const Ligh
         MISC_HILOGE("animation is invalid");
         return PARAMETER_ERROR;
     }
+    std::lock_guard<std::mutex> clientLock(clientMutex_);
     CHKPR(miscdeviceProxy_, ERROR);
     LightAnimationIPC animationIPC;
     animationIPC.SetMode(animation.mode);
@@ -162,6 +163,7 @@ int32_t LightClient::TurnOff(int32_t lightId)
         MISC_HILOGE("lightId is invalid, lightId:%{public}d", lightId);
         return LIGHT_ID_NOT_SUPPORT;
     }
+    std::lock_guard<std::mutex> clientLock(clientMutex_);
     CHKPR(miscdeviceProxy_, ERROR);
     return miscdeviceProxy_->TurnOff(lightId);
 }
@@ -170,7 +172,11 @@ void LightClient::ProcessDeathObserver(wptr<IRemoteObject> object)
 {
     CALL_LOG_ENTER;
     (void)object;
-    miscdeviceProxy_ = nullptr;
+    {
+        std::lock_guard<std::mutex> clientLock(clientMutex_);
+        miscdeviceProxy_ = nullptr;
+    }
+
     auto ret = InitLightClient();
     if (ret != ERR_OK) {
         MISC_HILOGE("InitLightClient failed, ret:%{public}d", ret);

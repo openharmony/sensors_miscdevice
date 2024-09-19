@@ -85,10 +85,9 @@ void LightAgentTest::SetUpTestCase()
 
 void LightAgentTest::TearDownTestCase()
 {
+    ASSERT_NE(0, tokenID_);
     int32_t ret = AccessTokenKit::DeleteToken(tokenID_);
-    if (tokenID_ != 0) {
-        ASSERT_EQ(RET_SUCCESS, ret);
-    }
+    ASSERT_EQ(RET_SUCCESS, ret);
 }
 
 /**
