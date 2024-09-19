@@ -43,6 +43,7 @@ public:
     int32_t DestroyHdiConnection() override;
     void ProcessDeathObserver(const wptr<IRemoteObject> &object);
     int32_t StartByIntensity(const std::string &effect, int32_t intensity) override;
+    int32_t GetAllWaveInfo(std::vector<HdfWaveInformation> &waveInfos) override;
 
 private:
     DISALLOW_COPY_AND_MOVE(HdiConnection);
