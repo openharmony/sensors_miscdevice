@@ -108,13 +108,13 @@ int32_t GetFileName(const int32_t &fd, std::string &fileName)
     char buf[FILE_PATH_MAX] = {'\0'};
     char filePath[FILE_PATH_MAX] = {'\0'};
 
-    int ret = snprintf_s(buf, sizeof(buf), sizeof(buf), "/proc/self/fd/%d", fd);
+    int ret = snprintf_s(buf, sizeof(buf), (sizeof(buf) - 1), "/proc/self/fd/%d", fd);
     if (ret < 0) {
         MISC_HILOGE("snprintf failed with %{public}d", errno);
         return ERROR;
     }
 
-    ret = readlink(buf, filePath, FILE_PATH_MAX);
+    ret = readlink(buf, filePath, FILE_PATH_MAX - 1);
     if (ret < 0 || ret >= FILE_PATH_MAX) {
         MISC_HILOGE("readlink failed with %{public}d", errno);
         return ERROR;

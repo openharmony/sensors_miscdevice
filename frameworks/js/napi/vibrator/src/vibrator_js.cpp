@@ -219,6 +219,7 @@ bool SetUsage(const std::string &usage, bool systemUsage)
 
 int32_t StartVibrate(const VibrateInfo &info)
 {
+    CALL_LOG_ENTER;
     if (!SetUsage(info.usage, info.systemUsage)) {
         MISC_HILOGE("SetUsage fail");
         return PARAMETER_ERROR;
@@ -539,5 +540,5 @@ extern "C" __attribute__((constructor)) void RegisterModule(void)
 {
     napi_module_register(&_module);
 }
-} // namespace Sensors
-} // namespace OHOS
+}  // namespace Sensors
+}  // namespace OHOS
