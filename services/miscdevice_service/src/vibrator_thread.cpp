@@ -76,10 +76,10 @@ int32_t VibratorThread::PlayOnce(const VibrateInfo &info)
         return ERROR;
     }
     cv_.wait_for(vibrateLck, std::chrono::milliseconds(info.duration), [this] { return exitFlag_.load(); });
-#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
-    VibratorDevice.Stop(HDF_VIBRATOR_MODE_ONCE);
-#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
     if (exitFlag_) {
+#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
+        VibratorDevice.Stop(HDF_VIBRATOR_MODE_ONCE);
+#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
         MISC_HILOGD("Stop duration:%{public}d, package:%{public}s", info.duration, info.packageName.c_str());
         return SUCCESS;
     }
@@ -97,10 +97,10 @@ int32_t VibratorThread::PlayEffect(const VibrateInfo &info)
             return ERROR;
         }
         cv_.wait_for(vibrateLck, std::chrono::milliseconds(info.duration), [this] { return exitFlag_.load(); });
-#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
-        VibratorDevice.Stop(HDF_VIBRATOR_MODE_PRESET);
-#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
         if (exitFlag_) {
+#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
+            VibratorDevice.Stop(HDF_VIBRATOR_MODE_PRESET);
+#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
             MISC_HILOGD("Stop effect:%{public}s, package:%{public}s", effect.c_str(), info.packageName.c_str());
             return SUCCESS;
         }
