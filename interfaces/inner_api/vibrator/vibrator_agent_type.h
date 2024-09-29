@@ -32,49 +32,49 @@ inline const char *VIBRATOR_TYPE_CLOCK_TIMER = "haptic.clock.timer";
  *
  * @since 11
  */
-inline const char *VIBRATOR_TYPE_FAIL = "haptic.fail";
+inline const char *VIBRATOR_TYPE_FAIL = "haptic.notice.fail";
 
 /**
  * @brief Describes the vibration effect of the vibrator when charging.
  *
  * @since 11
  */
-inline const char *VIBRATOR_TYPE_CHARGING = "haptic.charging";
+inline const char *VIBRATOR_TYPE_CHARGING = "haptic.calib.charge";
 
 /**
  * @brief Describes the vibration effect of the vibrator when long pressed.
  *
  * @since 11
  */
-inline const char *VIBRATOR_TYPE_LONG_PRESS_LIGHT = "haptic.long_press.light";
+inline const char *VIBRATOR_TYPE_LONG_PRESS_LIGHT = "haptic.long_press_light";
 
 /**
  * @brief Describes the vibration effect of the vibrator when long pressed.
  *
  * @since 11
  */
-inline const char *VIBRATOR_TYPE_LONG_PRESS_MEDIUM = "haptic.long_press.medium";
+inline const char *VIBRATOR_TYPE_LONG_PRESS_MEDIUM = "haptic.long_press_medium";
 
 /**
  * @brief Describes the vibration effect of the vibrator when long pressed.
  *
  * @since 11
  */
-inline const char *VIBRATOR_TYPE_LONG_PRESS_HEAVY = "haptic.long_press.heavy";
+inline const char *VIBRATOR_TYPE_LONG_PRESS_HEAVY = "haptic.long_press_medium";
 
 /**
  * @brief Describes the vibration effect of the vibrator when slide.
  *
  * @since 11
  */
-inline const char *VIBRATOR_TYPE_SLIDE_LIGHT = "haptic.slide.light";
+inline const char *VIBRATOR_TYPE_SLIDE_LIGHT = "haptic.slide";
 
 /**
  * @brief Describes the vibration effect of the vibrator when the threshold is reached.
  *
  * @since 11
  */
-inline const char *VIBRATOR_TYPE_THRESHOID = "haptic.threshold";
+inline const char *VIBRATOR_TYPE_THRESHOID = "haptic.common.threshold";
 
 /**
  * @brief Describes the hard vibration effect of the vibrator.
