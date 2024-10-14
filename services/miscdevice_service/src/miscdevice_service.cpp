@@ -470,6 +470,11 @@ int32_t MiscdeviceService::IsSupportEffect(const std::string &effect, bool &stat
         return ERROR;
     }
     state = effectInfo->isSupportEffect;
+    std::string packageName = GetPackageName(GetCallingTokenID());
+    std::string curVibrateTime = GetCurrentTime();
+    MISC_HILOGI("Stop vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, vibratorId:%{public}d,"
+        "effect:%{public}s, state:%{public}d", curVibrateTime.c_str(), packageName.c_str(), GetCallingPid(), vibratorId,
+        effect.c_str(), state);
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
     return NO_ERROR;
 }
