@@ -33,7 +33,7 @@ constexpr int32_t FILE_SIZE_MAX = 0x5000;
 constexpr int64_t READ_DATA_BUFF_SIZE = 256;
 constexpr int32_t INVALID_FILE_SIZE = -1;
 constexpr int32_t FILE_PATH_MAX = 1024;
-}  // namespace
+} // namespace
 
 std::string ReadJsonFile(const std::string &filePath)
 {
@@ -108,13 +108,13 @@ int32_t GetFileName(const int32_t &fd, std::string &fileName)
     char buf[FILE_PATH_MAX] = {'\0'};
     char filePath[FILE_PATH_MAX] = {'\0'};
 
-    int ret = snprintf_s(buf, sizeof(buf), sizeof(buf), "/proc/self/fd/%d", fd);
+    int ret = snprintf_s(buf, sizeof(buf), (sizeof(buf) - 1), "/proc/self/fd/%d", fd);
     if (ret < 0) {
         MISC_HILOGE("snprintf failed with %{public}d", errno);
         return ERROR;
     }
 
-    ret = readlink(buf, filePath, FILE_PATH_MAX);
+    ret = readlink(buf, filePath, FILE_PATH_MAX - 1);
     if (ret < 0 || ret >= FILE_PATH_MAX) {
         MISC_HILOGE("readlink failed with %{public}d", errno);
         return ERROR;
@@ -235,5 +235,5 @@ std::string GetFileSuffix(int32_t fd)
     }
     return fileAbsolutePath.substr(pos + 1);
 }
-}  // namespace Sensors
-}  // namespace OHOS
+} // namespace Sensors
+} // namespace OHOS

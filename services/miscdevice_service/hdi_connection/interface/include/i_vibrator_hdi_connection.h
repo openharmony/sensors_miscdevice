@@ -22,6 +22,7 @@
 
 #include <nocopyable.h>
 #include "v1_2/vibrator_types.h"
+#include "v1_3/ivibrator_interface.h"
 #include "vibrator_infos.h"
 
 namespace OHOS {
@@ -37,6 +38,7 @@ using OHOS::HDI::Vibrator::V1_2::HapticCapacity;
 using OHOS::HDI::Vibrator::V1_2::HapticPaket;
 using OHOS::HDI::Vibrator::V1_2::HapticEvent;
 using OHOS::HDI::Vibrator::V1_1::HdfEffectInfo;
+using OHOS::HDI::Vibrator::V1_3::HdfWaveInformation;
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 using OHOS::HDI::Vibrator::V1_1::HdfEffectType;
 using OHOS::HDI::Vibrator::V1_1::HDF_EFFECT_TYPE_TIME;
@@ -65,6 +67,7 @@ public:
     virtual int32_t GetVibratorCapacity(VibratorCapacity &capacity) = 0;
     virtual int32_t PlayPattern(const VibratePattern &pattern) = 0;
     virtual int32_t StartByIntensity(const std::string &effect, int32_t intensity) = 0;
+    virtual int32_t GetAllWaveInfo(std::vector<HdfWaveInformation> &waveInfos) = 0;
 
 private:
     DISALLOW_COPY_AND_MOVE(IVibratorHdiConnection);

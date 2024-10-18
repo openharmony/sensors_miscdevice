@@ -16,9 +16,9 @@
 #include "custom_vibration_matcher.h"
 
 #include <cmath>
-#include <map>
 
 #include "sensors_errors.h"
+#include "vibrator_hdi_connection.h"
 
 #undef LOG_TAG
 #define LOG_TAG "CustomVibrationMatcher"
@@ -26,33 +26,82 @@
 namespace OHOS {
 namespace Sensors {
 namespace {
-const std::map<int32_t, std::vector<int32_t>> TRANSIENT_VIBRATION_INFOS = {
-    {0x28, {0x4d, 0x4d, 0x0b}}, {0x2c, {0x2a, 0x64, 0x07}}, {0x30, {0x44, 0x52, 0x16}},
-    {0x3c, {0x45, 0x34, 0x0a}}, {0x40, {0x2e, 0x43, 0x0a}}, {0x48, {0x51, 0x52, 0x0a}},
-    {0x4c, {0x3a, 0x0c, 0x0f}}, {0x50, {0x64, 0x20, 0x14}}, {0x54, {0x55, 0x34, 0x1c}},
-    {0x5c, {0x32, 0x0c, 0x13}}, {0x60, {0x12, 0x07, 0x0a}}
-};
 constexpr int32_t FREQUENCY_MIN = 0;
 constexpr int32_t FREQUENCY_MAX = 100;
 constexpr int32_t INTENSITY_MIN = 0;
 constexpr int32_t INTENSITY_MAX = 100;
-constexpr int32_t TRANSIENT_GRADE_NUM = 4;
+constexpr int32_t VIBRATOR_DELAY = 20;
 constexpr int32_t CONTINUOUS_GRADE_NUM = 8;
 constexpr int32_t CONTINUOUS_GRADE_MASK = 100;
 constexpr float ROUND_OFFSET = 0.5;
-constexpr float TRANSIENT_GRADE_GAIN = 0.25;
 constexpr float CONTINUOUS_GRADE_SCALE = 100. / 8;
 constexpr float INTENSITY_WEIGHT = 0.5;
 constexpr float FREQUENCY_WEIGHT = 0.5;
 constexpr float WEIGHT_SUM_INIT = 100;
-constexpr int32_t STOP_WAVEFORM = 0;
 constexpr int32_t EFFECT_ID_BOUNDARY = 1000;
 constexpr int32_t DURATION_MAX = 1600;
 constexpr float CURVE_INTENSITY_SCALE = 100.00;
+const float EPSILON = 0.00001;
 constexpr int32_t SLICE_STEP = 50;
 constexpr int32_t CONTINUOUS_VIBRATION_DURATION_MIN = 15;
 constexpr int32_t INDEX_MIN_RESTRICT = 1;
+constexpr int32_t WAVE_INFO_DIMENSION = 3;
 }  // namespace
+
+CustomVibrationMatcher::CustomVibrationMatcher()
+{
+    auto &VibratorDevice = VibratorHdiConnection::GetInstance();
+    int32_t ret = VibratorDevice.GetAllWaveInfo(hdfWaveInfos_);
+    if (ret != ERR_OK) {
+        MISC_HILOGE("GetAllWaveInfo failed infoSize:%{public}zu", hdfWaveInfos_.size());
+        return;
+    }
+    if (!hdfWaveInfos_.empty()) {
+        for (const auto &info : hdfWaveInfos_) {
+            MISC_HILOGI("waveId:%{public}d, intensity:%{public}f, frequency:%{public}f, duration:%{public}d",
+                info.waveId, info.intensity, info.frequency, info.duration);
+        }
+        NormalizedWaveInfo();
+    }
+}
+
+void CustomVibrationMatcher::NormalizedWaveInfo()
+{
+    CALL_LOG_ENTER;
+    auto firstIt = hdfWaveInfos_.begin();
+    float maxIntensity = firstIt->intensity;
+    float minFrequency = firstIt->frequency;
+    float maxFrequency = firstIt->frequency;
+    for (const auto &info : hdfWaveInfos_) {
+        maxIntensity = (maxIntensity > info.intensity) ? maxIntensity : info.intensity;
+        minFrequency = (minFrequency < info.frequency) ? minFrequency : info.frequency;
+        maxFrequency = (maxFrequency > info.frequency) ? maxFrequency : info.frequency;
+    }
+
+    float intensityEqualValue = maxIntensity / INTENSITY_MAX;
+    float frequencyEqualValue = (maxFrequency - minFrequency) / FREQUENCY_MAX;
+    if ((std::abs(intensityEqualValue) <= EPSILON) || (std::abs(frequencyEqualValue) <= EPSILON)) {
+        MISC_HILOGE("The equal value of intensity or frequency is zero");
+        return;
+    }
+    for (const auto &info : hdfWaveInfos_) {
+        std::vector<int32_t> normalizedValue;
+        normalizedValue.push_back(static_cast<int32_t>(info.intensity / intensityEqualValue));
+        normalizedValue.push_back(static_cast<int32_t>((info.frequency - minFrequency) / frequencyEqualValue));
+        normalizedValue.push_back(info.duration);
+        waveInfos_[info.waveId] = normalizedValue;
+    }
+    for (const auto &info : waveInfos_) {
+        MISC_HILOGI("waveId:%{public}d, intensity:%{public}d, frequency:%{public}d, duration:%{public}d",
+            info.first, info.second[0], info.second[1], info.second[WAVE_INFO_DIMENSION - 1]);
+    }
+}
+
+CustomVibrationMatcher &CustomVibrationMatcher::GetInstance()
+{
+    static CustomVibrationMatcher instance;
+    return instance;
+}
 
 int32_t CustomVibrationMatcher::TransformTime(const VibratePackage &package,
     std::vector<CompositeEffect> &compositeEffects)
@@ -68,6 +117,8 @@ int32_t CustomVibrationMatcher::TransformTime(const VibratePackage &package,
         TimeEffect timeEffect;
         timeEffect.delay = event.time - frontTime;
         timeEffect.time = event.duration;
+        timeEffect.intensity = event.intensity;
+        timeEffect.frequency = event.frequency;
         CompositeEffect compositeEffect;
         compositeEffect.timeEffect = timeEffect;
         compositeEffects.push_back(compositeEffect);
@@ -76,6 +127,8 @@ int32_t CustomVibrationMatcher::TransformTime(const VibratePackage &package,
     TimeEffect timeEffect;
     timeEffect.delay = flatPattern.events.back().duration;
     timeEffect.time = 0;
+    timeEffect.intensity = 0;
+    timeEffect.frequency = 0;
     CompositeEffect compositeEffect;
     compositeEffect.timeEffect = timeEffect;
     compositeEffects.push_back(compositeEffect);
@@ -94,8 +147,16 @@ int32_t CustomVibrationMatcher::TransformEffect(const VibratePackage &package,
     int32_t preStartTime = flatPattern.startTime;
     int32_t preDuration = 0;
     for (const VibrateEvent &event : flatPattern.events) {
-        if (event.tag == EVENT_TAG_CONTINUOUS) {
-            ProcessContinuousEvent(event, preStartTime, preDuration, compositeEffects);
+        if ((event.tag == EVENT_TAG_CONTINUOUS) || waveInfos_.empty()) {
+            PrimitiveEffect primitiveEffect;
+            primitiveEffect.delay = event.time - preStartTime;
+            primitiveEffect.effectId = event.duration;
+            primitiveEffect.intensity = event.intensity;
+            CompositeEffect compositeEffect;
+            compositeEffect.primitiveEffect = primitiveEffect;
+            compositeEffects.push_back(compositeEffect);
+            preStartTime = event.time;
+            preDuration = event.duration;
         } else if (event.tag == EVENT_TAG_TRANSIENT) {
             ProcessTransientEvent(event, preStartTime, preDuration, compositeEffects);
         } else {
@@ -105,7 +166,8 @@ int32_t CustomVibrationMatcher::TransformEffect(const VibratePackage &package,
     }
     PrimitiveEffect primitiveEffect;
     primitiveEffect.delay = preDuration;
-    primitiveEffect.effectId = STOP_WAVEFORM;
+    primitiveEffect.effectId = 0;
+    primitiveEffect.intensity = 0;
     CompositeEffect compositeEffect;
     compositeEffect.primitiveEffect = primitiveEffect;
     compositeEffects.push_back(compositeEffect);
@@ -120,9 +182,12 @@ VibratePattern CustomVibrationMatcher::MixedWaveProcess(const VibratePackage &pa
         for (VibrateEvent event : pattern.events) {
             event.time += pattern.startTime;
             PreProcessEvent(event);
-            if ((outputEvents.empty()) ||
-                (event.time >= (outputEvents.back().time + outputEvents.back().duration)) ||
-                (outputEvents.back().tag == EVENT_TAG_TRANSIENT)) {
+            if ((outputEvents.empty()) || (outputEvents.back().tag == EVENT_TAG_TRANSIENT)) {
+                outputEvents.emplace_back(event);
+            } else if ((event.time >= (outputEvents.back().time + outputEvents.back().duration))) {
+                int32_t diffTime = event.time - outputEvents.back().time - outputEvents.back().duration;
+                outputEvents.back().duration += ((diffTime < VIBRATOR_DELAY) ? (diffTime - VIBRATOR_DELAY) : 0);
+                outputEvents.back().duration = std::max(outputEvents.back().duration, 0);
                 outputEvents.emplace_back(event);
             } else {
                 VibrateEvent &lastEvent = outputEvents.back();
@@ -317,22 +382,21 @@ void CustomVibrationMatcher::ProcessTransientEvent(const VibrateEvent &event, in
 {
     int32_t matchId = 0;
     float minWeightSum = WEIGHT_SUM_INIT;
-    for (const auto &transientInfo : TRANSIENT_VIBRATION_INFOS) {
+    for (const auto &transientInfo : waveInfos_) {
         int32_t id = transientInfo.first;
         const std::vector<int32_t> &info = transientInfo.second;
+        float intensityDistance = std::abs(event.intensity - info[0]);
         float frequencyDistance = std::abs(event.frequency - info[1]);
-        for (int32_t j = 0; j < TRANSIENT_GRADE_NUM; ++j) {
-            float intensityDistance = std::abs(event.intensity - info[0] * (1 - j * TRANSIENT_GRADE_GAIN));
-            float weightSum = INTENSITY_WEIGHT * intensityDistance + FREQUENCY_WEIGHT * frequencyDistance;
-            if (weightSum < minWeightSum) {
-                minWeightSum = weightSum;
-                matchId = id + j;
-            }
+        float weightSum = INTENSITY_WEIGHT * intensityDistance + FREQUENCY_WEIGHT * frequencyDistance;
+        if (weightSum < minWeightSum) {
+            minWeightSum = weightSum;
+            matchId = id;
         }
     }
     PrimitiveEffect primitiveEffect;
     primitiveEffect.delay = event.time - preStartTime;
-    primitiveEffect.effectId = matchId;
+    primitiveEffect.effectId = (-matchId);
+    primitiveEffect.intensity = INTENSITY_MAX;
     CompositeEffect compositeEffect;
     compositeEffect.primitiveEffect = primitiveEffect;
     compositeEffects.push_back(compositeEffect);

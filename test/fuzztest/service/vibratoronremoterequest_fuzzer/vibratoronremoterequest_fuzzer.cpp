@@ -39,7 +39,7 @@ constexpr uint32_t IPC_CODE_COUNT = 8;
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 auto g_service = MiscdeviceDelayedSpSingleton<MiscdeviceService>::GetInstance();
 const std::u16string VIBRATOR_INTERFACE_TOKEN = u"IMiscdeviceService";
-} // namespace
+}
 
 void SetUpTestCase()
 {
@@ -84,8 +84,8 @@ bool OnRemoteRequestFuzzTest(const uint8_t *data, size_t size)
     g_service->OnRemoteRequest(code, datas, reply, option);
     return true;
 }
-}  // namespace Sensors
-}  // namespace OHOS
+} // namespace Sensors
+} // namespace OHOS
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
