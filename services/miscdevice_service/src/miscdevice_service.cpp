@@ -188,6 +188,7 @@ void MiscdeviceService::OnStart()
         MISC_HILOGE("Publish MiscdeviceService failed");
         return;
     }
+    std::lock_guard<std::mutex> lock(miscDeviceIdMapMutex_);
     auto ret = miscDeviceIdMap_.insert(std::make_pair(MiscdeviceDeviceId::LED, lightExist_));
     if (!ret.second) {
         MISC_HILOGI("Light exist in miscDeviceIdMap_");
@@ -218,6 +219,7 @@ void MiscdeviceService::OnStartFuzz()
     if (!InitLightInterface()) {
         MISC_HILOGE("InitLightInterface failed");
     }
+    std::lock_guard<std::mutex> lock(miscDeviceIdMapMutex_);
     auto ret = miscDeviceIdMap_.insert(std::make_pair(MiscdeviceDeviceId::LED, lightExist_));
     if (!ret.second) {
         MISC_HILOGI("Light exist in miscDeviceIdMap_");

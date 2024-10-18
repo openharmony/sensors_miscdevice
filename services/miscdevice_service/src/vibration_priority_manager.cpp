@@ -248,10 +248,6 @@ bool VibrationPriorityManager::ShouldIgnoreInputMethod(const VibrateInfo &vibrat
 VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo,
     std::shared_ptr<VibratorThread> vibratorThread)
 {
-    if (vibratorThread == nullptr) {
-        MISC_HILOGD("There is no vibration, it can vibrate");
-        return VIBRATION;
-    }
     UpdateStatus();
     if (!IsSystemCalling() || vibrateInfo.systemUsage == false) {
         if ((vibrateInfo.usage == USAGE_ALARM || vibrateInfo.usage == USAGE_RING

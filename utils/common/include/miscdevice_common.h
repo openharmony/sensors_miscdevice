@@ -38,9 +38,7 @@ class MiscdeviceCommon {
 public:
     MiscdeviceCommon() = default;
     ~MiscdeviceCommon() = default;
-    static bool CheckCustomVibratorEffect(const std::vector<int32_t> &timing, const std::vector<int32_t> &intensity,
-                                          int32_t periodCount);
 };
-}  // namespace Sensors
-}  // namespace OHOS
-#endif  // MISCDEVICE_COMMON_H
+} // namespace Sensors
+} // namespace OHOS
+#endif // MISCDEVICE_COMMON_H

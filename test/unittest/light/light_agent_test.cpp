@@ -55,7 +55,7 @@ HapInfoParams g_infoManagerTestInfoParms = {
     .instIndex = 0,
     .appIDDesc = "LightAgentTest"
 };
-}  // namespace
+} // namespace
 
 class LightAgentTest : public testing::Test {
 public:
@@ -85,10 +85,9 @@ void LightAgentTest::SetUpTestCase()
 
 void LightAgentTest::TearDownTestCase()
 {
+    ASSERT_NE(0, tokenID_);
     int32_t ret = AccessTokenKit::DeleteToken(tokenID_);
-    if (tokenID_ != 0) {
-        ASSERT_EQ(RET_SUCCESS, ret);
-    }
+    ASSERT_EQ(RET_SUCCESS, ret);
 }
 
 /**
@@ -346,5 +345,5 @@ HWTEST_F(LightAgentTest, StartLightTest_011, TestSize.Level1)
     int32_t ret = TurnOff(g_invalidLightId);
     ASSERT_EQ(ret, -1);
 }
-}  // namespace Sensors
-}  // namespace OHOS
+} // namespace Sensors
+} // namespace OHOS
