@@ -310,7 +310,9 @@ bool MiscdeviceService::ShouldIgnoreVibrate(const VibrateInfo &info)
         MISC_HILOGE("Vibraion priority manager not ready");
         return VIBRATION;
     }
-    return (PriorityManager->ShouldIgnoreVibrate(info, vibratorThread_) != VIBRATION);
+    int32_t ret = PriorityManager->ShouldIgnoreVibrate(info, vibratorThread_);
+    MISC_HILOGE("ShouldIgnoreVibrate ret%{public}d", ret);
+    return (ret != VIBRATION);
 }
 
 int32_t MiscdeviceService::Vibrate(int32_t vibratorId, int32_t timeOut, int32_t usage, bool systemUsage)
