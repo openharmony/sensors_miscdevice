@@ -311,7 +311,7 @@ bool MiscdeviceService::ShouldIgnoreVibrate(const VibrateInfo &info)
         return VIBRATION;
     }
     int32_t ret = PriorityManager->ShouldIgnoreVibrate(info, vibratorThread_);
-    MISC_HILOGE("ShouldIgnoreVibrate ret%{public}d", ret);
+    MISC_HILOGE("ShouldIgnoreVibrate ret:%{public}d", ret);
     return (ret != VIBRATION);
 }
 
