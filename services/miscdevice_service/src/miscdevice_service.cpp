@@ -310,9 +310,10 @@ bool MiscdeviceService::ShouldIgnoreVibrate(const VibrateInfo &info)
         MISC_HILOGE("Vibraion priority manager not ready");
         return VIBRATION;
     }
+    std::string curVibrateTime = GetCurrentTime();
     int32_t ret = PriorityManager->ShouldIgnoreVibrate(info, vibratorThread_);
     if (ret != VIBRATION) {
-        MISC_HILOGE("ShouldIgnoreVibrate ret:%{public}d", ret);
+        MISC_HILOGE("ShouldIgnoreVibrate currentTime:%{public}s, ret:%{public}d", curVibrateTime.c_str(), ret);
     }
     return (ret != VIBRATION);
 }
