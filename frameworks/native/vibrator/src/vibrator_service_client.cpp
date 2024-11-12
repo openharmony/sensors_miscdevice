@@ -39,8 +39,6 @@ namespace Sensors {
 using namespace OHOS::HiviewDFX;
 
 namespace {
-constexpr int32_t GET_SERVICE_MAX_COUNT = 3;
-constexpr uint32_t WAIT_MS = 200;
 #ifdef __aarch64__
     static const std::string DECODER_LIBRARY_PATH = "/system/lib64/platformsdk/libvibrator_decoder.z.so";
 #else
@@ -80,32 +78,25 @@ int32_t VibratorServiceClient::InitServiceClient()
         MISC_HILOGE("sm cannot be null");
         return MISC_NATIVE_SAM_ERR;
     }
-    int32_t retry = 0;
-    while (retry < GET_SERVICE_MAX_COUNT) {
-        miscdeviceProxy_ = iface_cast<IMiscdeviceService>(sm->GetSystemAbility(MISCDEVICE_SERVICE_ABILITY_ID));
-        if (miscdeviceProxy_ != nullptr) {
-            MISC_HILOGD("Get service success, retry:%{public}d", retry);
-            serviceDeathObserver_ =
-                new (std::nothrow) DeathRecipientTemplate(*const_cast<VibratorServiceClient *>(this));
-            CHKPR(serviceDeathObserver_, MISC_NATIVE_GET_SERVICE_ERR);
-            auto remoteObject = miscdeviceProxy_->AsObject();
-            CHKPR(remoteObject, MISC_NATIVE_GET_SERVICE_ERR);
-            remoteObject->AddDeathRecipient(serviceDeathObserver_);
-            int32_t ret = TransferClientRemoteObject();
-            if (ret != ERR_OK) {
-                MISC_HILOGE("TransferClientRemoteObject failed, ret:%{public}d", ret);
-                return ERROR;
-            }
-            ret = GetVibratorCapacity();
-            if (ret != ERR_OK) {
-                MISC_HILOGE("GetVibratorCapacity failed, ret:%{public}d", ret);
-                return ERROR;
-            }
-            return ERR_OK;
+    miscdeviceProxy_ = iface_cast<IMiscdeviceService>(sm->GetSystemAbility(MISCDEVICE_SERVICE_ABILITY_ID));
+    if (miscdeviceProxy_ != nullptr) {
+        serviceDeathObserver_ =
+            new (std::nothrow) DeathRecipientTemplate(*const_cast<VibratorServiceClient *>(this));
+        CHKPR(serviceDeathObserver_, MISC_NATIVE_GET_SERVICE_ERR);
+        auto remoteObject = miscdeviceProxy_->AsObject();
+        CHKPR(remoteObject, MISC_NATIVE_GET_SERVICE_ERR);
+        remoteObject->AddDeathRecipient(serviceDeathObserver_);
+        int32_t ret = TransferClientRemoteObject();
+        if (ret != ERR_OK) {
+            MISC_HILOGE("TransferClientRemoteObject failed, ret:%{public}d", ret);
+            return ERROR;
         }
-        MISC_HILOGW("Get service failed, retry:%{public}d", retry);
-        std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_MS));
-        retry++;
+        ret = GetVibratorCapacity();
+        if (ret != ERR_OK) {
+            MISC_HILOGE("GetVibratorCapacity failed, ret:%{public}d", ret);
+            return ERROR;
+        }
+        return ERR_OK;
     }
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
     HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_EXCEPTION",
