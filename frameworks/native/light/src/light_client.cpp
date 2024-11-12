@@ -33,9 +33,7 @@ namespace OHOS {
 namespace Sensors {
 
 namespace {
-constexpr int32_t GET_SERVICE_MAX_COUNT = 30;
 constexpr uint32_t MAX_LIGHT_LIST_SIZE = 0X00ff;
-constexpr uint32_t WAIT_MS = 200;
 } // namespace
 
 LightClient::~LightClient()
@@ -59,23 +57,16 @@ int32_t LightClient::InitLightClient()
     }
     auto systemManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     CHKPR(systemManager, MISC_NATIVE_SAM_ERR);
-    int32_t retry = 0;
-    while (retry < GET_SERVICE_MAX_COUNT) {
-        miscdeviceProxy_ = iface_cast<IMiscdeviceService>(systemManager->GetSystemAbility(
-            MISCDEVICE_SERVICE_ABILITY_ID));
-        if (miscdeviceProxy_ != nullptr) {
-            MISC_HILOGD("miscdeviceProxy_ get service success, retry:%{public}d", retry);
-            serviceDeathObserver_ = new (std::nothrow) DeathRecipientTemplate(*const_cast<LightClient *>(this));
-            CHKPR(serviceDeathObserver_, MISC_NATIVE_GET_SERVICE_ERR);
-            auto remoteObject = miscdeviceProxy_->AsObject();
-            CHKPR(remoteObject, MISC_NATIVE_GET_SERVICE_ERR);
-            remoteObject->AddDeathRecipient(serviceDeathObserver_);
-            lightInfoList_ = miscdeviceProxy_->GetLightList();
-            return ERR_OK;
-        }
-        MISC_HILOGW("Get service failed, retry:%{public}d", retry);
-        std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_MS));
-        retry++;
+    miscdeviceProxy_ = iface_cast<IMiscdeviceService>(systemManager->GetSystemAbility(
+        MISCDEVICE_SERVICE_ABILITY_ID));
+    if (miscdeviceProxy_ != nullptr) {
+        serviceDeathObserver_ = new (std::nothrow) DeathRecipientTemplate(*const_cast<LightClient *>(this));
+        CHKPR(serviceDeathObserver_, MISC_NATIVE_GET_SERVICE_ERR);
+        auto remoteObject = miscdeviceProxy_->AsObject();
+        CHKPR(remoteObject, MISC_NATIVE_GET_SERVICE_ERR);
+        remoteObject->AddDeathRecipient(serviceDeathObserver_);
+        lightInfoList_ = miscdeviceProxy_->GetLightList();
+        return ERR_OK;
     }
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
     HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_EXCEPTION",
