@@ -95,7 +95,6 @@ private:
     std::string GetCurrentTime();
     void MergeVibratorParmeters(const VibrateParameter &parameter, VibratePackage &package);
     bool CheckVibratorParmeters(const VibrateParameter &parameter);
-    bool InitLightList();
     void RegisterClientDeathRecipient(sptr<IRemoteObject> vibratorServiceClient, int32_t pid);
     void UnregisterClientDeathRecipient(sptr<IRemoteObject> vibratorServiceClient);
     void SaveClientPid(const sptr<IRemoteObject> &vibratorServiceClient, int32_t pid);
@@ -120,6 +119,7 @@ private:
     std::map<sptr<IRemoteObject>, int32_t> clientPidMap_;
     std::mutex clientPidMapMutex_;
     std::mutex miscDeviceIdMapMutex_;
+    std::mutex lightInfosMutex_;
 };
 }  // namespace Sensors
 }  // namespace OHOS
