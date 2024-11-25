@@ -28,7 +28,7 @@ public:
     LightHdiConnection() = default;
     virtual ~LightHdiConnection() {}
     int32_t ConnectHdi() override;
-    int32_t GetLightList(std::vector<LightInfoIPC> &lightList) const override;
+    int32_t GetLightList(std::vector<LightInfoIPC> &lightList) override;
     int32_t TurnOn(int32_t lightId, const LightColor &color, const LightAnimationIPC &animation) override;
     int32_t TurnOff(int32_t lightId) override;
     int32_t DestroyHdiConnection() override;
@@ -38,6 +38,7 @@ private:
     int32_t ConnectHdiService();
     std::unique_ptr<ILightHdiConnection> iLightHdiConnection_;
     std::vector<LightInfoIPC> lightInfoList_;
+    std::mutex lightInfoListMutex_;
 };
 }  // namespace Sensors
 }  // namespace OHOS

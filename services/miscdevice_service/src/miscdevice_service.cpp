@@ -259,6 +259,7 @@ bool MiscdeviceService::InitLightInterface()
 bool MiscdeviceService::IsValid(int32_t lightId)
 {
     CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> lightInfosLock(lightInfosMutex_);
     for (const auto &item : lightInfos_) {
         if (lightId == item.GetLightId()) {
             return true;
@@ -573,23 +574,14 @@ std::string MiscdeviceService::GetPackageName(AccessTokenID tokenId)
 
 std::vector<LightInfoIPC> MiscdeviceService::GetLightList()
 {
+    std::lock_guard<std::mutex> lightInfosLock(lightInfosMutex_);
     std::string packageName = GetPackageName(GetCallingTokenID());
     MISC_HILOGI("GetLightList, package:%{public}s", packageName.c_str());
-    if (!InitLightList()) {
-        MISC_HILOGE("InitLightList init failed");
-        return lightInfos_;
-    }
-    return lightInfos_;
-}
-
-bool MiscdeviceService::InitLightList()
-{
     int32_t ret = lightHdiConnection_.GetLightList(lightInfos_);
     if (ret != ERR_OK) {
-        MISC_HILOGE("InitLightList failed, ret:%{public}d", ret);
-        return false;
+        MISC_HILOGE("GetLightList failed, ret:%{public}d", ret);
     }
-    return true;
+    return lightInfos_;
 }
 
 int32_t MiscdeviceService::TurnOn(int32_t lightId, const LightColor &color, const LightAnimationIPC &animation)

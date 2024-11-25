@@ -31,7 +31,7 @@ public:
     ILightHdiConnection() = default;
     virtual ~ILightHdiConnection() = default;
     virtual int32_t ConnectHdi() = 0;
-    virtual int32_t GetLightList(std::vector<LightInfoIPC> &lightList) const = 0;
+    virtual int32_t GetLightList(std::vector<LightInfoIPC> &lightList) = 0;
     virtual int32_t TurnOn(int32_t lightId, const LightColor &color, const LightAnimationIPC &animation) = 0;
     virtual int32_t TurnOff(int32_t lightId) = 0;
     virtual int32_t DestroyHdiConnection() = 0;

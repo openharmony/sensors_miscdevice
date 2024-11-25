@@ -36,7 +36,7 @@ int32_t CompatibleLightConnection::ConnectHdi()
     return ERR_OK;
 }
 
-int32_t CompatibleLightConnection::GetLightList(std::vector<LightInfoIPC> &lightList) const
+int32_t CompatibleLightConnection::GetLightList(std::vector<LightInfoIPC> &lightList)
 {
     CALL_LOG_ENTER;
     for (size_t i = 0; i < lightInfo.size(); ++i) {

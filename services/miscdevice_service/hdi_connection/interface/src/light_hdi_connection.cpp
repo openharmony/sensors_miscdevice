@@ -51,11 +51,13 @@ int32_t LightHdiConnection::ConnectHdiService()
         MISC_HILOGE("Connect hdi service failed");
         return LIGHT_HDF_CONNECT_ERR;
     }
+    std::lock_guard<std::mutex> lightInfoListLock(lightInfoListMutex_);
     return iLightHdiConnection_->GetLightList(lightInfoList_);
 }
 
-int32_t LightHdiConnection::GetLightList(std::vector<LightInfoIPC> &lightList) const
+int32_t LightHdiConnection::GetLightList(std::vector<LightInfoIPC> &lightList)
 {
+    std::lock_guard<std::mutex> lightInfoListLock(lightInfoListMutex_);
     lightList.assign(lightInfoList_.begin(), lightInfoList_.end());
     return ERR_OK;
 }
