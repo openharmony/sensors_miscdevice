@@ -39,7 +39,7 @@ namespace Sensors {
 using namespace OHOS::HiviewDFX;
 
 namespace {
-#ifdef __aarch64__
+#if (defined(__aarch64__) || defined(__x86_64__))
     static const std::string DECODER_LIBRARY_PATH = "/system/lib64/platformsdk/libvibrator_decoder.z.so";
 #else
     static const std::string DECODER_LIBRARY_PATH = "/system/lib/platformsdk/libvibrator_decoder.z.so";
