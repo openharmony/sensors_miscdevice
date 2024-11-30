@@ -51,7 +51,7 @@ int32_t HdiLightConnection::ConnectHdi()
     return ERR_INVALID_VALUE;
 }
 
-int32_t HdiLightConnection::GetLightList(std::vector<LightInfoIPC> &lightList) const
+int32_t HdiLightConnection::GetLightList(std::vector<LightInfoIPC> &lightList)
 {
     CALL_LOG_ENTER;
     std::vector<HDI::Light::V1_0::HdfLightInfo> lightInfos;
