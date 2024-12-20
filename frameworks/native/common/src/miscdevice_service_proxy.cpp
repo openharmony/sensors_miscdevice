@@ -48,11 +48,11 @@ int32_t MiscdeviceServiceProxy::Vibrate(int32_t vibratorId, int32_t timeOut, int
         return WRITE_MSG_ERR;
     }
     if (!data.WriteInt32(timeOut)) {
-        MISC_HILOGE("WriteUint32 timeOut failed");
+        MISC_HILOGE("WriteInt32 timeOut failed");
         return WRITE_MSG_ERR;
     }
     if (!data.WriteInt32(usage)) {
-        MISC_HILOGE("WriteUint32 usage failed");
+        MISC_HILOGE("WriteInt32 usage failed");
         return WRITE_MSG_ERR;
     }
     if (!data.WriteBool(systemUsage)) {
@@ -123,7 +123,7 @@ int32_t MiscdeviceServiceProxy::PlayVibratorEffect(int32_t vibratorId, const std
         return WRITE_MSG_ERR;
     }
     if (!data.WriteInt32(usage)) {
-        MISC_HILOGE("Writeint32 usage failed");
+        MISC_HILOGE("WriteInt32 usage failed");
         return WRITE_MSG_ERR;
     }
     if (!data.WriteBool(systemUsage)) {

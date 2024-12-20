@@ -759,7 +759,7 @@ static napi_value CreateClassVibratePattern(const napi_env env, const napi_value
 static napi_value CreateEnumEffectId(const napi_env env, const napi_value exports)
 {
     napi_value clockTime = nullptr;
-    napi_create_string_utf8(env, "haptic.clock.timer", NAPI_AUTO_LENGTH, &clockTime);
+    NAPI_CALL(env, napi_create_string_utf8(env, "haptic.clock.timer", NAPI_AUTO_LENGTH, &clockTime));
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_PROPERTY("EFFECT_CLOCK_TIMER", clockTime),
     };
