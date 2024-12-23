@@ -27,6 +27,9 @@ namespace OHOS {
 namespace Sensors {
 namespace {
 const std::string VIBRATE_CONTROL_THREAD_NAME = "OS_VibControl";
+constexpr int32_t DELAY_TIME1 = 5;    /** ms */
+constexpr int32_t DELAY_TIME2 = 10;   /** ms */
+constexpr size_t RETRY_NUMBER = 4;
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
 constexpr size_t COMPOSITE_EFFECT_PART = 128;
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
@@ -86,17 +89,37 @@ int32_t VibratorThread::PlayOnce(const VibrateInfo &info)
     return SUCCESS;
 }
 
+void VibratorThread::HandleMultipleVibrations()
+{
+    if (VibratorDevice.IsVibratorRunning()) {
+        VibratorDevice.Stop(HDF_VIBRATOR_MODE_PRESET);
+        for (size_t i = 0; i < RETRY_NUMBER; i++) {
+            if (!VibratorDevice.IsVibratorRunning()) {
+                MISC_HILOGI("No running vibration");
+                return;
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(DELAY_TIME1));
+        }
+        MISC_HILOGW("Unstopped vibration");
+    }
+}
+
 int32_t VibratorThread::PlayEffect(const VibrateInfo &info)
 {
     std::unique_lock<std::mutex> vibrateLck(vibrateMutex_);
     for (int32_t i = 0; i < info.count; ++i) {
         std::string effect = info.effect;
+        int32_t duration = info.duration;
+        if (i >= 1) { /**Multiple vibration treatment*/
+            HandleMultipleVibrations();
+            duration += DELAY_TIME2;
+        }
         int32_t ret = VibratorDevice.StartByIntensity(effect, info.intensity);
         if (ret != SUCCESS) {
             MISC_HILOGE("Vibrate effect %{public}s failed, ", effect.c_str());
             return ERROR;
         }
-        cv_.wait_for(vibrateLck, std::chrono::milliseconds(info.duration), [this] { return exitFlag_.load(); });
+        cv_.wait_for(vibrateLck, std::chrono::milliseconds(duration), [this] { return exitFlag_.load(); });
         if (exitFlag_) {
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
             VibratorDevice.Stop(HDF_VIBRATOR_MODE_PRESET);

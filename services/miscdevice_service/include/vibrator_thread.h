@@ -41,6 +41,7 @@ private:
     int32_t PlayOnce(const VibrateInfo &info);
     int32_t PlayEffect(const VibrateInfo &info);
     int32_t PlayCustomByHdHptic(const VibrateInfo &info);
+    void HandleMultipleVibrations();
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
     int32_t PlayCustomByCompositeEffect(const VibrateInfo &info);
     int32_t PlayCompositeEffect(const VibrateInfo &info, const HdfCompositeEffect &hdfCompositeEffect);
