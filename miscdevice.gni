@@ -16,6 +16,7 @@ import("//build/ohos.gni")
 declare_args() {
   miscdevice_feature_vibrator_custom = true
   miscdevice_feature_hiviewdfx_hisysevent = true
+  miscdevice_feature_vibrator_input_method_enable = true
 }
 
 print(
@@ -29,6 +30,10 @@ miscdevice_default_defines = []
 
 if (miscdevice_feature_vibrator_custom) {
   miscdevice_default_defines += [ "OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM" ]
+}
+
+if (miscdevice_feature_vibrator_input_method_enable) {
+  miscdevice_default_defines += [ "OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD" ]
 }
 
 if (!defined(global_parts_info) ||

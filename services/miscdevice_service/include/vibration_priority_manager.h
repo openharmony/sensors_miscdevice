@@ -69,7 +69,9 @@ private:
     bool IsCurrentVibrate(std::shared_ptr<VibratorThread> vibratorThread) const;
     bool IsLoopVibrate(const VibrateInfo &vibrateInfo) const;
     VibrateStatus ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo, VibrateInfo currentVibrateInfo) const;
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
     bool ShouldIgnoreInputMethod(const VibrateInfo &vibrateInfo);
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
     static void ExecRegisterCb(const sptr<MiscDeviceObserver> &observer);
     int32_t RegisterObserver(const sptr<MiscDeviceObserver> &observer);
     int32_t UnregisterObserver(const sptr<MiscDeviceObserver> &observer);
