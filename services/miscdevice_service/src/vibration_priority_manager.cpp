@@ -18,13 +18,16 @@
 #include <tokenid_kit.h>
 
 #include "accesstoken_kit.h"
-#include "bundle_mgr_client.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
-#include "os_account_manager.h"
-#include "running_process_info.h"
 #include "system_ability_definition.h"
 #include "uri.h"
+
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
+#include "bundle_mgr_client.h"
+#include "os_account_manager.h"
+#include "running_process_info.h"
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 
 #include "sensors_errors.h"
 
@@ -194,6 +197,7 @@ bool VibrationPriorityManager::IsSystemCalling()
     return Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(IPCSkeleton::GetCallingFullTokenID());
 }
 
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 bool VibrationPriorityManager::ShouldIgnoreInputMethod(const VibrateInfo &vibrateInfo)
 {
     if (vibrateInfo.packageName == SCENEBOARD_BUNDLENAME) {
@@ -244,6 +248,7 @@ bool VibrationPriorityManager::ShouldIgnoreInputMethod(const VibrateInfo &vibrat
     }
     return false;
 }
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 
 VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo,
     std::shared_ptr<VibratorThread> vibratorThread)
@@ -258,7 +263,12 @@ VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &v
         }
         if (((vibrateInfo.usage == USAGE_TOUCH || vibrateInfo.usage == USAGE_MEDIA || vibrateInfo.usage == USAGE_UNKNOWN
             || vibrateInfo.usage == USAGE_PHYSICAL_FEEDBACK || vibrateInfo.usage == USAGE_SIMULATE_REALITY)
-            && (miscFeedback_ == FEEDBACK_MODE_OFF)) && !ShouldIgnoreInputMethod(vibrateInfo)) {
+            && (miscFeedback_ == FEEDBACK_MODE_OFF))
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
+            && !ShouldIgnoreInputMethod(vibrateInfo)) {
+#else // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
+            ) {
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
             MISC_HILOGD("Vibration is ignored for feedback:%{public}d", static_cast<int32_t>(miscFeedback_));
             return IGNORE_FEEDBACK;
         }
