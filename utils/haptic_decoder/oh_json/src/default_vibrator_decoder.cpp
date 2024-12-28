@@ -50,7 +50,7 @@ constexpr int32_t MAX_JSON_FILE_SIZE = 64 * 1024;
 } // namespace
 
 int32_t DefaultVibratorDecoder::DecodeEffect(const RawFileDescriptor &rawFd, const JsonParser &parser,
-    VibratePackage &patternPackage)
+    VibratePackage &patternPackage) __attribute__((no_sanitize("cfi")))
 {
     if ((rawFd.fd < 0) || (rawFd.offset < 0) || (rawFd.length <= 0) || (rawFd.length > MAX_JSON_FILE_SIZE)) {
         MISC_HILOGE("Invalid file descriptor, fd:%{public}d, offset:%{public}" PRId64 ", length:%{public}" PRId64,
@@ -272,7 +272,8 @@ int32_t DefaultVibratorDecoder::ParseCurve(const JsonParser &parser, cJSON *curv
     return SUCCESS;
 }
 
-void DefaultVibratorDecoder::PatternSplit(VibratePattern &originPattern, VibratePackage &patternPackage)
+void DefaultVibratorDecoder::PatternSplit(VibratePattern &originPattern,
+    VibratePackage &patternPackage) __attribute__((no_sanitize("cfi")))
 {
     if (originPattern.events.empty()) {
         MISC_HILOGI("The origin pattern is empty");
@@ -291,5 +292,5 @@ void DefaultVibratorDecoder::PatternSplit(VibratePattern &originPattern, Vibrate
         }
     }
 }
-}  // namespace Sensors
-}  // namespace OHOS
+} // namespace Sensors
+} // namespace OHOS
