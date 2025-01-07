@@ -775,14 +775,23 @@ static napi_value CreateEnumHapticFeedback(const napi_env env, napi_value export
     napi_value effectSoft = nullptr;
     napi_value effectHard = nullptr;
     napi_value effectSharp = nullptr;
+    napi_value effectNoticeSuccess = nullptr;
+    napi_value effectNoticeFail = nullptr;
+    napi_value effectNoticeWarning = nullptr;
     NAPI_CALL(env, napi_create_string_utf8(env, "haptic.effect.soft", NAPI_AUTO_LENGTH, &effectSoft));
     NAPI_CALL(env, napi_create_string_utf8(env, "haptic.effect.hard", NAPI_AUTO_LENGTH, &effectHard));
     NAPI_CALL(env, napi_create_string_utf8(env, "haptic.effect.sharp", NAPI_AUTO_LENGTH, &effectSharp));
+    NAPI_CALL(env, napi_create_string_utf8(env, "haptic.notice.success", NAPI_AUTO_LENGTH, &effectNoticeSuccess));
+    NAPI_CALL(env, napi_create_string_utf8(env, "haptic.notice.fail", NAPI_AUTO_LENGTH, &effectNoticeFail));
+    NAPI_CALL(env, napi_create_string_utf8(env, "haptic.notice.warning", NAPI_AUTO_LENGTH, &effectNoticeWarning));
 
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_PROPERTY("EFFECT_SOFT", effectSoft),
         DECLARE_NAPI_STATIC_PROPERTY("EFFECT_HARD", effectHard),
         DECLARE_NAPI_STATIC_PROPERTY("EFFECT_SHARP", effectSharp),
+        DECLARE_NAPI_STATIC_PROPERTY("EFFECT_NOTICE_SUCCESS", effectNoticeSuccess),
+        DECLARE_NAPI_STATIC_PROPERTY("EFFECT_NOTICE_FAILURE", effectNoticeFail),
+        DECLARE_NAPI_STATIC_PROPERTY("EFFECT_NOTICE_WARNING", effectNoticeWarning),
     };
     napi_value result = nullptr;
     NAPI_CALL(env, napi_define_class(env, "HapticFeedback", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
