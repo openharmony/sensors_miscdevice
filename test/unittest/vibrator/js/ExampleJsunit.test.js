@@ -1212,7 +1212,7 @@ describe("VibratorJsTest", function () {
         if (ret) {
             vibrator.startVibration({
                 type: "preset",
-                effectId: "haptic.effect.soft",
+                effectId: "haptic.effect.hard",
                 count: 1,
                 intensity: 50,
             }, {
@@ -3307,5 +3307,113 @@ describe("VibratorJsTest", function () {
             expect(false).assertTrue();
         }
         console.info("VibrateTest051 end");
+    })
+
+    /*
+     * @tc.name:VibrateJsTest052
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: I53SGE
+     * @tc.number: VibrateJsTest052
+     */
+    it("VibrateJsTest052", 0, async function () {
+        let ret = vibrator.isSupportEffectSync("haptic.notice.success");
+        if (ret) {
+            vibrator.startVibration({
+                type: "preset",
+                effectId: "haptic.notice.success",
+                count: 1,
+                intensity: 50,
+            }, {
+                usage: "unknown"
+            }, (error) => {
+                if (error) {
+                    console.info('VibrateJsTest052 vibrator error');
+                    expect(false).assertTrue();
+                } else {
+                    console.info('VibrateJsTest052 vibrator success');
+                    expect(true).assertTrue();
+                }
+                setTimeout(() => {
+                    done();
+                }, 139);
+            });
+        } else {
+            console.info('This device is not supportEffect');
+            expect(true).assertTrue();
+            done();
+        }
+    })
+
+    /*
+     * @tc.name:VibrateJsTest053
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: I53SGE
+     * @tc.number: VibrateJsTest053
+     */
+    it("VibrateJsTest053", 0, async function () {
+        let ret = vibrator.isSupportEffectSync("haptic.notice.fail");
+        if (ret) {
+            vibrator.startVibration({
+                type: "preset",
+                effectId: "haptic.notice.fail",
+                count: 1,
+                intensity: 50,
+            }, {
+                usage: "unknown"
+            }, (error) => {
+                if (error) {
+                    console.info('VibrateJsTest053 vibrator error');
+                    expect(false).assertTrue();
+                } else {
+                    console.info('VibrateJsTest053 vibrator success');
+                    expect(true).assertTrue();
+                }
+                setTimeout(() => {
+                    done();
+                }, 277);
+            });
+        } else {
+            console.info('This device is not supportEffect');
+            expect(true).assertTrue();
+            done();
+        }
+    })
+
+    /*
+     * @tc.name:VibrateJsTest054
+     * @tc.desc:verify app info is not null
+     * @tc.type: FUNC
+     * @tc.require: I53SGE
+     * @tc.number: VibrateJsTest054
+     */
+    it("VibrateJsTest054", 0, async function () {
+        let ret = vibrator.isSupportEffectSync("haptic.notice.warning");
+        if (ret) {
+            vibrator.startVibration({
+                type: "preset",
+                effectId: "haptic.notice.warning",
+                count: 1,
+                intensity: 50,
+            }, {
+                usage: "unknown"
+            }, (error) => {
+                if (error) {
+                    console.info('VibrateJsTest054 vibrator error');
+                    expect(false).assertTrue();
+                } else {
+                    console.info('VibrateJsTest054 vibrator success');
+                    expect(true).assertTrue();
+                }
+                setTimeout(() => {
+                    done();
+                }, 2200);
+            });
+        } else {
+            console.info('This device is not supportEffect');
+            expect(true).assertTrue();
+            done();
+        }
     })
 })

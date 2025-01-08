@@ -105,6 +105,27 @@ inline const char *VIBRATOR_TYPE_SHARP = "haptic.effect.sharp";
 inline const char *VIBRATOR_TYPE_SLIDE = "haptic.slide";
 
 /**
+ * @brief Describes the vibration effect of the succeed notice.
+ *
+ * @since 16
+ */
+inline const char *VIBRATOR_TYPE_NOTICE_SUCCESS = "haptic.notice.success";
+
+/**
+ * @brief Describes the vibration effect of the failed notice.
+ *
+ * @since 16
+ */
+inline const char *VIBRATOR_TYPE_NOTICE_FAILURE = "haptic.notice.fail";
+
+/**
+ * @brief Describes the vibration effect of the warning notice.
+ *
+ * @since 16
+ */
+inline const char *VIBRATOR_TYPE_NOTICE_WARNING = "haptic.notice.warning";
+
+/**
  * @brief Enumerates vibration usages.
  *
  * @since 9
