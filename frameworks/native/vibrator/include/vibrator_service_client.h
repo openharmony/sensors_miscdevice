@@ -75,13 +75,19 @@ public:
     int32_t PlayPrimitiveEffect(int32_t vibratorId, const std::string &effect, int32_t intensity, int32_t usage,
         bool systemUsage, int32_t count);
     bool IsSupportVibratorCustom();
+    int32_t SeekTimeOnPackage(int32_t seekTime, const VibratorPackage &completePackage, VibratorPackage &seekPackage);
 
 private:
     int32_t InitServiceClient();
     int32_t LoadDecoderLibrary(const std::string& path);
-    int32_t ConvertVibratePackage(const VibratePackage& inPkg, VibratorPackage &outPkg);
+    int32_t ConvertVibratorPackage(const VibratePackage& inPkg, VibratorPackage &outPkg);
     int32_t TransferClientRemoteObject();
     int32_t GetVibratorCapacity();
+    void ConvertSeekVibratorPackage(const VibratorPackage &completePackage, VibratePackage &convertPackage,
+        int32_t seekTime);
+    void ConvertVibratorPattern(const VibratorPattern &vibratorPattern, VibratePattern &vibratePattern);
+    bool SkipEventAndConvertVibratorEvent(const VibratorEvent &vibratorEvent, VibratePattern &vibratePattern,
+        int32_t patternStartTime, VibrateEvent &vibrateEvent);
     sptr<IRemoteObject::DeathRecipient> serviceDeathObserver_ = nullptr;
     sptr<IMiscdeviceService> miscdeviceProxy_ = nullptr;
     sptr<VibratorClientStub> vibratorClient_ = nullptr;

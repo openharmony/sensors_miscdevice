@@ -230,6 +230,17 @@ int32_t PlayPattern(const VibratorPattern &pattern)
     return SUCCESS;
 }
 
+int32_t SeekTimeOnPackage(int32_t seekTime, const VibratorPackage &completePackage, VibratorPackage &seekPackage)
+{
+    auto &client = VibratorServiceClient::GetInstance();
+    int32_t ret = client.SeekTimeOnPackage(seekTime, completePackage, seekPackage);
+    if (ret != ERR_OK) {
+        MISC_HILOGD("SeekTimeOnPackage failed, ret:%{public}d", ret);
+        return NormalizeErrCode(ret);
+    }
+    return SUCCESS;
+}
+
 int32_t FreeVibratorPackage(VibratorPackage &package)
 {
     auto &client = VibratorServiceClient::GetInstance();
