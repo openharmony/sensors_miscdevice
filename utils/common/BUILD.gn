@@ -24,6 +24,18 @@ ohos_shared_library("libmiscdevice_utils") {
     "src/vibrator_infos.cpp",
   ]
 
+  cflags = [
+    "-ffunction-sections",
+    "-fdata-sections",
+    "-Oz",
+  ]
+
+  cflags_cc = [
+    "-ffunction-sections",
+    "-fdata-sections",
+    "-Oz",
+  ]
+
   branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
