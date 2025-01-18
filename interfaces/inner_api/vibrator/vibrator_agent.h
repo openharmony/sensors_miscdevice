@@ -174,6 +174,16 @@ int32_t GetDelayTime(int32_t &delayTime);
 int32_t PreProcess(const VibratorFileDescription &fd, VibratorPackage &package);
 
 /**
+ * @brief Analyze the complete waveform based on the seek time and return the waveform after the time point.
+ * @param seekTime: The seek time point.
+ * @param completePackage: the complete vibration sequence package, such as {@link VibrationPackage}.
+ * @param seekPackage: the resulting after the time point vibration sequence package, such as {@link VibrationPackage}.
+ * @return 0 indicates success, otherwise indicates failure.
+ * @since 16
+ */
+int32_t SeekTimeOnPackage(int32_t seekTime, const VibratorPackage &completePackage, VibratorPackage &seekPackage);
+
+/**
  * @brief Free up the vibration sequence package memory.
  * @param package: Vibration sequence packages, such as {@link VibrationPackage}.
  * @return 0 indicates success, otherwise indicates failure.

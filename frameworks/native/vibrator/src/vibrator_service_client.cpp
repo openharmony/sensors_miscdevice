@@ -36,6 +36,7 @@
 
 namespace OHOS {
 namespace Sensors {
+static constexpr int32_t MIN_VIBRATOR_EVENT_TIME = 100;
 using namespace OHOS::HiviewDFX;
 
 namespace {
@@ -353,7 +354,7 @@ int32_t VibratorServiceClient::PreProcess(const VibratorFileDescription &fd, Vib
     }
     decodeHandle_.destroy(decodeHandle_.decoder);
     decodeHandle_.decoder = nullptr;
-    return ConvertVibratePackage(pkg, package);
+    return ConvertVibratorPackage(pkg, package);
 }
 
 int32_t VibratorServiceClient::GetDelayTime(int32_t &delayTime)
@@ -440,7 +441,7 @@ int32_t VibratorServiceClient::PlayPattern(const VibratorPattern &pattern, int32
     return ret;
 }
 
-int32_t VibratorServiceClient::ConvertVibratePackage(const VibratePackage& inPkg,
+int32_t VibratorServiceClient::ConvertVibratorPackage(const VibratePackage& inPkg,
     VibratorPackage &outPkg)
 {
     inPkg.Dump();
@@ -569,6 +570,104 @@ bool VibratorServiceClient::IsSupportVibratorCustom()
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
     }
     return (capacity_.isSupportHdHaptic || capacity_.isSupportPresetMapping || capacity_.isSupportTimeDelay);
+}
+
+int32_t VibratorServiceClient::SeekTimeOnPackage(int32_t seekTime, const VibratorPackage &completePackage,
+    VibratorPackage &seekPackage)
+{
+    VibratePackage convertPackage = {};
+    ConvertSeekVibratorPackage(completePackage, convertPackage, seekTime);
+    return ConvertVibratorPackage(convertPackage, seekPackage);
+}
+
+void VibratorServiceClient::ConvertSeekVibratorPackage(const VibratorPackage &completePackage,
+    VibratePackage &convertPackage, int32_t seekTime)
+{
+    convertPackage.packageDuration = completePackage.packageDuration;
+    for (int32_t i = 0; i < completePackage.patternNum; ++i) {
+        VibratePattern vibratePattern = {};
+        int32_t patternStartTime = completePackage.patterns[i].time;
+        if (patternStartTime >= seekTime) {
+            ConvertVibratorPattern(completePackage.patterns[i], vibratePattern);
+            convertPackage.patterns.emplace_back(vibratePattern);
+            continue;
+        }
+        vibratePattern.startTime = seekTime;
+        for (int32_t j = 0; j < completePackage.patterns[i].eventNum; ++j) {
+            VibrateEvent vibrateEvent = {};
+            if (SkipEventAndConvertVibratorEvent(completePackage.patterns[i].events[j], vibratePattern,
+                                                 patternStartTime, vibrateEvent)) {
+                convertPackage.packageDuration -= completePackage.patterns[i].events[j].duration;
+                convertPackage.packageDuration += vibrateEvent.duration;
+                convertPackage.packageDuration = convertPackage.packageDuration < 0 ? 0
+                                                                                    : convertPackage.packageDuration;
+                continue;
+            }
+            vibrateEvent.tag = static_cast<VibrateTag>(completePackage.patterns[i].events[j].type);
+            vibrateEvent.time = completePackage.patterns[i].events[j].time + patternStartTime - seekTime;
+            vibrateEvent.duration = completePackage.patterns[i].events[j].duration;
+            vibrateEvent.intensity = completePackage.patterns[i].events[j].intensity;
+            vibrateEvent.frequency = completePackage.patterns[i].events[j].frequency;
+            vibrateEvent.index = completePackage.patterns[i].events[j].index;
+            for (size_t k = 0; k < completePackage.patterns[i].events[j].pointNum; ++k) {
+                VibrateCurvePoint vibrateCurvePoint = {};
+                vibrateCurvePoint.time = completePackage.patterns[i].events[j].points[k].time;
+                vibrateCurvePoint.intensity = completePackage.patterns[i].events[j].points[k].intensity;
+                vibrateCurvePoint.frequency = completePackage.patterns[i].events[j].points[k].frequency;
+                vibrateEvent.points.emplace_back(vibrateCurvePoint);
+            }
+            vibratePattern.patternDuration += vibrateEvent.duration;
+            vibratePattern.events.emplace_back(vibrateEvent);
+        }
+        if (vibratePattern.events.empty()) {
+            continue;
+        }
+        convertPackage.patterns.emplace_back(vibratePattern);
+    }
+}
+
+void VibratorServiceClient::ConvertVibratorPattern(const VibratorPattern &vibratorPattern,
+    VibratePattern &vibratePattern)
+{
+    vibratePattern.startTime = vibratorPattern.time;
+    vibratePattern.patternDuration = vibratorPattern.patternDuration;
+    for (int32_t j = 0; j < vibratorPattern.eventNum; ++j) {
+        VibrateEvent vibrateEvent = {};
+        vibrateEvent.tag = static_cast<VibrateTag>(vibratorPattern.events[j].type);
+        vibrateEvent.time = vibratorPattern.events[j].time;
+        vibrateEvent.duration = vibratorPattern.events[j].duration;
+        vibrateEvent.intensity = vibratorPattern.events[j].intensity;
+        vibrateEvent.frequency = vibratorPattern.events[j].frequency;
+        vibrateEvent.index = vibratorPattern.events[j].index;
+        for (size_t k = 0; k < vibratorPattern.events[j].pointNum; ++k) {
+            VibrateCurvePoint vibrateCurvePoint = {};
+            vibrateCurvePoint.time = vibratorPattern.events[j].points[k].time;
+            vibrateCurvePoint.intensity = vibratorPattern.events[j].points[k].intensity;
+            vibrateCurvePoint.frequency = vibratorPattern.events[j].points[k].frequency;
+            vibrateEvent.points.emplace_back(vibrateCurvePoint);
+        }
+        vibratePattern.events.emplace_back(vibrateEvent);
+    }
+}
+
+bool VibratorServiceClient::SkipEventAndConvertVibratorEvent(const VibratorEvent &vibratorEvent,
+    VibratePattern &vibratePattern, int32_t patternStartTime, VibrateEvent &vibrateEvent)
+{
+    int32_t eventStartTime = vibratorEvent.time + patternStartTime;
+    if (vibratePattern.startTime > eventStartTime) {
+        if (vibratorEvent.type == EVENT_TYPE_CONTINUOUS &&
+            (eventStartTime + vibratorEvent.duration - vibratePattern.startTime) >= MIN_VIBRATOR_EVENT_TIME) {
+            vibrateEvent.tag = static_cast<VibrateTag>(vibratorEvent.type);
+            vibrateEvent.duration = eventStartTime + vibratorEvent.duration - vibratePattern.startTime;
+            vibrateEvent.intensity = vibratorEvent.intensity;
+            vibrateEvent.frequency = vibratorEvent.frequency;
+            vibrateEvent.index = vibratorEvent.index;
+            vibratePattern.patternDuration += vibrateEvent.duration;
+            vibratePattern.events.emplace_back(vibrateEvent);
+        }
+        return true;
+    }
+    return false;
 }
 } // namespace Sensors
 } // namespace OHOS
