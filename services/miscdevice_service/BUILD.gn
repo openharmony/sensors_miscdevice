@@ -41,6 +41,21 @@ ohos_shared_library("libmiscdevice_service") {
     "$SUBSYSTEM_DIR/utils/haptic_decoder/oh_json/include",
   ]
 
+  cflags = [
+    "-Wno-error=inconsistent-missing-override",
+    "-fvisibility=hidden",
+    "-ffunction-sections",
+    "-fdata-sections",
+    "-Oz",
+  ]
+
+  cflags_cc = [
+    "-fvisibility=hidden",
+    "-ffunction-sections",
+    "-fdata-sections",
+    "-Oz",
+  ]
+
   if (miscdevice_build_eng) {
     sources += [ "hdi_connection/adapter/src/compatible_connection.cpp" ]
   }
@@ -52,7 +67,6 @@ ohos_shared_library("libmiscdevice_service") {
     debug = false
   }
 
-  cflags = [ "-Wno-error=inconsistent-missing-override" ]
   deps = [ "$SUBSYSTEM_DIR/utils:miscdevice_utils_target" ]
 
   external_deps = [
@@ -149,6 +163,21 @@ ohos_static_library("libmiscdevice_service_static") {
     "$SUBSYSTEM_DIR/utils/haptic_decoder/oh_json/include",
   ]
 
+  cflags = [
+    "-fvisibility=hidden",
+    "-ffunction-sections",
+    "-fdata-sections",
+    "-Oz",
+  ]
+
+  cflags_cc = [
+    "-Wno-error=inconsistent-missing-override",
+    "-fvisibility=hidden",
+    "-ffunction-sections",
+    "-fdata-sections",
+    "-Oz",
+  ]
+
   if (miscdevice_build_eng) {
     sources += [ "hdi_connection/adapter/src/compatible_connection.cpp" ]
   }
@@ -160,7 +189,6 @@ ohos_static_library("libmiscdevice_service_static") {
     debug = false
   }
 
-  cflags = [ "-Wno-error=inconsistent-missing-override" ]
   deps = [ "$SUBSYSTEM_DIR/utils:miscdevice_utils_target" ]
 
   external_deps = [

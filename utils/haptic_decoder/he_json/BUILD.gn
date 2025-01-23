@@ -30,6 +30,18 @@ ohos_shared_library("libhe_vibrator_decoder") {
     ubsan = true
   }
 
+  cflags = [
+    "-ffunction-sections",
+    "-fdata-sections",
+    "-Oz",
+  ]
+
+  cflags_cc = [
+    "-ffunction-sections",
+    "-fdata-sections",
+    "-Oz",
+  ]
+
   include_dirs = [
     "include",
     "$SUBSYSTEM_DIR/utils/common/include",
