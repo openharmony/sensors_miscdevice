@@ -18,6 +18,9 @@
 #include <tokenid_kit.h>
 
 #include "accesstoken_kit.h"
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
+#include "hisysevent.h"
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
@@ -36,6 +39,7 @@
 
 namespace OHOS {
 namespace Sensors {
+using namespace OHOS::HiviewDFX;
 namespace {
 const std::string SETTING_COLUMN_KEYWORD = "KEYWORD";
 const std::string SETTING_COLUMN_VALUE = "VALUE";
@@ -78,11 +82,19 @@ bool VibrationPriorityManager::Init()
         }
         miscFeedback_ = feedback;
         MISC_HILOGI("feedback:%{public}d", feedback);
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "SWITCHES_TOGGLE",
+            HiSysEvent::EventType::BEHAVIOR, "SWITCH_TYPE", "feedback", "STATUS", feedback);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
         int32_t ringerMode = miscAudioRingerMode_;
         if (GetIntValue(SETTING_RINGER_MODE_KEY, ringerMode) != ERR_OK) {
             MISC_HILOGE("Get ringerMode failed");
         }
         miscAudioRingerMode_ = ringerMode;
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "SWITCHES_TOGGLE",
+            HiSysEvent::EventType::BEHAVIOR, "SWITCH_TYPE", "ringerMode", "STATUS", ringerMode);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
         MISC_HILOGI("ringerMode:%{public}d", ringerMode);
     };
     auto observer_ = CreateObserver(updateFunc);
