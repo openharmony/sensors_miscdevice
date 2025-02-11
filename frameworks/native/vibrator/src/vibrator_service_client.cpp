@@ -609,7 +609,7 @@ void VibratorServiceClient::ConvertSeekVibratorPackage(const VibratorPackage &co
             vibrateEvent.intensity = completePackage.patterns[i].events[j].intensity;
             vibrateEvent.frequency = completePackage.patterns[i].events[j].frequency;
             vibrateEvent.index = completePackage.patterns[i].events[j].index;
-            for (size_t k = 0; k < completePackage.patterns[i].events[j].pointNum; ++k) {
+            for (size_t k = 0; k < static_cast<uint32_t>(completePackage.patterns[i].events[j].pointNum); ++k) {
                 VibrateCurvePoint vibrateCurvePoint = {};
                 vibrateCurvePoint.time = completePackage.patterns[i].events[j].points[k].time;
                 vibrateCurvePoint.intensity = completePackage.patterns[i].events[j].points[k].intensity;
@@ -639,7 +639,7 @@ void VibratorServiceClient::ConvertVibratorPattern(const VibratorPattern &vibrat
         vibrateEvent.intensity = vibratorPattern.events[j].intensity;
         vibrateEvent.frequency = vibratorPattern.events[j].frequency;
         vibrateEvent.index = vibratorPattern.events[j].index;
-        for (size_t k = 0; k < vibratorPattern.events[j].pointNum; ++k) {
+        for (size_t k = 0; k < static_cast<uint32_t>(vibratorPattern.events[j].pointNum); ++k) {
             VibrateCurvePoint vibrateCurvePoint = {};
             vibrateCurvePoint.time = vibratorPattern.events[j].points[k].time;
             vibrateCurvePoint.intensity = vibratorPattern.events[j].points[k].intensity;
