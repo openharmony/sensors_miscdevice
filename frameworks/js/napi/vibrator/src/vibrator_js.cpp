@@ -273,7 +273,7 @@ static bool ParseVibrateEvent(napi_env env, napi_value eventArray, int32_t index
         uint32_t pointsLength = 0;
         CHKCF((napi_get_array_length(env, pointsArray, &pointsLength) == napi_ok),
             "napi_get_array_length pointsArray fail");
-        event.pointNum = pointsLength;
+        event.pointNum = static_cast<int32_t>(pointsLength);
         if (pointsLength > 0) {
             if (!ParseVibratorCurvePointArray(env, pointsArray, pointsLength, event)) {
                 MISC_HILOGE("ParseVibratorCurvePointArray failed");
@@ -296,7 +296,7 @@ static bool ParseVibratorPattern(napi_env env, napi_value args[], VibrateInfo &i
     CHKCF(IsMatchArrayType(env, eventArray), "Wrong argument type, Napi array expected");
     uint32_t length = 0;
     CHKCF((napi_get_array_length(env, eventArray, &length) == napi_ok), "napi_get_array_length fail");
-    info.vibratorPattern.eventNum = length;
+    info.vibratorPattern.eventNum = static_cast<int32_t>(length);
     if (length <= 0 || length > EVENT_NUM_MAX) {
         MISC_HILOGE("length should not be less than or equal to 0 or greater than EVENT_NUM_MAX");
         return false;
