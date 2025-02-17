@@ -166,6 +166,43 @@ bool VibratorPatternBuilder::ParseOptions(const napi_env &env, const napi_value 
     return true;
 }
 
+bool VibratorPatternBuilder::ParseTransientOptions(const napi_env &env, const napi_value &value,
+    VibrateEvent &event)
+{
+    CALL_LOG_ENTER;
+    bool exist = false;
+    napi_status status = napi_has_named_property(env, value, "intensity", &exist);
+    if ((status == napi_ok) && exist) {
+        napi_value intensity = nullptr;
+        CHKCF((napi_get_named_property(env, value, "intensity", &intensity) == napi_ok), "napi get intensity fail");
+        CHKCF(IsMatchType(env, intensity, napi_number),
+            "The intensity parameter type is incorrect. napi_number expected");
+        CHKCF(GetInt32Value(env, intensity, event.intensity), "Get int number intensity fail");
+    } else {
+        event.intensity = DEFAULT_EVENT_INTENSITY;
+    }
+    status = napi_has_named_property(env, value, "frequency", &exist);
+    if ((status == napi_ok) && exist) {
+        napi_value frequency = nullptr;
+        CHKCF((napi_get_named_property(env, value, "frequency", &frequency) == napi_ok), "napi get frequency fail");
+        CHKCF(IsMatchType(env, frequency, napi_number),
+            "The frequency parameter type is incorrect. napi_number expected");
+        CHKCF(GetInt32Value(env, frequency, event.frequency), "Get int number frequency fail");
+    } else {
+        event.frequency = DEFAULT_EVENT_FREQUENCY;
+    }
+    status = napi_has_named_property(env, value, "index", &exist);
+    if ((status == napi_ok) && exist) {
+        napi_value index = nullptr;
+        CHKCF((napi_get_named_property(env, value, "index", &index) == napi_ok), "napi get frequency fail");
+        CHKCF(IsMatchType(env, index, napi_number), "The index parameter type is incorrect. napi_number expected");
+        CHKCF(GetInt32Value(env, index, event.index), "Get int number frequency fail");
+    } else {
+        event.index = 0;
+    }
+    return true;
+}
+
 bool VibratorPatternBuilder::CheckCurvePoints(const VibrateEvent &event)
 {
     int32_t pointNum = static_cast<int32_t>(event.points.size());
@@ -358,8 +395,8 @@ napi_value VibratorPatternBuilder::AddTransientEvent(napi_env env, napi_callback
             ThrowErr(env, PARAMETER_ERROR, "parameter invalid");
             return nullptr;
         }
-        if (!ParseOptions(env, args[1], event)) {
-            ThrowErr(env, PARAMETER_ERROR, "ParseOptions fail");
+        if (!ParseTransientOptions(env, args[1], event)) {
+            ThrowErr(env, PARAMETER_ERROR, "ParseTransientOptions fail");
             return nullptr;
         }
     } else {
