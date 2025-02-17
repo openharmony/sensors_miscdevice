@@ -35,7 +35,7 @@ public:
     int32_t GetLightType() const;
     void SetLightType(int32_t lightType);
     bool ReadFromParcel(Parcel &parcel);
-    static std::unique_ptr<LightInfoIPC> Unmarshalling(Parcel &parcel);
+    static LightInfoIPC* Unmarshalling(Parcel &parcel);
     virtual bool Marshalling(Parcel &parcel) const override;
 
 private:

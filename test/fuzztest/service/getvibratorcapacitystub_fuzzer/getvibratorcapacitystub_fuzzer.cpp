@@ -69,7 +69,7 @@ bool OnRemoteRequestFuzzTest(const uint8_t *data, size_t size)
     MessageParcel reply;
     MessageOption option;
     g_service->OnStartFuzz();
-    g_service->OnRemoteRequest(static_cast<uint32_t>(MiscdeviceInterfaceCode::GET_VIBRATOR_CAPACITY),
+    g_service->OnRemoteRequest(static_cast<uint32_t>(IMiscdeviceServiceIpcCode::COMMAND_GET_VIBRATOR_CAPACITY),
         datas, reply, option);
     return true;
 }

@@ -65,7 +65,8 @@ int32_t LightClient::InitLightClient()
         auto remoteObject = miscdeviceProxy_->AsObject();
         CHKPR(remoteObject, MISC_NATIVE_GET_SERVICE_ERR);
         remoteObject->AddDeathRecipient(serviceDeathObserver_);
-        lightInfoList_ = miscdeviceProxy_->GetLightList();
+        lightInfoList_.clear();
+        miscdeviceProxy_->GetLightList(lightInfoList_);
         return ERR_OK;
     }
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
@@ -148,7 +149,7 @@ int32_t LightClient::TurnOn(int32_t lightId, const LightColor &color, const Ligh
     animationIPC.SetMode(animation.mode);
     animationIPC.SetOnTime(animation.onTime);
     animationIPC.SetOffTime(animation.offTime);
-    return miscdeviceProxy_->TurnOn(lightId, color, animationIPC);
+    return miscdeviceProxy_->TurnOn(lightId, color.singleColor, animationIPC);
 }
 
 int32_t LightClient::TurnOff(int32_t lightId)

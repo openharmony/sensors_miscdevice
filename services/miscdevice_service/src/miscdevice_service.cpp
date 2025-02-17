@@ -20,6 +20,9 @@
 #include <string_ex.h>
 
 #include "death_recipient_template.h"
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
+#include "hisysevent.h"
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
 #ifdef MEMMGR_ENABLE
 #include "iservice_registry.h"
 #include "mem_mgr_client.h"
@@ -35,6 +38,7 @@
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 #include "parameters.h"
+#include "permission_util.h"
 #include "default_vibrator_decoder.h"
 #include "default_vibrator_decoder_factory.h"
 #include "vibrator_decoder_creator.h"
@@ -45,9 +49,13 @@
 
 namespace OHOS {
 namespace Sensors {
+using namespace OHOS::HiviewDFX;
 namespace {
 auto g_miscdeviceService = MiscdeviceDelayedSpSingleton<MiscdeviceService>::GetInstance();
 const bool G_REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(g_miscdeviceService.GetRefPtr());
+const std::string VIBRATE_PERMISSION = "ohos.permission.VIBRATE";
+const std::string LIGHT_PERMISSION = "ohos.permission.SYSTEM_LIGHT_CONTROL";
+constexpr int32_t MAX_LIGHT_COUNT = 0XFF;
 constexpr int32_t MIN_VIBRATOR_TIME = 0;
 constexpr int32_t MAX_VIBRATOR_TIME = 1800000;
 constexpr int32_t MIN_VIBRATOR_COUNT = 1;
@@ -321,6 +329,16 @@ bool MiscdeviceService::ShouldIgnoreVibrate(const VibrateInfo &info)
 
 int32_t MiscdeviceService::Vibrate(int32_t vibratorId, int32_t timeOut, int32_t usage, bool systemUsage)
 {
+    PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
+    int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
+    if (ret != PERMISSION_GRANTED) {
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
+            HiSysEvent::EventType::SECURITY, "PKG_NAME", "VibrateStub", "ERROR_CODE", ret);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
+        MISC_HILOGE("CheckVibratePermission failed, ret:%{public}d", ret);
+        return PERMISSION_DENIED;
+    }
     if ((timeOut <= MIN_VIBRATOR_TIME) || (timeOut > MAX_VIBRATOR_TIME)
         || (usage >= USAGE_MAX) || (usage < 0)) {
         MISC_HILOGE("Invalid parameter");
@@ -351,6 +369,16 @@ int32_t MiscdeviceService::Vibrate(int32_t vibratorId, int32_t timeOut, int32_t 
 int32_t MiscdeviceService::StopVibrator(int32_t vibratorId)
 {
     std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
+    PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
+    int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
+    if (ret != PERMISSION_GRANTED) {
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
+            HiSysEvent::EventType::SECURITY, "PKG_NAME", "StopVibratorStub", "ERROR_CODE", ret);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
+        MISC_HILOGE("Result:%{public}d", ret);
+        return PERMISSION_DENIED;
+    }
 #if defined (OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM) && defined (HDF_DRIVERS_INTERFACE_VIBRATOR)
     if ((vibratorThread_ == nullptr) || (!vibratorThread_->IsRunning() &&
         !vibratorHdiConnection_.IsVibratorRunning())) {
@@ -378,9 +406,10 @@ int32_t MiscdeviceService::StopVibrator(int32_t vibratorId)
 int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::string &effect,
     int32_t count, int32_t usage, bool systemUsage)
 {
-    if ((count < MIN_VIBRATOR_COUNT) || (count > MAX_VIBRATOR_COUNT) || (usage >= USAGE_MAX) || (usage < 0)) {
-        MISC_HILOGE("Invalid parameter");
-        return PARAMETER_ERROR;
+    int32_t checkResult = PlayVibratorEffectCheckAuthAndParam(count, usage);
+    if (checkResult != ERR_OK) {
+        MISC_HILOGE("CheckAuthAndParam failed, ret:%{public}d", checkResult);
+        return checkResult;
     }
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
     std::optional<HdfEffectInfo> effectInfo = vibratorHdiConnection_.GetEffectInfo(effect);
@@ -420,6 +449,25 @@ int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::str
     return NO_ERROR;
 }
 
+int32_t MiscdeviceService::PlayVibratorEffectCheckAuthAndParam(int32_t count, int32_t usage)
+{
+    PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
+    int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
+    if (ret != PERMISSION_GRANTED) {
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
+            HiSysEvent::EventType::SECURITY, "PKG_NAME", "PlayVibratorEffectStub", "ERROR_CODE", ret);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
+        MISC_HILOGE("CheckVibratePermission failed, ret:%{public}d", ret);
+        return PERMISSION_DENIED;
+    }
+    if ((count < MIN_VIBRATOR_COUNT) || (count > MAX_VIBRATOR_COUNT) || (usage >= USAGE_MAX) || (usage < 0)) {
+        MISC_HILOGE("Invalid parameter");
+        return PARAMETER_ERROR;
+    }
+    return ERR_OK;
+}
+
 void MiscdeviceService::StartVibrateThread(VibrateInfo info)
 {
     if (vibratorThread_ == nullptr) {
@@ -447,9 +495,19 @@ void MiscdeviceService::StopVibrateThread()
     }
 }
 
-int32_t MiscdeviceService::StopVibrator(int32_t vibratorId, const std::string &mode)
+int32_t MiscdeviceService::StopVibratorByMode(int32_t vibratorId, const std::string &mode)
 {
     std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
+    PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
+    int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
+    if (ret != PERMISSION_GRANTED) {
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
+            HiSysEvent::EventType::SECURITY, "PKG_NAME", "StopVibratorByModeStub", "ERROR_CODE", ret);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
+        MISC_HILOGE("CheckVibratePermission failed, ret:%{public}d", ret);
+        return PERMISSION_DENIED;
+    }
     if ((vibratorThread_ == nullptr) || (!vibratorThread_->IsRunning())) {
         MISC_HILOGD("No vibration, no need to stop");
         return ERROR;
@@ -503,17 +561,18 @@ std::string MiscdeviceService::GetCurrentTime()
 }
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, const RawFileDescriptor &rawFd, int32_t usage,
-    bool systemUsage, const VibrateParameter &parameter)
+int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, int32_t fd, int64_t offset, int64_t length,
+    int32_t usage, bool systemUsage, const VibrateParameter &parameter)
 {
-    if (!(g_capacity.isSupportHdHaptic || g_capacity.isSupportPresetMapping || g_capacity.isSupportTimeDelay)) {
-        MISC_HILOGE("The device does not support this operation");
-        return IS_NOT_SUPPORTED;
+    int32_t checkResult = CheckAuthAndParam(usage, parameter);
+    if (checkResult != ERR_OK) {
+        MISC_HILOGE("CheckAuthAndParam failed, ret:%{public}d", checkResult);
+        return checkResult;
     }
-    if ((usage >= USAGE_MAX) || (usage < 0) || (!CheckVibratorParmeters(parameter))) {
-        MISC_HILOGE("Invalid parameter, usage:%{public}d", usage);
-        return PARAMETER_ERROR;
-    }
+    RawFileDescriptor rawFd;
+    rawFd.fd = fd;
+    rawFd.offset = offset;
+    rawFd.length = length;
     JsonParser parser(rawFd);
     VibratorDecoderCreator creator;
     std::unique_ptr<IVibratorDecoder> decoder(creator.CreateDecoder(parser));
@@ -555,6 +614,29 @@ int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, const RawFileD
 }
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
+int32_t MiscdeviceService::CheckAuthAndParam(int32_t usage, const VibrateParameter &parameter)
+{
+    PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
+    int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
+    if (ret != PERMISSION_GRANTED) {
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
+            HiSysEvent::EventType::SECURITY, "PKG_NAME", "PlayVibratorCustomStub", "ERROR_CODE", ret);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
+        MISC_HILOGE("CheckVibratePermission failed, ret:%{public}d", ret);
+        return PERMISSION_DENIED;
+    }
+    if (!(g_capacity.isSupportHdHaptic || g_capacity.isSupportPresetMapping || g_capacity.isSupportTimeDelay)) {
+        MISC_HILOGE("The device does not support this operation");
+        return IS_NOT_SUPPORTED;
+    }
+    if ((usage >= USAGE_MAX) || (usage < 0) || (!CheckVibratorParmeters(parameter))) {
+        MISC_HILOGE("Invalid parameter, usage:%{public}d", usage);
+        return PARAMETER_ERROR;
+    }
+    return ERR_OK;
+}
+
 std::string MiscdeviceService::GetPackageName(AccessTokenID tokenId)
 {
     std::string packageName;
@@ -587,7 +669,7 @@ std::string MiscdeviceService::GetPackageName(AccessTokenID tokenId)
     return packageName;
 }
 
-std::vector<LightInfoIPC> MiscdeviceService::GetLightList()
+int32_t MiscdeviceService::GetLightList(std::vector<LightInfoIPC> &lightInfoIpcList)
 {
     std::lock_guard<std::mutex> lightInfosLock(lightInfosMutex_);
     std::string packageName = GetPackageName(GetCallingTokenID());
@@ -596,11 +678,31 @@ std::vector<LightInfoIPC> MiscdeviceService::GetLightList()
     if (ret != ERR_OK) {
         MISC_HILOGE("GetLightList failed, ret:%{public}d", ret);
     }
-    return lightInfos_;
+    size_t lightCount = lightInfos_.size();
+    MISC_HILOGI("lightCount:%{public}zu", lightCount);
+    if (lightCount > MAX_LIGHT_COUNT) {
+        lightCount = MAX_LIGHT_COUNT;
+    }
+    for (size_t i = 0; i < lightCount; ++i) {
+        lightInfoIpcList.push_back(lightInfos_[i]);
+    }
+    return ERR_OK;
 }
 
-int32_t MiscdeviceService::TurnOn(int32_t lightId, const LightColor &color, const LightAnimationIPC &animation)
+int32_t MiscdeviceService::TurnOn(int32_t lightId, int32_t singleColor, const LightAnimationIPC &animation)
 {
+    PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
+    int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), LIGHT_PERMISSION);
+    if (ret != PERMISSION_GRANTED) {
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "LIGHT_PERMISSIONS_EXCEPTION", HiSysEvent::EventType::SECURITY,
+            "PKG_NAME", "turnOnStub", "ERROR_CODE", ret);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
+        MISC_HILOGE("CheckLightPermission failed, ret:%{public}d", ret);
+        return PERMISSION_DENIED;
+    }
+    LightColor color;
+    color.singleColor = singleColor;
     std::string packageName = GetPackageName(GetCallingTokenID());
     MISC_HILOGI("TurnOn, package:%{public}s", packageName.c_str());
     if (!IsValid(lightId)) {
@@ -611,7 +713,7 @@ int32_t MiscdeviceService::TurnOn(int32_t lightId, const LightColor &color, cons
         MISC_HILOGE("animation is invalid");
         return MISCDEVICE_NATIVE_SAM_ERR;
     }
-    int32_t ret = lightHdiConnection_.TurnOn(lightId, color, animation);
+    ret = lightHdiConnection_.TurnOn(lightId, color, animation);
     if (ret != ERR_OK) {
         MISC_HILOGE("TurnOn failed, error:%{public}d", ret);
         return ERROR;
@@ -621,13 +723,23 @@ int32_t MiscdeviceService::TurnOn(int32_t lightId, const LightColor &color, cons
 
 int32_t MiscdeviceService::TurnOff(int32_t lightId)
 {
+    PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
+    int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), LIGHT_PERMISSION);
+    if (ret != PERMISSION_GRANTED) {
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "LIGHT_PERMISSIONS_EXCEPTION", HiSysEvent::EventType::SECURITY,
+            "PKG_NAME", "TurnOffStub", "ERROR_CODE", ret);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
+        MISC_HILOGE("CheckLightPermission failed, ret:%{public}d", ret);
+        return PERMISSION_DENIED;
+    }
     std::string packageName = GetPackageName(GetCallingTokenID());
     MISC_HILOGI("TurnOff, package:%{public}s", packageName.c_str());
     if (!IsValid(lightId)) {
         MISC_HILOGE("lightId is invalid, lightId:%{public}d", lightId);
         return MISCDEVICE_NATIVE_SAM_ERR;
     }
-    int32_t ret = lightHdiConnection_.TurnOff(lightId);
+    ret = lightHdiConnection_.TurnOff(lightId);
     if (ret != ERR_OK) {
         MISC_HILOGE("TurnOff failed, error:%{public}d", ret);
         return ERROR;
@@ -660,14 +772,14 @@ int32_t MiscdeviceService::Dump(int32_t fd, const std::vector<std::u16string> &a
 int32_t MiscdeviceService::PlayPattern(const VibratePattern &pattern, int32_t usage,
     bool systemUsage, const VibrateParameter &parameter)
 {
-    if ((usage >= USAGE_MAX) || (usage < 0) || (!CheckVibratorParmeters(parameter))) {
-        MISC_HILOGE("Invalid parameter, usage:%{public}d", usage);
-        return PARAMETER_ERROR;
+    int32_t checkResult = PlayPatternCheckAuthAndParam(usage, parameter);
+    if (checkResult != ERR_OK) {
+        MISC_HILOGE("CheckAuthAndParam failed, ret:%{public}d", checkResult);
+        return checkResult;
     }
-    VibratePattern vibratePattern = {
-        .startTime = 0,
-        .events = pattern.events
-    };
+    VibratePattern vibratePattern;
+    vibratePattern.startTime = 0;
+    vibratePattern.events = pattern.events;
     std::vector<VibratePattern> patterns = {vibratePattern};
     VibratePackage package = {
         .patterns = patterns
@@ -707,6 +819,25 @@ int32_t MiscdeviceService::PlayPattern(const VibratePattern &pattern, int32_t us
     MISC_HILOGI("Start vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, usage:%{public}d,"
         "duration:%{public}d", curVibrateTime.c_str(), info.packageName.c_str(), info.pid, info.usage,
         pattern.patternDuration);
+    return ERR_OK;
+}
+
+int32_t MiscdeviceService::PlayPatternCheckAuthAndParam(int32_t usage, const VibrateParameter &parameter)
+{
+    PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
+    int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
+    if (ret != PERMISSION_GRANTED) {
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
+            HiSysEvent::EventType::SECURITY, "PKG_NAME", "PlayPatternStub", "ERROR_CODE", ret);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
+        MISC_HILOGE("CheckVibratePermission failed, ret:%{public}d", ret);
+        return PERMISSION_DENIED;
+    }
+    if ((usage >= USAGE_MAX) || (usage < 0) || (!CheckVibratorParmeters(parameter))) {
+        MISC_HILOGE("Invalid parameter, usage:%{public}d", usage);
+        return PARAMETER_ERROR;
+    }
     return ERR_OK;
 }
 
@@ -864,9 +995,10 @@ void MiscdeviceService::DestroyClientPid(const sptr<IRemoteObject> &vibratorServ
 int32_t MiscdeviceService::PlayPrimitiveEffect(int32_t vibratorId, const std::string &effect,
     int32_t intensity, int32_t usage, bool systemUsage, int32_t count)
 {
-    if ((intensity <= INTENSITY_MIN) || (intensity > INTENSITY_MAX) || (usage >= USAGE_MAX) || (usage < 0)) {
-        MISC_HILOGE("Invalid parameter");
-        return PARAMETER_ERROR;
+    int32_t checkResult = PlayPrimitiveEffectCheckAuthAndParam(intensity, usage);
+    if (checkResult != ERR_OK) {
+        MISC_HILOGE("CheckAuthAndParam failed, ret:%{public}d", checkResult);
+        return checkResult;
     }
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
     std::optional<HdfEffectInfo> effectInfo = vibratorHdiConnection_.GetEffectInfo(effect);
@@ -904,6 +1036,25 @@ int32_t MiscdeviceService::PlayPrimitiveEffect(int32_t vibratorId, const std::st
         "vibratorId:%{public}d, duration:%{public}d, effect:%{public}s", curVibrateTime.c_str(),
         info.packageName.c_str(), info.pid, info.usage, vibratorId, info.duration, info.effect.c_str());
     return NO_ERROR;
+}
+
+int32_t MiscdeviceService::PlayPrimitiveEffectCheckAuthAndParam(int32_t intensity, int32_t usage)
+{
+    PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
+    int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
+    if (ret != PERMISSION_GRANTED) {
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
+            HiSysEvent::EventType::SECURITY, "PKG_NAME", "PlayPrimitiveEffectStub", "ERROR_CODE", ret);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
+        MISC_HILOGE("CheckVibratePermission failed, ret:%{public}d", ret);
+        return PERMISSION_DENIED;
+    }
+    if ((intensity <= INTENSITY_MIN) || (intensity > INTENSITY_MAX) || (usage >= USAGE_MAX) || (usage < 0)) {
+        MISC_HILOGE("Invalid parameter");
+        return PARAMETER_ERROR;
+    }
+    return ERR_OK;
 }
 
 int32_t MiscdeviceService::GetVibratorCapacity(VibratorCapacity &capacity)

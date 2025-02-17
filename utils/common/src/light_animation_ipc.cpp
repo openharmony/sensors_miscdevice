@@ -69,12 +69,12 @@ bool LightAnimationIPC::Marshalling(Parcel &parcel) const
     return true;
 }
 
-std::unique_ptr<LightAnimationIPC> LightAnimationIPC::Unmarshalling(Parcel &parcel)
+LightAnimationIPC* LightAnimationIPC::Unmarshalling(Parcel &parcel)
 {
-    auto lightAnimation = std::make_unique<LightAnimationIPC>();
-    if (!lightAnimation->ReadFromParcel(parcel)) {
+    auto lightAnimation = new (std::nothrow) LightAnimationIPC();
+    if (lightAnimation != nullptr && !lightAnimation->ReadFromParcel(parcel)) {
         MISC_HILOGE("ReadFromParcel is failed");
-        return nullptr;
+        lightAnimation = nullptr;
     }
     return lightAnimation;
 }

@@ -67,14 +67,14 @@ public:
     virtual int32_t PlayVibratorEffect(int32_t vibratorId, const std::string &effect,
                                        int32_t loopCount, int32_t usage, bool systemUsage) override;
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    virtual int32_t PlayVibratorCustom(int32_t vibratorId, const RawFileDescriptor &rawFd, int32_t usage,
+    virtual int32_t PlayVibratorCustom(int32_t vibratorId, int32_t fd, int64_t offset, int64_t length, int32_t usage,
         bool systemUsage, const VibrateParameter &parameter) override;
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     virtual int32_t StopVibrator(int32_t vibratorId) override;
-    virtual int32_t StopVibrator(int32_t vibratorId, const std::string &mode) override;
+    virtual int32_t StopVibratorByMode(int32_t vibratorId, const std::string &mode) override;
     virtual int32_t IsSupportEffect(const std::string &effect, bool &state) override;
-    virtual std::vector<LightInfoIPC> GetLightList() override;
-    virtual int32_t TurnOn(int32_t lightId, const LightColor &color, const LightAnimationIPC &animation) override;
+    virtual int32_t GetLightList(std::vector<LightInfoIPC> &lightInfoIpcList) override;
+    virtual int32_t TurnOn(int32_t lightId, int32_t singleColor, const LightAnimationIPC &animation) override;
     virtual int32_t TurnOff(int32_t lightId) override;
     virtual int32_t PlayPattern(const VibratePattern &pattern, int32_t usage,
         bool systemUsage, const VibrateParameter &parameter) override;
@@ -103,6 +103,10 @@ private:
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
     int32_t SubscribeCommonEvent(const std::string &eventName, EventReceiver receiver);
     void OnReceiveEvent(const EventFwk::CommonEventData &data);
+    int32_t CheckAuthAndParam(int32_t usage, const VibrateParameter &parameter);
+    int32_t PlayPatternCheckAuthAndParam(int32_t usage, const VibrateParameter &parameter);
+    int32_t PlayPrimitiveEffectCheckAuthAndParam(int32_t intensity, int32_t usage);
+    int32_t PlayVibratorEffectCheckAuthAndParam(int32_t count, int32_t usage);
     std::mutex isVibrationPriorityReadyMutex_;
     static bool isVibrationPriorityReady_;
     VibratorHdiConnection &vibratorHdiConnection_ = VibratorHdiConnection::GetInstance();

@@ -82,7 +82,7 @@ struct VibrateEvent {
     std::vector<VibrateCurvePoint> points;
 };
 
-struct VibratePattern {
+struct VibratePattern : public Parcelable {
     bool operator<(const VibratePattern &rhs) const
     {
         return startTime < rhs.startTime;
@@ -92,7 +92,7 @@ struct VibratePattern {
     std::vector<VibrateEvent> events;
     void Dump() const;
     bool Marshalling(Parcel &parcel) const;
-    std::optional<VibratePattern> Unmarshalling(Parcel &data);
+    static VibratePattern* Unmarshalling(Parcel &data);
 };
 
 struct VibratePackage {
@@ -101,14 +101,14 @@ struct VibratePackage {
     void Dump() const;
 };
 
-struct VibratorCapacity {
+struct VibratorCapacity : public Parcelable {
     bool isSupportHdHaptic = false;
     bool isSupportPresetMapping = false;
     bool isSupportTimeDelay = false;
     void Dump() const;
     int32_t GetVibrateMode();
     bool Marshalling(Parcel &parcel) const;
-    std::optional<VibratorCapacity> Unmarshalling(Parcel &data);
+    static VibratorCapacity* Unmarshalling(Parcel &data);
 };
 
 struct VibrateSlice {
@@ -132,13 +132,13 @@ struct VibrateInfo {
     VibratePackage package;
 };
 
-struct VibrateParameter {
+struct VibrateParameter : public Parcelable {
     int32_t intensity = 100;  // from 0 to 100
     int32_t frequency = 0;    // from -100 to 100
     int32_t reserved = 0;
     void Dump() const;
     bool Marshalling(Parcel &parcel) const;
-    std::optional<VibrateParameter> Unmarshalling(Parcel &data);
+    static VibrateParameter* Unmarshalling(Parcel &data);
 };
 } // namespace Sensors
 } // namespace OHOS

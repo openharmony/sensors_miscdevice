@@ -83,12 +83,12 @@ bool LightInfoIPC::Marshalling(Parcel &parcel) const
     return true;
 }
 
-std::unique_ptr<LightInfoIPC> LightInfoIPC::Unmarshalling(Parcel &parcel)
+LightInfoIPC* LightInfoIPC::Unmarshalling(Parcel &parcel)
 {
-    auto lightInfo = std::make_unique<LightInfoIPC>();
-    if (!lightInfo->ReadFromParcel(parcel)) {
+    auto lightInfo = new (std::nothrow) LightInfoIPC();
+    if (lightInfo != nullptr && !lightInfo->ReadFromParcel(parcel)) {
         MISC_HILOGE("ReadFromParcel is failed");
-        return nullptr;
+        lightInfo = nullptr;
     }
     return lightInfo;
 }

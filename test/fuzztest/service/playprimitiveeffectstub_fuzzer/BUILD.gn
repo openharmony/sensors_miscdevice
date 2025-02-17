@@ -44,6 +44,7 @@ ohos_fuzztest("PlayPrimitiveEffectStubFuzzTest") {
 
   deps = [
     "$SUBSYSTEM_DIR/frameworks/native/light:light_interface_native",
+    "$SUBSYSTEM_DIR/frameworks/native/vibrator:miscdevice_service_stub",
     "$SUBSYSTEM_DIR/frameworks/native/vibrator:vibrator_interface_native",
     "$SUBSYSTEM_DIR/services/miscdevice_service:libmiscdevice_service_static",
     "$SUBSYSTEM_DIR/utils/common:libmiscdevice_utils",
