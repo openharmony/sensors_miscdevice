@@ -56,6 +56,7 @@ public:
 
 private:
     static bool ParseOptions(const napi_env &env, const napi_value &value, VibrateEvent &event);
+    static bool ParseTransientOptions(const napi_env &env, const napi_value &value, VibrateEvent &event);
     static bool ParsePoints(const napi_env &env, const napi_value &value, VibrateEvent &event);
     static napi_value ConvertVibrateEvent(napi_env env, const VibrateEvent &event);
     static napi_value ConvertVibrateCurvePoint(napi_env env, const VibrateCurvePoint &point);
