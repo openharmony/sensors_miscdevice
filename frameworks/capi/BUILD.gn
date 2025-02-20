@@ -35,6 +35,7 @@ ohos_shared_library("ohvibrator") {
 
   external_deps = [ "hilog:libhilog" ]
 
+  cflags_cc = [ "-fstack-protector-strong" ]
   relative_install_dir = "ndk"
   part_name = "miscdevice"
   subsystem_name = "sensors"

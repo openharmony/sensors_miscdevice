@@ -19,6 +19,7 @@
 
 #include "accesstoken_kit.h"
 #include "bundle_mgr_client.h"
+#include "hisysevent.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
 #include "os_account_manager.h"
@@ -33,6 +34,7 @@
 
 namespace OHOS {
 namespace Sensors {
+using namespace OHOS::HiviewDFX;
 namespace {
 const std::string SETTING_COLUMN_KEYWORD = "KEYWORD";
 const std::string SETTING_COLUMN_VALUE = "VALUE";
@@ -74,12 +76,16 @@ bool VibrationPriorityManager::Init()
             MISC_HILOGE("Get feedback failed");
         }
         miscFeedback_ = feedback;
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "SWITCHES_TOGGLE",
+            HiSysEvent::EventType::BEHAVIOR, "SWITCH_TYPE", "feedback", "STATUS", feedback);
         MISC_HILOGI("feedback:%{public}d", feedback);
         int32_t ringerMode = miscAudioRingerMode_;
         if (GetIntValue(SETTING_RINGER_MODE_KEY, ringerMode) != ERR_OK) {
             MISC_HILOGE("Get ringerMode failed");
         }
         miscAudioRingerMode_ = ringerMode;
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "SWITCHES_TOGGLE",
+            HiSysEvent::EventType::BEHAVIOR, "SWITCH_TYPE", "ringerMode", "STATUS", ringerMode);
         MISC_HILOGI("ringerMode:%{public}d", ringerMode);
     };
     auto observer_ = CreateObserver(updateFunc);
