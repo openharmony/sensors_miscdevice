@@ -11,8 +11,89 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/config/components/idl_tool/idl.gni")
 import("//build/ohos.gni")
 import("./../../../miscdevice.gni")
+
+idl_gen_interface("miscdevice_service_interface") {
+  if (miscdevice_feature_vibrator_custom) {
+    sources = [ "all/IMiscdeviceService.idl" ]
+  } else {
+    sources = [ "part/IMiscdeviceService.idl" ]
+  }
+  log_domainid = "0xD002701"
+  log_tag = "IMiscdeviceServiceIdl"
+  part_name = "miscdevice"
+  subsystem_name = "sensors"
+}
+
+config("miscdevice_service_idl_config") {
+  include_dirs = [
+    "${target_gen_dir}",
+    "include",
+    "$SUBSYSTEM_DIR/interfaces/inner_api/light",
+    "$SUBSYSTEM_DIR/interfaces/inner_api/vibrator",
+    "$SUBSYSTEM_DIR/utils/common/include",
+  ]
+}
+
+ohos_source_set("miscdevice_service_stub") {
+  public_configs = [ ":miscdevice_service_idl_config" ]
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  output_values = get_target_outputs(":miscdevice_service_interface")
+  sources = filter_include(output_values, [ "*_stub.cpp" ])
+  deps = [ ":miscdevice_service_interface" ]
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+    "samgr:samgr_proxy",
+  ]
+  part_name = "miscdevice"
+  subsystem_name = "sensors"
+}
+
+ohos_source_set("miscdevice_service_proxy") {
+  public_configs = [ ":miscdevice_service_idl_config" ]
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  output_values = get_target_outputs(":miscdevice_service_interface")
+  sources = filter_include(output_values, [ "*_proxy.cpp" ])
+  deps = [ ":miscdevice_service_interface" ]
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+    "samgr:samgr_proxy",
+  ]
+  part_name = "miscdevice"
+  subsystem_name = "sensors"
+}
+
+ohos_source_set("miscdevice_service_file_h") {
+  public_configs = [ ":miscdevice_service_idl_config" ]
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  deps = [ ":miscdevice_service_interface" ]
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+    "samgr:samgr_proxy",
+  ]
+  part_name = "miscdevice"
+  subsystem_name = "sensors"
+}
 
 ohos_ndk_library("libvibrator_ndk") {
   output_name = "vibrator_agent"
@@ -37,8 +118,8 @@ ohos_shared_library("vibrator_interface_native") {
   sources = [ "vibrator_agent.cpp" ]
 
   include_dirs = [
+    "${target_gen_dir}",
     "include",
-    "$SUBSYSTEM_DIR/frameworks/native/common/include",
     "$SUBSYSTEM_DIR/interfaces/inner_api/light",
     "$SUBSYSTEM_DIR/interfaces/inner_api/vibrator",
     "$SUBSYSTEM_DIR/utils/common/include",
@@ -60,6 +141,7 @@ ohos_shared_library("vibrator_interface_native") {
     "$SUBSYSTEM_DIR/frameworks/native/light:light_ndk_header",
     "$SUBSYSTEM_DIR/frameworks/native/vibrator:libvibrator_native",
     "$SUBSYSTEM_DIR/frameworks/native/vibrator:libvibrator_ndk",
+    "$SUBSYSTEM_DIR/utils/common:libmiscdevice_utils",
   ]
 
   external_deps = [
@@ -77,22 +159,26 @@ ohos_shared_library("vibrator_interface_native") {
 }
 
 ohos_shared_library("libvibrator_native") {
+  output_values = get_target_outputs(":miscdevice_service_interface")
   sources = [
-    "$SUBSYSTEM_DIR/frameworks/native/common/src/miscdevice_service_proxy.cpp",
     "src/vibrator_client_stub.cpp",
     "src/vibrator_service_client.cpp",
   ]
+  sources += filter_include(output_values, [ "*_proxy.cpp" ])
 
   include_dirs = [
+    "${target_gen_dir}",
     "$SUBSYSTEM_DIR/utils/haptic_decoder/interface",
     "$SUBSYSTEM_DIR/interfaces/inner_api/vibrator",
     "include",
-    "$SUBSYSTEM_DIR/frameworks/native/common/include",
     "$SUBSYSTEM_DIR/interfaces/inner_api/light",
     "$SUBSYSTEM_DIR/utils/common/include",
   ]
 
-  deps = [ "$SUBSYSTEM_DIR/utils/common:libmiscdevice_utils" ]
+  deps = [
+    ":miscdevice_service_interface",
+    "$SUBSYSTEM_DIR/utils/common:libmiscdevice_utils",
+  ]
 
   branch_protector_ret = "pac_ret"
   sanitize = {

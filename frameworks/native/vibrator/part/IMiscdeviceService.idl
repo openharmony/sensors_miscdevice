@@ -1,0 +1,39 @@
+/*
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+sequenceable light_agent_type..LightColor;
+sequenceable light_animation_ipc..OHOS.Sensors.LightAnimationIPC;
+sequenceable light_info_ipc..OHOS.Sensors.LightInfoIPC;
+sequenceable OHOS.IRemoteObject;
+sequenceable raw_file_descriptor..OHOS.Sensors.RawFileDescriptor;
+sequenceable vibrator_infos..OHOS.Sensors.VibrateParameter;
+sequenceable vibrator_infos..OHOS.Sensors.VibratePattern;
+sequenceable vibrator_infos..OHOS.Sensors.VibratorCapacity;
+
+interface OHOS.Sensors.IMiscdeviceService {
+    void Vibrate([in] int vibratorId, [in] int timeOut, [in] int usage, [in] boolean systemUsage);
+    void PlayVibratorEffect([in] int vibratorId, [in] String effect, [in] int loopCount, [in] int usage, [in] boolean systemUsage);
+    void StopVibrator([in] int vibratorId);
+    void StopVibratorByMode([in] int vibratorId, [in] String mode);
+    void IsSupportEffect([in] String effect, [out] boolean state);
+    void GetLightList([out] LightInfoIPC[] lightInfoIpcList);
+    void TurnOn([in] int lightId, [in] int singleColor, [in] LightAnimationIPC animation);
+    void TurnOff([in] int lightId);
+    void GetDelayTime([out] int delayTime);
+    void PlayPattern([in] VibratePattern pattern, [in] int usage, [in] boolean systemUsage, [in] VibrateParameter parameter);
+    void TransferClientRemoteObject([in] IRemoteObject vibratorClient);
+    void PlayPrimitiveEffect([in] int vibratorId, [in] String effect, [in] int intensity, [in] int usage, [in] boolean systemUsage, [in] int count);
+    void GetVibratorCapacity([out] VibratorCapacity capacity);
+}

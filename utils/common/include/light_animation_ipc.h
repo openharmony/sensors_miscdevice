@@ -31,7 +31,7 @@ public:
     int32_t GetOffTime() const;
     void SetOffTime(int32_t offTime);
     bool ReadFromParcel(Parcel &parcel);
-    static std::unique_ptr<LightAnimationIPC> Unmarshalling(Parcel &parcel);
+    static LightAnimationIPC* Unmarshalling(Parcel &parcel);
     virtual bool Marshalling(Parcel &parcel) const override;
 
 private:

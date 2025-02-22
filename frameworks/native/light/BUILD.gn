@@ -37,7 +37,6 @@ ohos_shared_library("light_interface_native") {
   sources = [ "light_agent.cpp" ]
 
   include_dirs = [
-    "$SUBSYSTEM_DIR/frameworks/native/common/include",
     "$SUBSYSTEM_DIR/interfaces/inner_api/light",
     "$SUBSYSTEM_DIR/utils/common/include",
     "include",
@@ -56,6 +55,7 @@ ohos_shared_library("light_interface_native") {
     "$SUBSYSTEM_DIR/frameworks/native/light:liblight_native",
     "$SUBSYSTEM_DIR/frameworks/native/light:liblight_ndk",
     "$SUBSYSTEM_DIR/frameworks/native/light:light_ndk_header",
+    "$SUBSYSTEM_DIR/frameworks/native/vibrator:miscdevice_service_file_h",
   ]
 
   external_deps = [
@@ -71,14 +71,10 @@ ohos_shared_library("light_interface_native") {
 }
 
 ohos_shared_library("liblight_native") {
-  sources = [
-    "$SUBSYSTEM_DIR/frameworks/native/common/src/miscdevice_service_proxy.cpp",
-    "src/light_client.cpp",
-  ]
+  sources = [ "src/light_client.cpp" ]
 
   include_dirs = [
     "include",
-    "$SUBSYSTEM_DIR/frameworks/native/common/include",
     "$SUBSYSTEM_DIR/interfaces/inner_api/light",
     "$SUBSYSTEM_DIR/utils/common/include",
   ]
@@ -94,6 +90,7 @@ ohos_shared_library("liblight_native") {
 
   deps = [
     "$SUBSYSTEM_DIR/frameworks/native/light:light_ndk_header",
+    "$SUBSYSTEM_DIR/frameworks/native/vibrator:miscdevice_service_proxy",
     "$SUBSYSTEM_DIR/utils/common:libmiscdevice_utils",
   ]
 

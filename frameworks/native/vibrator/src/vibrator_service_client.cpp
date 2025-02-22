@@ -187,11 +187,11 @@ int32_t VibratorServiceClient::PlayVibratorCustom(int32_t vibratorId, const RawF
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "PlayVibratorCustom");
 #endif // HIVIEWDFX_HITRACE_ENABLE
-    VibrateParameter vibateParameter = {
-        .intensity = parameter.intensity,
-        .frequency = parameter.frequency
-    };
-    ret = miscdeviceProxy_->PlayVibratorCustom(vibratorId, rawFd, usage, systemUsage, vibateParameter);
+    VibrateParameter vibateParameter;
+    vibateParameter.intensity = parameter.intensity;
+    vibateParameter.frequency = parameter.frequency;
+    ret = miscdeviceProxy_->PlayVibratorCustom(vibratorId, rawFd.fd, rawFd.offset, rawFd.length, usage, systemUsage,
+        vibateParameter);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
 #endif // HIVIEWDFX_HITRACE_ENABLE
@@ -215,7 +215,7 @@ int32_t VibratorServiceClient::StopVibrator(int32_t vibratorId, const std::strin
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "StopVibratorByMode");
 #endif // HIVIEWDFX_HITRACE_ENABLE
-    ret = miscdeviceProxy_->StopVibrator(vibratorId, mode);
+    ret = miscdeviceProxy_->StopVibratorByMode(vibratorId, mode);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
 #endif // HIVIEWDFX_HITRACE_ENABLE
@@ -410,10 +410,9 @@ int32_t VibratorServiceClient::InitPlayPattern(const VibratorPattern &pattern, i
         vibratePattern.events.emplace_back(event);
         vibratePattern.patternDuration = pattern.patternDuration;
     }
-    VibrateParameter vibateParameter = {
-        .intensity = parameter.intensity,
-        .frequency = parameter.frequency
-    };
+    VibrateParameter vibateParameter;
+    vibateParameter.intensity = parameter.intensity;
+    vibateParameter.frequency = parameter.frequency;
     std::lock_guard<std::mutex> clientLock(clientMutex_);
     CHKPR(miscdeviceProxy_, ERROR);
     return miscdeviceProxy_->PlayPattern(vibratePattern, usage, systemUsage, vibateParameter);

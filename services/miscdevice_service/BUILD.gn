@@ -24,7 +24,6 @@ ohos_shared_library("libmiscdevice_service") {
     "src/miscdevice_dump.cpp",
     "src/miscdevice_observer.cpp",
     "src/miscdevice_service.cpp",
-    "src/miscdevice_service_stub.cpp",
     "src/vibration_priority_manager.cpp",
     "src/vibrator_thread.cpp",
   ]
@@ -32,7 +31,6 @@ ohos_shared_library("libmiscdevice_service") {
   include_dirs = [
     "haptic_matcher/include",
     "include",
-    "$SUBSYSTEM_DIR/frameworks/native/common/include",
     "$SUBSYSTEM_DIR/interfaces/inner_api/light",
     "$SUBSYSTEM_DIR/services/miscdevice_service/hdi_connection/adapter/include",
     "$SUBSYSTEM_DIR/services/miscdevice_service/hdi_connection/interface/include",
@@ -67,7 +65,10 @@ ohos_shared_library("libmiscdevice_service") {
     debug = false
   }
 
-  deps = [ "$SUBSYSTEM_DIR/utils:miscdevice_utils_target" ]
+  deps = [
+    "$SUBSYSTEM_DIR/frameworks/native/vibrator:miscdevice_service_stub",
+    "$SUBSYSTEM_DIR/utils:miscdevice_utils_target",
+  ]
 
   external_deps = [
     "ability_base:want",
@@ -146,7 +147,6 @@ ohos_static_library("libmiscdevice_service_static") {
     "src/miscdevice_dump.cpp",
     "src/miscdevice_observer.cpp",
     "src/miscdevice_service.cpp",
-    "src/miscdevice_service_stub.cpp",
     "src/vibration_priority_manager.cpp",
     "src/vibrator_thread.cpp",
   ]
@@ -154,7 +154,6 @@ ohos_static_library("libmiscdevice_service_static") {
   include_dirs = [
     "haptic_matcher/include",
     "include",
-    "$SUBSYSTEM_DIR/frameworks/native/common/include",
     "$SUBSYSTEM_DIR/interfaces/inner_api/light",
     "$SUBSYSTEM_DIR/services/miscdevice_service/hdi_connection/adapter/include",
     "$SUBSYSTEM_DIR/services/miscdevice_service/hdi_connection/interface/include",
@@ -189,7 +188,10 @@ ohos_static_library("libmiscdevice_service_static") {
     debug = false
   }
 
-  deps = [ "$SUBSYSTEM_DIR/utils:miscdevice_utils_target" ]
+  deps = [
+    "$SUBSYSTEM_DIR/frameworks/native/vibrator:miscdevice_service_stub",
+    "$SUBSYSTEM_DIR/utils:miscdevice_utils_target",
+  ]
 
   external_deps = [
     "ability_base:want",

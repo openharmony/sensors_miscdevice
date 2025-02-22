@@ -95,20 +95,27 @@ bool VibratorCapacity::Marshalling(Parcel &parcel) const
     return true;
 }
 
-std::optional<VibratorCapacity> VibratorCapacity::Unmarshalling(Parcel &data)
+VibratorCapacity* VibratorCapacity::Unmarshalling(Parcel &data)
 {
-    VibratorCapacity capacity;
-    if (!(data.ReadBool(capacity.isSupportHdHaptic))) {
+    auto capacity = new (std::nothrow) VibratorCapacity();
+    if (capacity == nullptr) {
+        MISC_HILOGE("Read init capacity failed");
+        return nullptr;
+    }
+    if (!(data.ReadBool(capacity->isSupportHdHaptic))) {
         MISC_HILOGE("Read isSupportHdHaptic failed");
-        return std::nullopt;
+        capacity = nullptr;
+        return capacity;
     }
-    if (!(data.ReadBool(capacity.isSupportPresetMapping))) {
+    if (!(data.ReadBool(capacity->isSupportPresetMapping))) {
         MISC_HILOGE("Read isSupportPresetMapping failed");
-        return std::nullopt;
+        capacity = nullptr;
+        return capacity;
     }
-    if (!(data.ReadBool(capacity.isSupportTimeDelay))) {
+    if (!(data.ReadBool(capacity->isSupportTimeDelay))) {
         MISC_HILOGE("Read isSupportTimeDelay failed");
-        return std::nullopt;
+        capacity = nullptr;
+        return capacity;
     }
     return capacity;
 }
@@ -174,79 +181,50 @@ bool VibratePattern::Marshalling(Parcel &parcel) const
     return true;
 }
 
-std::optional<VibratePattern> VibratePattern::Unmarshalling(Parcel &data)
+VibratePattern* VibratePattern::Unmarshalling(Parcel &data)
 {
-    VibratePattern pattern;
-    if (!(data.ReadInt32(pattern.startTime))) {
-        MISC_HILOGE("Read time failed");
-        return std::nullopt;
+    auto pattern = new (std::nothrow) VibratePattern();
+    if (pattern == nullptr || !(data.ReadInt32(pattern->startTime)) || !(data.ReadInt32(pattern->patternDuration))) {
+        MISC_HILOGE("Read pattern basic info failed");
+        pattern = nullptr;
+        return pattern;
     }
-    if (!(data.ReadInt32(pattern.patternDuration))) {
-        MISC_HILOGE("Read duration failed");
-        return std::nullopt;
-    }
-    int32_t eventSize { 0 };
-    if (!(data.ReadInt32(eventSize))) {
-        MISC_HILOGE("Read eventSize failed");
-        return std::nullopt;
-    }
-    if (eventSize > MAX_EVENT_SIZE) {
-        MISC_HILOGE("eventSize exceed the maximum");
-        return std::nullopt;
+    int32_t eventSize{ 0 };
+    if (!(data.ReadInt32(eventSize)) || eventSize > MAX_EVENT_SIZE) {
+        MISC_HILOGE("Read eventSize failed or eventSize exceed the maximum");
+        pattern = nullptr;
+        return pattern;
     }
     for (int32_t i = 0; i < eventSize; ++i) {
         VibrateEvent event;
-        int32_t tag { -1 };
+        int32_t tag{ -1 };
         if (!data.ReadInt32(tag)) {
             MISC_HILOGE("Read type failed");
-            return std::nullopt;
+            pattern = nullptr;
+            return pattern;
         }
         event.tag = static_cast<VibrateTag>(tag);
-        if (!data.ReadInt32(event.time)) {
-            MISC_HILOGE("Read events's time failed");
-            return std::nullopt;
+        if (!data.ReadInt32(event.time) || !data.ReadInt32(event.duration) || !data.ReadInt32(event.intensity) ||
+            !data.ReadInt32(event.frequency) || !data.ReadInt32(event.index)) {
+            MISC_HILOGE("Read events info failed");
+            pattern = nullptr;
+            return pattern;
         }
-        if (!data.ReadInt32(event.duration)) {
-            MISC_HILOGE("Read duration failed");
-            return std::nullopt;
+        int32_t pointSize{ 0 };
+        if (!data.ReadInt32(pointSize) || pointSize > MAX_POINT_SIZE) {
+            MISC_HILOGE("Read pointSize failed or pointSize exceed the maximum");
+            pattern = nullptr;
+            return pattern;
         }
-        if (!data.ReadInt32(event.intensity)) {
-            MISC_HILOGE("Read intensity failed");
-            return std::nullopt;
-        }
-        if (!data.ReadInt32(event.frequency)) {
-            MISC_HILOGE("Read frequency failed");
-            return std::nullopt;
-        }
-        if (!data.ReadInt32(event.index)) {
-            MISC_HILOGE("Read index failed");
-            return std::nullopt;
-        }
-        int32_t pointSize { 0 };
-        if (!data.ReadInt32(pointSize)) {
-            MISC_HILOGE("Read pointSize failed");
-            return std::nullopt;
-        }
-        if (pointSize > MAX_POINT_SIZE) {
-            MISC_HILOGE("pointSize exceed the maximum");
-            return std::nullopt;
-        }
-        pattern.events.emplace_back(event);
+        pattern->events.emplace_back(event);
         for (int32_t j = 0; j < pointSize; ++j) {
             VibrateCurvePoint point;
-            if (!data.ReadInt32(point.time)) {
-                MISC_HILOGE("Read points's time failed");
-                return std::nullopt;
+            if (!data.ReadInt32(point.time) || !data.ReadInt32(point.intensity) || !data.ReadInt32(point.frequency)) {
+                MISC_HILOGE("Read points info time failed");
+                pattern = nullptr;
+                return pattern;
             }
-            if (!data.ReadInt32(point.intensity)) {
-                MISC_HILOGE("Read points's intensity failed");
-                return std::nullopt;
-            }
-            if (!data.ReadInt32(point.frequency)) {
-                MISC_HILOGE("Read points's frequency failed");
-                return std::nullopt;
-            }
-            pattern.events[i].points.emplace_back(point);
+            pattern->events[i].points.emplace_back(point);
         }
     }
     return pattern;
@@ -270,16 +248,16 @@ bool VibrateParameter::Marshalling(Parcel &parcel) const
     return true;
 }
 
-std::optional<VibrateParameter> VibrateParameter::Unmarshalling(Parcel &data)
+VibrateParameter* VibrateParameter::Unmarshalling(Parcel &data)
 {
-    VibrateParameter parameter;
-    if (!(data.ReadInt32(parameter.intensity))) {
-        MISC_HILOGE("Read parameter's intensity failed");
-        return std::nullopt;
+    auto parameter = new (std::nothrow) VibrateParameter();
+    if (parameter == nullptr) {
+        MISC_HILOGE("Read init parameter failed");
+        return nullptr;
     }
-    if (!(data.ReadInt32(parameter.frequency))) {
-        MISC_HILOGE("Read parameter's frequency failed");
-        return std::nullopt;
+    if (!(data.ReadInt32(parameter->intensity)) && !(data.ReadInt32(parameter->frequency))) {
+        MISC_HILOGE("Read parameter's intensity failed");
+        parameter = nullptr;
     }
     return parameter;
 }

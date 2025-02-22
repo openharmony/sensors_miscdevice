@@ -69,7 +69,7 @@ bool OnRemoteRequestFuzzTest(const uint8_t *data, size_t size)
     MessageParcel reply;
     MessageOption option;
     g_service->OnStartFuzz();
-    g_service->OnRemoteRequest(static_cast<uint32_t>(MiscdeviceInterfaceCode::TURN_ON),
+    g_service->OnRemoteRequest(static_cast<uint32_t>(IMiscdeviceServiceIpcCode::COMMAND_TURN_ON),
         datas, reply, option);
     return true;
 }
