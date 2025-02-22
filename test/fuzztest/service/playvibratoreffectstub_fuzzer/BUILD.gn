@@ -59,6 +59,7 @@ ohos_fuzztest("PlayVibratorEffectStubFuzzTest") {
     "drivers_interface_vibrator:libvibrator_proxy_1.1",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
 
