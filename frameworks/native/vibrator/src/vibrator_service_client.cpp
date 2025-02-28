@@ -483,7 +483,7 @@ int32_t VibratorServiceClient::ConvertVibratorPackage(const VibratePackage& inPk
                 points[k].frequency  = vibratePoints[k].frequency;
             }
             events[j].points = points;
-            clientPatternDuration += events[j].duration;
+            clientPatternDuration = events[j].time + events[j].duration;
         }
         patterns[i].events = events;
         patterns[i].patternDuration = clientPatternDuration;
