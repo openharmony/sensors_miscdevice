@@ -368,7 +368,6 @@ int32_t MiscdeviceService::Vibrate(int32_t vibratorId, int32_t timeOut, int32_t 
 
 int32_t MiscdeviceService::StopVibrator(int32_t vibratorId)
 {
-    std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
     int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
     if (ret != PERMISSION_GRANTED) {
@@ -379,6 +378,12 @@ int32_t MiscdeviceService::StopVibrator(int32_t vibratorId)
         MISC_HILOGE("Result:%{public}d", ret);
         return PERMISSION_DENIED;
     }
+    return StopVibratorService(vibratorId);
+}
+
+int32_t MiscdeviceService::StopVibratorService(int32_t vibratorId)
+{
+    std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
 #if defined (OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM) && defined (HDF_DRIVERS_INTERFACE_VIBRATOR)
     if ((vibratorThread_ == nullptr) || (!vibratorThread_->IsRunning() &&
         !vibratorHdiConnection_.IsVibratorRunning())) {
@@ -913,7 +918,7 @@ void MiscdeviceService::ProcessDeathObserver(const wptr<IRemoteObject> &object)
     int32_t vibratePid = info.pid;
     MISC_HILOGI("ClientPid:%{public}d, VibratePid:%{public}d", clientPid, vibratePid);
     if ((clientPid != INVALID_PID) && (clientPid == vibratePid)) {
-        StopVibrator(VIBRATOR_ID);
+        StopVibratorService(VIBRATOR_ID);
     }
     UnregisterClientDeathRecipient(client);
 }

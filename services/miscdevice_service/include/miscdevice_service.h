@@ -90,6 +90,7 @@ private:
     bool InitLightInterface();
     std::string GetPackageName(AccessTokenID tokenId);
     void StartVibrateThread(VibrateInfo info);
+    int32_t StopVibratorService(int32_t vibratorId);
     void StopVibrateThread();
     bool ShouldIgnoreVibrate(const VibrateInfo &info);
     std::string GetCurrentTime();
