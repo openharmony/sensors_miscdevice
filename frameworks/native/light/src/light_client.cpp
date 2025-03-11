@@ -94,6 +94,27 @@ bool LightClient::IsLightIdValid(int32_t lightId)
     return false;
 }
 
+void LightClient::WriteHiSysIPCEvent(IMiscdeviceServiceIpcCode code, int32_t ret)
+{
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
+    if (ret != NO_ERROR) {
+        switch (code) {
+            case IMiscdeviceServiceIpcCode::COMMAND_TURN_ON:
+                HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+                    HiviewDFX::HiSysEvent::EventType::FAULT, "PKG_NAME", "TurnOn", "ERROR_CODE", ret);
+                break;
+            case IMiscdeviceServiceIpcCode::COMMAND_TURN_OFF:
+                HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+                    HiviewDFX::HiSysEvent::EventType::FAULT, "PKG_NAME", "TurnOff", "ERROR_CODE", ret);
+                break;
+            default:
+                MISC_HILOGW("Code does not exist, code:%{public}d", static_cast<int32_t>(code));
+                break;
+        }
+    }
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
+}
+
 int32_t LightClient::GetLightList(LightInfo **lightInfo, int32_t &count)
 {
     CALL_LOG_ENTER;
@@ -149,7 +170,9 @@ int32_t LightClient::TurnOn(int32_t lightId, const LightColor &color, const Ligh
     animationIPC.SetMode(animation.mode);
     animationIPC.SetOnTime(animation.onTime);
     animationIPC.SetOffTime(animation.offTime);
-    return miscdeviceProxy_->TurnOn(lightId, color.singleColor, animationIPC);
+    int32_t ret = miscdeviceProxy_->TurnOn(lightId, color.singleColor, animationIPC);
+    WriteHiSysIPCEvent(IMiscdeviceServiceIpcCode::COMMAND_TURN_ON, ret);
+    return ret;
 }
 
 int32_t LightClient::TurnOff(int32_t lightId)
@@ -161,7 +184,9 @@ int32_t LightClient::TurnOff(int32_t lightId)
     }
     std::lock_guard<std::mutex> clientLock(clientMutex_);
     CHKPR(miscdeviceProxy_, ERROR);
-    return miscdeviceProxy_->TurnOff(lightId);
+    int32_t ret = miscdeviceProxy_->TurnOff(lightId);
+    WriteHiSysIPCEvent(IMiscdeviceServiceIpcCode::COMMAND_TURN_OFF, ret);
+    return ret;
 }
 
 void LightClient::ProcessDeathObserver(wptr<IRemoteObject> object)

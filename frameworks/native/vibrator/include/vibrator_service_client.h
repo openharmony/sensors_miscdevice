@@ -88,6 +88,8 @@ private:
     void ConvertVibratorPattern(const VibratorPattern &vibratorPattern, VibratePattern &vibratePattern);
     bool SkipEventAndConvertVibratorEvent(const VibratorEvent &vibratorEvent, VibratePattern &vibratePattern,
         int32_t patternStartTime, VibrateEvent &vibrateEvent);
+    void WriteVibratorHiSysIPCEvent(IMiscdeviceServiceIpcCode code, int32_t ret);
+    void WriteOtherHiSysIPCEvent(IMiscdeviceServiceIpcCode code, int32_t ret);
     sptr<IRemoteObject::DeathRecipient> serviceDeathObserver_ = nullptr;
     sptr<IMiscdeviceService> miscdeviceProxy_ = nullptr;
     sptr<VibratorClientStub> vibratorClient_ = nullptr;

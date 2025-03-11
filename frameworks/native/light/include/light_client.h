@@ -39,6 +39,7 @@ private:
     int32_t InitLightClient();
     bool IsLightAnimationValid(const LightAnimation &animation);
     bool IsLightIdValid(int32_t lightId);
+    void WriteHiSysIPCEvent(IMiscdeviceServiceIpcCode code, int32_t ret);
     std::mutex lightInfosMutex_;
     LightInfo *lightInfos_ {nullptr};
     int32_t lightInfoCount_ {-1};
