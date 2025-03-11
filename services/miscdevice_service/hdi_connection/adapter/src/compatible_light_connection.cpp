@@ -14,10 +14,6 @@
  */
 #include "compatible_light_connection.h"
 
-#include <ctime>
-#include <string>
-#include <vector>
-
 #include "sensors_errors.h"
 
 #undef LOG_TAG

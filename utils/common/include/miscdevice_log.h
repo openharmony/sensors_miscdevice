@@ -15,10 +15,7 @@
 #ifndef MISCDEVICE_LOG_H
 #define MISCDEVICE_LOG_H
 
-#include "hilog/log.h"
-
 #include "sensors_errors.h"
-#include "miscdevice_log.h"
 
 #undef LOG_DOMAIN
 #define LOG_DOMAIN 0xD002701

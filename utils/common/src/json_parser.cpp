@@ -14,10 +14,6 @@
  */
 #include "json_parser.h"
 
-#include <cmath>
-#include <sys/stat.h>
-#include <unistd.h>
-
 #include "file_utils.h"
 #include "sensors_errors.h"
 

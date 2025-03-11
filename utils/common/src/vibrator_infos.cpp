@@ -14,12 +14,6 @@
  */
 #include "vibrator_infos.h"
 
-#include <cerrno>
-#include <cinttypes>
-
-#include <sys/stat.h>
-#include <unistd.h>
-
 #include "sensors_errors.h"
 
 #undef LOG_TAG

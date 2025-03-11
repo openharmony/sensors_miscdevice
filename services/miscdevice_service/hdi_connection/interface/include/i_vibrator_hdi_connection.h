@@ -16,13 +16,7 @@
 #ifndef I_VIBRATOR_HDI_CONNECTION_H
 #define I_VIBRATOR_HDI_CONNECTION_H
 
-#include <optional>
-#include <stdint.h>
-#include <string>
-
-#include <nocopyable.h>
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
-#include "v1_2/vibrator_types.h"
 #include "v1_3/ivibrator_interface.h"
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
 #include "vibrator_infos.h"

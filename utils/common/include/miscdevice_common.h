@@ -16,9 +16,6 @@
 #ifndef MISCDEVICE_COMMON_H
 #define MISCDEVICE_COMMON_H
 
-#include <cstdint>
-#include <vector>
-
 namespace OHOS {
 namespace Sensors {
 // These LightId correspond to logical lights

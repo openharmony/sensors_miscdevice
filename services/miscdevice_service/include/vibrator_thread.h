@@ -16,14 +16,11 @@
 #ifndef VIBRATOR_THREAD_H
 #define VIBRATOR_THREAD_H
 
-#include <condition_variable>
-#include <cstdint>
 #include <thread>
 
 #include "thread_ex.h"
 
 #include "vibrator_hdi_connection.h"
-#include "vibrator_infos.h"
 
 namespace OHOS {
 namespace Sensors {

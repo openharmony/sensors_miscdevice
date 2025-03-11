@@ -16,30 +16,16 @@
 #ifndef MISCDEVICE_SERVICE_H
 #define MISCDEVICE_SERVICE_H
 
-#include <memory>
-#include <mutex>
-#include <set>
-#include <string>
-#include <unordered_map>
-#include <vector>
-
 #include "accesstoken_kit.h"
 #include "common_event_manager.h"
-#include "nocopyable.h"
 #include "system_ability.h"
-#include "thread_ex.h"
-#include "want.h"
 
-#include "file_utils.h"
-#include "json_parser.h"
 #include "light_hdi_connection.h"
 #include "miscdevice_common.h"
 #include "miscdevice_common_event_subscriber.h"
 #include "miscdevice_delayed_sp_singleton.h"
 #include "miscdevice_dump.h"
 #include "miscdevice_service_stub.h"
-#include "vibrator_hdi_connection.h"
-#include "vibrator_infos.h"
 #include "vibrator_thread.h"
 
 namespace OHOS {

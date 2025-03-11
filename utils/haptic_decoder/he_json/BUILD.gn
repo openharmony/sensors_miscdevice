@@ -51,7 +51,6 @@ ohos_shared_library("libhe_vibrator_decoder") {
   deps = [ "$SUBSYSTEM_DIR/utils/common:libmiscdevice_utils" ]
 
   external_deps = [
-    "access_token:libaccesstoken_sdk",
     "cJSON:cjson",
     "c_utils:utils",
     "hilog:libhilog",

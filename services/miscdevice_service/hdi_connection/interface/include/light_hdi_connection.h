@@ -16,8 +16,6 @@
 #ifndef LIGHT_HDI_CONNECTION_H
 #define LIGHT_HDI_CONNECTION_H
 
-#include <vector>
-
 #include "i_light_hdi_connection.h"
 #include "singleton.h"
 

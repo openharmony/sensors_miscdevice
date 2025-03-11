@@ -14,11 +14,7 @@
  */
 #include "vibrator_decoder_creator.h"
 
-#include <fcntl.h>
-#include <unistd.h>
-
 #include "default_vibrator_decoder_factory.h"
-#include "file_utils.h"
 #include "he_vibrator_decoder_factory.h"
 #include "sensors_errors.h"
 

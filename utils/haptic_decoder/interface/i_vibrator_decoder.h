@@ -17,7 +17,6 @@
 #define VIBRATOR_DECODER_H
 
 #include "json_parser.h"
-#include "raw_file_descriptor.h"
 #include "vibrator_infos.h"
 
 namespace OHOS {

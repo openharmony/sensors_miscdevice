@@ -15,7 +15,6 @@
 
 #include "default_vibrator_decoder.h"
 
-#include <algorithm>
 #include <cinttypes>
 
 #include "sensors_errors.h"

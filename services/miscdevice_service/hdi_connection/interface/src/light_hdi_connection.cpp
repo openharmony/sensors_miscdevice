@@ -14,8 +14,6 @@
  */
 #include "light_hdi_connection.h"
 
-#include <list>
-
 #include "compatible_light_connection.h"
 #ifdef HDF_DRIVERS_INTERFACE_LIGHT
 #include "hdi_light_connection.h"

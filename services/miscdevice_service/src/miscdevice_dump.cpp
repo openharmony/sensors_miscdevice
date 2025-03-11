@@ -17,9 +17,6 @@
 
 #include <getopt.h>
 
-#include <cinttypes>
-#include <cstring>
-#include <ctime>
 #include <map>
 
 #include "securec.h"

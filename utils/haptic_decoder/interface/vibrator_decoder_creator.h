@@ -17,9 +17,6 @@
 #define VIBRATOR_DECODER_MANAGER_H
 
 #include "i_vibrator_decoder.h"
-#include "json_parser.h"
-#include "raw_file_descriptor.h"
-#include "vibrator_infos.h"
 
 namespace OHOS {
 namespace Sensors {

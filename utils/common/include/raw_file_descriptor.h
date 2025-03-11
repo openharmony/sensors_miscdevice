@@ -16,8 +16,6 @@
 #ifndef RAW_FILE_DESCRIPTOR
 #define RAW_FILE_DESCRIPTOR
 
-#include <cstdint>
-
 namespace OHOS {
 namespace Sensors {
 struct RawFileDescriptor {

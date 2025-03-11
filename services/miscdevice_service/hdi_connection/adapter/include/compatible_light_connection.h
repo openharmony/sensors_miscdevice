@@ -16,10 +16,7 @@
 #ifndef COMPATIBLE_LIGHT_CONNECTION_H
 #define COMPATIBLE_LIGHT_CONNECTION_H
 
-#include <atomic>
-#include <mutex>
 #include <thread>
-#include <vector>
 
 #include "i_light_hdi_connection.h"
 namespace OHOS {
