@@ -72,6 +72,7 @@ public:
     bool Init();
     VibrateStatus ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo, std::shared_ptr<VibratorThread> vibratorThread);
     bool ShouldIgnoreByIntensity(const VibrateInfo &vibrateInfo);
+    void MiscCrownIntensityFeedbackInit(void);
 
 private:
     bool IsCurrentVibrate(std::shared_ptr<VibratorThread> vibratorThread) const;
