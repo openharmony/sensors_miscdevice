@@ -12,7 +12,8 @@
     "syscap": ["SystemCapability.Sensors.MiscDevice", "SystemCapability.Sensors.MiscDevice.Lite"],
     "features": [
       "miscdevice_feature_vibrator_custom",
-      "miscdevice_feature_vibrator_input_method_enable"
+      "miscdevice_feature_vibrator_input_method_enable",
+      "miscdevice_feature_vibrator_enable"
     ],
     "adapted_system_type": [ "standard" ],
     "rom": "1024KB",
