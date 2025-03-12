@@ -48,6 +48,7 @@ const std::string SETTING_RINGER_MODE_KEY = "ringer_mode";
 const std::string SETTING_URI_PROXY = "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
 const std::string SCENEBOARD_BUNDLENAME = "com.ohos.sceneboard";
 constexpr const char *SETTINGS_DATA_EXT_URI = "datashare:///com.ohos.settingsdata.DataAbility";
+const std::string SETTING_VIBRATE_INTENSITY_KEY = "vibration_intensity_index";
 constexpr int32_t DECEM_BASE = 10;
 constexpr int32_t DATA_SHARE_READY = 0;
 constexpr int32_t DATA_SHARE_NOT_READY = 1055;
@@ -96,6 +97,25 @@ bool VibrationPriorityManager::Init()
             HiSysEvent::EventType::BEHAVIOR, "SWITCH_TYPE", "ringerMode", "STATUS", ringerMode);
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
         MISC_HILOGI("ringerMode:%{public}d", ringerMode);
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
+        /* watch vibrate contronl */
+        int32_t crownfeedback = miscCrownFeedback_;
+        if (GetIntValue(SETTING_CROWN_FEEDBACK_KEY, crownfeedback) != ERR_OK) {
+            MISC_HILOGE("Get crownFeedback_ failed");
+        }
+        MISC_HILOGE("Get crownFeedback_ failed");
+        miscCrownFeedback_ = crownfeedback;
+        MISC_HILOGI("feedback:%{public}d", crownfeedback);
+
+        int32_t intensity = miscIntensity_;
+        if (GetIntValue(SETTING_VIBRATE_INTENSITY_KEY, intensity) != ERR_OK) {
+            MISC_HILOGE("Get crownFeedback_ failed");
+        }
+        MISC_HILOGE("Get crownFeedback_ failed");
+        miscIntensity_ = intensity;
+        MISC_HILOGI("intensity:%{public}d", intensity);
+        /* watch vibrate contronl */
+#endif
     };
     auto observer_ = CreateObserver(updateFunc);
     if (observer_ == nullptr) {
@@ -180,6 +200,7 @@ void VibrationPriorityManager::UpdateStatus()
         }
         miscFeedback_ = feedback;
     }
+    MISC_HILOGI("UpdateStatus is ignored for miscFeedback_:%{public}d", static_cast<int32_t>(miscFeedback_));
     if (miscAudioRingerMode_ == RINGER_MODE_INVALID) {
         int32_t ringerMode = RINGER_MODE_INVALID;
         if (GetIntValue(SETTING_RINGER_MODE_KEY, ringerMode) != ERR_OK) {
@@ -188,6 +209,28 @@ void VibrationPriorityManager::UpdateStatus()
         }
         miscAudioRingerMode_ = ringerMode;
     }
+    MISC_HILOGI("UpdateStatus is ignored for miscAudioRingerMode_:%{public}d", static_cast<int32_t>(miscAudioRingerMode_));
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
+    if (miscCrownFeedback_ == FEEDBACK_MODE_INVALID) {
+        int32_t corwnfeedback = FEEDBACK_MODE_INVALID;
+        if (GetIntValue(SETTING_CROWN_FEEDBACK_KEY, corwnfeedback) != ERR_OK) {
+            corwnfeedback = FEEDBACK_MODE_ON;
+            MISC_HILOGE("Get corwnfeedback failed");
+        }
+        miscCrownFeedback_ = corwnfeedback;
+    }
+    if (miscIntensity_ == FEEDBACK_INTENSITY_INVALID) {
+        int32_t intensity = FEEDBACK_INTENSITY_INVALID;
+        if (GetIntValue(SETTING_VIBRATE_INTENSITY_KEY, intensity) != ERR_OK) {
+            intensity = FEEDBACK_INTENSITY_NONE;
+            MISC_HILOGE("Get feedback failed");
+        }
+        miscIntensity_ = intensity;
+    }
+    MISC_HILOGI("UpdateStatus is ignored for miscCrownFeedback_:%{public}d", static_cast<int32_t>(miscCrownFeedback_));
+#endif
+
+    return;
 }
 
 bool VibrationPriorityManager::IsSystemServiceCalling()
@@ -262,6 +305,33 @@ bool VibrationPriorityManager::ShouldIgnoreInputMethod(const VibrateInfo &vibrat
 }
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 
+bool VibrationPriorityManager::ShouldIgnoreByIntensity(const VibrateInfo &vibrateInfo)
+{
+    MISC_HILOGI("ShouldIgnoreByIntensity miscIntensity_:%{public}d", static_cast<int32_t>(miscIntensity_));
+    MISC_HILOGI("ShouldIgnoreByIntensity miscCrownFeedback_:%{public}d", static_cast<int32_t>(miscCrownFeedback_));
+    std::string effect = vibrateInfo.effect;
+    MISC_HILOGI("ShouldIgnoreByIntensity effect:%{public}s", effect.c_str());
+
+    if (effect.find("crown") != std::string::npos) {
+        MISC_HILOGI("ShouldIgnoreByIntensity effect.find crown");
+        if (miscCrownFeedback_ == FEEDBACK_MODE_OFF) {
+            MISC_HILOGI("ShouldIgnoreByIntensity miscCrownFeedback_ == FEEDBACK_MODE_OFF");
+            return true;  // should ignore
+        }
+    } else {
+        MISC_HILOGI("ShouldIgnoreByIntensity not find crown");
+        if (miscIntensity_ == FEEDBACK_INTENSITY_NONE) {
+            if ((effect.find("short") != std::string::npos) || (effect.find("feedback") != std::string::npos)) {
+                MISC_HILOGI("ShouldIgnoreByIntensity feedback or short == true");
+                return false;
+            }
+            MISC_HILOGI("ShouldIgnoreByIntensity miscIntensity_ == FEEDBACK_INTENSITY_NONE");
+            return true; // should ignore
+        }
+    }
+    return false;
+}
+
 VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo,
     std::shared_ptr<VibratorThread> vibratorThread)
 {
@@ -270,7 +340,7 @@ VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &v
         if ((vibrateInfo.usage == USAGE_ALARM || vibrateInfo.usage == USAGE_RING
             || vibrateInfo.usage == USAGE_NOTIFICATION || vibrateInfo.usage == USAGE_COMMUNICATION)
             && (miscAudioRingerMode_ == RINGER_MODE_SILENT)) {
-            MISC_HILOGD("Vibration is ignored for ringer mode:%{public}d", static_cast<int32_t>(miscAudioRingerMode_));
+            MISC_HILOGI("Vibration is ignored for ringer mode:%{public}d", static_cast<int32_t>(miscAudioRingerMode_));
             return IGNORE_RINGER_MODE;
         }
         if (((vibrateInfo.usage == USAGE_TOUCH || vibrateInfo.usage == USAGE_MEDIA || vibrateInfo.usage == USAGE_UNKNOWN
@@ -281,10 +351,17 @@ VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &v
 #else // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
             ) {
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
-            MISC_HILOGD("Vibration is ignored for feedback:%{public}d", static_cast<int32_t>(miscFeedback_));
+            MISC_HILOGI("Vibration is ignored for feedback:%{public}d", static_cast<int32_t>(miscFeedback_));
             return IGNORE_FEEDBACK;
         }
     }
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
+    MISC_HILOGI("Vibration is ignored for intensity:%{public}d", static_cast<int32_t>(vibrateInfo.intensity));
+    if (ShouldIgnoreByIntensity(vibrateInfo)) {
+        MISC_HILOGD("Vibration is ignored for Intensity:%{public}d", static_cast<int32_t>(miscIntensity_));
+        return IGNORE_FEEDBACK;
+    }
+#endif
     if (vibratorThread == nullptr) {
         MISC_HILOGD("There is no vibration, it can vibrate");
         return VIBRATION;
@@ -399,6 +476,14 @@ int32_t VibrationPriorityManager::RegisterObserver(const sptr<MiscDeviceObserver
     auto uriFeedback = AssembleUri(SETTING_FEEDBACK_KEY);
     helper->RegisterObserver(uriFeedback, observer);
     helper->NotifyChange(uriFeedback);
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
+    auto uriCrownFeedback = AssembleUri(SETTING_CROWN_FEEDBACK_KEY);
+    helper->RegisterObserver(uriCrownFeedback, observer);
+    helper->NotifyChange(uriCrownFeedback);
+    auto uriIntensityContrl = AssembleUri(SETTING_CROWN_FEEDBACK_KEY);
+    helper->RegisterObserver(uriIntensityContrl, observer);
+    helper->NotifyChange(uriIntensityContrl);
+#endif
     auto uriRingerMode = AssembleUri(SETTING_RINGER_MODE_KEY);
     helper->RegisterObserver(uriRingerMode, observer);
     helper->NotifyChange(uriRingerMode);
@@ -424,6 +509,12 @@ int32_t VibrationPriorityManager::UnregisterObserver(const sptr<MiscDeviceObserv
     }
     auto uriFeedback = AssembleUri(SETTING_FEEDBACK_KEY);
     helper->UnregisterObserver(uriFeedback, observer);
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
+    auto uriCrownnFeedback = AssembleUri(SETTING_CROWN_FEEDBACK_KEY);
+    helper->UnregisterObserver(uriCrownnFeedback, observer);
+    auto uriIntensityContrl = AssembleUri(SETTING_CROWN_FEEDBACK_KEY);
+    helper->UnregisterObserver(uriIntensityContrl, observer);
+#endif
     auto uriRingerMode = AssembleUri(SETTING_RINGER_MODE_KEY);
     helper->UnregisterObserver(uriRingerMode, observer);
     ReleaseDataShareHelper(helper);
