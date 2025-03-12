@@ -97,25 +97,7 @@ bool VibrationPriorityManager::Init()
             HiSysEvent::EventType::BEHAVIOR, "SWITCH_TYPE", "ringerMode", "STATUS", ringerMode);
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
         MISC_HILOGI("ringerMode:%{public}d", ringerMode);
-#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
-        /* watch vibrate contronl */
-        int32_t crownfeedback = miscCrownFeedback_;
-        if (GetIntValue(SETTING_CROWN_FEEDBACK_KEY, crownfeedback) != ERR_OK) {
-            MISC_HILOGE("Get crownFeedback_ failed");
-        }
-        MISC_HILOGE("Get crownFeedback_ failed");
-        miscCrownFeedback_ = crownfeedback;
-        MISC_HILOGI("feedback:%{public}d", crownfeedback);
-
-        int32_t intensity = miscIntensity_;
-        if (GetIntValue(SETTING_VIBRATE_INTENSITY_KEY, intensity) != ERR_OK) {
-            MISC_HILOGE("Get crownFeedback_ failed");
-        }
-        MISC_HILOGE("Get crownFeedback_ failed");
-        miscIntensity_ = intensity;
-        MISC_HILOGI("intensity:%{public}d", intensity);
-        /* watch vibrate contronl */
-#endif
+        MiscCrownIntensityFeedbackInit();
     };
     auto observer_ = CreateObserver(updateFunc);
     if (observer_ == nullptr) {
@@ -127,6 +109,31 @@ bool VibrationPriorityManager::Init()
         return false;
     }
     return true;
+}
+
+void VibrationPriorityManager::MiscCrownIntensityFeedbackInit(void)
+{
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
+    /* watch vibrate contronl */
+    int32_t crownfeedback = miscCrownFeedback_;
+    if (GetIntValue(SETTING_CROWN_FEEDBACK_KEY, crownfeedback) != ERR_OK) {
+        MISC_HILOGE("Get crownFeedback_ failed");
+    }
+    MISC_HILOGE("Get crownFeedback_ failed");
+    miscCrownFeedback_ = crownfeedback;
+    MISC_HILOGI("feedback:%{public}d", crownfeedback);
+
+    int32_t intensity = miscIntensity_;
+    if (GetIntValue(SETTING_VIBRATE_INTENSITY_KEY, intensity) != ERR_OK) {
+        MISC_HILOGE("Get crownFeedback_ failed");
+    }
+    MISC_HILOGE("Get crownFeedback_ failed");
+    miscIntensity_ = intensity;
+    MISC_HILOGI("intensity:%{public}d", intensity);
+    /* watch vibrate contronl */
+#endif
+
+    return;
 }
 
 int32_t VibrationPriorityManager::GetIntValue(const std::string &key, int32_t &value)
@@ -209,7 +216,7 @@ void VibrationPriorityManager::UpdateStatus()
         }
         miscAudioRingerMode_ = ringerMode;
     }
-    MISC_HILOGI("UpdateStatus is ignored for miscAudioRingerMode_:%{public}d", static_cast<int32_t>(miscAudioRingerMode_));
+    MISC_HILOGI("UpdateStatus for miscAudioRingerMode_:%{public}d", static_cast<int32_t>(miscAudioRingerMode_));
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
     if (miscCrownFeedback_ == FEEDBACK_MODE_INVALID) {
         int32_t corwnfeedback = FEEDBACK_MODE_INVALID;
