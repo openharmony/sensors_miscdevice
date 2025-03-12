@@ -76,6 +76,7 @@ ohos_shared_library("libmiscdevice_service") {
     "access_token:libtokenid_sdk",
     "cJSON:cjson",
     "data_share:datashare_consumer",
+    "hilog:libhilog",
     "safwk:system_ability_fwk",
   ]
 
@@ -189,6 +190,7 @@ ohos_static_library("libmiscdevice_service_static") {
     "access_token:libtokenid_sdk",
     "cJSON:cjson",
     "data_share:datashare_consumer",
+    "hilog:libhilog",
     "safwk:system_ability_fwk",
   ]
 
