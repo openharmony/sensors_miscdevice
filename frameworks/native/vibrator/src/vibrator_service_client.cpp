@@ -116,6 +116,7 @@ int32_t VibratorServiceClient::TransferClientRemoteObject()
     StartTrace(HITRACE_TAG_SENSORS, "TransferClientRemoteObject");
 #endif // HIVIEWDFX_HITRACE_ENABLE
     int32_t ret = miscdeviceProxy_->TransferClientRemoteObject(remoteObject);
+    WriteOtherHiSysIPCEvent(IMiscdeviceServiceIpcCode::COMMAND_TRANSFER_CLIENT_REMOTE_OBJECT, ret);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
 #endif // HIVIEWDFX_HITRACE_ENABLE
@@ -136,6 +137,7 @@ int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, int32_t timeOut, int3
     StartTrace(HITRACE_TAG_SENSORS, "VibrateTime");
 #endif // HIVIEWDFX_HITRACE_ENABLE
     ret = miscdeviceProxy_->Vibrate(vibratorId, timeOut, usage, systemUsage);
+    WriteVibratorHiSysIPCEvent(IMiscdeviceServiceIpcCode::COMMAND_VIBRATE, ret);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
 #endif // HIVIEWDFX_HITRACE_ENABLE
@@ -161,6 +163,7 @@ int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, const std::string &ef
     StartTrace(HITRACE_TAG_SENSORS, "VibrateEffect");
 #endif // HIVIEWDFX_HITRACE_ENABLE
     ret = miscdeviceProxy_->PlayVibratorEffect(vibratorId, effect, loopCount, usage, systemUsage);
+    WriteVibratorHiSysIPCEvent(IMiscdeviceServiceIpcCode::COMMAND_PLAY_VIBRATOR_EFFECT, ret);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
 #endif // HIVIEWDFX_HITRACE_ENABLE
@@ -192,6 +195,7 @@ int32_t VibratorServiceClient::PlayVibratorCustom(int32_t vibratorId, const RawF
     vibateParameter.frequency = parameter.frequency;
     ret = miscdeviceProxy_->PlayVibratorCustom(vibratorId, rawFd.fd, rawFd.offset, rawFd.length, usage, systemUsage,
         vibateParameter);
+    WriteVibratorHiSysIPCEvent(IMiscdeviceServiceIpcCode::COMMAND_PLAY_VIBRATOR_CUSTOM, ret);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
 #endif // HIVIEWDFX_HITRACE_ENABLE
@@ -216,6 +220,7 @@ int32_t VibratorServiceClient::StopVibrator(int32_t vibratorId, const std::strin
     StartTrace(HITRACE_TAG_SENSORS, "StopVibratorByMode");
 #endif // HIVIEWDFX_HITRACE_ENABLE
     ret = miscdeviceProxy_->StopVibratorByMode(vibratorId, mode);
+    WriteVibratorHiSysIPCEvent(IMiscdeviceServiceIpcCode::COMMAND_STOP_VIBRATOR_BY_MODE, ret);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
 #endif // HIVIEWDFX_HITRACE_ENABLE
@@ -239,6 +244,7 @@ int32_t VibratorServiceClient::StopVibrator(int32_t vibratorId)
     StartTrace(HITRACE_TAG_SENSORS, "StopVibratorAll");
 #endif // HIVIEWDFX_HITRACE_ENABLE
     ret = miscdeviceProxy_->StopVibrator(vibratorId);
+    WriteVibratorHiSysIPCEvent(IMiscdeviceServiceIpcCode::COMMAND_STOP_VIBRATOR, ret);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
 #endif // HIVIEWDFX_HITRACE_ENABLE
@@ -273,6 +279,7 @@ int32_t VibratorServiceClient::IsSupportEffect(const std::string &effect, bool &
     StartTrace(HITRACE_TAG_SENSORS, "VibrateEffect");
 #endif // HIVIEWDFX_HITRACE_ENABLE
     ret = miscdeviceProxy_->IsSupportEffect(effect, state);
+    WriteOtherHiSysIPCEvent(IMiscdeviceServiceIpcCode::COMMAND_IS_SUPPORT_EFFECT, ret);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
 #endif // HIVIEWDFX_HITRACE_ENABLE
@@ -370,6 +377,7 @@ int32_t VibratorServiceClient::GetDelayTime(int32_t &delayTime)
     StartTrace(HITRACE_TAG_SENSORS, "GetDelayTime");
 #endif // HIVIEWDFX_HITRACE_ENABLE
     ret = miscdeviceProxy_->GetDelayTime(delayTime);
+    WriteOtherHiSysIPCEvent(IMiscdeviceServiceIpcCode::COMMAND_GET_DELAY_TIME, ret);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
 #endif // HIVIEWDFX_HITRACE_ENABLE
@@ -415,7 +423,9 @@ int32_t VibratorServiceClient::InitPlayPattern(const VibratorPattern &pattern, i
     vibateParameter.frequency = parameter.frequency;
     std::lock_guard<std::mutex> clientLock(clientMutex_);
     CHKPR(miscdeviceProxy_, ERROR);
-    return miscdeviceProxy_->PlayPattern(vibratePattern, usage, systemUsage, vibateParameter);
+    int32_t ret = miscdeviceProxy_->PlayPattern(vibratePattern, usage, systemUsage, vibateParameter);
+    WriteOtherHiSysIPCEvent(IMiscdeviceServiceIpcCode::COMMAND_PLAY_PATTERN, ret);
+    return ret;
 }
 
 int32_t VibratorServiceClient::PlayPattern(const VibratorPattern &pattern, int32_t usage,
@@ -538,6 +548,7 @@ int32_t VibratorServiceClient::PlayPrimitiveEffect(int32_t vibratorId, const std
     StartTrace(HITRACE_TAG_SENSORS, "PlayPrimitiveEffect");
 #endif // HIVIEWDFX_HITRACE_ENABLE
     ret = miscdeviceProxy_->PlayPrimitiveEffect(vibratorId, effect, intensity, usage, systemUsage, count);
+    WriteOtherHiSysIPCEvent(IMiscdeviceServiceIpcCode::COMMAND_PLAY_PRIMITIVE_EFFECT, ret);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
 #endif // HIVIEWDFX_HITRACE_ENABLE
@@ -555,6 +566,7 @@ int32_t VibratorServiceClient::GetVibratorCapacity()
     StartTrace(HITRACE_TAG_SENSORS, "GetVibratorCapacity");
 #endif // HIVIEWDFX_HITRACE_ENABLE
     int32_t ret = miscdeviceProxy_->GetVibratorCapacity(capacity_);
+    WriteVibratorHiSysIPCEvent(IMiscdeviceServiceIpcCode::COMMAND_GET_VIBRATOR_CAPACITY, ret);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
 #endif // HIVIEWDFX_HITRACE_ENABLE
@@ -667,6 +679,76 @@ bool VibratorServiceClient::SkipEventAndConvertVibratorEvent(const VibratorEvent
         return true;
     }
     return false;
+}
+
+void VibratorServiceClient::WriteVibratorHiSysIPCEvent(IMiscdeviceServiceIpcCode code, int32_t ret)
+{
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
+    if (ret != NO_ERROR) {
+        switch (code) {
+            case IMiscdeviceServiceIpcCode::COMMAND_VIBRATE:
+                HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+                    HiSysEvent::EventType::FAULT, "PKG_NAME", "Vibrate", "ERROR_CODE", ret);
+                break;
+            case IMiscdeviceServiceIpcCode::COMMAND_STOP_VIBRATOR:
+                HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+                    HiSysEvent::EventType::FAULT, "PKG_NAME", "StopVibrator", "ERROR_CODE", ret);
+                break;
+            case IMiscdeviceServiceIpcCode::COMMAND_PLAY_VIBRATOR_EFFECT:
+                HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+                    HiSysEvent::EventType::FAULT, "PKG_NAME", "PlayVibratorEffect", "ERROR_CODE", ret);
+                break;
+            case IMiscdeviceServiceIpcCode::COMMAND_STOP_VIBRATOR_BY_MODE:
+                HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+                    HiSysEvent::EventType::FAULT, "PKG_NAME", "StopVibratorByMode", "ERROR_CODE", ret);
+                break;
+            case IMiscdeviceServiceIpcCode::COMMAND_PLAY_VIBRATOR_CUSTOM:
+                HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+                    HiSysEvent::EventType::FAULT, "PKG_NAME", "PlayVibratorCustom", "ERROR_CODE", ret);
+                break;
+            case IMiscdeviceServiceIpcCode::COMMAND_GET_VIBRATOR_CAPACITY:
+                HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+                    HiSysEvent::EventType::FAULT, "PKG_NAME", "GetVibratorCapacity", "ERROR_CODE", ret);
+                break;
+            default:
+                MISC_HILOGW("Code does not exist, code:%{public}d", static_cast<int32_t>(code));
+                break;
+        }
+    }
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
+}
+
+void VibratorServiceClient::WriteOtherHiSysIPCEvent(IMiscdeviceServiceIpcCode code, int32_t ret)
+{
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
+    if (ret != NO_ERROR) {
+        switch (code) {
+            case IMiscdeviceServiceIpcCode::COMMAND_IS_SUPPORT_EFFECT:
+                HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+                    HiSysEvent::EventType::FAULT, "PKG_NAME", "IsSupportEffect", "ERROR_CODE", ret);
+                break;
+            case IMiscdeviceServiceIpcCode::COMMAND_GET_DELAY_TIME:
+                HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+                    HiSysEvent::EventType::FAULT, "PKG_NAME", "GetDelayTime", "ERROR_CODE", ret);
+                break;
+            case IMiscdeviceServiceIpcCode::COMMAND_PLAY_PATTERN:
+                HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+                    HiSysEvent::EventType::FAULT, "PKG_NAME", "PlayPattern", "ERROR_CODE", ret);
+                break;
+            case IMiscdeviceServiceIpcCode::COMMAND_TRANSFER_CLIENT_REMOTE_OBJECT:
+                HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+                    HiSysEvent::EventType::FAULT, "PKG_NAME", "TransferClientRemoteObject", "ERROR_CODE", ret);
+                break;
+            case IMiscdeviceServiceIpcCode::COMMAND_PLAY_PRIMITIVE_EFFECT:
+                HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+                    HiSysEvent::EventType::FAULT, "PKG_NAME", "PlayPrimitiveEffect", "ERROR_CODE", ret);
+                break;
+            default:
+                MISC_HILOGW("Code does not exist, code:%{public}d", static_cast<int32_t>(code));
+                break;
+        }
+    }
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
 }
 } // namespace Sensors
 } // namespace OHOS
