@@ -58,12 +58,14 @@ enum FeedbackMode {
     FEEDBACK_MODE_ON = 1
 };
 
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
 enum FeedbackIntensity {
     FEEDBACK_INTENSITY_INVALID = -1,
     FEEDBACK_INTENSITY_WEAK = 0,
     FEEDBACK_INTENSITY_STRONGE = 1,
     FEEDBACK_INTENSITY_NONE = 2,
 };
+#endif
 
 class VibrationPriorityManager {
     DECLARE_DELAYED_SINGLETON(VibrationPriorityManager);
@@ -71,8 +73,10 @@ public:
     DISALLOW_COPY_AND_MOVE(VibrationPriorityManager);
     bool Init();
     VibrateStatus ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo, std::shared_ptr<VibratorThread> vibratorThread);
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
     bool ShouldIgnoreByIntensity(const VibrateInfo &vibrateInfo);
     void MiscCrownIntensityFeedbackInit(void);
+#endif
 
 private:
     bool IsCurrentVibrate(std::shared_ptr<VibratorThread> vibratorThread) const;
@@ -99,8 +103,10 @@ private:
     std::shared_ptr<AppExecFwk::AppMgrClient> appMgrClientPtr_ {nullptr};
     std::atomic_int32_t miscFeedback_ = FEEDBACK_MODE_INVALID;
     std::atomic_int32_t miscAudioRingerMode_ = RINGER_MODE_INVALID;
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
     std::atomic_int32_t miscCrownFeedback_ = FEEDBACK_MODE_INVALID;
     std::atomic_int32_t miscIntensity_ = FEEDBACK_INTENSITY_INVALID;
+#endif
 };
 #define PriorityManager DelayedSingleton<VibrationPriorityManager>::GetInstance()
 }  // namespace Sensors
