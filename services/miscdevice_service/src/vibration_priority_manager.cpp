@@ -44,12 +44,14 @@ namespace {
 const std::string SETTING_COLUMN_KEYWORD = "KEYWORD";
 const std::string SETTING_COLUMN_VALUE = "VALUE";
 const std::string SETTING_FEEDBACK_KEY = "physic_navi_haptic_feedback_enabled";
-const std::string SETTING_CROWN_FEEDBACK_KEY = "watch_crown_feedback_enabled";
 const std::string SETTING_RINGER_MODE_KEY = "ringer_mode";
 const std::string SETTING_URI_PROXY = "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
 const std::string SCENEBOARD_BUNDLENAME = "com.ohos.sceneboard";
 constexpr const char *SETTINGS_DATA_EXT_URI = "datashare:///com.ohos.settingsdata.DataAbility";
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
+const std::string SETTING_CROWN_FEEDBACK_KEY = "watch_crown_feedback_enabled";
 const std::string SETTING_VIBRATE_INTENSITY_KEY = "vibration_intensity_index";
+#endif
 constexpr int32_t DECEM_BASE = 10;
 constexpr int32_t DATA_SHARE_READY = 0;
 constexpr int32_t DATA_SHARE_NOT_READY = 1055;
@@ -98,7 +100,9 @@ bool VibrationPriorityManager::Init()
             HiSysEvent::EventType::BEHAVIOR, "SWITCH_TYPE", "ringerMode", "STATUS", ringerMode);
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
         MISC_HILOGI("ringerMode:%{public}d", ringerMode);
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
         MiscCrownIntensityFeedbackInit();
+#endif
     };
     auto observer_ = CreateObserver(updateFunc);
     if (observer_ == nullptr) {
@@ -112,30 +116,41 @@ bool VibrationPriorityManager::Init()
     return true;
 }
 
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
 void VibrationPriorityManager::MiscCrownIntensityFeedbackInit(void)
 {
-#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
-    /* watch vibrate contronl */
     int32_t crownfeedback = miscCrownFeedback_;
     if (GetIntValue(SETTING_CROWN_FEEDBACK_KEY, crownfeedback) != ERR_OK) {
-        MISC_HILOGE("Get crownFeedback_ failed");
+        MISC_HILOGE("Get crownfeedback failed");
     }
-    MISC_HILOGE("Get crownFeedback_ failed");
     miscCrownFeedback_ = crownfeedback;
-    MISC_HILOGI("feedback:%{public}d", crownfeedback);
-
+ 
     int32_t intensity = miscIntensity_;
     if (GetIntValue(SETTING_VIBRATE_INTENSITY_KEY, intensity) != ERR_OK) {
-        MISC_HILOGE("Get crownFeedback_ failed");
+        MISC_HILOGE("Get intensity failed");
     }
-    MISC_HILOGE("Get crownFeedback_ failed");
     miscIntensity_ = intensity;
-    MISC_HILOGI("intensity:%{public}d", intensity);
-    /* watch vibrate contronl */
-#endif
-
     return;
 }
+ 
+bool VibrationPriorityManager::ShouldIgnoreByIntensity(const VibrateInfo &vibrateInfo)
+{
+    std::string effect = vibrateInfo.effect;
+    if (effect.find("crown") != std::string::npos) {
+        if (miscCrownFeedback_ == FEEDBACK_MODE_OFF) {
+            return true;
+        }
+    } else {
+        if (miscIntensity_ == FEEDBACK_INTENSITY_NONE) {
+            if ((effect.find("short") != std::string::npos) || (effect.find("feedback") != std::string::npos)) {
+                return false;
+            }
+            return true;
+        }
+    }
+    return false;
+}
+#endif
 
 int32_t VibrationPriorityManager::GetIntValue(const std::string &key, int32_t &value)
 {
@@ -217,7 +232,6 @@ void VibrationPriorityManager::UpdateStatus()
         }
         miscAudioRingerMode_ = ringerMode;
     }
-    MISC_HILOGI("UpdateStatus for miscAudioRingerMode_:%{public}d", static_cast<int32_t>(miscAudioRingerMode_));
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
     if (miscCrownFeedback_ == FEEDBACK_MODE_INVALID) {
         int32_t corwnfeedback = FEEDBACK_MODE_INVALID;
@@ -231,13 +245,11 @@ void VibrationPriorityManager::UpdateStatus()
         int32_t intensity = FEEDBACK_INTENSITY_INVALID;
         if (GetIntValue(SETTING_VIBRATE_INTENSITY_KEY, intensity) != ERR_OK) {
             intensity = FEEDBACK_INTENSITY_NONE;
-            MISC_HILOGE("Get feedback failed");
+            MISC_HILOGE("Get intensity failed");
         }
         miscIntensity_ = intensity;
     }
-    MISC_HILOGI("UpdateStatus is ignored for miscCrownFeedback_:%{public}d", static_cast<int32_t>(miscCrownFeedback_));
 #endif
-
     return;
 }
 
