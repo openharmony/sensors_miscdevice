@@ -223,7 +223,6 @@ void VibrationPriorityManager::UpdateStatus()
         }
         miscFeedback_ = feedback;
     }
-    MISC_HILOGI("UpdateStatus is ignored for miscFeedback_:%{public}d", static_cast<int32_t>(miscFeedback_));
     if (miscAudioRingerMode_ == RINGER_MODE_INVALID) {
         int32_t ringerMode = RINGER_MODE_INVALID;
         if (GetIntValue(SETTING_RINGER_MODE_KEY, ringerMode) != ERR_OK) {
@@ -325,33 +324,6 @@ bool VibrationPriorityManager::ShouldIgnoreInputMethod(const VibrateInfo &vibrat
 }
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 
-bool VibrationPriorityManager::ShouldIgnoreByIntensity(const VibrateInfo &vibrateInfo)
-{
-    MISC_HILOGI("ShouldIgnoreByIntensity miscIntensity_:%{public}d", static_cast<int32_t>(miscIntensity_));
-    MISC_HILOGI("ShouldIgnoreByIntensity miscCrownFeedback_:%{public}d", static_cast<int32_t>(miscCrownFeedback_));
-    std::string effect = vibrateInfo.effect;
-    MISC_HILOGI("ShouldIgnoreByIntensity effect:%{public}s", effect.c_str());
-
-    if (effect.find("crown") != std::string::npos) {
-        MISC_HILOGI("ShouldIgnoreByIntensity effect.find crown");
-        if (miscCrownFeedback_ == FEEDBACK_MODE_OFF) {
-            MISC_HILOGI("ShouldIgnoreByIntensity miscCrownFeedback_ == FEEDBACK_MODE_OFF");
-            return true;  // should ignore
-        }
-    } else {
-        MISC_HILOGI("ShouldIgnoreByIntensity not find crown");
-        if (miscIntensity_ == FEEDBACK_INTENSITY_NONE) {
-            if ((effect.find("short") != std::string::npos) || (effect.find("feedback") != std::string::npos)) {
-                MISC_HILOGI("ShouldIgnoreByIntensity feedback or short == true");
-                return false;
-            }
-            MISC_HILOGI("ShouldIgnoreByIntensity miscIntensity_ == FEEDBACK_INTENSITY_NONE");
-            return true; // should ignore
-        }
-    }
-    return false;
-}
-
 VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo,
     std::shared_ptr<VibratorThread> vibratorThread)
 {
@@ -376,9 +348,8 @@ VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &v
         }
     }
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
-    MISC_HILOGI("Vibration is ignored for intensity:%{public}d", static_cast<int32_t>(vibrateInfo.intensity));
     if (ShouldIgnoreByIntensity(vibrateInfo)) {
-        MISC_HILOGD("Vibration is ignored for Intensity:%{public}d", static_cast<int32_t>(miscIntensity_));
+        MISC_HILOGI("ShouldIgnoreByIntensity: vibrateInfo.effect:%{public}s", vibrateInfo.effect.c_str());
         return IGNORE_FEEDBACK;
     }
 #endif
