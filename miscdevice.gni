@@ -17,7 +17,7 @@ declare_args() {
   miscdevice_feature_vibrator_custom = true
   miscdevice_feature_hiviewdfx_hisysevent = true
   miscdevice_feature_vibrator_input_method_enable = true
-  miscdevice_feature_vibrator_enable = false
+  miscdevice_feature_crown_vibrator_enable = false
 }
 
 print(
@@ -37,7 +37,7 @@ if (miscdevice_feature_vibrator_input_method_enable) {
   miscdevice_default_defines += [ "OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD" ]
 }
 
-if (miscdevice_feature_vibrator_enable) {
+if (miscdevice_feature_crown_vibrator_enable) {
   miscdevice_default_defines += [ "OHOS_BUILD_ENABLE_VIBRATOR_CROWN" ]
 }
 
