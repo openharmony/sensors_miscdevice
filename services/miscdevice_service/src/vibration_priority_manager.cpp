@@ -332,7 +332,7 @@ VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &v
         if ((vibrateInfo.usage == USAGE_ALARM || vibrateInfo.usage == USAGE_RING
             || vibrateInfo.usage == USAGE_NOTIFICATION || vibrateInfo.usage == USAGE_COMMUNICATION)
             && (miscAudioRingerMode_ == RINGER_MODE_SILENT)) {
-            MISC_HILOGI("Vibration is ignored for ringer mode:%{public}d", static_cast<int32_t>(miscAudioRingerMode_));
+            MISC_HILOGD("Vibration is ignored for ringer mode:%{public}d", static_cast<int32_t>(miscAudioRingerMode_));
             return IGNORE_RINGER_MODE;
         }
         if (((vibrateInfo.usage == USAGE_TOUCH || vibrateInfo.usage == USAGE_MEDIA || vibrateInfo.usage == USAGE_UNKNOWN
@@ -343,7 +343,7 @@ VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &v
 #else // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
             ) {
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
-            MISC_HILOGI("Vibration is ignored for feedback:%{public}d", static_cast<int32_t>(miscFeedback_));
+            MISC_HILOGD("Vibration is ignored for feedback:%{public}d", static_cast<int32_t>(miscFeedback_));
             return IGNORE_FEEDBACK;
         }
     }
