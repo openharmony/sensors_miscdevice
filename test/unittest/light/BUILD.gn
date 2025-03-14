@@ -15,7 +15,7 @@ import("//build/test.gni")
 import("./../../../miscdevice.gni")
 
 ohos_unittest("LightAgentTest") {
-  module_out_path = "sensors/miscdevice/test"
+  module_out_path = "miscdevice/miscdevice/test"
 
   sources = [ "light_agent_test.cpp" ]
 

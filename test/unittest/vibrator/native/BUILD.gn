@@ -15,7 +15,7 @@ import("//build/test.gni")
 import("./../../../../miscdevice.gni")
 
 ohos_unittest("VibratorAgentTest") {
-  module_out_path = "sensors/miscdevice/test"
+  module_out_path = "miscdevice/miscdevice/native"
 
   sources = [ "vibrator_agent_test.cpp" ]
 
@@ -48,7 +48,7 @@ ohos_unittest("VibratorAgentTest") {
 }
 
 ohos_unittest("VibratorAgentSeekTest") {
-  module_out_path = "sensors/miscdevice/test"
+  module_out_path = "miscdevice/miscdevice/native"
 
   sources = [ "vibrator_agent_seek_test.cpp" ]
 

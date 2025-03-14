@@ -14,7 +14,7 @@
 import("//build/test.gni")
 import("./../../../../miscdevice.gni")
 
-module_output_path = "miscdevice/vibrator"
+module_output_path = "miscdevice/miscdevice/capi"
 
 ###############################################################################
 
