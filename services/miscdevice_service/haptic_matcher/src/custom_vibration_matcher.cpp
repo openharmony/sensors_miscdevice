@@ -15,8 +15,6 @@
 
 #include "custom_vibration_matcher.h"
 
-#include <cmath>
-
 #include "sensors_errors.h"
 #include "vibrator_hdi_connection.h"
 

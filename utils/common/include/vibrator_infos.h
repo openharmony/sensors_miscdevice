@@ -16,10 +16,6 @@
 #ifndef VIBRATOR_INFOS_H
 #define VIBRATOR_INFOS_H
 
-#include <string>
-#include <unordered_map>
-#include <vector>
-
 #include "parcel.h"
 namespace OHOS {
 namespace Sensors {

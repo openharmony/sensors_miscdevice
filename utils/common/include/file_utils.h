@@ -16,11 +16,7 @@
 #ifndef MISCDEVICE_FILE_UTILS_H
 #define MISCDEVICE_FILE_UTILS_H
 
-#include <cstdint>
-#include <cstdio>
 #include <string>
-
-#include <unistd.h>
 
 #include "raw_file_descriptor.h"
 

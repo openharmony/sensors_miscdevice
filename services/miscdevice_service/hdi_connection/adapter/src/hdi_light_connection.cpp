@@ -15,15 +15,8 @@
 
 #include "hdi_light_connection.h"
 
-#include <memory>
-#include <securec.h>
 #include <thread>
-#include <vector>
 
-#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
-#include "hisysevent.h"
-#endif // HIVIEWDFX_HISYSEVENT_ENABLE
-#include "v1_0/light_interface_proxy.h"
 #include "sensors_errors.h"
 
 #undef LOG_TAG

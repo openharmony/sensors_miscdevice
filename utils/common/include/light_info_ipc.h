@@ -16,8 +16,6 @@
 #ifndef LIGHT_INFO_IPC_H
 #define LIGHT_INFO_IPC_H
 
-#include <string>
-
 #include "parcel.h"
 
 namespace OHOS {

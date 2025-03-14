@@ -14,7 +14,6 @@
  */
 #include "file_utils.h"
 
-#include <cerrno>
 #include <cinttypes>
 #include <sys/stat.h>
 #include <unistd.h>

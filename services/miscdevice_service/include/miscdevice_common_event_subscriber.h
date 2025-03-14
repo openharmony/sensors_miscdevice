@@ -16,9 +16,6 @@
 #ifndef MISCDEVICE_COMMON_EVENT_SUBSCRIBER_H
 #define MISCDEVICE_COMMON_EVENT_SUBSCRIBER_H
 
-#include <functional>
-
-#include "common_event_data.h"
 #include "common_event_subscriber.h"
 
 namespace OHOS {

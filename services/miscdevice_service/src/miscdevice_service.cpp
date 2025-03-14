@@ -15,16 +15,11 @@
 
 #include "miscdevice_service.h"
 
-#include <algorithm>
-#include <map>
-#include <string_ex.h>
-
 #include "death_recipient_template.h"
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
 #include "hisysevent.h"
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
 #ifdef MEMMGR_ENABLE
-#include "iservice_registry.h"
 #include "mem_mgr_client.h"
 #endif // MEMMGR_ENABLE
 #include "system_ability_definition.h"
@@ -37,10 +32,7 @@
 #endif // HDF_DRIVERS_INTERFACE_LIGHT
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-#include "parameters.h"
 #include "permission_util.h"
-#include "default_vibrator_decoder.h"
-#include "default_vibrator_decoder_factory.h"
 #include "vibrator_decoder_creator.h"
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 

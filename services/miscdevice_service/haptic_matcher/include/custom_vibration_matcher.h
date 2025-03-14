@@ -17,12 +17,8 @@
 #define CUSTOM_VIBRATION_MATCHER_H
 
 #include <map>
-#include <set>
-#include <string>
-#include <vector>
 
 #include "i_vibrator_hdi_connection.h"
-#include "vibrator_infos.h"
 
 namespace OHOS {
 namespace Sensors {

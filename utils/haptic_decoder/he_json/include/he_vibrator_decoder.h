@@ -16,11 +16,7 @@
 #ifndef HE_VIBRATOR_DECODER_H
 #define HE_VIBRATOR_DECODER_H
 
-#include <cstdint>
-#include <vector>
-
 #include "i_vibrator_decoder.h"
-#include "json_parser.h"
 
 namespace OHOS {
 namespace Sensors {

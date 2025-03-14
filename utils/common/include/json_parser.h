@@ -16,8 +16,6 @@
 #ifndef MISCDEVICE_JSON_PARSER_H
 #define MISCDEVICE_JSON_PARSER_H
 
-#include <cstdint>
-#include <string>
 #include <vector>
 
 #include "cJSON.h"

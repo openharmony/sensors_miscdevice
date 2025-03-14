@@ -56,7 +56,6 @@ ohos_shared_library("libvibrator_decoder") {
   ]
 
   external_deps = [
-    "access_token:libaccesstoken_sdk",
     "cJSON:cjson",
     "c_utils:utils",
     "hilog:libhilog",

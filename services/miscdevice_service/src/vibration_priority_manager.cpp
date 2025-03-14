@@ -24,12 +24,10 @@
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
-#include "uri.h"
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 #include "bundle_mgr_client.h"
 #include "os_account_manager.h"
-#include "running_process_info.h"
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 
 #include "sensors_errors.h"

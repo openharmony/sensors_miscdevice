@@ -16,11 +16,6 @@
 #ifndef MISCDEVICE_DELAYED_SP_SINGLETON_H
 #define MISCDEVICE_DELAYED_SP_SINGLETON_H
 
-#include <mutex>
-#include <memory>
-#include <refbase.h>
-#include "nocopyable.h"
-
 namespace OHOS {
 namespace Sensors {
 #define MISCDEVICE_DECLARE_DELAYED_SP_SINGLETON(MyClass) \

@@ -20,7 +20,6 @@
 
 #include "singleton.h"
 
-#include "nocopyable.h"
 #include "vibrator_infos.h"
 
 namespace OHOS {

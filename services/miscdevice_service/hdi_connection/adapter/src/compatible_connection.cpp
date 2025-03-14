@@ -14,11 +14,7 @@
  */
 #include "compatible_connection.h"
 
-#include <ctime>
-#include <string>
 #include <sys/prctl.h>
-#include <unordered_map>
-#include <vector>
 
 #include "sensors_errors.h"
 

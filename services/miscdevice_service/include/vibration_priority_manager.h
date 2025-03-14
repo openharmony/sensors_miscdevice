@@ -16,18 +16,10 @@
 #ifndef VIBRATION_PRIORITY_MANAGER_H
 #define VIBRATION_PRIORITY_MANAGER_H
 
-#include <cstdint>
-#include <cstring>
-#include <memory>
-#include <vector>
-
 #include "app_mgr_client.h"
 #include "datashare_helper.h"
-#include "iremote_object.h"
-#include "singleton.h"
 
 #include "miscdevice_observer.h"
-#include "vibrator_infos.h"
 #include "vibrator_thread.h"
 
 namespace OHOS {

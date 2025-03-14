@@ -16,11 +16,7 @@
 #ifndef PERMISSION_UTIL_H
 #define PERMISSION_UTIL_H
 
-#include <mutex>
-#include <string>
-#include <unordered_map>
 #include "accesstoken_kit.h"
-#include "refbase.h"
 #include "singleton.h"
 
 namespace OHOS {
