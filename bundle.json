@@ -85,6 +85,13 @@
             ],
             "header_base": "//base/sensors/miscdevice/interfaces/inner_api/light"
           }
+        },
+        {
+          "name": "//base/sensors/miscdevice/frameworks/cj:cj_vibrator_ffi",
+          "header": {
+            "header_files": [],
+            "header_base": "//base/sensors/miscdevice/frameworks/cj/src"
+          }
         }
       ],
       "test": [
