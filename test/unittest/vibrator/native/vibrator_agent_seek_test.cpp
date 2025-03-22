@@ -113,7 +113,8 @@ void PrintVibratorPackageInfo(const VibratorPackage package, std::string functio
 HWTEST_F(VibratorAgentSeekTest, SeekTimeIsZero, TestSize.Level1)
 {
     MISC_HILOGI("SeekTimeIsZero in");
-    if (IsSupportVibratorCustom()) {
+    bool isSupport = IsSupportVibratorCustom();
+    if (isSupport) {
         int32_t delayTime{ -1 };
         int32_t ret = GetDelayTime(delayTime);
         ASSERT_EQ(ret, 0);
@@ -138,14 +139,15 @@ HWTEST_F(VibratorAgentSeekTest, SeekTimeIsZero, TestSize.Level1)
         ret = FreeVibratorPackage(package);
         ASSERT_EQ(ret, 0);
     } else {
-        ASSERT_EQ(0, 0);
+        ASSERT_EQ(isSupport, false);
     }
 }
 
 HWTEST_F(VibratorAgentSeekTest, RemainingDurationGreaterThanMinValue, TestSize.Level1)
 {
     MISC_HILOGI("RemainDurationGreaterThanMinValue in");
-    if (IsSupportVibratorCustom()) {
+    bool isSupport = IsSupportVibratorCustom();
+    if (isSupport) {
         int32_t delayTime{ -1 };
         int32_t ret = GetDelayTime(delayTime);
         ASSERT_EQ(ret, 0);
@@ -178,14 +180,15 @@ HWTEST_F(VibratorAgentSeekTest, RemainingDurationGreaterThanMinValue, TestSize.L
         ret = FreeVibratorPackage(seekPackage);
         ASSERT_EQ(ret, 0);
     } else {
-        ASSERT_EQ(0, 0);
+        ASSERT_EQ(isSupport, false);
     }
 }
 
 HWTEST_F(VibratorAgentSeekTest, RemainingDurationEqualMinValue, TestSize.Level1)
 {
     MISC_HILOGI("RemainingDurationEqualMinValue in");
-    if (IsSupportVibratorCustom()) {
+    bool isSupport = IsSupportVibratorCustom();
+    if (isSupport) {
         int32_t delayTime{ -1 };
         int32_t ret = GetDelayTime(delayTime);
         ASSERT_EQ(ret, 0);
@@ -218,14 +221,15 @@ HWTEST_F(VibratorAgentSeekTest, RemainingDurationEqualMinValue, TestSize.Level1)
         ret = FreeVibratorPackage(seekPackage);
         ASSERT_EQ(ret, 0);
     } else {
-        ASSERT_EQ(0, 0);
+        ASSERT_EQ(isSupport, false);
     }
 }
 
 HWTEST_F(VibratorAgentSeekTest, RemainingDurationLessThanMinValue, TestSize.Level1)
 {
     MISC_HILOGI("RemainingDurationLessThanMinValue in");
-    if (IsSupportVibratorCustom()) {
+    bool isSupport = IsSupportVibratorCustom();
+    if (isSupport) {
         int32_t delayTime{ -1 };
         int32_t ret = GetDelayTime(delayTime);
         ASSERT_EQ(ret, 0);
@@ -258,14 +262,15 @@ HWTEST_F(VibratorAgentSeekTest, RemainingDurationLessThanMinValue, TestSize.Leve
         ret = FreeVibratorPackage(seekPackage);
         ASSERT_EQ(ret, 0);
     } else {
-        ASSERT_EQ(0, 0);
+        ASSERT_EQ(isSupport, false);
     }
 }
 
 HWTEST_F(VibratorAgentSeekTest, SeekTimePatternIsZero, TestSize.Level1)
 {
     MISC_HILOGI("SeekTimePatternIsZero in");
-    if (IsSupportVibratorCustom()) {
+    bool isSupport = IsSupportVibratorCustom();
+    if (isSupport) {
         int32_t delayTime{ -1 };
         int32_t ret = GetDelayTime(delayTime);
         ASSERT_EQ(ret, 0);
@@ -297,14 +302,15 @@ HWTEST_F(VibratorAgentSeekTest, SeekTimePatternIsZero, TestSize.Level1)
         ret = FreeVibratorPackage(seekPackage);
         ASSERT_NE(ret, 0);
     } else {
-        ASSERT_EQ(0, 0);
+        ASSERT_EQ(isSupport, false);
     }
 }
 
 HWTEST_F(VibratorAgentSeekTest, SeekTimeOnBetweenEvents, TestSize.Level1)
 {
     MISC_HILOGI("SeekTimeOnBetweenEvents in");
-    if (IsSupportVibratorCustom()) {
+    bool isSupport = IsSupportVibratorCustom();
+    if (isSupport) {
         int32_t delayTime{ -1 };
         int32_t ret = GetDelayTime(delayTime);
         ASSERT_EQ(ret, 0);
@@ -338,14 +344,15 @@ HWTEST_F(VibratorAgentSeekTest, SeekTimeOnBetweenEvents, TestSize.Level1)
         ret = FreeVibratorPackage(seekPackage);
         ASSERT_EQ(ret, 0);
     } else {
-        ASSERT_EQ(0, 0);
+        ASSERT_EQ(isSupport, false);
     }
 }
 
 HWTEST_F(VibratorAgentSeekTest, SeekTimeOnThirdPattern, TestSize.Level1)
 {
     MISC_HILOGI("SeekTimeOnThirdPattern in");
-    if (IsSupportVibratorCustom()) {
+    bool isSupport = IsSupportVibratorCustom();
+    if (isSupport) {
         int32_t delayTime{ -1 };
         int32_t ret = GetDelayTime(delayTime);
         ASSERT_EQ(ret, 0);
@@ -378,7 +385,7 @@ HWTEST_F(VibratorAgentSeekTest, SeekTimeOnThirdPattern, TestSize.Level1)
         ret = FreeVibratorPackage(seekPackage);
         ASSERT_EQ(ret, 0);
     } else {
-        ASSERT_EQ(0, 0);
+        ASSERT_EQ(isSupport, false);
     }
 }
 } // namespace Sensors
