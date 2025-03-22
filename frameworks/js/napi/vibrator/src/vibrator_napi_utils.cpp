@@ -45,6 +45,26 @@ AsyncCallbackInfo::~AsyncCallbackInfo()
     }
 }
 
+bool ClearVibratorPattern(VibratorPattern &vibratorPattern)
+{
+    CALL_LOG_ENTER;
+    int32_t eventSize = vibratorPattern.eventNum;
+    if ((eventSize <= 0) || (vibratorPattern.events == nullptr)) {
+        MISC_HILOGW("events is not need to free, eventSize:%{public}d", eventSize);
+        return false;
+    }
+    auto events = vibratorPattern.events;
+    for (int32_t j = 0; j < eventSize; ++j) {
+        if (events[j].points != nullptr) {
+            free(events[j].points);
+            events[j].points = nullptr;
+        }
+    }
+    free(events);
+    events = nullptr;
+    return true;
+}
+
 bool CreateInt32Property(napi_env env, napi_value &eventObj, const char* name, int32_t value)
 {
     CALL_LOG_ENTER;
@@ -308,6 +328,40 @@ void EmitSystemCallback(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallba
     NAPI_CALL_RETURN_VOID(env, napi_call_function(env, nullptr, callback, 1, result, &callResult));
 }
 
+void CompleteCallback(napi_env env, napi_status status, void *data)
+{
+    CALL_LOG_ENTER;
+    sptr<AsyncCallbackInfo> asyncCallbackInfo(static_cast<AsyncCallbackInfo *>(data));
+    /**
+        * After the asynchronous task is created, the asyncCallbackInfo reference count is reduced
+        * to 0 destruction, so you need to add 1 to the asyncCallbackInfo reference count when the
+        * asynchronous task is created, and subtract 1 from the reference count after the naked
+        * pointer is converted to a pointer when the asynchronous task is executed, the reference
+        * count of the smart pointer is guaranteed to be 1.
+        */
+    asyncCallbackInfo->DecStrongRef(nullptr);
+    if (asyncCallbackInfo->callbackType == SYSTEM_VIBRATE_CALLBACK) {
+        EmitSystemCallback(env, asyncCallbackInfo);
+        return;
+    }
+    if (asyncCallbackInfo->flag == "preset" && asyncCallbackInfo->info.vibratorPattern.events != nullptr) {
+        CHKCV(ClearVibratorPattern(asyncCallbackInfo->info.vibratorPattern), "ClearVibratorPattern fail");
+    }
+    CHKPV(asyncCallbackInfo->callback[0]);
+    napi_value callback = nullptr;
+    napi_status ret = napi_get_reference_value(env, asyncCallbackInfo->callback[0], &callback);
+    CHKCV((ret == napi_ok), "napi_get_reference_value fail");
+    napi_value result[RESULT_LENGTH] = { 0 };
+    CHKCV((g_convertFuncList.find(asyncCallbackInfo->callbackType) != g_convertFuncList.end()),
+        "Callback type invalid in async work");
+    bool state = g_convertFuncList[asyncCallbackInfo->callbackType](env, asyncCallbackInfo, result,
+        sizeof(result) / sizeof(napi_value));
+    CHKCV(state, "Create napi data fail in async work");
+    napi_value callResult = nullptr;
+    CHKCV((napi_call_function(env, nullptr, callback, 2, result, &callResult) == napi_ok),
+        "napi_call_function fail");
+}
+
 void EmitAsyncCallbackWork(sptr<AsyncCallbackInfo> asyncCallbackInfo)
 {
     CALL_LOG_ENTER;
@@ -319,40 +373,17 @@ void EmitAsyncCallbackWork(sptr<AsyncCallbackInfo> asyncCallbackInfo)
     CHKCV((ret == napi_ok), "napi_create_string_latin1 fail");
     asyncCallbackInfo->IncStrongRef(nullptr);
     napi_status status = napi_create_async_work(
-        env, nullptr, resourceName, [](napi_env env, void *data) {},
-        [](napi_env env, napi_status status, void *data) {
+        env, nullptr, resourceName, [](napi_env env, void *data) {
             CALL_LOG_ENTER;
             sptr<AsyncCallbackInfo> asyncCallbackInfo(static_cast<AsyncCallbackInfo *>(data));
-            /**
-             * After the asynchronous task is created, the asyncCallbackInfo reference count is reduced
-             * to 0 destruction, so you need to add 1 to the asyncCallbackInfo reference count when the
-             * asynchronous task is created, and subtract 1 from the reference count after the naked
-             * pointer is converted to a pointer when the asynchronous task is executed, the reference
-             * count of the smart pointer is guaranteed to be 1.
-             */
-            asyncCallbackInfo->DecStrongRef(nullptr);
-            if (asyncCallbackInfo->callbackType == SYSTEM_VIBRATE_CALLBACK) {
-                EmitSystemCallback(env, asyncCallbackInfo);
-                return;
+            if (asyncCallbackInfo->flag == "preset") {
+                asyncCallbackInfo->error.code = PlayPrimitiveEffect(asyncCallbackInfo->info.effectId.c_str(),
+                    asyncCallbackInfo->info.intensity);
             }
-            CHKPV(asyncCallbackInfo->callback[0]);
-            napi_value callback = nullptr;
-            napi_status ret = napi_get_reference_value(env, asyncCallbackInfo->callback[0], &callback);
-            CHKCV((ret == napi_ok), "napi_get_reference_value fail");
-            napi_value result[RESULT_LENGTH] = { 0 };
-            CHKCV((g_convertFuncList.find(asyncCallbackInfo->callbackType) != g_convertFuncList.end()),
-                "Callback type invalid in async work");
-            bool state = g_convertFuncList[asyncCallbackInfo->callbackType](env, asyncCallbackInfo, result,
-                sizeof(result) / sizeof(napi_value));
-            CHKCV(state, "Create napi data fail in async work");
-            napi_value callResult = nullptr;
-            CHKCV((napi_call_function(env, nullptr, callback, 2, result, &callResult) == napi_ok),
-                "napi_call_function fail");
-        },
-        asyncCallbackInfo.GetRefPtr(), &asyncCallbackInfo->asyncWork);
+        }, CompleteCallback, asyncCallbackInfo.GetRefPtr(), &asyncCallbackInfo->asyncWork);
     if (status != napi_ok
         || napi_queue_async_work_with_qos(
-            asyncCallbackInfo->env, asyncCallbackInfo->asyncWork, napi_qos_default) != napi_ok) {
+            asyncCallbackInfo->env, asyncCallbackInfo->asyncWork, napi_qos_user_initiated) != napi_ok) {
         MISC_HILOGE("Create async work fail");
         asyncCallbackInfo->DecStrongRef(nullptr);
     }

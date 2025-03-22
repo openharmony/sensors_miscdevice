@@ -25,6 +25,7 @@
 #include "refbase.h"
 
 #include "sensors_errors.h"
+#include "vibrator_agent.h"
 #include "vibrator_agent_type.h"
 
 namespace OHOS {
@@ -39,6 +40,20 @@ enum CallbackType {
     IS_SUPPORT_EFFECT_CALLBACK,
 };
 
+struct VibrateInfo {
+    std::string type;
+    std::string usage;
+    bool systemUsage {false};
+    int32_t duration = 0;
+    std::string effectId;
+    int32_t count = 0;
+    int32_t fd = -1;
+    int64_t offset = 0;
+    int64_t length = -1;
+    int32_t intensity = 0;
+    VibratorPattern vibratorPattern;
+};
+
 class AsyncCallbackInfo : public RefBase {
 public:
     struct AsyncCallbackError {
@@ -48,6 +63,7 @@ public:
         string stack;
     };
 
+    VibrateInfo info;
     napi_env env = nullptr;
     napi_async_work asyncWork = nullptr;
     napi_deferred deferred = nullptr;
@@ -55,6 +71,7 @@ public:
     AsyncCallbackError error;
     CallbackType callbackType = COMMON_CALLBACK;
     bool isSupportEffect {false};
+    std::string flag;
     AsyncCallbackInfo(napi_env env) : env(env) {}
     ~AsyncCallbackInfo();
 };
@@ -83,6 +100,7 @@ bool ConstructIsSupportEffectResult(const napi_env &env, sptr<AsyncCallbackInfo>
     napi_value result[], int32_t length);
 void EmitAsyncCallbackWork(sptr<AsyncCallbackInfo> async_callback_info);
 void EmitPromiseWork(sptr<AsyncCallbackInfo> asyncCallbackInfo);
+bool ClearVibratorPattern(VibratorPattern &vibratorPattern);
 } // namespace Sensors
 } // namespace OHOS
 #endif // VIBRATOR_NAPI_UTILS_H

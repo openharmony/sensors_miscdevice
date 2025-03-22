@@ -43,14 +43,14 @@ namespace Sensors {
  *
  * @since 6
  */
-const char *VIBRATOR_STOP_MODE_TIME = "time";
+static const char *VIBRATOR_STOP_MODE_TIME = "time";
 
 /**
  * @brief Indicates the mode of stopping a preset vibration effect.
  *
  * @since 6
  */
-const char *VIBRATOR_STOP_MODE_PRESET = "preset";
+static const char *VIBRATOR_STOP_MODE_PRESET = "preset";
 
 /**
  * @brief Controls this vibrator to perform a vibration with a preset vibration effect.

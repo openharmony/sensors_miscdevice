@@ -25,7 +25,6 @@
 
 #include "file_utils.h"
 #include "miscdevice_log.h"
-#include "vibrator_agent.h"
 #include "vibrator_napi_error.h"
 #include "vibrator_napi_utils.h"
 #include "vibrator_pattern_js.h"
@@ -69,20 +68,6 @@ static std::map<std::string, int32_t> g_usageType = {
 };
 
 static std::set<std::string> g_allowedTypes = {"time", "preset", "file", "pattern"};
-
-struct VibrateInfo {
-    std::string type;
-    std::string usage;
-    bool systemUsage;
-    int32_t duration = 0;
-    std::string effectId;
-    int32_t count = 0;
-    int32_t fd = -1;
-    int64_t offset = 0;
-    int64_t length = -1;
-    int32_t intensity = 0;
-    VibratorPattern vibratorPattern;
-};
 
 static napi_value EmitAsyncWork(napi_value param, sptr<AsyncCallbackInfo> info)
 {
@@ -192,26 +177,6 @@ static napi_value VibrateMode(napi_env env, napi_value args[], size_t argc)
     }
     EmitAsyncCallbackWork(asyncCallbackInfo);
     return nullptr;
-}
-
-static bool ClearVibratorPattern(VibratorPattern &vibratorPattern)
-{
-    CALL_LOG_ENTER;
-    int32_t eventSize = vibratorPattern.eventNum;
-    if ((eventSize <= 0) || (vibratorPattern.events == nullptr)) {
-        MISC_HILOGW("events is not need to free, eventSize:%{public}d", eventSize);
-        return false;
-    }
-    auto events = vibratorPattern.events;
-    for (int32_t j = 0; j < eventSize; ++j) {
-        if (events[j].points != nullptr) {
-            free(events[j].points);
-            events[j].points = nullptr;
-        }
-    }
-    free(events);
-    events = nullptr;
-    return true;
 }
 
 static bool ParseVibratorCurvePoint(napi_env env, napi_value pointsArray, uint32_t index, VibratorCurvePoint &point)
@@ -463,7 +428,7 @@ bool SetUsage(const std::string &usage, bool systemUsage)
     return SetUsage(g_usageType[usage], systemUsage);
 }
 
-int32_t StartVibrate(const VibrateInfo &info)
+int32_t CheckParameters(const VibrateInfo &info)
 {
     CALL_LOG_ENTER;
     if (!SetUsage(info.usage, info.systemUsage)) {
@@ -474,13 +439,17 @@ int32_t StartVibrate(const VibrateInfo &info)
         MISC_HILOGE("Invalid vibrate type, type:%{public}s", info.type.c_str());
         return PARAMETER_ERROR;
     }
-    if (info.type == "preset") {
-        if (!SetLoopCount(info.count)) {
-            MISC_HILOGE("SetLoopCount fail");
-            return PARAMETER_ERROR;
-        }
-        return PlayPrimitiveEffect(info.effectId.c_str(), info.intensity);
-    } else if (info.type == "file") {
+    return ERR_OK;
+}
+
+int32_t StartVibrate(const VibrateInfo &info)
+{
+    CALL_LOG_ENTER;
+    if (CheckParameters(info) != ERR_OK) {
+        MISC_HILOGE("CheckParameters fail");
+        return PARAMETER_ERROR;
+    }
+    if (info.type == "file") {
         return PlayVibratorCustom(info.fd, info.offset, info.length);
     } else if (info.type == "pattern") {
         return PlayPattern(info.vibratorPattern);
@@ -490,21 +459,30 @@ int32_t StartVibrate(const VibrateInfo &info)
 
 static napi_value VibrateEffect(napi_env env, napi_value args[], size_t argc)
 {
-    VibrateInfo info;
-    if (!ParseParameter(env, args, argc, info)) {
-        ThrowErr(env, PARAMETER_ERROR, "parameter fail");
-        return nullptr;
-    }
     sptr<AsyncCallbackInfo> asyncCallbackInfo = new (std::nothrow) AsyncCallbackInfo(env);
     CHKPP(asyncCallbackInfo);
-    asyncCallbackInfo->error.code = StartVibrate(info);
-
-    if (info.vibratorPattern.events != nullptr) {
-        CHKCP(ClearVibratorPattern(info.vibratorPattern), "ClearVibratorPattern fail");
-    }
-    if ((asyncCallbackInfo->error.code != SUCCESS) && (asyncCallbackInfo->error.code == PARAMETER_ERROR)) {
-        ThrowErr(env, PARAMETER_ERROR, "parameters invalid");
+    if (!ParseParameter(env, args, argc, asyncCallbackInfo->info)) {
+        MISC_HILOGE("ParseParameter fail");
+        ThrowErr(env, PARAMETER_ERROR, "ParseParameter fail");
         return nullptr;
+    }
+    if (asyncCallbackInfo->info.type == "preset") {
+        if (!SetLoopCount(asyncCallbackInfo->info.count) || CheckParameters(asyncCallbackInfo->info) != ERR_OK ||
+            asyncCallbackInfo->info.effectId.empty()) {
+            MISC_HILOGE("SetLoopCount fail or parameter invalid");
+            ThrowErr(env, PARAMETER_ERROR, "SetLoopCount fail or parameter invalid");
+            return nullptr;
+        }
+        asyncCallbackInfo->flag = "preset";
+    } else {
+        asyncCallbackInfo->error.code = StartVibrate(asyncCallbackInfo->info);
+        if (asyncCallbackInfo->info.vibratorPattern.events != nullptr) {
+            CHKCP(ClearVibratorPattern(asyncCallbackInfo->info.vibratorPattern), "ClearVibratorPattern fail");
+        }
+        if (asyncCallbackInfo->error.code == PARAMETER_ERROR) {
+            ThrowErr(env, PARAMETER_ERROR, "Parameters invalid");
+            return nullptr;
+        }
     }
     if (argc >= PARAMETER_THREE && IsMatchType(env, args[2], napi_function)) {
         return EmitAsyncWork(args[2], asyncCallbackInfo);
