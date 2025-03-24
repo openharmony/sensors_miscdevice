@@ -992,11 +992,12 @@ HWTEST_F(VibratorAgentTest, PreProcess_001, TestSize.Level1)
         VibratorFileDescription vfd;
         VibratorPackage package;
         struct stat64 statbuf = { 0 };
-        if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
+        bool ret = fstat64(fileDescriptor.fd, &statbuf);
+        if (ret) {
             vfd.fd = fileDescriptor.fd;
             vfd.offset = 0;
             vfd.length = statbuf.st_size;
-            int32_t ret = PreProcess(vfd, package);
+            ret = PreProcess(vfd, package);
             ASSERT_NE(ret, 0);
             ret = FreeVibratorPackage(package);
             ASSERT_NE(ret, 0);
