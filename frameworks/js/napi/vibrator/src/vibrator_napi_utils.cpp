@@ -362,6 +362,16 @@ void CompleteCallback(napi_env env, napi_status status, void *data)
         "napi_call_function fail");
 }
 
+void ExecuteCallBack(napi_env env, void *data)
+{
+    CALL_LOG_ENTER;
+    sptr<AsyncCallbackInfo> asyncCallbackInfo(static_cast<AsyncCallbackInfo *>(data));
+    if (asyncCallbackInfo->flag == "preset") {
+        asyncCallbackInfo->error.code = PlayPrimitiveEffect(asyncCallbackInfo->info.effectId.c_str(),
+            asyncCallbackInfo->info.intensity);
+    }
+}
+
 void EmitAsyncCallbackWork(sptr<AsyncCallbackInfo> asyncCallbackInfo)
 {
     CALL_LOG_ENTER;
@@ -373,14 +383,8 @@ void EmitAsyncCallbackWork(sptr<AsyncCallbackInfo> asyncCallbackInfo)
     CHKCV((ret == napi_ok), "napi_create_string_latin1 fail");
     asyncCallbackInfo->IncStrongRef(nullptr);
     napi_status status = napi_create_async_work(
-        env, nullptr, resourceName, [](napi_env env, void *data) {
-            CALL_LOG_ENTER;
-            sptr<AsyncCallbackInfo> asyncCallbackInfo(static_cast<AsyncCallbackInfo *>(data));
-            if (asyncCallbackInfo->flag == "preset") {
-                asyncCallbackInfo->error.code = PlayPrimitiveEffect(asyncCallbackInfo->info.effectId.c_str(),
-                    asyncCallbackInfo->info.intensity);
-            }
-        }, CompleteCallback, asyncCallbackInfo.GetRefPtr(), &asyncCallbackInfo->asyncWork);
+        env, nullptr, resourceName, ExecuteCallBack, CompleteCallback,
+        asyncCallbackInfo.GetRefPtr(), &asyncCallbackInfo->asyncWork);
     if (status != napi_ok
         || napi_queue_async_work_with_qos(
             asyncCallbackInfo->env, asyncCallbackInfo->asyncWork, napi_qos_user_initiated) != napi_ok) {
@@ -401,7 +405,7 @@ void EmitPromiseWork(sptr<AsyncCallbackInfo> asyncCallbackInfo)
     // Make the reference count of asyncCallbackInfo add 1, and the function exits the non-destructor
     asyncCallbackInfo->IncStrongRef(nullptr);
     napi_status status = napi_create_async_work(
-        env, nullptr, resourceName, [](napi_env env, void *data) {},
+        env, nullptr, resourceName, ExecuteCallBack,
         [](napi_env env, napi_status status, void *data) {
             CALL_LOG_ENTER;
             sptr<AsyncCallbackInfo> asyncCallbackInfo(static_cast<AsyncCallbackInfo *>(data));
