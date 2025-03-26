@@ -90,6 +90,9 @@ private:
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
     int32_t SubscribeCommonEvent(const std::string &eventName, EventReceiver receiver);
     void OnReceiveEvent(const EventFwk::CommonEventData &data);
+#ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
+    void OnReceiveUserSwitchEvent(const EventFwk::CommonEventData &data);
+#endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
     int32_t CheckAuthAndParam(int32_t usage, const VibrateParameter &parameter);
     int32_t PlayPatternCheckAuthAndParam(int32_t usage, const VibrateParameter &parameter);
     int32_t PlayPrimitiveEffectCheckAuthAndParam(int32_t intensity, int32_t usage);

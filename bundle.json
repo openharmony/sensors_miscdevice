@@ -13,7 +13,8 @@
     "features": [
       "miscdevice_feature_vibrator_custom",
       "miscdevice_feature_vibrator_input_method_enable",
-      "miscdevice_feature_crown_vibrator_enable"
+      "miscdevice_feature_crown_vibrator_enable",
+      "miscdevice_feature_do_not_disturb_enable"
     ],
     "adapted_system_type": [ "standard" ],
     "rom": "1024KB",
