@@ -18,6 +18,7 @@ declare_args() {
   miscdevice_feature_hiviewdfx_hisysevent = true
   miscdevice_feature_vibrator_input_method_enable = true
   miscdevice_feature_crown_vibrator_enable = false
+  miscdevice_feature_do_not_disturb_enable = false
 }
 
 print(
@@ -39,6 +40,10 @@ if (miscdevice_feature_vibrator_input_method_enable) {
 
 if (miscdevice_feature_crown_vibrator_enable) {
   miscdevice_default_defines += [ "OHOS_BUILD_ENABLE_VIBRATOR_CROWN" ]
+}
+
+if (miscdevice_feature_do_not_disturb_enable) {
+  miscdevice_default_defines += [ "OHOS_BUILD_ENABLE_DO_NOT_DISTURB" ]
 }
 
 if (!defined(global_parts_info) ||

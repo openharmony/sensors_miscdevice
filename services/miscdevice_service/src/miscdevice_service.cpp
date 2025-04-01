@@ -15,6 +15,9 @@
 
 #include "miscdevice_service.h"
 
+#ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
+#include "common_event_support.h"
+#endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
 #include "death_recipient_template.h"
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
 #include "hisysevent.h"
@@ -130,6 +133,13 @@ void MiscdeviceService::OnAddSystemAbility(int32_t systemAbilityId, const std::s
             if (ret != ERR_OK) {
                 MISC_HILOGE("Subscribe usual.event.DATA_SHARE_READY fail");
             }
+#ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
+            ret = SubscribeCommonEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED,
+                std::bind(&MiscdeviceService::OnReceiveUserSwitchEvent, this, std::placeholders::_1));
+            if (ret != ERR_OK) {
+                MISC_HILOGE("Subscribe usual.event.USER_SWITCHED fail");
+            }
+#endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
             AddSystemAbilityListener(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
             break;
         }
@@ -170,6 +180,24 @@ void MiscdeviceService::OnReceiveEvent(const EventFwk::CommonEventData &data)
         }
     }
 }
+
+#ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
+void MiscdeviceService::OnReceiveUserSwitchEvent(const EventFwk::CommonEventData &data)
+{
+    const auto &want = data.GetWant();
+    std::string action = want.GetAction();
+    if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
+        MISC_HILOGI("OnReceiveUserSwitchEvent user switched");
+        PriorityManager->UnregisterUserObserver();
+        PriorityManager->UpdateCurrentUserId();
+        PriorityManager->RegisterUserObserver();
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "USER_SWITCHED_EXCEPTION", HiSysEvent::EventType::FAULT,
+            "PKG_NAME", "OnReceiveUserSwitchEvent", "ERROR_CODE", ERR_OK);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
+    }
+}
+#endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
 
 void MiscdeviceService::OnStart()
 {

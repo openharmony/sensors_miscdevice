@@ -124,7 +124,7 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationTest_002, TestSize.Level1)
 {
     CALL_LOG_ENTER;
     Vibrator_Attribute vibrateAttribute = {
-        .usage = VIBRATOR_USAGE_RING
+        .usage = VIBRATOR_USAGE_COMMUNICATION
     };
     int32_t ret = OH_Vibrator_PlayVibration(g_duration, vibrateAttribute);
     ASSERT_EQ(ret, RET_SUCCESS);
@@ -163,7 +163,7 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_001, TestSize.Level
             .length = statbuf.st_size
         };
         Vibrator_Attribute vibrateAttribute = {
-            .usage = VIBRATOR_USAGE_RING
+            .usage = VIBRATOR_USAGE_ALARM
         };
         int32_t ret = OH_Vibrator_PlayVibrationCustom(fileDescription, vibrateAttribute);
         bool isSuccess = ((ret == 0) || (ret == UNSUPPORTED));
@@ -186,7 +186,7 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_002, TestSize.Level
             .length = statbuf.st_size
         };
         Vibrator_Attribute vibrateAttribute = {
-            .usage = VIBRATOR_USAGE_RING
+            .usage = VIBRATOR_USAGE_ALARM
         };
         int32_t ret = OH_Vibrator_PlayVibrationCustom(fileDescription, vibrateAttribute);
         ASSERT_NE(ret, 0);
@@ -206,7 +206,7 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_003, TestSize.Level
             .length = statbuf.st_size
         };
         Vibrator_Attribute vibrateAttribute = {
-            .usage = VIBRATOR_USAGE_RING
+            .usage = VIBRATOR_USAGE_ALARM
         };
         int32_t ret = OH_Vibrator_PlayVibrationCustom(fileDescription, vibrateAttribute);
         ASSERT_NE(ret, 0);
@@ -226,7 +226,7 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_004, TestSize.Level
             .length = statbuf.st_size
         };
         Vibrator_Attribute vibrateAttribute = {
-            .usage = VIBRATOR_USAGE_RING
+            .usage = VIBRATOR_USAGE_ALARM
         };
         int32_t ret = OH_Vibrator_PlayVibrationCustom(fileDescription, vibrateAttribute);
         ASSERT_NE(ret, 0);
@@ -246,7 +246,7 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_005, TestSize.Level
             .length = statbuf.st_size
         };
         Vibrator_Attribute vibrateAttribute = {
-            .usage = VIBRATOR_USAGE_RING
+            .usage = VIBRATOR_USAGE_ALARM
         };
         int32_t ret = OH_Vibrator_PlayVibrationCustom(fileDescription, vibrateAttribute);
         ASSERT_NE(ret, 0);
@@ -266,7 +266,7 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_006, TestSize.Level
             .length = statbuf.st_size
         };
         Vibrator_Attribute vibrateAttribute = {
-            .usage = VIBRATOR_USAGE_RING
+            .usage = VIBRATOR_USAGE_ALARM
         };
         int32_t ret = OH_Vibrator_PlayVibrationCustom(fileDescription, vibrateAttribute);
         ASSERT_NE(ret, 0);
@@ -286,7 +286,7 @@ HWTEST_F(NativeVibratorTest, PlayVibratorCustom_018, TestSize.Level1)
             .length = statbuf.st_size
         };
         Vibrator_Attribute vibrateAttribute = {
-            .usage = VIBRATOR_USAGE_RING
+            .usage = VIBRATOR_USAGE_ALARM
         };
         int32_t ret = OH_Vibrator_PlayVibrationCustom(fileDescription, vibrateAttribute);
         ASSERT_NE(ret, 0);
@@ -306,7 +306,7 @@ HWTEST_F(NativeVibratorTest, PlayVibratorCustom_019, TestSize.Level1)
             .length = statbuf.st_size
         };
         Vibrator_Attribute vibrateAttribute = {
-            .usage = VIBRATOR_USAGE_RING
+            .usage = VIBRATOR_USAGE_ALARM
         };
         int32_t ret = OH_Vibrator_PlayVibrationCustom(fileDescription, vibrateAttribute);
         ASSERT_NE(ret, 0);
@@ -349,7 +349,7 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_021, TestSize.Level
             .length = statbuf.st_size
         };
         Vibrator_Attribute vibrateAttribute = {
-            .usage = VIBRATOR_USAGE_RING
+            .usage = VIBRATOR_USAGE_ALARM
         };
         int32_t ret = OH_Vibrator_PlayVibrationCustom(fileDescription, vibrateAttribute);
         bool isSuccess = ((ret != 0) || (ret == UNSUPPORTED));
@@ -372,7 +372,7 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_022, TestSize.Level
             .length = statbuf.st_size
         };
         Vibrator_Attribute vibrateAttribute = {
-            .usage = VIBRATOR_USAGE_RING
+            .usage = VIBRATOR_USAGE_ALARM
         };
         int32_t ret = OH_Vibrator_PlayVibrationCustom(fileDescription, vibrateAttribute);
         bool isSuccess = ((ret != 0) || (ret == UNSUPPORTED));
@@ -394,7 +394,7 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_023, TestSize.Level
             .length = -1
         };
         Vibrator_Attribute vibrateAttribute = {
-            .usage = VIBRATOR_USAGE_RING
+            .usage = VIBRATOR_USAGE_ALARM
         };
         int32_t ret = OH_Vibrator_PlayVibrationCustom(fileDescription, vibrateAttribute);
         bool isSuccess = ((ret != 0) || (ret == UNSUPPORTED));
