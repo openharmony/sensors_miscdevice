@@ -534,6 +534,14 @@ int32_t MiscdeviceService::StopVibratorByMode(int32_t vibratorId, const std::str
         return PERMISSION_DENIED;
     }
     if ((vibratorThread_ == nullptr) || (!vibratorThread_->IsRunning())) {
+#if defined (OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM) && defined (HDF_DRIVERS_INTERFACE_VIBRATOR)
+        if (vibratorHdiConnection_.IsVibratorRunning()) {
+            vibratorHdiConnection_.Stop(HDF_VIBRATOR_MODE_PRESET);
+            vibratorHdiConnection_.Stop(HDF_VIBRATOR_MODE_HDHAPTIC);
+            MISC_HILOGD("StopVibratorByMode");
+            return NO_ERROR;
+        }
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM && HDF_DRIVERS_INTERFACE_VIBRATOR
         MISC_HILOGD("No vibration, no need to stop");
         return ERROR;
     }

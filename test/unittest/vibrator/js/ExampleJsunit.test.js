@@ -3341,7 +3341,6 @@ describe("VibratorJsTest", function () {
         } else {
             console.info('This device is not supportEffect');
             expect(true).assertTrue();
-            done();
         }
     })
 
@@ -3377,7 +3376,6 @@ describe("VibratorJsTest", function () {
         } else {
             console.info('This device is not supportEffect');
             expect(true).assertTrue();
-            done();
         }
     })
 
@@ -3413,7 +3411,6 @@ describe("VibratorJsTest", function () {
         } else {
             console.info('This device is not supportEffect');
             expect(true).assertTrue();
-            done();
         }
     })
 })
