@@ -221,6 +221,7 @@ void VibrationPriorityManager::UpdateCurrentUserId()
 int32_t VibrationPriorityManager::RegisterUserObserver()
 {
     MISC_HILOGI("RegisterUserObserver start");
+    std::lock_guard<std::mutex> currentUserObserverLock(currentUserObserverMutex_);
     MiscDeviceObserver::UpdateFunc updateFunc = [&]() { InitDoNotDisturbData(); };
     currentUserObserver_ = CreateObserver(updateFunc);
     if (currentUserObserver_ == nullptr) {
@@ -260,6 +261,7 @@ int32_t VibrationPriorityManager::UnregisterUserObserver()
         MISC_HILOGE("currentUserObserver_ is nullptr");
         return MISC_NO_INIT_ERR;
     }
+    std::lock_guard<std::mutex> currentUserObserverLock(currentUserObserverMutex_);
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
     auto doNotDisturbHelper =
         CreateDataShareHelper(ReplaceUserIdForUri(USER_SETTING_SECURE_URI_PROXY, g_currentUserId));
