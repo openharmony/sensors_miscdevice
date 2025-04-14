@@ -149,7 +149,7 @@ HWTEST_F(VibratorAgentTest, StartVibratorTest_003, TestSize.Level1)
     ASSERT_NE(ret, 0);
 }
 
-HWTEST_F(VibratorAgentTest, StartVibratorOnceTest_001, TestSize.Level1)
+HWTEST_F(VibratorAgentTest, StartVibratorOnceTest_001, TestSize.Level0)
 {
     MISC_HILOGI("StartVibratorOnceTest_001 in");
     int32_t ret = StartVibratorOnce(300);
@@ -256,7 +256,7 @@ HWTEST_F(VibratorAgentTest, SetUsage_003, TestSize.Level1)
     ASSERT_FALSE(ret);
 }
 
-HWTEST_F(VibratorAgentTest, PlayVibratorCustom_001, TestSize.Level1)
+HWTEST_F(VibratorAgentTest, PlayVibratorCustom_001, TestSize.Level0)
 {
     MISC_HILOGI("PlayVibratorCustom_001 in");
     bool isSupport = IsSupportVibratorCustom();
