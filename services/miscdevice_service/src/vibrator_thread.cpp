@@ -29,7 +29,7 @@ namespace {
 const std::string VIBRATE_CONTROL_THREAD_NAME = "OS_VibControl";
 constexpr int32_t DELAY_TIME1 = 5;    /** ms */
 constexpr int32_t DELAY_TIME2 = 10;   /** ms */
-constexpr size_t RETRY_NUMBER = 4;
+constexpr size_t RETRY_NUMBER = 6;
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
 constexpr size_t COMPOSITE_EFFECT_PART = 128;
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
@@ -93,6 +93,7 @@ void VibratorThread::HandleMultipleVibrations()
 {
     if (VibratorDevice.IsVibratorRunning()) {
         VibratorDevice.Stop(HDF_VIBRATOR_MODE_PRESET);
+        VibratorDevice.Stop(HDF_VIBRATOR_MODE_HDHAPTIC);
         for (size_t i = 0; i < RETRY_NUMBER; i++) {
             if (!VibratorDevice.IsVibratorRunning()) {
                 MISC_HILOGI("No running vibration");
@@ -151,6 +152,9 @@ int32_t VibratorThread::PlayCustomByHdHptic(const VibrateInfo &info)
             MISC_HILOGD("Stop hd haptic, package:%{public}s", info.packageName.c_str());
             return SUCCESS;
         }
+#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
+        HandleMultipleVibrations();
+#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
         int32_t ret = VibratorDevice.PlayPattern(patterns[i]);
         if (ret != SUCCESS) {
             MISC_HILOGE("Vibrate hd haptic failed");

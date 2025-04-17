@@ -835,6 +835,9 @@ int32_t MiscdeviceService::PlayPattern(const VibratePattern &pattern, int32_t us
             return ERROR;
         }
         StartVibrateThread(info);
+        MISC_HILOGI("Start vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, usage:%{public}d,"
+            "duration:%{public}d", curVibrateTime.c_str(), info.packageName.c_str(), info.pid, info.usage,
+            pattern.patternDuration);
         return vibratorHdiConnection_.PlayPattern(package.patterns.front());
     } else if (g_capacity.isSupportPresetMapping) {
         info.mode = VIBRATE_CUSTOM_COMPOSITE_EFFECT;
@@ -1066,8 +1069,8 @@ int32_t MiscdeviceService::PlayPrimitiveEffect(int32_t vibratorId, const std::st
     }
     StartVibrateThread(info);
     MISC_HILOGI("Start vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, usage:%{public}d,"
-        "vibratorId:%{public}d, duration:%{public}d, effect:%{public}s", curVibrateTime.c_str(),
-        info.packageName.c_str(), info.pid, info.usage, vibratorId, info.duration, info.effect.c_str());
+        "vibratorId:%{public}d, duration:%{public}d, effect:%{public}s, intensity:%{public}d", curVibrateTime.c_str(),
+        info.packageName.c_str(), info.pid, info.usage, vibratorId, info.duration, info.effect.c_str(), info.intensity);
     return NO_ERROR;
 }
 
