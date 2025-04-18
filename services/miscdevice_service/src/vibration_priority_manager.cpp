@@ -456,6 +456,7 @@ void VibrationPriorityManager::MiscCrownIntensityFeedbackInit(void)
  
     int32_t intensity = miscIntensity_;
     if (GetIntValue(SETTING_VIBRATE_INTENSITY_KEY, intensity) != ERR_OK) {
+        intensity = FEEDBACK_INTENSITY_STRONGE;
         MISC_HILOGE("Get intensity failed");
     }
     miscIntensity_ = intensity;
@@ -582,7 +583,7 @@ void VibrationPriorityManager::UpdateStatus()
     if (miscIntensity_ == FEEDBACK_INTENSITY_INVALID) {
         int32_t intensity = FEEDBACK_INTENSITY_INVALID;
         if (GetIntValue(SETTING_VIBRATE_INTENSITY_KEY, intensity) != ERR_OK) {
-            intensity = FEEDBACK_INTENSITY_NONE;
+            intensity = FEEDBACK_INTENSITY_STRONGE;
             MISC_HILOGE("Get intensity failed");
         }
         miscIntensity_ = intensity;
