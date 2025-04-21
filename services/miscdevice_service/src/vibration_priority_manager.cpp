@@ -134,6 +134,9 @@ bool VibrationPriorityManager::Init()
         MISC_HILOGE("RegisterObserver failed");
         return false;
     }
+#ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
+    ReregisterCurrentUserObserver();
+#endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
     return true;
 }
 
@@ -187,6 +190,13 @@ void VibrationPriorityManager::InitDoNotDisturbData()
         MISC_HILOGW("DoNotDisturbSwitch invalid, DoNotDisturbSwitch:%{public}d",
             static_cast<int32_t>(doNotDisturbSwitch_));
     }
+}
+
+void VibrationPriorityManager::ReregisterCurrentUserObserver()
+{
+    UnregisterUserObserver();
+    UpdateCurrentUserId();
+    RegisterUserObserver();
 }
 
 void VibrationPriorityManager::UpdateCurrentUserId()

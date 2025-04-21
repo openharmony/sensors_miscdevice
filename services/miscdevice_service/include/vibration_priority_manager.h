@@ -83,9 +83,7 @@ public:
     VibrateStatus ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo, std::shared_ptr<VibratorThread> vibratorThread);
 #ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
     void InitDoNotDisturbData();
-    void UpdateCurrentUserId();
-    int32_t RegisterUserObserver();
-    int32_t UnregisterUserObserver();
+    void ReregisterCurrentUserObserver();
 #endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
     bool ShouldIgnoreByIntensity(const VibrateInfo &vibrateInfo);
@@ -112,6 +110,9 @@ private:
     int32_t GetWhiteListValue(const std::string &key, std::vector<WhiteListAppInfo> &value);
     void DeleteCJSONValue(cJSON *jsonValue);
     bool IgnoreAppVibrations(const VibrateInfo &vibrateInfo);
+    void UpdateCurrentUserId();
+    int32_t RegisterUserObserver();
+    int32_t UnregisterUserObserver();
     std::string ReplaceUserIdForUri(std::string uri, int32_t userId);
     Uri DoNotDisturbAssembleUri(const std::string &key);
 #endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
