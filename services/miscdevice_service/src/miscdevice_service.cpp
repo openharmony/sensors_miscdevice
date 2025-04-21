@@ -129,13 +129,13 @@ void MiscdeviceService::OnAddSystemAbility(int32_t systemAbilityId, const std::s
         case COMMON_EVENT_SERVICE_ID: {
             MISC_HILOGI("Common event service start");
             int32_t ret = SubscribeCommonEvent("usual.event.DATA_SHARE_READY",
-                std::bind(&MiscdeviceService::OnReceiveEvent, this, std::placeholders::_1));
+                [this](const EventFwk::CommonEventData &data) { this->OnReceiveEvent(data); });
             if (ret != ERR_OK) {
                 MISC_HILOGE("Subscribe usual.event.DATA_SHARE_READY fail");
             }
 #ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
             ret = SubscribeCommonEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED,
-                std::bind(&MiscdeviceService::OnReceiveUserSwitchEvent, this, std::placeholders::_1));
+                [this](const EventFwk::CommonEventData &data) { this->OnReceiveUserSwitchEvent(data); });
             if (ret != ERR_OK) {
                 MISC_HILOGE("Subscribe usual.event.USER_SWITCHED fail");
             }
@@ -188,9 +188,7 @@ void MiscdeviceService::OnReceiveUserSwitchEvent(const EventFwk::CommonEventData
     std::string action = want.GetAction();
     if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
         MISC_HILOGI("OnReceiveUserSwitchEvent user switched");
-        PriorityManager->UnregisterUserObserver();
-        PriorityManager->UpdateCurrentUserId();
-        PriorityManager->RegisterUserObserver();
+        PriorityManager->ReregisterCurrentUserObserver();
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "USER_SWITCHED_EXCEPTION", HiSysEvent::EventType::FAULT,
             "PKG_NAME", "OnReceiveUserSwitchEvent", "ERROR_CODE", ERR_OK);
