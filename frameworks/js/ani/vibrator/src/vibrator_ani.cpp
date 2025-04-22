@@ -57,24 +57,41 @@ typedef struct VibrateInfo {
     VibratorPattern vibratorPattern;
 } VibrateInfo;
 
-static ani_error CreateAniError(ani_env *env, std::string&& errMsg)
+static void ThrowBusinessError(ani_env *env, int errCode, std::string&& errMsg)
 {
-    static const char *errorClsName = "Lescompat/Error;";
+    MISC_HILOGD("Begin ThrowBusinessError.");
+    static const char *errorClsName = "L@ohos/base/BusinessError;";
     ani_class cls {};
     if (ANI_OK != env->FindClass(errorClsName, &cls)) {
-        MISC_HILOGE("Not found namespace %{public}s.", errorClsName);
-        return nullptr;
+        MISC_HILOGE("find class BusinessError %{public}s failed", errorClsName);
+        return;
     }
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "Lstd/core/String;:V", &ctor)) {
-        MISC_HILOGE("Not found <ctor> in %{public}s.", errorClsName);
-        return nullptr;
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":V", &ctor)) {
+        MISC_HILOGE("find method BusinessError.constructor failed");
+        return;
     }
-    ani_string error_msg;
-    env->String_NewUTF8(errMsg.c_str(), 17U, &error_msg);
     ani_object errorObject;
-    env->Object_New(cls, ctor, &errorObject, error_msg);
-    return static_cast<ani_error>(errorObject);
+    if (ANI_OK != env->Object_New(cls, ctor, &errorObject)) {
+        MISC_HILOGE("create BusinessError object failed");
+        return;
+    }
+    ani_double aniErrCode = static_cast<ani_double>(errCode);
+    ani_string errMsgStr;
+    if (ANI_OK != env->String_NewUTF8(errMsg.c_str(), errMsg.size(), &errMsgStr)) {
+        MISC_HILOGE("convert errMsg to ani_string failed");
+        return;
+    }
+    if (ANI_OK != env->Object_SetFieldByName_Double(errorObject, "code", aniErrCode)) {
+        MISC_HILOGE("set error code failed");
+        return;
+    }
+    if (ANI_OK != env->Object_SetPropertyByName_Ref(errorObject, "message", errMsgStr)) {
+        MISC_HILOGE("set error message failed");
+        return;
+    }
+    env->ThrowError(static_cast<ani_error>(errorObject));
+    return;
 }
 
 static bool ParserParamFromVibrateTime(ani_env *env, ani_object effect, VibrateInfo &vibrateInfo)
@@ -337,27 +354,23 @@ static void StartVibrationSync([[maybe_unused]] ani_env *env, ani_object effect,
     env->Object_InstanceOf(effect, vibrateFromFileClass, &isInstanceOfFile);
     if (isInstanceOfTime) {
         if (!ParserParamFromVibrateTime(env, effect, vibrateInfo)) {
-            ani_error error = CreateAniError(env, "ParserParamFromVibrateTime failed!");
-            env->ThrowError(error);
+            ThrowBusinessError(env, PARAMETER_ERROR, "ParserParamFromVibrateTime failed!");
             return;
         }
     } else if (isInstanceOfPreset) {
         if (!ParserParamFromVibratePreset(env, effect, vibrateInfo)) {
-            ani_error error = CreateAniError(env, "ParserParamFromVibratePreset failed!");
-            env->ThrowError(error);
+            ThrowBusinessError(env, PARAMETER_ERROR, "ParserParamFromVibratePreset failed!");
             return;
         }
     } else if (isInstanceOfFile) {
         if (!ParserParamFromVibrateFromFile(env, effect, vibrateInfo)) {
-            ani_error error = CreateAniError(env, "ParserParamFromVibrateFromFile failed!");
-            env->ThrowError(error);
+            ThrowBusinessError(env, PARAMETER_ERROR, "ParserParamFromVibrateFromFile failed!");
             return;
         }
     }
 
     if (!ParserParamFromVibrateAttribute(env, attribute, vibrateInfo)) {
-        ani_error error = CreateAniError(env, "ParserParamFromVibrateAttribute failed!");
-        env->ThrowError(error);
+        ThrowBusinessError(env, PARAMETER_ERROR, "ParserParamFromVibrateAttribute failed!");
         return;
     }
     StartVibrate(vibrateInfo);
