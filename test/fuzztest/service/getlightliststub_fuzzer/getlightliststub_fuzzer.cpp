@@ -36,6 +36,20 @@ auto g_service = MiscdeviceDelayedSpSingleton<MiscdeviceService>::GetInstance();
 const std::u16string VIBRATOR_INTERFACE_TOKEN = u"IMiscdeviceService";
 } // namespace
 
+template<class T>
+size_t GetObject(const uint8_t *data, size_t size, T &object)
+{
+    size_t objectSize = sizeof(object);
+    if (objectSize > size) {
+        return 0;
+    }
+    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
+    if (ret != EOK) {
+        return 0;
+    }
+    return objectSize;
+}
+
 void SetUpTestCase()
 {
     const char **perms = new (std::nothrow) const char *[1];
@@ -62,15 +76,11 @@ void SetUpTestCase()
 bool OnRemoteRequestFuzzTest(const uint8_t *data, size_t size)
 {
     SetUpTestCase();
-    MessageParcel datas;
-    datas.WriteInterfaceToken(VIBRATOR_INTERFACE_TOKEN);
-    datas.WriteBuffer(data, size);
-    datas.RewindRead(0);
-    MessageParcel reply;
-    MessageOption option;
     g_service->OnStartFuzz();
-    g_service->OnRemoteRequest(static_cast<uint32_t>(IMiscdeviceServiceIpcCode::COMMAND_GET_LIGHT_LIST),
-        datas, reply, option);
+    size_t startPos = 0;
+    std::vector<LightInfoIPC> lightInfoIpcList;
+    GetObject<LightInfoIPC>(data + startPos, size - startPos, lightInfoIpcList[0]);
+    g_service->GetLightList(lightInfoIpcList);
     return true;
 }
 } // namespace Sensors
