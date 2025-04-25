@@ -21,10 +21,12 @@
 #include "accesstoken_kit.h"
 #include "nativetoken_kit.h"
 #include "parameters.h"
+#include "parcel.h"
 #include "token_setproc.h"
 
 #include "sensors_errors.h"
 #include "vibrator_agent.h"
+#include "vibrator_infos.h"
 
 #undef LOG_TAG
 #define LOG_TAG "VibratorAgentTest"
@@ -1344,6 +1346,82 @@ HWTEST_F(VibratorAgentTest, IsHdHapticSupported_001, TestSize.Level1)
         ASSERT_EQ(isSupport, false);
     }
     Cancel();
+}
+
+HWTEST_F(VibratorAgentTest, StartVibratorUseNotifactionTest, TestSize.Level1)
+{
+    MISC_HILOGI("StartVibratorUseNotifactionTest in");
+    bool flag = SetUsage(USAGE_UNKNOWN);
+    ASSERT_TRUE(flag);
+    int32_t ret = StartVibrator(VIBRATOR_TYPE_FAIL);
+    ASSERT_EQ(ret, SUCCESS);
+    flag = SetUsage(USAGE_NOTIFICATION);
+    ASSERT_TRUE(flag);
+    ret = StartVibrator(VIBRATOR_TYPE_FAIL);
+    ASSERT_TRUE(ret == SUCCESS || ret == DEVICE_OPERATION_FAILED);
+    Cancel();
+}
+
+HWTEST_F(VibratorAgentTest, StartVibratorUseRingTest, TestSize.Level1)
+{
+    MISC_HILOGI("StartVibratorUseRingTest in");
+    bool flag = SetUsage(USAGE_UNKNOWN);
+    ASSERT_TRUE(flag);
+    int32_t ret = StartVibrator(VIBRATOR_TYPE_FAIL);
+    ASSERT_EQ(ret, SUCCESS);
+    flag = SetUsage(USAGE_RING);
+    ASSERT_TRUE(flag);
+    ret = StartVibrator(VIBRATOR_TYPE_FAIL);
+    ASSERT_TRUE(ret == SUCCESS || ret == DEVICE_OPERATION_FAILED);
+    Cancel();
+}
+
+HWTEST_F(VibratorAgentTest, GetVibrateModeTest, TestSize.Level1)
+{
+    MISC_HILOGI("GetVibrateModeTest in");
+    VibratorCapacity vibrateCapacity;
+    int32_t mode = vibrateCapacity.GetVibrateMode();
+    ASSERT_EQ(mode, ERROR);
+    vibrateCapacity.isSupportHdHaptic = true;
+    mode = vibrateCapacity.GetVibrateMode();
+    ASSERT_EQ(mode, VIBRATE_MODE_HD);
+    vibrateCapacity.isSupportHdHaptic = false;
+    vibrateCapacity.isSupportPresetMapping = true;
+    mode = vibrateCapacity.GetVibrateMode();
+    ASSERT_EQ(mode, VIBRATE_MODE_MAPPING);
+    vibrateCapacity.isSupportHdHaptic = false;
+    vibrateCapacity.isSupportPresetMapping = false;
+    vibrateCapacity.isSupportTimeDelay = true;
+    mode = vibrateCapacity.GetVibrateMode();
+    ASSERT_EQ(mode, VIBRATE_MODE_TIMES);
+}
+
+HWTEST_F(VibratorAgentTest, VibratePatternTest, TestSize.Level1)
+{
+    MISC_HILOGI("VibratePatternTest in");
+    VibratePattern vibratePattern;
+    vibratePattern.startTime = 10;
+    vibratePattern.patternDuration = 1000;
+    VibrateEvent vibrateEvent;
+    vibrateEvent.time = 1;
+    vibrateEvent.duration = 50;
+    vibrateEvent.intensity = 98;
+    vibrateEvent.frequency = 78;
+    vibrateEvent.index = 0;
+    vibrateEvent.tag = EVENT_TAG_CONTINUOUS;
+    VibrateCurvePoint vibrateCurvePoint;
+    vibrateCurvePoint.time = 1;
+    vibrateCurvePoint.intensity = 1;
+    vibrateCurvePoint.frequency = 1;
+    vibrateEvent.points.push_back(vibrateCurvePoint);
+    vibratePattern.events.push_back(vibrateEvent);
+    Parcel data;
+    bool flag = vibratePattern.Marshalling(data);
+    ASSERT_EQ(flag, true);
+    VibratePattern *ret = vibratePattern.Unmarshalling(data);
+    ASSERT_EQ(ret->startTime, 10);
+    ASSERT_EQ(ret->patternDuration, 1000);
+    ret = nullptr;
 }
 } // namespace Sensors
 } // namespace OHOS
