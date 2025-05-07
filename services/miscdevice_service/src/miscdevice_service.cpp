@@ -72,6 +72,9 @@ VibratorCapacity g_capacity;
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 const std::string PHONE_TYPE = "phone";
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_PRESET_INFO
+constexpr int32_t VIBRATOR_DURATION = 50;
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_PRESET_INFO
 }  // namespace
 
 bool MiscdeviceService::isVibrationPriorityReady_ = false;
@@ -496,15 +499,26 @@ void MiscdeviceService::StartVibrateThread(VibrateInfo info)
     if (vibratorThread_ == nullptr) {
         vibratorThread_ = std::make_shared<VibratorThread>();
     }
-    StopVibrateThread();
-#if defined (OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM) && defined (HDF_DRIVERS_INTERFACE_VIBRATOR)
-    if (vibratorHdiConnection_.IsVibratorRunning()) {
-        vibratorHdiConnection_.Stop(HDF_VIBRATOR_MODE_PRESET);
-        vibratorHdiConnection_.Stop(HDF_VIBRATOR_MODE_HDHAPTIC);
-    }
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_PRESET_INFO
+    VibrateInfo currentVibrateInfo = vibratorThread_->GetCurrentVibrateInfo();
+    if (info.duration <= VIBRATOR_DURATION && currentVibrateInfo.duration <= VIBRATOR_DURATION &&
+        info.mode == VIBRATE_PRESET && currentVibrateInfo.mode == VIBRATE_PRESET) {
+        vibratorThread_->UpdateVibratorEffect(info);
+        vibratorThread_->Start("VibratorThread");
+    } else {
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_PRESET_INFO
+        StopVibrateThread();
+#if defined(OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM) && defined(HDF_DRIVERS_INTERFACE_VIBRATOR)
+        if (vibratorHdiConnection_.IsVibratorRunning()) {
+            vibratorHdiConnection_.Stop(HDF_VIBRATOR_MODE_PRESET);
+            vibratorHdiConnection_.Stop(HDF_VIBRATOR_MODE_HDHAPTIC);
+        }
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM && HDF_DRIVERS_INTERFACE_VIBRATOR
-    vibratorThread_->UpdateVibratorEffect(info);
-    vibratorThread_->Start("VibratorThread");
+        vibratorThread_->UpdateVibratorEffect(info);
+        vibratorThread_->Start("VibratorThread");
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_PRESET_INFO
+    }
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_PRESET_INFO
     DumpHelper->SaveVibrateRecord(info);
 }
 
