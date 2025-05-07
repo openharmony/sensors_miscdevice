@@ -36,6 +36,8 @@ if (miscdevice_feature_vibrator_custom) {
 
 if (miscdevice_feature_vibrator_input_method_enable) {
   miscdevice_default_defines += [ "OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD" ]
+} else {
+  miscdevice_default_defines += [ "OHOS_BUILD_ENABLE_VIBRATOR_PRESET_INFO" ]
 }
 
 if (miscdevice_feature_crown_vibrator_enable) {
