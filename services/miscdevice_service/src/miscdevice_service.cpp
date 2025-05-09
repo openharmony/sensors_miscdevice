@@ -612,6 +612,7 @@ int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, int32_t fd, in
     int32_t checkResult = CheckAuthAndParam(usage, parameter);
     if (checkResult != ERR_OK) {
         MISC_HILOGE("CheckAuthAndParam failed, ret:%{public}d", checkResult);
+        close(fd);
         return checkResult;
     }
     RawFileDescriptor rawFd;
