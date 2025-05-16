@@ -75,6 +75,9 @@ private:
     bool InitInterface();
     bool InitLightInterface();
     std::string GetPackageName(AccessTokenID tokenId);
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_PRESET_INFO
+    int32_t FastVibratorEffect(const VibrateInfo &info);
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_PRESET_INFO
     void StartVibrateThread(VibrateInfo info);
     int32_t StopVibratorService(int32_t vibratorId);
     void StopVibrateThread();

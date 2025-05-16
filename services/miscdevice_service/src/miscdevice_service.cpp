@@ -73,7 +73,7 @@ VibratorCapacity g_capacity;
 const std::string PHONE_TYPE = "phone";
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_PRESET_INFO
-constexpr int32_t VIBRATOR_DURATION = 50;
+constexpr int32_t SHORT_VIBRATOR_DURATION = 50;
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_PRESET_INFO
 }  // namespace
 
@@ -502,9 +502,9 @@ void MiscdeviceService::StartVibrateThread(VibrateInfo info)
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_PRESET_INFO
     VibrateInfo currentVibrateInfo = vibratorThread_->GetCurrentVibrateInfo();
     if (info.duration <= VIBRATOR_DURATION && currentVibrateInfo.duration <= VIBRATOR_DURATION &&
-        info.mode == VIBRATE_PRESET && currentVibrateInfo.mode == VIBRATE_PRESET) {
+        info.mode == VIBRATE_PRESET && currentVibrateInfo.mode == VIBRATE_PRESET && info.count == 1) {
         vibratorThread_->UpdateVibratorEffect(info);
-        vibratorThread_->Start("VibratorThread");
+        FastVibratorEffect(info);
     } else {
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_PRESET_INFO
         StopVibrateThread();
@@ -545,15 +545,8 @@ int32_t MiscdeviceService::StopVibratorByMode(int32_t vibratorId, const std::str
         MISC_HILOGE("CheckVibratePermission failed, ret:%{public}d", ret);
         return PERMISSION_DENIED;
     }
-    if ((vibratorThread_ == nullptr) || (!vibratorThread_->IsRunning())) {
-#if defined (OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM) && defined (HDF_DRIVERS_INTERFACE_VIBRATOR)
-        if (vibratorHdiConnection_.IsVibratorRunning()) {
-            vibratorHdiConnection_.Stop(HDF_VIBRATOR_MODE_PRESET);
-            vibratorHdiConnection_.Stop(HDF_VIBRATOR_MODE_HDHAPTIC);
-            MISC_HILOGD("StopVibratorByMode");
-            return NO_ERROR;
-        }
-#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM && HDF_DRIVERS_INTERFACE_VIBRATOR
+    if ((vibratorThread_ == nullptr) || (!vibratorThread_->IsRunning() &&
+        !vibratorHdiConnection_.IsVibratorRunning())) {
         MISC_HILOGD("No vibration, no need to stop");
         return ERROR;
     }
@@ -563,6 +556,9 @@ int32_t MiscdeviceService::StopVibratorByMode(int32_t vibratorId, const std::str
         return ERROR;
     }
     StopVibrateThread();
+    if (vibratorHdiConnection_.IsVibratorRunning()) {
+        vibratorHdiConnection_.Stop(HDF_VIBRATOR_MODE_PRESET);
+    }
     std::string packageName = GetPackageName(GetCallingTokenID());
     std::string curVibrateTime = GetCurrentTime();
     MISC_HILOGI("Stop vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, vibratorId:%{public}d,"
@@ -1111,5 +1107,17 @@ int32_t MiscdeviceService::GetVibratorCapacity(VibratorCapacity &capacity)
     capacity = g_capacity;
     return ERR_OK;
 }
+
+// 手表短振快速下发不启动线程
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_PRESET_INFO
+int32_t MiscdeviceService::FastVibratorEffect(const VibrateInfo &info)
+{
+    int32_t ret = VibratorDevice.StartByIntensity(info.effect, info.intensity);
+    if (ret != SUCCESS) {
+        MISC_HILOGE("Vibrate effect %{public}s failed.", info.effect.c_str());
+    }
+    return NO_ERROR;
+}
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_PRESET_INFO
 }  // namespace Sensors
 }  // namespace OHOS
