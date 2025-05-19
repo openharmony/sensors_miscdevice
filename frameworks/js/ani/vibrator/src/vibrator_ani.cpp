@@ -175,7 +175,7 @@ static bool ParserParamFromVibratePreset(ani_env *env, ani_object effect, Vibrat
     return true;
 }
 
-bool SetVibratePropertyInt64(ani_env* env, ani_object effect, const char* propertyName, int64_t& propertyValue)
+static bool SetVibratePropertyInt64(ani_env* env, ani_object effect, const char* propertyName, int64_t& propertyValue)
 {
     ani_ref propertyRef;
     ani_boolean isUndefined = false;
@@ -285,7 +285,7 @@ static bool ParserParamFromVibrateAttribute(ani_env *env, ani_object attribute, 
     return true;
 }
 
-bool SetUsage(const std::string &usage, bool systemUsage)
+static bool SetUsage(const std::string &usage, bool systemUsage)
 {
     if (auto iter = g_usageType.find(usage); iter == g_usageType.end()) {
         MISC_HILOGE("Wrong usage type");
@@ -318,7 +318,7 @@ static int32_t StartVibrate(const VibrateInfo &info)
     return StartVibratorOnce(info.duration);
 }
 
-ani_class FindClassInNamespace(ani_env *env, ani_namespace &ns, const char *className)
+static ani_class FindClassInNamespace(ani_env *env, ani_namespace &ns, const char *className)
 {
     ani_class cls;
     if (ANI_OK != env->Namespace_FindClass(ns, className, &cls)) {
@@ -376,7 +376,7 @@ static void StartVibrationSync([[maybe_unused]] ani_env *env, ani_object effect,
     StartVibrate(vibrateInfo);
 }
 
-bool IsSupportEffectInterally([[maybe_unused]] ani_env *env, ani_string effectId)
+static bool IsSupportEffectInterally([[maybe_unused]] ani_env *env, ani_string effectId)
 {
     auto effectIdStr = AniStringUtils::ToStd(env, static_cast<ani_string>(effectId));
     MISC_HILOGD("effectId:%{public}s", effectIdStr.c_str());
