@@ -40,27 +40,30 @@ bool VibratorThread::Run()
     CALL_LOG_ENTER;
     prctl(PR_SET_NAME, VIBRATE_CONTROL_THREAD_NAME.c_str());
     VibrateInfo info = GetCurrentVibrateInfo();
+    VibratorIdentifierIPC identifier = GetCurrentVibrateParams();
+    std::vector<HdfWaveInformation> waveInfos = GetCurrentWaveInfo();
+    MISC_HILOGD("info.mode:%{public}s, deviceId:%{public}d, vibratorId:%{public}d", info.mode.c_str(), identifier.deviceId, identifier.vibratorId);
     if (info.mode == VIBRATE_TIME) {
-        int32_t ret = PlayOnce(info);
+        int32_t ret = PlayOnce(info, identifier);
         if (ret != SUCCESS) {
             MISC_HILOGE("Play once vibration fail, package:%{public}s", info.packageName.c_str());
             return false;
         }
     } else if (info.mode == VIBRATE_PRESET) {
-        int32_t ret = PlayEffect(info);
+        int32_t ret = PlayEffect(info, identifier);
         if (ret != SUCCESS) {
             MISC_HILOGE("Play effect vibration fail, package:%{public}s", info.packageName.c_str());
             return false;
         }
     } else if (info.mode == VIBRATE_CUSTOM_HD) {
-        int32_t ret = PlayCustomByHdHptic(info);
+        int32_t ret = PlayCustomByHdHptic(info, identifier);
         if (ret != SUCCESS) {
             MISC_HILOGE("Play custom vibration by hd haptic fail, package:%{public}s", info.packageName.c_str());
             return false;
         }
     } else if (info.mode == VIBRATE_CUSTOM_COMPOSITE_EFFECT || info.mode == VIBRATE_CUSTOM_COMPOSITE_TIME) {
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
-        int32_t ret = PlayCustomByCompositeEffect(info);
+        int32_t ret = PlayCustomByCompositeEffect(info, identifier, waveInfos);
         if (ret != SUCCESS) {
             MISC_HILOGE("Play custom vibration by composite effect fail, package:%{public}s", info.packageName.c_str());
             return false;
@@ -70,10 +73,10 @@ bool VibratorThread::Run()
     return false;
 }
 
-int32_t VibratorThread::PlayOnce(const VibrateInfo &info)
+int32_t VibratorThread::PlayOnce(const VibrateInfo &info, const VibratorIdentifierIPC& identifier)
 {
     std::unique_lock<std::mutex> vibrateLck(vibrateMutex_);
-    int32_t ret = VibratorDevice.StartOnce(static_cast<uint32_t>(info.duration));
+    int32_t ret = VibratorDevice.StartOnce(identifier, static_cast<uint32_t>(info.duration));
     if (ret != SUCCESS) {
         MISC_HILOGE("StartOnce fail, duration:%{public}d", info.duration);
         return ERROR;
@@ -81,7 +84,7 @@ int32_t VibratorThread::PlayOnce(const VibrateInfo &info)
     cv_.wait_for(vibrateLck, std::chrono::milliseconds(info.duration), [this] { return exitFlag_.load(); });
     if (exitFlag_) {
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
-        VibratorDevice.Stop(HDF_VIBRATOR_MODE_ONCE);
+        VibratorDevice.Stop(identifier, HDF_VIBRATOR_MODE_ONCE);
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
         MISC_HILOGD("Stop duration:%{public}d, package:%{public}s", info.duration, info.packageName.c_str());
         return SUCCESS;
@@ -89,13 +92,13 @@ int32_t VibratorThread::PlayOnce(const VibrateInfo &info)
     return SUCCESS;
 }
 
-void VibratorThread::HandleMultipleVibrations()
+void VibratorThread::HandleMultipleVibrations(const VibratorIdentifierIPC& identifier)
 {
-    if (VibratorDevice.IsVibratorRunning()) {
-        VibratorDevice.Stop(HDF_VIBRATOR_MODE_PRESET);
-        VibratorDevice.Stop(HDF_VIBRATOR_MODE_HDHAPTIC);
+    if (VibratorDevice.IsVibratorRunning(identifier)) {
+        VibratorDevice.Stop(identifier, HDF_VIBRATOR_MODE_PRESET);
+        VibratorDevice.Stop(identifier, HDF_VIBRATOR_MODE_HDHAPTIC);
         for (size_t i = 0; i < RETRY_NUMBER; i++) {
-            if (!VibratorDevice.IsVibratorRunning()) {
+            if (!VibratorDevice.IsVibratorRunning(identifier)) {
                 MISC_HILOGI("No running vibration");
                 return;
             }
@@ -105,17 +108,17 @@ void VibratorThread::HandleMultipleVibrations()
     }
 }
 
-int32_t VibratorThread::PlayEffect(const VibrateInfo &info)
+int32_t VibratorThread::PlayEffect(const VibrateInfo &info, const VibratorIdentifierIPC& identifier)
 {
     std::unique_lock<std::mutex> vibrateLck(vibrateMutex_);
     for (int32_t i = 0; i < info.count; ++i) {
         std::string effect = info.effect;
         int32_t duration = info.duration;
         if (i >= 1) { /**Multiple vibration treatment*/
-            HandleMultipleVibrations();
+            HandleMultipleVibrations(identifier);
             duration += DELAY_TIME2;
         }
-        int32_t ret = VibratorDevice.StartByIntensity(effect, info.intensity);
+        int32_t ret = VibratorDevice.StartByIntensity(identifier, effect, info.intensity);
         if (ret != SUCCESS) {
             MISC_HILOGE("Vibrate effect %{public}s failed, ", effect.c_str());
             return ERROR;
@@ -123,7 +126,7 @@ int32_t VibratorThread::PlayEffect(const VibrateInfo &info)
         cv_.wait_for(vibrateLck, std::chrono::milliseconds(duration), [this] { return exitFlag_.load(); });
         if (exitFlag_) {
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
-            VibratorDevice.Stop(HDF_VIBRATOR_MODE_PRESET);
+            VibratorDevice.Stop(identifier, HDF_VIBRATOR_MODE_PRESET);
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
             MISC_HILOGD("Stop effect:%{public}s, package:%{public}s", effect.c_str(), info.packageName.c_str());
             return SUCCESS;
@@ -132,7 +135,7 @@ int32_t VibratorThread::PlayEffect(const VibrateInfo &info)
     return SUCCESS;
 }
 
-int32_t VibratorThread::PlayCustomByHdHptic(const VibrateInfo &info)
+int32_t VibratorThread::PlayCustomByHdHptic(const VibrateInfo &info, const VibratorIdentifierIPC& identifier)
 {
     std::unique_lock<std::mutex> vibrateLck(vibrateMutex_);
     const std::vector<VibratePattern> &patterns = info.package.patterns;
@@ -147,15 +150,15 @@ int32_t VibratorThread::PlayCustomByHdHptic(const VibrateInfo &info)
         cv_.wait_for(vibrateLck, std::chrono::milliseconds(delayTime), [this] { return exitFlag_.load(); });
         if (exitFlag_) {
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
-            VibratorDevice.Stop(HDF_VIBRATOR_MODE_HDHAPTIC);
+            VibratorDevice.Stop(identifier, HDF_VIBRATOR_MODE_HDHAPTIC);
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
             MISC_HILOGD("Stop hd haptic, package:%{public}s", info.packageName.c_str());
             return SUCCESS;
         }
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
-        HandleMultipleVibrations();
+        HandleMultipleVibrations(identifier);
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
-        int32_t ret = VibratorDevice.PlayPattern(patterns[i]);
+        int32_t ret = VibratorDevice.PlayPattern(identifier, patterns[i]);
         if (ret != SUCCESS) {
             MISC_HILOGE("Vibrate hd haptic failed");
             return ERROR;
@@ -164,19 +167,49 @@ int32_t VibratorThread::PlayCustomByHdHptic(const VibrateInfo &info)
     return SUCCESS;
 }
 
-#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
-int32_t VibratorThread::PlayCustomByCompositeEffect(const VibrateInfo &info)
+VibrateInfo VibratorThread::copyInfoWithIndexEvents(const VibrateInfo& originalInfo, const VibratorIdentifierIPC& identifier) 
 {
-    auto &matcher = CustomVibrationMatcher::GetInstance();
+    VibrateInfo newInfo = originalInfo;
+    VibratePackage newPackage;
+    int32_t parseDuration = 0;
+
+    for (const auto& pattern : originalInfo.package.patterns) {
+        VibratePattern newPattern;
+        newPattern.startTime = pattern.startTime;
+        newPattern.patternDuration = pattern.patternDuration;
+        
+        for (const auto& event : pattern.events) {
+            if (event.index == 0 || event.index == identifier.position) {
+                newPattern.events.push_back(event);
+                parseDuration = event.duration;
+            }
+        }
+        
+        if (!newPattern.events.empty()) {
+            newPackage.patterns.push_back(newPattern);
+        }
+    }
+    
+    newInfo.package = newPackage;
+    newInfo.package.packageDuration = parseDuration;
+    return newInfo;
+}
+
+#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
+int32_t VibratorThread::PlayCustomByCompositeEffect(const VibrateInfo &info, const VibratorIdentifierIPC& identifier,
+    std::vector<HdfWaveInformation> waveInfo)
+{
+    CustomVibrationMatcher matcher(identifier, waveInfo);
     HdfCompositeEffect hdfCompositeEffect;
-    if (info.mode == VIBRATE_CUSTOM_COMPOSITE_EFFECT) {
+    VibrateInfo newInfo = copyInfoWithIndexEvents(info, identifier);
+    if (newInfo.mode == VIBRATE_CUSTOM_COMPOSITE_EFFECT) {
         hdfCompositeEffect.type = HDF_EFFECT_TYPE_PRIMITIVE;
-        int32_t ret = matcher.TransformEffect(info.package, hdfCompositeEffect.compositeEffects);
+        int32_t ret = matcher.TransformEffect(newInfo.package, hdfCompositeEffect.compositeEffects);
         if (ret != SUCCESS) {
             MISC_HILOGE("Transform pattern to predefined wave fail");
             return ERROR;
         }
-    } else if (info.mode == VIBRATE_CUSTOM_COMPOSITE_TIME) {
+    } else if (newInfo.mode == VIBRATE_CUSTOM_COMPOSITE_TIME) {
         hdfCompositeEffect.type = HDF_EFFECT_TYPE_TIME;
         int32_t ret = matcher.TransformTime(info.package, hdfCompositeEffect.compositeEffects);
         if (ret != SUCCESS) {
@@ -184,10 +217,11 @@ int32_t VibratorThread::PlayCustomByCompositeEffect(const VibrateInfo &info)
             return ERROR;
         }
     }
-    return PlayCompositeEffect(info, hdfCompositeEffect);
+    return PlayCompositeEffect(newInfo, hdfCompositeEffect, identifier);
 }
 
-int32_t VibratorThread::PlayCompositeEffect(const VibrateInfo &info, const HdfCompositeEffect &hdfCompositeEffect)
+int32_t VibratorThread::PlayCompositeEffect(const VibrateInfo &info, const HdfCompositeEffect &hdfCompositeEffect, 
+    const VibratorIdentifierIPC& identifier)
 {
     std::unique_lock<std::mutex> vibrateLck(vibrateMutex_);
     HdfCompositeEffect effectsPart;
@@ -205,7 +239,7 @@ int32_t VibratorThread::PlayCompositeEffect(const VibrateInfo &info, const HdfCo
             return ERROR;
         }
         if ((effectsPart.compositeEffects.size() >= COMPOSITE_EFFECT_PART) || (i == (effectSize - 1))) {
-            int32_t ret = VibratorDevice.EnableCompositeEffect(effectsPart);
+            int32_t ret = VibratorDevice.EnableCompositeEffect(identifier, effectsPart);
             if (ret != SUCCESS) {
                 MISC_HILOGE("EnableCompositeEffect failed");
                 return ERROR;
@@ -215,7 +249,7 @@ int32_t VibratorThread::PlayCompositeEffect(const VibrateInfo &info, const HdfCo
             effectsPart.compositeEffects.clear();
         }
         if (exitFlag_) {
-            VibratorDevice.Stop(HDF_VIBRATOR_MODE_PRESET);
+            VibratorDevice.Stop(identifier, HDF_VIBRATOR_MODE_PRESET);
             MISC_HILOGD("Stop composite effect part, package:%{public}s", info.packageName.c_str());
             return SUCCESS;
         }
@@ -224,16 +258,31 @@ int32_t VibratorThread::PlayCompositeEffect(const VibrateInfo &info, const HdfCo
 }
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
 
-void VibratorThread::UpdateVibratorEffect(const VibrateInfo &info)
+void VibratorThread::UpdateVibratorEffect(const VibrateInfo &info, const VibratorIdentifierIPC& identifier,
+    std::vector<HdfWaveInformation> &waveInfos)
 {
     std::unique_lock<std::mutex> lck(currentVibrationMutex_);
     currentVibration_ = info;
+    currentVibrateParams_ = identifier;
+    waveInfos_ = waveInfos;
 }
 
 VibrateInfo VibratorThread::GetCurrentVibrateInfo()
 {
     std::unique_lock<std::mutex> lck(currentVibrationMutex_);
     return currentVibration_;
+}
+
+VibratorIdentifierIPC VibratorThread::GetCurrentVibrateParams()
+{
+    std::unique_lock<std::mutex> lck(currentVibrateParamsMutex_);
+    return currentVibrateParams_;
+}
+
+std::vector<HdfWaveInformation> VibratorThread::GetCurrentWaveInfo()
+{
+    std::unique_lock<std::mutex> lck(currentVibrateParamsMutex_);
+    return waveInfos_;
 }
 
 void VibratorThread::SetExitStatus(bool status)
@@ -245,6 +294,21 @@ void VibratorThread::WakeUp()
 {
     MISC_HILOGD("Notify the vibratorThread");
     cv_.notify_one();
+}
+
+void VibratorThread::ResetVibrateInfo()
+{
+    std::unique_lock<std::mutex> lck(currentVibrationMutex_);
+    currentVibration_.mode = "";
+    currentVibration_.packageName = "";
+    currentVibration_.pid = -1;
+    currentVibration_.uid = -1;
+    currentVibration_.usage = 0;
+    currentVibration_.systemUsage = false;
+    currentVibration_.duration = 0;
+    currentVibration_.effect = "";
+    currentVibration_.count = 0;
+    currentVibration_.intensity = 0;
 }
 }  // namespace Sensors
 }  // namespace OHOS

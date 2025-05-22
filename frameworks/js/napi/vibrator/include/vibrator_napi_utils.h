@@ -34,10 +34,21 @@ using std::string;
 constexpr int32_t CALLBACK_NUM = 3;
 constexpr uint32_t STRING_LENGTH_MAX = 64;
 
+#define CHKNRF(env, state, message) \
+    do { \
+        if ((state) != napi_ok) { \
+            MISC_HILOGE("(%{public}s) fail", #message); \
+            return false; \
+        } \
+    } while (0)
+
 enum CallbackType {
     SYSTEM_VIBRATE_CALLBACK = 1,
     COMMON_CALLBACK,
     IS_SUPPORT_EFFECT_CALLBACK,
+    GET_VIBRATOR_INFO_LIST,
+    GET_EFFECT_INFO,
+    VIBRATOR_STATE_CHANGE,
 };
 
 struct VibrateInfo {
@@ -71,6 +82,10 @@ public:
     AsyncCallbackError error;
     CallbackType callbackType = COMMON_CALLBACK;
     bool isSupportEffect {false};
+    std::vector<VibratorInfos> vibratorInfos;
+    int32_t arrayLength;
+    EffectInfo effectInfo;
+    VibratorDeviceInfo deviceInfo;
     std::string flag;
     AsyncCallbackInfo(napi_env env) : env(env) {}
     ~AsyncCallbackInfo();
@@ -80,6 +95,9 @@ using ConstructResultFunc = bool(*)(const napi_env &env, sptr<AsyncCallbackInfo>
     napi_value result[], int32_t length);
 
 bool CreateInt32Property(napi_env env, napi_value &eventObj, const char* name, int32_t value);
+bool CreateStringProperty(napi_env env, napi_value &eventObj, const char* name,
+    const char* value, int32_t valueLength);
+bool CreateBooleanProperty(napi_env env, napi_value &eventObj, const char* name, bool value);
 bool IsMatchArrayType(const napi_env &env, const napi_value &value);
 bool IsMatchType(const napi_env &env, const napi_value &value, const napi_valuetype &type);
 bool GetNapiInt32(const napi_env &env, const int32_t value, napi_value &result);
@@ -94,9 +112,17 @@ bool GetPropertyInt32(const napi_env &env, const napi_value &value, const std::s
 bool GetPropertyInt64(const napi_env &env, const napi_value &value, const std::string &type, int64_t &result);
 bool GetNapiParam(const napi_env &env, const napi_callback_info &info, size_t &argc, napi_value &argv);
 bool ConvertErrorToResult(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo, napi_value &result);
+napi_value ConvertToJsVibratorInfo(const napi_env& env, const VibratorInfos& vibratorInfo);
+napi_value ConvertToJsEffectInfo(const napi_env& env, const EffectInfo& effectInfo);
 bool ConstructCommonResult(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo, napi_value result[],
     int32_t length);
 bool ConstructIsSupportEffectResult(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo,
+    napi_value result[], int32_t length);
+bool ConstructGetVibratorInfoListResult(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo,
+    napi_value result[], int32_t length);  
+bool ConstructIsSupportEffectInfoResult(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo,
+    napi_value result[], int32_t length);
+bool ConstructVibratorPlugInfoResult(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo,
     napi_value result[], int32_t length);
 void EmitAsyncCallbackWork(sptr<AsyncCallbackInfo> async_callback_info);
 void EmitPromiseWork(sptr<AsyncCallbackInfo> asyncCallbackInfo);

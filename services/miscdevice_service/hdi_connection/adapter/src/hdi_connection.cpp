@@ -21,6 +21,7 @@
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
 
 #include "sensors_errors.h"
+#include "vibrator_plug_callback.h"
 
 #undef LOG_TAG
 #define LOG_TAG "HdiConnection"
@@ -29,17 +30,23 @@ namespace OHOS {
 namespace Sensors {
 using namespace OHOS::HiviewDFX;
 namespace {
+sptr<IVibratorPlugCallback> g_eventCallback = nullptr;
 constexpr int32_t GET_HDI_SERVICE_COUNT = 10;
 constexpr uint32_t WAIT_MS = 100;
 } // namespace
+DevicePlugCallback HdiConnection::devicePlugCb_ = nullptr;
 
 int32_t HdiConnection::ConnectHdi()
 {
+    return ERR_OK;
     CALL_LOG_ENTER;
     int32_t retry = 0;
     while (retry < GET_HDI_SERVICE_COUNT) {
         vibratorInterface_ = IVibratorInterface::Get();
         if (vibratorInterface_ != nullptr) {
+            MISC_HILOGW("Connect v2_0 hdi success");
+            g_eventCallback = new (std::nothrow) VibratorPlugCallback();
+            CHKPR(g_eventCallback, ERR_NO_INIT);
             RegisterHdiDeathRecipient();
             return ERR_OK;
         }
@@ -55,10 +62,11 @@ int32_t HdiConnection::ConnectHdi()
     return ERR_INVALID_VALUE;
 }
 
-int32_t HdiConnection::StartOnce(uint32_t duration)
+int32_t HdiConnection::StartOnce(const VibratorIdentifierIPC &params, uint32_t duration)
 {
-    CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
-    int32_t ret = vibratorInterface_->StartOnce(duration);
+    // CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
+    // int32_t ret = vibratorInterface_->StartOnce(params.deviceId, params.vibratorId, duration);
+    int32_t ret = 0;
     if (ret < 0) {
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
@@ -70,15 +78,17 @@ int32_t HdiConnection::StartOnce(uint32_t duration)
     return ERR_OK;
 }
 
-int32_t HdiConnection::Start(const std::string &effectType)
+int32_t HdiConnection::Start(const VibratorIdentifierIPC &params, const std::string &effectType)
 {
     MISC_HILOGD("Time delay measurement:end time");
     if (effectType.empty()) {
         MISC_HILOGE("effectType is null");
         return VIBRATOR_ON_ERR;
     }
-    CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
-    int32_t ret = vibratorInterface_->Start(effectType);
+    // CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
+    // int32_t ret = vibratorInterface_->Start(params.deviceId, params.vibratorId, effectType);
+    int32_t ret = 0;
+    
     if (ret < 0) {
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
@@ -91,15 +101,17 @@ int32_t HdiConnection::Start(const std::string &effectType)
 }
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-int32_t HdiConnection::EnableCompositeEffect(const HdfCompositeEffect &hdfCompositeEffect)
+int32_t HdiConnection::EnableCompositeEffect(const VibratorIdentifierIPC &params, const HdfCompositeEffect &hdfCompositeEffect)
 {
     MISC_HILOGD("Time delay measurement:end time");
     if (hdfCompositeEffect.compositeEffects.empty()) {
         MISC_HILOGE("compositeEffects is empty");
         return VIBRATOR_ON_ERR;
     }
-    CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
-    int32_t ret = vibratorInterface_->EnableCompositeEffect(hdfCompositeEffect);
+    // CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
+    // int32_t ret = vibratorInterface_->EnableCompositeEffect(params.deviceId, params.vibratorId, hdfCompositeEffect);
+    int32_t ret = 0;
+
     if (ret < 0) {
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
@@ -111,23 +123,29 @@ int32_t HdiConnection::EnableCompositeEffect(const HdfCompositeEffect &hdfCompos
     return ERR_OK;
 }
 
-bool HdiConnection::IsVibratorRunning()
+bool HdiConnection::IsVibratorRunning(const VibratorIdentifierIPC &params)
 {
     bool state = false;
-    CHKPR(vibratorInterface_, false);
-    vibratorInterface_->IsVibratorRunning(state);
+    // CHKPR(vibratorInterface_, false);
+    // vibratorInterface_->IsVibratorRunning(params.deviceId, params.vibratorId, state);
+    state = true;
+
     return state;
 }
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
-std::optional<HdfEffectInfo> HdiConnection::GetEffectInfo(const std::string &effect)
+std::optional<HdfEffectInfo> HdiConnection::GetEffectInfo(const VibratorIdentifierIPC &params, const std::string &effect)
 {
-    if (vibratorInterface_ == nullptr) {
-        MISC_HILOGE("Connect v1_1 hdi failed");
-        return std::nullopt;
-    }
+    // if (vibratorInterface_ == nullptr) {
+    //     MISC_HILOGE("Connect v1_1 hdi failed");
+    //     return std::nullopt;
+    // }
     HdfEffectInfo effectInfo;
-    int32_t ret = vibratorInterface_->GetEffectInfo(effect, effectInfo);
+    // int32_t ret = vibratorInterface_->GetEffectInfo(params.deviceId, params.vibratorId, effect, effectInfo);
+    effectInfo.duration = 2000;
+    effectInfo.isSupportEffect = true;
+    int32_t ret = 0;
+
     if (ret < 0) {
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
@@ -139,10 +157,12 @@ std::optional<HdfEffectInfo> HdiConnection::GetEffectInfo(const std::string &eff
     return effectInfo;
 }
 
-int32_t HdiConnection::Stop(HdfVibratorModeV1_2 mode)
+int32_t HdiConnection::Stop(const VibratorIdentifierIPC &params, HdfVibratorMode mode)
 {
-    CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
-    int32_t ret = vibratorInterface_->StopV1_2(mode);
+    // CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
+    // int32_t ret = vibratorInterface_->Stop(params.deviceId, params.vibratorId, mode);
+    int32_t ret = 0;
+
     if (ret < 0) {
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
@@ -154,10 +174,13 @@ int32_t HdiConnection::Stop(HdfVibratorModeV1_2 mode)
     return ERR_OK;
 }
 
-int32_t HdiConnection::GetDelayTime(int32_t mode, int32_t &delayTime)
+int32_t HdiConnection::GetDelayTime(const VibratorIdentifierIPC &params, int32_t mode, int32_t &delayTime)
 {
-    CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
-    int32_t ret = vibratorInterface_->GetHapticStartUpTime(mode, delayTime);
+    // CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
+    // int32_t ret = vibratorInterface_->GetHapticStartUpTime(params.deviceId, params.vibratorId, mode, delayTime);
+    int32_t ret = 0;
+    delayTime = 2000;
+
     if (ret < 0) {
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
@@ -169,11 +192,17 @@ int32_t HdiConnection::GetDelayTime(int32_t mode, int32_t &delayTime)
     return ERR_OK;
 }
 
-int32_t HdiConnection::GetVibratorCapacity(VibratorCapacity &capacity)
+int32_t HdiConnection::GetVibratorCapacity(const VibratorIdentifierIPC &params, VibratorCapacity &capacity)
 {
-    CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
+    // CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
     HapticCapacity hapticCapacity;
-    int32_t ret = vibratorInterface_->GetHapticCapacity(hapticCapacity);
+    // int32_t ret = vibratorInterface_->GetHapticCapacity(params.deviceId, hapticCapacity);
+    int32_t ret = 0;
+    capacity.isSupportHdHaptic = true;
+    capacity.isSupportPresetMapping = true;
+    capacity.isSupportTimeDelay = true;
+    return ERR_OK;
+
     if (ret < 0) {
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
@@ -189,9 +218,9 @@ int32_t HdiConnection::GetVibratorCapacity(VibratorCapacity &capacity)
     return ERR_OK;
 }
 
-int32_t HdiConnection::PlayPattern(const VibratePattern &pattern)
+int32_t HdiConnection::PlayPattern(const VibratorIdentifierIPC &params, const VibratePattern &pattern)
 {
-    CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
+    // CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
     HapticPaket packet = {};
     packet.time = pattern.startTime;
     int32_t eventNum = static_cast<int32_t>(pattern.events.size());
@@ -215,7 +244,9 @@ int32_t HdiConnection::PlayPattern(const VibratePattern &pattern)
         }
         packet.events.emplace_back(hapticEvent);
     }
-    int32_t ret = vibratorInterface_->PlayHapticPattern(packet);
+    // int32_t ret = vibratorInterface_->PlayHapticPattern(params.deviceId, packet);
+    int32_t ret = 0;
+
     if (ret < 0) {
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
@@ -229,12 +260,26 @@ int32_t HdiConnection::PlayPattern(const VibratePattern &pattern)
 
 int32_t HdiConnection::DestroyHdiConnection()
 {
+    CALL_LOG_ENTER;
+    CHKPR(vibratorInterface_, ERR_NO_INIT);
+    int32_t ret = vibratorInterface_->UnRegVibratorPlugCallback(g_eventCallback);
+    if (ret != 0) {
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "DestroyHdiConnection", "ERROR_CODE", ret);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
+        MISC_HILOGE("UnRegVibratorPlugCallback is failed");
+        return ret;
+    }
+    g_eventCallback = nullptr;
     UnregisterHdiDeathRecipient();
     return ERR_OK;
 }
 
 void HdiConnection::RegisterHdiDeathRecipient()
 {
+    return;
+
     CALL_LOG_ENTER;
     if (vibratorInterface_ == nullptr) {
         MISC_HILOGE("Connect v1_1 hdi failed");
@@ -281,15 +326,17 @@ void HdiConnection::Reconnect()
     }
 }
 
-int32_t HdiConnection::StartByIntensity(const std::string &effect, int32_t intensity)
+int32_t HdiConnection::StartByIntensity(const VibratorIdentifierIPC &params, const std::string &effect, int32_t intensity)
 {
     MISC_HILOGD("Time delay measurement:end time, effect:%{public}s, intensity:%{public}d", effect.c_str(), intensity);
     if (effect.empty()) {
         MISC_HILOGE("effect is null");
         return VIBRATOR_ON_ERR;
     }
-    CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
-    int32_t ret = vibratorInterface_->StartByIntensity(effect, intensity);
+    // CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
+    // int32_t ret = vibratorInterface_->StartByIntensity(params.deviceId, params.vibratorId, effect, intensity);
+    int32_t ret = 0;
+
     if (ret < 0) {
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
@@ -301,16 +348,177 @@ int32_t HdiConnection::StartByIntensity(const std::string &effect, int32_t inten
     return ERR_OK;
 }
 
-int32_t HdiConnection::GetAllWaveInfo(std::vector<HdfWaveInformation> &waveInfos)
+int32_t HdiConnection::GetVibratorInfo(std::vector<HdfVibratorInfo> &hdfVibratorInfo)
 {
-    CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
-    int32_t vibratorId = 1;
-    int32_t ret = vibratorInterface_->GetAllWaveInfo(vibratorId, waveInfos);
+    // CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
+    // int32_t ret = vibratorInterface_->GetVibratorInfo(hdfVibratorInfo);
+    int32_t ret = 0;
+    HdfVibratorInfo info;
+    info.isSupportIntensity = true;
+    info.isSupportFrequency = false;
+    info.intensityMaxValue = 255;
+    info.intensityMinValue = 0;
+    info.frequencyMaxValue = 200;
+    info.frequencyMinValue = 50;
+    info.deviceId = 2;
+    info.vibratorId = 99;
+    info.isLocal = 1;
+    info.position = 1;
+    hdfVibratorInfo.push_back(info);
+
+    HdfVibratorInfo info1;
+    info1.isSupportIntensity = true;
+    info1.isSupportFrequency = false;
+    info1.intensityMaxValue = 255;
+    info1.intensityMinValue = 0;
+    info1.frequencyMaxValue = 200;
+    info1.frequencyMinValue = 50;
+    info1.deviceId = 2;
+    info1.vibratorId = 100;
+    info1.isLocal = 1;
+    info1.position = 2;
+    hdfVibratorInfo.push_back(info1);
+
+    if (ret != ERR_OK) {
+        MISC_HILOGE("GetVibratorInfo failed");
+    }
+    return ret;
+    
+}
+
+int32_t HdiConnection::GetAllWaveInfo(const VibratorIdentifierIPC &params, std::vector<HdfWaveInformation> &waveInfos)
+{
+    // CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
+    // int32_t ret = vibratorInterface_->GetAllWaveInfo(params.deviceId, params.vibratorId, waveInfos);
+    int32_t ret = 0;
+        HdfWaveInformation info1;
+        info1.vibratorId = 1;
+        info1.waveId = 101;
+        info1.intensity = 0.8f;
+        info1.frequency = 50.0f;
+        info1.duration = 200;
+        info1.reserved = 0;
+        waveInfos.push_back(info1);
+    
+        HdfWaveInformation info2;
+        info2.vibratorId = 2;
+        info2.waveId = 102;
+        info2.intensity = 0.6f;
+        info2.frequency = 60.0f;
+        info2.duration = 300;
+        info2.reserved = 0;
+        waveInfos.push_back(info2);
+
     if (ret != ERR_OK) {
         MISC_HILOGE("GetAllWaveInfo failed");
     }
     return ret;
 }
 
+int32_t HdiConnection::GetVibratorIdList(const VibratorIdentifierIPC &params,
+    std::vector<HdfVibratorInfo> &vibratorInfo)
+{
+    // CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
+    // int32_t ret = vibratorInterface_->GetVibratorIdSingle(params.deviceId, vibratorInfo);
+    int32_t ret = 0;
+    HdfVibratorInfo info;
+    info.isSupportIntensity = true;
+    info.isSupportFrequency = false;
+    info.intensityMaxValue = 255;
+    info.intensityMinValue = 0;
+    info.frequencyMaxValue = 200;
+    info.frequencyMinValue = 50;
+    info.deviceId = 3;
+    info.vibratorId = 101;
+    info.isLocal = 0;
+    vibratorInfo.push_back(info);
+
+    HdfVibratorInfo info1;
+    info1.isSupportIntensity = true;
+    info1.isSupportFrequency = false;
+    info1.intensityMaxValue = 255;
+    info1.intensityMinValue = 0;
+    info1.frequencyMaxValue = 200;
+    info1.frequencyMinValue = 50;
+    info1.deviceId = 3;
+    info1.vibratorId = 102;
+    info1.isLocal = 0;
+    vibratorInfo.push_back(info1);
+
+
+    if (ret != ERR_OK) {
+        MISC_HILOGE("GetVibratorIdList failed");
+    }
+    return ret;
+}
+
+int32_t HdiConnection::GetEffectInfo(const VibratorIdentifierIPC &params, const std::string &effectType,
+            HdfEffectInfo &effectInfo)
+{
+    // CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
+    // int32_t ret = vibratorInterface_->GetEffectInfo(params.deviceId, params.vibratorId, effectType, effectInfo);
+    int32_t ret = 0;
+    effectInfo.duration = 2000;
+    effectInfo.isSupportEffect = true;
+
+    if (ret != ERR_OK) {
+        MISC_HILOGE("GetVibratorIdList failed");
+    }
+    return ret;
+}
+
+int32_t HdiConnection::RegisterVibratorPlugCallback(DevicePlugCallback cb)
+{
+    CALL_LOG_ENTER;
+    CHKPR(cb, ERR_NO_INIT);
+    // CHKPR(vibratorInterface_, ERR_NO_INIT);
+    devicePlugCb_ = cb;
+    // int32_t ret = vibratorInterface_->RegVibratorPlugCallback(g_eventCallback);
+    int32_t ret = 0;
+
+    if (ret != 0) {
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "RegisterVibratorCallback", "ERROR_CODE", ret);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
+        MISC_HILOGE("RegVibratorPlugCallback is failed");
+        return ret;
+    }
+
+
+    // std::thread thread([this]() mutable {
+    //     while (1)
+    //     {
+    //         sleep(30);
+    //         HdfVibratorPlugInfo info;
+    //         info.status = 1;
+    //         info.deviceId = 2;
+    //         if (devicePlugCb_) {
+    //             devicePlugCb_(info);
+    //         }
+    //         sleep(30);
+    //         {
+    //             HdfVibratorPlugInfo info;
+    //             info.status = 0;
+    //             info.deviceId = 2;
+    //             if (devicePlugCb_) {
+    //                 devicePlugCb_(info);
+    //             }
+    //         }
+    //     }
+    // });
+    // thread.detach();
+
+
+    return ERR_OK;
+}
+
+DevicePlugCallback HdiConnection::GetVibratorPlugCb()
+{
+    if (devicePlugCb_ == nullptr) {
+        MISC_HILOGE("GetVibratorPlugCb cannot be null");
+    }
+    return devicePlugCb_;
+}
 }  // namespace Sensors
 }  // namespace OHOS

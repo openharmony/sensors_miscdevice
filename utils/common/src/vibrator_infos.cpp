@@ -224,36 +224,286 @@ VibratePattern* VibratePattern::Unmarshalling(Parcel &data)
     return pattern;
 }
 
-void VibrateParameter::Dump() const
+bool VibratorInfoIPC::Marshalling(Parcel &parcel) const
 {
-    MISC_HILOGI("intensity:%{public}d, frequency:%{public}d", intensity, frequency);
-}
-
-bool VibrateParameter::Marshalling(Parcel &parcel) const
-{
-    if (!parcel.WriteInt32(intensity)) {
-        MISC_HILOGE("Write parameter's intensity failed");
+    if (!parcel.WriteInt32(deviceId)) {
+        MISC_HILOGE("Write deviceId failed");
         return false;
     }
-    if (!parcel.WriteInt32(frequency)) {
-        MISC_HILOGE("Write parameter's frequency failed");
+    if (!parcel.WriteInt32(vibratorId)) {
+        MISC_HILOGE("Write vibratorId failed");
+        return false;
+    }
+    if (!parcel.WriteString(deviceName)) {
+        MISC_HILOGE("Write vibratorId failed");
+        return false;
+    }
+    if (!parcel.WriteBool(isSupportHdHaptic)) {
+        MISC_HILOGE("Write isSupportHdHaptic failed");
+        return false;
+    }
+    if (!parcel.WriteBool(isLocalVibrator)) {
+        MISC_HILOGE("Write isLocalVibrator failed");
         return false;
     }
     return true;
 }
 
-VibrateParameter* VibrateParameter::Unmarshalling(Parcel &data)
+VibratorInfoIPC* VibratorInfoIPC::Unmarshalling(Parcel &data)
 {
-    auto parameter = new (std::nothrow) VibrateParameter();
-    if (parameter == nullptr) {
+    auto vibratorInfoIPC = new (std::nothrow) VibratorInfoIPC();
+    if (vibratorInfoIPC == nullptr) {
+        MISC_HILOGE("Read init vibratorInfoIPC failed");
+        return nullptr;
+    }
+    if (!data.ReadInt32(vibratorInfoIPC->deviceId)) {
+        MISC_HILOGE("Read deviceId failed");
+        vibratorInfoIPC = nullptr;
+        return vibratorInfoIPC;
+    }
+    if (!data.ReadInt32(vibratorInfoIPC->vibratorId)) {
+        MISC_HILOGE("Read vibratorId failed");
+        vibratorInfoIPC = nullptr;
+        return vibratorInfoIPC;
+    }
+    if (!data.ReadString(vibratorInfoIPC->deviceName)) {
+        MISC_HILOGE("Read deviceName failed");
+        vibratorInfoIPC = nullptr;
+        return vibratorInfoIPC;
+    }
+    if (!data.ReadBool(vibratorInfoIPC->isSupportHdHaptic)) {
+        MISC_HILOGE("Read isSupportHdHaptic failed");
+        vibratorInfoIPC = nullptr;
+        return vibratorInfoIPC;
+    }
+    if (!data.ReadBool(vibratorInfoIPC->isLocalVibrator)) {
+        MISC_HILOGE("Read isLocalVibrator failed");
+        vibratorInfoIPC = nullptr;
+        return vibratorInfoIPC;
+    }
+    return vibratorInfoIPC;
+}
+
+void VibratorInfoIPC::Dump() const
+{
+    std::string retStr;
+    retStr = "deviceId: "+ std::to_string(deviceId) + " ";
+    retStr += ("vibratorId: " + std::to_string(vibratorId) + " ");
+    retStr += ("deviceName: " + deviceName + " ");
+    retStr += ("isSupportHdHaptic: " + (isSupportHdHaptic? std::string("true"):std::string("false")) + " ");
+    MISC_HILOGI("VibratorInfoIPC: [%{public}s]", retStr.c_str());
+}
+
+void VibratorIdentifierIPC::Dump() const
+{
+    MISC_HILOGI("deviceId:%{public}d, vibratorId:%{public}d", deviceId, vibratorId);
+}
+
+bool VibratorIdentifierIPC::Marshalling(Parcel &parcel) const
+{
+    if (!parcel.WriteInt32(deviceId)) {
+        MISC_HILOGE("Write parameter's deviceId failed");
+        return false;
+    }
+    if (!parcel.WriteInt32(vibratorId)) {
+        MISC_HILOGE("Write parameter's vibratorId failed");
+        return false;
+    }
+    return true;
+}
+
+VibratorIdentifierIPC* VibratorIdentifierIPC::Unmarshalling(Parcel &data)
+{
+    auto identifier = new (std::nothrow) VibratorIdentifierIPC();
+    if (identifier == nullptr) {
         MISC_HILOGE("Read init parameter failed");
         return nullptr;
     }
-    if (!(data.ReadInt32(parameter->intensity)) && !(data.ReadInt32(parameter->frequency))) {
-        MISC_HILOGE("Read parameter's intensity failed");
-        parameter = nullptr;
+    if (!(data.ReadInt32(identifier->deviceId))) {
+        MISC_HILOGE("Read parameter's deviceId or vibratorId failed");
+        identifier = nullptr;
     }
-    return parameter;
+    if (!(data.ReadInt32(identifier->vibratorId))) {
+        MISC_HILOGE("Read parameter's deviceId or vibratorId failed");
+        identifier = nullptr;
+    }
+    return identifier;
 }
+
+bool EffectInfoIPC::Marshalling(Parcel &parcel) const
+{
+    if (!parcel.WriteInt32(duration)) {
+        MISC_HILOGE("Write duration failed");
+        return false;
+    }
+    if (!parcel.WriteBool(isSupportEffect)) {
+        MISC_HILOGE("Write isSupportEffect failed");
+        return false;
+    }
+    return true;
+}
+
+EffectInfoIPC* EffectInfoIPC::Unmarshalling(Parcel &data)
+{
+    auto effectInfoIPC = new (std::nothrow) EffectInfoIPC();
+    if (effectInfoIPC == nullptr) {
+        MISC_HILOGE("Read init EffectInfoIPC failed");
+        return nullptr;
+    }
+    if (!data.ReadInt32(effectInfoIPC->duration)) {
+        MISC_HILOGE("Read duration failed");
+        effectInfoIPC = nullptr;
+        return effectInfoIPC;
+    }
+    if (!data.ReadBool(effectInfoIPC->isSupportEffect)) {
+        MISC_HILOGE("Read isSupportEffect failed");
+        effectInfoIPC = nullptr;
+        return effectInfoIPC;
+    }
+    return effectInfoIPC;
+}
+
+void EffectInfoIPC::Dump() const
+{
+    std::string retStr;
+    retStr = "duration: "+ std::to_string(duration) + " ";
+    retStr += ("isSupportEffect: " + (isSupportEffect? std::string("true"):std::string("false")));
+    MISC_HILOGI("EffectInfoIPC: [%{public}s]", retStr.c_str());
+}
+
+bool CustomHapticInfoIPC::Marshalling(Parcel &parcel) const
+{
+    if (!parcel.WriteInt32(usage)) {
+        MISC_HILOGE("Write usage failed");
+        return false;
+    }
+    if (!parcel.WriteBool(systemUsage)) {
+        MISC_HILOGE("Write systemUsage failed");
+        return false;
+    }
+    if (!parcel.WriteInt32(parameter.intensity)) {
+        MISC_HILOGE("Write intensity failed");
+        return false;
+    }
+    if (!parcel.WriteInt32(parameter.frequency)) {
+        MISC_HILOGE("Write frequency failed");
+        return false;
+    }
+    if (!parcel.WriteInt32(parameter.reserved)) {
+        MISC_HILOGE("Write reserved failed");
+        return false;
+    }
+    return true;
+}
+
+CustomHapticInfoIPC* CustomHapticInfoIPC::Unmarshalling(Parcel &data)
+{
+    auto customHapticInfoIPC = new (std::nothrow) CustomHapticInfoIPC();
+    if (customHapticInfoIPC == nullptr) {
+        MISC_HILOGE("Read init EffectInfoIPC failed");
+        return nullptr;
+    }
+    if (!data.ReadInt32(customHapticInfoIPC->usage)) {
+        MISC_HILOGE("Read usage failed");
+        customHapticInfoIPC = nullptr;
+        return customHapticInfoIPC;
+    }
+    if (!data.ReadBool(customHapticInfoIPC->systemUsage)) {
+        MISC_HILOGE("Read systemUsage failed");
+        customHapticInfoIPC = nullptr;
+        return customHapticInfoIPC;
+    }
+    if (!data.ReadInt32(customHapticInfoIPC->parameter.intensity)) {
+        MISC_HILOGE("Read intensity failed");
+        customHapticInfoIPC = nullptr;
+        return customHapticInfoIPC;
+    }
+    if (!data.ReadInt32(customHapticInfoIPC->parameter.frequency)) {
+        MISC_HILOGE("Read frequency failed");
+        customHapticInfoIPC = nullptr;
+        return customHapticInfoIPC;
+    }
+    if (!data.ReadInt32(customHapticInfoIPC->parameter.reserved)) {
+        MISC_HILOGE("Read reserved failed");
+        customHapticInfoIPC = nullptr;
+        return customHapticInfoIPC;
+    }
+    return customHapticInfoIPC;
+}
+
+void CustomHapticInfoIPC::Dump() const
+{
+    std::string retStr;
+    retStr = "usage: "+ std::to_string(usage) + " ";
+    retStr += "systemUsage: " + std::to_string(systemUsage)  + " ";
+    retStr += "parameter.intensity: " + std::to_string(parameter.intensity)  + " ";
+    retStr += "parameter.intensity: " + std::to_string(parameter.frequency)  + " ";
+    retStr += "parameter.intensity: " + std::to_string(parameter.reserved)  + " ";
+    MISC_HILOGI("CustomHapticInfoIPC: [%{public}s]", retStr.c_str());
+}
+
+bool PrimitiveEffectIPC::Marshalling(Parcel &parcel) const
+{
+    if (!parcel.WriteInt32(intensity)) {
+        MISC_HILOGE("Write intensity failed");
+        return false;
+    }
+    if (!parcel.WriteInt32(usage)) {
+        MISC_HILOGE("Write usage failed");
+        return false;
+    }
+    if (!parcel.WriteBool(systemUsage)) {
+        MISC_HILOGE("Write systemUsage failed");
+        return false;
+    }
+    if (!parcel.WriteInt32(count)) {
+        MISC_HILOGE("Write count failed");
+        return false;
+    }
+    return true;
+}
+
+PrimitiveEffectIPC* PrimitiveEffectIPC::Unmarshalling(Parcel &data)
+{
+    auto primitiveEffectIPC = new (std::nothrow) PrimitiveEffectIPC();
+    if (primitiveEffectIPC == nullptr) {
+        MISC_HILOGE("Read init PrimitiveEffectIPC failed");
+        return nullptr;
+    }
+    if (!data.ReadInt32(primitiveEffectIPC->intensity)) {
+        MISC_HILOGE("Read intensity failed");
+        primitiveEffectIPC = nullptr;
+        return primitiveEffectIPC;
+    }
+    if (!data.ReadInt32(primitiveEffectIPC->usage)) {
+        MISC_HILOGE("Read usage failed");
+        primitiveEffectIPC = nullptr;
+        return primitiveEffectIPC;
+    }
+
+    if (!data.ReadBool(primitiveEffectIPC->systemUsage)) {
+        MISC_HILOGE("Read systemUsage failed");
+        primitiveEffectIPC = nullptr;
+        return primitiveEffectIPC;
+    }
+
+    if (!data.ReadInt32(primitiveEffectIPC->count)) {
+        MISC_HILOGE("Read count failed");
+        primitiveEffectIPC = nullptr;
+        return primitiveEffectIPC;
+    }
+    return primitiveEffectIPC;
+}
+
+void PrimitiveEffectIPC::Dump() const
+{
+    std::string retStr;
+    retStr = "intensity: "+ std::to_string(intensity) + " ";
+    retStr += "usage: " + std::to_string(usage)  + " ";
+    retStr += "systemUsage: " + std::to_string(systemUsage)  + " ";
+    retStr += "count: " + std::to_string(count)  + " ";
+    MISC_HILOGI("PrimitiveEffectIPC: [%{public}s]", retStr.c_str());
+}
+
 } // namespace Sensors
 } // namespace OHOS

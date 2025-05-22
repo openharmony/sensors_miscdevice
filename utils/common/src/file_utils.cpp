@@ -187,12 +187,10 @@ std::string ReadFd(const RawFileDescriptor &rawFd)
     int64_t fdSize = GetFileSize(rawFd.fd);
     if ((rawFd.offset < 0) || (rawFd.offset > fdSize)) {
         MISC_HILOGE("offset is invalid, offset:%{public}" PRId64, rawFd.offset);
-        close(rawFd.fd);
         return {};
     }
     if ((rawFd.length <= 0) || (rawFd.length > fdSize - rawFd.offset)) {
         MISC_HILOGE("length is invalid, length:%{public}" PRId64, rawFd.length);
-        close(rawFd.fd);
         return {};
     }
     FILE *fp = fdopen(rawFd.fd, "r");

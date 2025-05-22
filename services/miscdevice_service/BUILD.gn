@@ -20,6 +20,7 @@ ohos_shared_library("libmiscdevice_service") {
     "hdi_connection/adapter/src/compatible_light_connection.cpp",
     "hdi_connection/interface/src/light_hdi_connection.cpp",
     "hdi_connection/interface/src/vibrator_hdi_connection.cpp",
+    "hdi_connection/adapter/src/vibrator_plug_callback.cpp",
     "src/miscdevice_common_event_subscriber.cpp",
     "src/miscdevice_dump.cpp",
     "src/miscdevice_observer.cpp",
@@ -105,6 +106,7 @@ ohos_shared_library("libmiscdevice_service") {
       "drivers_interface_vibrator:libvibrator_proxy_1.1",
       "drivers_interface_vibrator:libvibrator_proxy_1.2",
       "drivers_interface_vibrator:libvibrator_proxy_1.3",
+      "drivers_interface_vibrator:libvibrator_proxy_2.0",
     ]
   }
 
@@ -219,6 +221,7 @@ ohos_static_library("libmiscdevice_service_static") {
       "drivers_interface_vibrator:libvibrator_proxy_1.1",
       "drivers_interface_vibrator:libvibrator_proxy_1.2",
       "drivers_interface_vibrator:libvibrator_proxy_1.3",
+      "drivers_interface_vibrator:libvibrator_proxy_2.0",
     ]
   }
 

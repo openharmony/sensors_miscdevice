@@ -17,14 +17,14 @@
 #define HDI_CONNECTION_H
 
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
-#include "v1_3/vibrator_interface_proxy.h"
+#include "v2_0/vibrator_interface_proxy.h"
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
 
 #include "death_recipient_template.h"
 #include "i_vibrator_hdi_connection.h"
 
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
-using OHOS::HDI::Vibrator::V1_3::IVibratorInterface;
+using OHOS::HDI::Vibrator::V2_0::IVibratorInterface;
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
 namespace OHOS {
 namespace Sensors {
@@ -33,25 +33,36 @@ public:
     HdiConnection() = default;
     virtual ~HdiConnection() {};
     int32_t ConnectHdi() override;
-    int32_t StartOnce(uint32_t duration) override;
-    int32_t Start(const std::string &effectType) override;
+    int32_t StartOnce(const VibratorIdentifierIPC &identifier, uint32_t duration) override;
+    int32_t Start(const VibratorIdentifierIPC &identifier, const std::string &effectType) override;
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    int32_t EnableCompositeEffect(const HdfCompositeEffect &hdfCompositeEffect) override;
-    bool IsVibratorRunning() override;
+    int32_t EnableCompositeEffect(const VibratorIdentifierIPC &identifier,
+        const HdfCompositeEffect &hdfCompositeEffect) override;
+    bool IsVibratorRunning(const VibratorIdentifierIPC &identifier) override;
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    std::optional<HdfEffectInfo> GetEffectInfo(const std::string &effect) override;
-    int32_t Stop(HdfVibratorModeV1_2 mode) override;
+    std::optional<HdfEffectInfo> GetEffectInfo(const VibratorIdentifierIPC &identifier,
+        const std::string &effect) override;
+    int32_t Stop(const VibratorIdentifierIPC &identifier, HdfVibratorMode mode) override;
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
-    int32_t GetDelayTime(int32_t mode, int32_t &delayTime) override;
-    int32_t GetVibratorCapacity(VibratorCapacity &capacity) override;
-    int32_t PlayPattern(const VibratePattern &pattern) override;
+    int32_t GetDelayTime(const VibratorIdentifierIPC &identifier, int32_t mode, int32_t &delayTime) override;
+    int32_t GetVibratorCapacity(const VibratorIdentifierIPC &identifier, VibratorCapacity &capacity) override;
+    int32_t PlayPattern(const VibratorIdentifierIPC &identifier, const VibratePattern &pattern) override;
     int32_t DestroyHdiConnection() override;
     void ProcessDeathObserver(const wptr<IRemoteObject> &object);
-    int32_t StartByIntensity(const std::string &effect, int32_t intensity) override;
+    int32_t StartByIntensity(const VibratorIdentifierIPC &identifier, const std::string &effect,
+        int32_t intensity) override;
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
-    int32_t GetAllWaveInfo(std::vector<HdfWaveInformation> &waveInfos) override;
+    int32_t GetVibratorInfo(std::vector<HdfVibratorInfo> &hdfVibratorInfo) override;
+    int32_t GetAllWaveInfo(const VibratorIdentifierIPC &identifier,
+        std::vector<HdfWaveInformation> &waveInfos) override;
+    int32_t GetVibratorIdList(const VibratorIdentifierIPC &identifier,
+        std::vector<HdfVibratorInfo> &vibratorInfoIpc) override;
+    int32_t GetEffectInfo(const VibratorIdentifierIPC &identifier, const std::string &effectType, 
+        HdfEffectInfo &effectInfo) override;
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
+    int32_t RegisterVibratorPlugCallback(DevicePlugCallback cb) override;
+    DevicePlugCallback GetVibratorPlugCb() override;
 
 private:
     DISALLOW_COPY_AND_MOVE(HdiConnection);
@@ -59,6 +70,7 @@ private:
     sptr<IVibratorInterface> vibratorInterface_ = nullptr;
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
     sptr<IRemoteObject::DeathRecipient> hdiDeathObserver_ = nullptr;
+    static DevicePlugCallback devicePlugCb_;
     void RegisterHdiDeathRecipient();
     void UnregisterHdiDeathRecipient();
     void Reconnect();

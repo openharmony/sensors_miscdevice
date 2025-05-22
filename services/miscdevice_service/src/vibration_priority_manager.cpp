@@ -675,32 +675,32 @@ bool VibrationPriorityManager::ShouldIgnoreInputMethod(const VibrateInfo &vibrat
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 
 VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo,
-    std::shared_ptr<VibratorThread> vibratorThread)
+    std::shared_ptr<VibratorThread> vibratorThread, const VibratorIdentifierIPC& identifier)
 {
     UpdateStatus();
     if (!IsSystemCalling() || vibrateInfo.systemUsage == false) {
 #ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
-        if (IgnoreAppVibrations(vibrateInfo)) {
-            MISC_HILOGD("Vibration is ignored for doNotDisturb, usage:%{public}d", vibrateInfo.usage);
-            return IGNORE_GLOBAL_SETTINGS;
-        }
+    if (IgnoreAppVibrations(vibrateInfo)) {
+        MISC_HILOGD("Vibration is ignored for doNotDisturb, usage:%{public}d", vibrateInfo.usage);
+        return IGNORE_GLOBAL_SETTINGS;
+    }
 #endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
-        if ((vibrateInfo.usage == USAGE_ALARM || vibrateInfo.usage == USAGE_RING
-            || vibrateInfo.usage == USAGE_NOTIFICATION || vibrateInfo.usage == USAGE_COMMUNICATION)
-            && (miscAudioRingerMode_ == RINGER_MODE_SILENT)) {
-            MISC_HILOGD("Vibration is ignored for ringer mode:%{public}d", static_cast<int32_t>(miscAudioRingerMode_));
-            return IGNORE_RINGER_MODE;
-        }
-        if (((vibrateInfo.usage == USAGE_TOUCH || vibrateInfo.usage == USAGE_MEDIA || vibrateInfo.usage == USAGE_UNKNOWN
-            || vibrateInfo.usage == USAGE_PHYSICAL_FEEDBACK || vibrateInfo.usage == USAGE_SIMULATE_REALITY)
-            && (miscFeedback_ == FEEDBACK_MODE_OFF))
+    if ((vibrateInfo.usage == USAGE_ALARM || vibrateInfo.usage == USAGE_RING
+        || vibrateInfo.usage == USAGE_NOTIFICATION || vibrateInfo.usage == USAGE_COMMUNICATION)
+        && (miscAudioRingerMode_ == RINGER_MODE_SILENT)) {
+        MISC_HILOGD("Vibration is ignored for ringer mode:%{public}d", static_cast<int32_t>(miscAudioRingerMode_));
+        return IGNORE_RINGER_MODE;
+    }
+    if (((vibrateInfo.usage == USAGE_TOUCH || vibrateInfo.usage == USAGE_MEDIA || vibrateInfo.usage == USAGE_UNKNOWN
+        || vibrateInfo.usage == USAGE_PHYSICAL_FEEDBACK || vibrateInfo.usage == USAGE_SIMULATE_REALITY)
+        && (miscFeedback_ == FEEDBACK_MODE_OFF))
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
-            && !ShouldIgnoreInputMethod(vibrateInfo)) {
+        && !ShouldIgnoreInputMethod(vibrateInfo)) {
 #else // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
-            ) {
+        ) {
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
-            MISC_HILOGD("Vibration is ignored for feedback:%{public}d", static_cast<int32_t>(miscFeedback_));
-            return IGNORE_FEEDBACK;
+        MISC_HILOGD("Vibration is ignored for feedback:%{public}d", static_cast<int32_t>(miscFeedback_));
+        return IGNORE_FEEDBACK;
         }
     }
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
@@ -713,7 +713,7 @@ VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &v
         MISC_HILOGD("There is no vibration, it can vibrate");
         return VIBRATION;
     }
-    if (!IsCurrentVibrate(vibratorThread)) {
+    if (!IsCurrentVibrate(vibratorThread, identifier)) {
         MISC_HILOGD("There is no vibration at the moment, it can vibrate");
         return VIBRATION;
     }
@@ -724,10 +724,12 @@ VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &v
     return ShouldIgnoreVibrate(vibrateInfo, vibratorThread->GetCurrentVibrateInfo());
 }
 
-bool VibrationPriorityManager::IsCurrentVibrate(std::shared_ptr<VibratorThread> vibratorThread) const
+bool VibrationPriorityManager::IsCurrentVibrate(std::shared_ptr<VibratorThread> vibratorThread, 
+            const VibratorIdentifierIPC& identifier) const
 {
 #if defined(OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM) && defined(HDF_DRIVERS_INTERFACE_VIBRATOR)
-    return ((vibratorThread != nullptr) && (vibratorThread->IsRunning() || VibratorDevice.IsVibratorRunning()));
+    return ((vibratorThread != nullptr) && (vibratorThread->IsRunning() ||
+        VibratorDevice.IsVibratorRunning(identifier)));
 #else
     return ((vibratorThread != nullptr) && (vibratorThread->IsRunning()));
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM && HDF_DRIVERS_INTERFACE_VIBRATOR

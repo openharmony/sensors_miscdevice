@@ -26,25 +26,34 @@ namespace OHOS {
 namespace Sensors {
 class VibratorThread : public Thread {
 public:
-    void UpdateVibratorEffect(const VibrateInfo &vibrateInfo);
+    void UpdateVibratorEffect(const VibrateInfo &vibrateInfo, const VibratorIdentifierIPC& identifier,
+        std::vector<HdfWaveInformation> &waveInfos);
     VibrateInfo GetCurrentVibrateInfo();
+    std::vector<HdfWaveInformation> GetCurrentWaveInfo();
     void SetExitStatus(bool status);
     void WakeUp();
-
+    void ResetVibrateInfo();
 protected:
     virtual bool Run();
 
 private:
-    int32_t PlayOnce(const VibrateInfo &info);
-    int32_t PlayEffect(const VibrateInfo &info);
-    int32_t PlayCustomByHdHptic(const VibrateInfo &info);
-    void HandleMultipleVibrations();
+    VibratorIdentifierIPC GetCurrentVibrateParams();
+    int32_t PlayOnce(const VibrateInfo &info, const VibratorIdentifierIPC& identifier);
+    int32_t PlayEffect(const VibrateInfo &info, const VibratorIdentifierIPC& identifier);
+    int32_t PlayCustomByHdHptic(const VibrateInfo &info, const VibratorIdentifierIPC& identifier);
+    void HandleMultipleVibrations(const VibratorIdentifierIPC& identifier);
+    VibrateInfo copyInfoWithIndexEvents(const VibrateInfo& originalInfo, const VibratorIdentifierIPC& identifier);
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
-    int32_t PlayCustomByCompositeEffect(const VibrateInfo &info);
-    int32_t PlayCompositeEffect(const VibrateInfo &info, const HdfCompositeEffect &hdfCompositeEffect);
+    int32_t PlayCustomByCompositeEffect(const VibrateInfo &info, const VibratorIdentifierIPC& identifier,
+        std::vector<HdfWaveInformation> waveInfo);
+    int32_t PlayCompositeEffect(const VibrateInfo &info, const HdfCompositeEffect &hdfCompositeEffect, 
+        const VibratorIdentifierIPC& identifier);
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
     std::mutex currentVibrationMutex_;
     VibrateInfo currentVibration_;
+    std::vector<HdfWaveInformation> waveInfos_;
+    std::mutex currentVibrateParamsMutex_;
+    VibratorIdentifierIPC currentVibrateParams_;
     std::mutex vibrateMutex_;
     std::condition_variable cv_;
     std::atomic<bool> exitFlag_ = false;

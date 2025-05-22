@@ -22,8 +22,12 @@ namespace OHOS {
 namespace Sensors {
 class IVibratorClient : public IRemoteBroker {
 public:
+    enum VibratorClientInterfaceId {
+        TRANS_ID_PLUG_ABILITY = 5,
+    };
     IVibratorClient() = default;
     virtual ~IVibratorClient() = default;
+    virtual int ProcessPlugEvent(int32_t eventCode, int32_t deviceId) = 0;
     DECLARE_INTERFACE_DESCRIPTOR(u"IVibratorClient");
 };
 } // namespace Sensors

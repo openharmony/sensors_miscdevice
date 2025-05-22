@@ -18,6 +18,9 @@
 
 #include <dlfcn.h>
 #include <mutex>
+#include <map>
+#include <set>
+#include <vector>
 
 #include "iremote_object.h"
 #include "singleton.h"
@@ -54,35 +57,46 @@ struct VibratorDecodeHandle {
 class VibratorServiceClient : public Singleton<VibratorServiceClient> {
 public:
     ~VibratorServiceClient() override;
-    int32_t Vibrate(int32_t vibratorId, int32_t timeOut, int32_t usage, bool systemUsage);
-    int32_t Vibrate(int32_t vibratorId, const std::string &effect, int32_t loopCount, int32_t usage, bool systemUsage);
+    int32_t Vibrate(const VibratorIdentifier &identifier, int32_t timeOut, int32_t usage, bool systemUsage);
+    int32_t Vibrate(const VibratorIdentifier &identifier, const std::string &effect,
+        int32_t loopCount, int32_t usage, bool systemUsage);
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    int32_t PlayVibratorCustom(int32_t vibratorId, const RawFileDescriptor &rawFd, int32_t usage,
-        bool systemUsage, const VibratorParameter &parameter);
+    int32_t PlayVibratorCustom(const VibratorIdentifier &identifier, const RawFileDescriptor &rawFd,
+        int32_t usage, bool systemUsage, const VibratorParameter &parameter);
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    int32_t StopVibrator(int32_t vibratorId, const std::string &mode);
-    int32_t StopVibrator(int32_t vibratorId);
-    bool IsHdHapticSupported();
-    int32_t IsSupportEffect(const std::string &effect, bool &state);
+    int32_t StopVibrator(const VibratorIdentifier &identifier, const std::string &mode);
+    int32_t StopVibrator(const VibratorIdentifier &identifier);
+    bool IsHdHapticSupported(const VibratorIdentifier &identifier);
+    int32_t IsSupportEffect(const VibratorIdentifier &identifier, const std::string &effect, bool &state);
     void ProcessDeathObserver(const wptr<IRemoteObject> &object);
     int32_t PreProcess(const VibratorFileDescription &fd, VibratorPackage &package);
-    int32_t GetDelayTime(int32_t &delayTime);
-    int32_t InitPlayPattern(const VibratorPattern &pattern, int32_t usage, bool systemUsage,
-        const VibratorParameter &parameter);
-    int32_t PlayPattern(const VibratorPattern &pattern, int32_t usage, bool systemUsage,
-        const VibratorParameter &parameter);
+    int32_t GetDelayTime(const VibratorIdentifier &identifier, int32_t &delayTime);
+    int32_t InitPlayPattern(const VibratorIdentifier &identifier, const VibratorPattern &pattern, int32_t usage,
+        bool systemUsage, const VibratorParameter &parameter);
+    int32_t PlayPattern(const VibratorIdentifier &identifier, const VibratorPattern &pattern, int32_t usage,
+        bool systemUsage, const VibratorParameter &parameter);
     int32_t FreeVibratorPackage(VibratorPackage &package);
-    int32_t PlayPrimitiveEffect(int32_t vibratorId, const std::string &effect, int32_t intensity, int32_t usage,
-        bool systemUsage, int32_t count);
-    bool IsSupportVibratorCustom();
+    int32_t PlayPrimitiveEffect(const VibratorIdentifier &identifier, const std::string &effect,
+        const PrimitiveEffect &primitiveEffect);
+    bool IsSupportVibratorCustom(const VibratorIdentifier &identifier);
     int32_t SeekTimeOnPackage(int32_t seekTime, const VibratorPackage &completePackage, VibratorPackage &seekPackage);
+    int32_t SubscribeVibratorPlugInfo(const VibratorUser *user);
+    int32_t UnsubscribeVibratorPlugInfo(const VibratorUser *user);
+    std::set<RecordVibratorPlugCallback> GetSubscribeUserCallback(int32_t deviceId);
+    bool HandleVibratorData(VibratorDeviceInfo info);
+    void SetUsage(const VibratorIdentifier &identifier, int32_t usage, bool systemUsage);
+    void SetLoopCount(const VibratorIdentifier &identifier, int32_t count);
+    void SetParameters(const VibratorIdentifier &identifier, const VibratorParameter &parameter);
+    VibratorEffectParameter GetVibratorEffectParameter(const VibratorIdentifier &identifier);
+    int32_t GetVibratorIdList(const VibratorIdentifier& identifier, std::vector<VibratorInfos>& vibratorInfo);
+    int32_t GetEffectInfo(const VibratorIdentifier& identifier,const std::string& effectType, EffectInfo& effectInfo);
 
 private:
     int32_t InitServiceClient();
     int32_t LoadDecoderLibrary(const std::string& path);
     int32_t ConvertVibratorPackage(const VibratePackage& inPkg, VibratorPackage &outPkg);
     int32_t TransferClientRemoteObject();
-    int32_t GetVibratorCapacity();
+    int32_t GetVibratorCapacity(const VibratorIdentifier &identifier, VibratorCapacity &capacity);
     void ConvertSeekVibratorPackage(const VibratorPackage &completePackage, VibratePackage &convertPackage,
         int32_t seekTime);
     void ConvertVibratorPattern(const VibratorPattern &vibratorPattern, VibratePattern &vibratePattern);
@@ -94,9 +108,14 @@ private:
     sptr<IMiscdeviceService> miscdeviceProxy_ = nullptr;
     sptr<VibratorClientStub> vibratorClient_ = nullptr;
     VibratorDecodeHandle decodeHandle_;
-    VibratorCapacity capacity_;
     std::mutex clientMutex_;
     std::mutex decodeMutex_;
+
+    std::recursive_mutex subscribeMutex_;
+    std::set<const VibratorUser *> subscribeSet_;
+
+    std::mutex vibratorEffectMutex_;
+    std::map<VibratorIdentifier, VibratorEffectParameter> vibratorEffectMap_;
 };
 } // namespace Sensors
 } // namespace OHOS

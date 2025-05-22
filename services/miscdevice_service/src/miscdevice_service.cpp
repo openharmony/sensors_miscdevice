@@ -29,6 +29,7 @@
 
 #include "sensors_errors.h"
 #include "vibration_priority_manager.h"
+#include "vibrator_client_proxy.h"
 
 #ifdef HDF_DRIVERS_INTERFACE_LIGHT
 #include "v1_0/light_interface_proxy.h"
@@ -64,11 +65,9 @@ constexpr int32_t INTENSITY_ADJUST_MAX = 100;
 constexpr int32_t FREQUENCY_ADJUST_MIN = -100;
 constexpr int32_t FREQUENCY_ADJUST_MAX = 100;
 constexpr int32_t INVALID_PID = -1;
-constexpr int32_t VIBRATOR_ID = 0;
 constexpr int32_t BASE_YEAR = 1900;
 constexpr int32_t BASE_MON = 1;
 constexpr int32_t CONVERSION_RATE = 1000;
-VibratorCapacity g_capacity;
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 const std::string PHONE_TYPE = "phone";
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
@@ -78,20 +77,32 @@ constexpr int32_t SHORT_VIBRATOR_DURATION = 50;
 }  // namespace
 
 bool MiscdeviceService::isVibrationPriorityReady_ = false;
+std::map<int32_t , VibratorAllInfos> MiscdeviceService::devicesManageMap_;
+std::map<sptr<IRemoteObject>, int32_t> MiscdeviceService::clientPidMap_;
 
 MiscdeviceService::MiscdeviceService()
     : SystemAbility(MISCDEVICE_SERVICE_ABILITY_ID, true),
       lightExist_(false),
       vibratorExist_(false),
-      state_(MiscdeviceServiceState::STATE_STOPPED),
-      vibratorThread_(nullptr)
+      state_(MiscdeviceServiceState::STATE_STOPPED)
 {
     MISC_HILOGD("Add SystemAbility");
 }
 
 MiscdeviceService::~MiscdeviceService()
 {
-    StopVibrateThread();
+    std::lock_guard<std::mutex> lock(devicesManageMutex_);
+    auto it = devicesManageMap_.begin();
+    while (it != devicesManageMap_.end()) {
+        int deviceId = it->first;
+        const VibratorControlInfo& vibratorControlInfo_ = it->second.controlInfo;
+        MISC_HILOGI("Device ID:%d, Motor Count:%d", deviceId, vibratorControlInfo_.motorCount);
+        VibratorIdentifierIPC identifier;
+        identifier.deviceId = deviceId;
+        identifier.vibratorId = -1;
+        StopVibratorService(identifier);
+        it = devicesManageMap_.erase(it);
+    }
 }
 
 void MiscdeviceService::OnDump()
@@ -199,7 +210,6 @@ void MiscdeviceService::OnReceiveUserSwitchEvent(const EventFwk::CommonEventData
     }
 }
 #endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
-
 void MiscdeviceService::OnStart()
 {
     CALL_LOG_ENTER;
@@ -233,6 +243,18 @@ void MiscdeviceService::OnStart()
     AddSystemAbilityListener(MEMORY_MANAGER_SA_ID);
 #endif // MEMMGR_ENABLE
     AddSystemAbilityListener(COMMON_EVENT_SERVICE_ID);
+    RegisterVibratorPlugCb();
+}
+
+int32_t MiscdeviceService::RegisterVibratorPlugCb()
+{
+    auto ret = vibratorHdiConnection_.RegisterVibratorPlugCallback(
+            std::bind(&MiscdeviceService::SendMsgToClient, this, std::placeholders::_1));
+    if (ret != ERR_OK) {
+        MISC_HILOGE("InitVibratorServiceImpl failed");
+        return false;
+    }
+    return true;
 }
 
 void MiscdeviceService::OnStartFuzz()
@@ -269,9 +291,7 @@ bool MiscdeviceService::InitInterface()
         MISC_HILOGE("InitVibratorServiceImpl failed");
         return false;
     }
-    if (vibratorHdiConnection_.GetVibratorCapacity(g_capacity) != ERR_OK) {
-        MISC_HILOGE("GetVibratorCapacity failed");
-    }
+    (void)FirstGetLocalVibratorInfo();
     return true;
 }
 
@@ -333,7 +353,7 @@ void MiscdeviceService::OnStop()
 #endif // MEMMGR_ENABLE
 }
 
-bool MiscdeviceService::ShouldIgnoreVibrate(const VibrateInfo &info)
+bool MiscdeviceService::ShouldIgnoreVibrate(const VibrateInfo &info, const VibratorIdentifierIPC& identifier)
 {
     std::lock_guard<std::mutex> lock(isVibrationPriorityReadyMutex_);
     if (!isVibrationPriorityReady_) {
@@ -341,14 +361,16 @@ bool MiscdeviceService::ShouldIgnoreVibrate(const VibrateInfo &info)
         return VIBRATION;
     }
     std::string curVibrateTime = GetCurrentTime();
-    int32_t ret = PriorityManager->ShouldIgnoreVibrate(info, vibratorThread_);
+    auto vibratorThread_ = GetVibratorThread(identifier);
+    int32_t ret = PriorityManager->ShouldIgnoreVibrate(info, vibratorThread_, identifier);
     if (ret != VIBRATION) {
         MISC_HILOGE("ShouldIgnoreVibrate currentTime:%{public}s, ret:%{public}d", curVibrateTime.c_str(), ret);
     }
     return (ret != VIBRATION);
 }
 
-int32_t MiscdeviceService::Vibrate(int32_t vibratorId, int32_t timeOut, int32_t usage, bool systemUsage)
+int32_t MiscdeviceService::Vibrate(const VibratorIdentifierIPC& identifier, int32_t timeOut, int32_t usage,
+    bool systemUsage)
 {
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
     int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
@@ -376,18 +398,21 @@ int32_t MiscdeviceService::Vibrate(int32_t vibratorId, int32_t timeOut, int32_t 
     };
     std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
     std::string curVibrateTime = GetCurrentTime();
-    if (ShouldIgnoreVibrate(info)) {
-        MISC_HILOGE("%{public}s:vibration is ignored and high priority is vibrating", curVibrateTime.c_str());
-        return ERROR;
+    {
+        std::lock_guard<std::mutex> lock(devicesManageMutex_);
+        if (StartVibrateThreadControl(identifier, info) != ERR_OK) {
+            MISC_HILOGE("%{public}s:vibration is ignored and high priority is vibrating or no vibration found",
+                curVibrateTime.c_str());
+            return ERROR;
+        }
     }
-    StartVibrateThread(info);
     MISC_HILOGI("Start vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, usage:%{public}d,"
-        "vibratorId:%{public}d, duration:%{public}d", curVibrateTime.c_str(), info.packageName.c_str(), info.pid,
-        info.usage, vibratorId, info.duration);
+        "deviceId:%{public}d, vibratorId:%{public}d, duration:%{public}d", curVibrateTime.c_str(),
+        info.packageName.c_str(), info.pid, info.usage, identifier.vibratorId, identifier.deviceId, info.duration);
     return NO_ERROR;
 }
 
-int32_t MiscdeviceService::StopVibrator(int32_t vibratorId)
+int32_t MiscdeviceService::StopVibrator(const VibratorIdentifierIPC& identifier)
 {
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
     int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
@@ -399,37 +424,54 @@ int32_t MiscdeviceService::StopVibrator(int32_t vibratorId)
         MISC_HILOGE("Result:%{public}d", ret);
         return PERMISSION_DENIED;
     }
-    return StopVibratorService(vibratorId);
+    std::lock_guard<std::mutex> lock(devicesManageMutex_);
+    return StopVibratorService(identifier);
 }
 
-int32_t MiscdeviceService::StopVibratorService(int32_t vibratorId)
+int32_t MiscdeviceService::StopVibratorService(const VibratorIdentifierIPC& identifier)
 {
     std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
-#if defined (OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM) && defined (HDF_DRIVERS_INTERFACE_VIBRATOR)
-    if ((vibratorThread_ == nullptr) || (!vibratorThread_->IsRunning() &&
-        !vibratorHdiConnection_.IsVibratorRunning())) {
+    std::vector<VibratorIdentifierIPC> result = CheckDeviceIdIsValid(identifier);
+    int ignoreVibrateNum = 0;
+    if(result.empty()) {
         MISC_HILOGD("No vibration, no need to stop");
         return ERROR;
     }
-    if (vibratorHdiConnection_.IsVibratorRunning()) {
-        vibratorHdiConnection_.Stop(HDF_VIBRATOR_MODE_PRESET);
-        vibratorHdiConnection_.Stop(HDF_VIBRATOR_MODE_HDHAPTIC);
+    for (const auto& paramIt : result) {
+        auto vibratorThread_ = GetVibratorThread(paramIt);
+        #if defined (OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM) && defined (HDF_DRIVERS_INTERFACE_VIBRATOR)
+            if ((vibratorThread_ == nullptr) || (!vibratorThread_->IsRunning() &&
+                !vibratorHdiConnection_.IsVibratorRunning(paramIt))) {
+                MISC_HILOGD("No vibration, no need to stop");
+                ignoreVibrateNum ++;
+                continue;
+            }
+            if (vibratorHdiConnection_.IsVibratorRunning(paramIt)) {
+                vibratorHdiConnection_.Stop(paramIt, HDF_VIBRATOR_MODE_PRESET);
+                vibratorHdiConnection_.Stop(paramIt, HDF_VIBRATOR_MODE_HDHAPTIC);
+            }
+        #else
+            if ((vibratorThread_ == nullptr) || (!vibratorThread_->IsRunning())) {
+                MISC_HILOGD("No vibration, no need to stop");
+                ignoreVibrateNum ++;
+                continue;
+            }
+        #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM && HDF_DRIVERS_INTERFACE_VIBRATOR
+            StopVibrateThread(vibratorThread_);
     }
-#else
-    if ((vibratorThread_ == nullptr) || (!vibratorThread_->IsRunning())) {
+    if(ignoreVibrateNum == result.size()) {
         MISC_HILOGD("No vibration, no need to stop");
         return ERROR;
     }
-#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM && HDF_DRIVERS_INTERFACE_VIBRATOR
-    StopVibrateThread();
     std::string packageName = GetPackageName(GetCallingTokenID());
     std::string curVibrateTime = GetCurrentTime();
-    MISC_HILOGI("Stop vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, vibratorId:%{public}d",
-        curVibrateTime.c_str(), packageName.c_str(), GetCallingPid(), vibratorId);
+    MISC_HILOGI("Stop vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, deviceId:%{public}d,"
+        "vibratorId:%{public}d", curVibrateTime.c_str(), packageName.c_str(), GetCallingPid(), identifier.deviceId,
+        identifier.vibratorId);
     return NO_ERROR;
 }
 
-int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::string &effect,
+int32_t MiscdeviceService::PlayVibratorEffect(const VibratorIdentifierIPC& identifier, const std::string &effect,
     int32_t count, int32_t usage, bool systemUsage)
 {
     int32_t checkResult = PlayVibratorEffectCheckAuthAndParam(count, usage);
@@ -438,7 +480,7 @@ int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::str
         return checkResult;
     }
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
-    std::optional<HdfEffectInfo> effectInfo = vibratorHdiConnection_.GetEffectInfo(effect);
+    std::optional<HdfEffectInfo> effectInfo = vibratorHdiConnection_.GetEffectInfo(identifier, effect);
     if (!effectInfo) {
         MISC_HILOGE("GetEffectInfo fail");
         return ERROR;
@@ -464,14 +506,18 @@ int32_t MiscdeviceService::PlayVibratorEffect(int32_t vibratorId, const std::str
     };
     std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
     std::string curVibrateTime = GetCurrentTime();
-    if (ShouldIgnoreVibrate(info)) {
-        MISC_HILOGE("%{public}s:vibration is ignored and high priority is vibrating", curVibrateTime.c_str());
-        return ERROR;
+    {
+        std::lock_guard<std::mutex> lock(devicesManageMutex_);
+        if (StartVibrateThreadControl(identifier, info) != ERR_OK) {
+            MISC_HILOGE("%{public}s:vibration is ignored and high priority is vibrating or no vibration found",
+                curVibrateTime.c_str());
+            return ERROR;
+        }
     }
-    StartVibrateThread(info);
     MISC_HILOGI("Start vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, usage:%{public}d,"
-        "vibratorId:%{public}d, duration:%{public}d, effect:%{public}s, count:%{public}d", curVibrateTime.c_str(),
-        info.packageName.c_str(), info.pid, info.usage, vibratorId, info.duration, info.effect.c_str(), info.count);
+        "deviceId:%{public}d, vibratorId:%{public}d, duration:%{public}d, effect:%{public}s, count:%{public}d", 
+        curVibrateTime.c_str(), info.packageName.c_str(), info.pid, info.usage, identifier.deviceId,
+        identifier.vibratorId, info.duration, info.effect.c_str(), info.count);
     return NO_ERROR;
 }
 
@@ -494,45 +540,53 @@ int32_t MiscdeviceService::PlayVibratorEffectCheckAuthAndParam(int32_t count, in
     return ERR_OK;
 }
 
-void MiscdeviceService::StartVibrateThread(VibrateInfo info)
+void MiscdeviceService::StartVibrateThread(VibrateInfo info, const VibratorIdentifierIPC& identifier)
 {
+    auto vibratorThread_ = GetVibratorThread(identifier);
     if (vibratorThread_ == nullptr) {
-        vibratorThread_ = std::make_shared<VibratorThread>();
+        MISC_HILOGD("No effective vibrator thread");
+        return;
     }
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_PRESET_INFO
     VibrateInfo currentVibrateInfo = vibratorThread_->GetCurrentVibrateInfo();
-    if (info.duration <= VIBRATOR_DURATION && currentVibrateInfo.duration <= VIBRATOR_DURATION &&
+    if (info.duration <= SHORT_VIBRATOR_DURATION && currentVibrateInfo.duration <= SHORT_VIBRATOR_DURATION &&
         info.mode == VIBRATE_PRESET && currentVibrateInfo.mode == VIBRATE_PRESET && info.count == 1) {
-        vibratorThread_->UpdateVibratorEffect(info);
-        FastVibratorEffect(info);
+        vibratorThread_->UpdateVibratorEffect(info, identifier, waveInfo);
+        FastVibratorEffect(info, identifier);
     } else {
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_PRESET_INFO
-        StopVibrateThread();
-#if defined(OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM) && defined(HDF_DRIVERS_INTERFACE_VIBRATOR)
-        if (vibratorHdiConnection_.IsVibratorRunning()) {
-            vibratorHdiConnection_.Stop(HDF_VIBRATOR_MODE_PRESET);
-            vibratorHdiConnection_.Stop(HDF_VIBRATOR_MODE_HDHAPTIC);
-        }
-#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM && HDF_DRIVERS_INTERFACE_VIBRATOR
-        vibratorThread_->UpdateVibratorEffect(info);
-        vibratorThread_->Start("VibratorThread");
-#ifdef OHOS_BUILD_ENABLE_VIBRATOR_PRESET_INFO
+    StopVibrateThread(vibratorThread_);
+#if defined (OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM) && defined (HDF_DRIVERS_INTERFACE_VIBRATOR)
+    if (vibratorHdiConnection_.IsVibratorRunning(identifier)) {
+        vibratorHdiConnection_.Stop(identifier, HDF_VIBRATOR_MODE_PRESET);
+        vibratorHdiConnection_.Stop(identifier, HDF_VIBRATOR_MODE_HDHAPTIC);
     }
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM && HDF_DRIVERS_INTERFACE_VIBRATOR
+    std::vector<HdfWaveInformation> waveInfo;
+    if(GetAllWaveInfo(identifier, waveInfo) != ERR_OK) {
+        MISC_HILOGE("GetAllWaveInfo failed");
+        return;
+    }
+    vibratorThread_->UpdateVibratorEffect(info, identifier, waveInfo);
+    vibratorThread_->Start("VibratorThread");
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_PRESET_INFO
+}
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_PRESET_INFO
     DumpHelper->SaveVibrateRecord(info);
 }
 
-void MiscdeviceService::StopVibrateThread()
+void MiscdeviceService::StopVibrateThread(std::shared_ptr<VibratorThread> vibratorThread)
 {
-    if ((vibratorThread_ != nullptr) && (vibratorThread_->IsRunning())) {
-        vibratorThread_->SetExitStatus(true);
-        vibratorThread_->WakeUp();
-        vibratorThread_->NotifyExitSync();
-        vibratorThread_->SetExitStatus(false);
+    if ((vibratorThread != nullptr) && (vibratorThread->IsRunning())) {
+        vibratorThread->SetExitStatus(true);
+        vibratorThread->WakeUp();
+        vibratorThread->NotifyExitSync();
+        vibratorThread->SetExitStatus(false);
+        vibratorThread->ResetVibrateInfo();
     }
 }
 
-int32_t MiscdeviceService::StopVibratorByMode(int32_t vibratorId, const std::string &mode)
+int32_t MiscdeviceService::StopVibratorByMode(const VibratorIdentifierIPC& identifier, const std::string &mode)
 {
     std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
@@ -545,31 +599,47 @@ int32_t MiscdeviceService::StopVibratorByMode(int32_t vibratorId, const std::str
         MISC_HILOGE("CheckVibratePermission failed, ret:%{public}d", ret);
         return PERMISSION_DENIED;
     }
-    if ((vibratorThread_ == nullptr) || (!vibratorThread_->IsRunning() &&
-        !vibratorHdiConnection_.IsVibratorRunning())) {
+    std::vector<VibratorIdentifierIPC> result = CheckDeviceIdIsValid(identifier);
+    int ignoreVibrateNum = 0;
+    if(result.empty()) {
         MISC_HILOGD("No vibration, no need to stop");
         return ERROR;
     }
-    const VibrateInfo info = vibratorThread_->GetCurrentVibrateInfo();
-    if (info.mode != mode) {
-        MISC_HILOGD("Stop vibration information mismatch");
-        return ERROR;
+    for (const auto& paramIt : result) {
+        auto vibratorThread_ = GetVibratorThread(paramIt);
+        if ((vibratorThread_ == nullptr) || (!vibratorThread_->IsRunning() &&
+            !vibratorHdiConnection_.IsVibratorRunning(paramIt))) {
+            MISC_HILOGD("No vibration, no need to stop");
+            ignoreVibrateNum ++;
+            continue;
+        }
+        const VibrateInfo info = vibratorThread_->GetCurrentVibrateInfo();
+        if (info.mode != mode) {
+            MISC_HILOGD("Stop vibration information mismatch");
+            continue;
+        }
+        StopVibrateThread(vibratorThread_);
+        if (vibratorHdiConnection_.IsVibratorRunning(paramIt)) {
+            vibratorHdiConnection_.Stop(paramIt, HDF_VIBRATOR_MODE_PRESET);
+        }
     }
-    StopVibrateThread();
-    if (vibratorHdiConnection_.IsVibratorRunning()) {
-        vibratorHdiConnection_.Stop(HDF_VIBRATOR_MODE_PRESET);
+    if(ignoreVibrateNum == result.size()) {
+        MISC_HILOGD("No vibration, no need to stop");
+        return ERROR;
     }
     std::string packageName = GetPackageName(GetCallingTokenID());
     std::string curVibrateTime = GetCurrentTime();
-    MISC_HILOGI("Stop vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, vibratorId:%{public}d,"
-        "mode:%{public}s", curVibrateTime.c_str(), packageName.c_str(), GetCallingPid(), vibratorId, mode.c_str());
+    MISC_HILOGI("Stop vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, deviceId:%{public}d,"
+        "vibratorId:%{public}d, mode:%{public}s", curVibrateTime.c_str(), packageName.c_str(), GetCallingPid(),
+        identifier.deviceId, identifier.vibratorId, mode.c_str());
     return NO_ERROR;
 }
 
-int32_t MiscdeviceService::IsSupportEffect(const std::string &effect, bool &state)
+int32_t MiscdeviceService::IsSupportEffect(const VibratorIdentifierIPC& identifier, const std::string &effect,
+    bool &state)
 {
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
-    std::optional<HdfEffectInfo> effectInfo = vibratorHdiConnection_.GetEffectInfo(effect);
+    std::optional<HdfEffectInfo> effectInfo = vibratorHdiConnection_.GetEffectInfo(identifier, effect);
     if (!effectInfo) {
         MISC_HILOGE("GetEffectInfo fail");
         return ERROR;
@@ -602,10 +672,10 @@ std::string MiscdeviceService::GetCurrentTime()
 }
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, int32_t fd, int64_t offset, int64_t length,
-    int32_t usage, bool systemUsage, const VibrateParameter &parameter)
+int32_t MiscdeviceService::PlayVibratorCustom(const VibratorIdentifierIPC& identifier, int32_t fd,
+    int64_t offset, int64_t length, const CustomHapticInfoIPC& customHapticInfoIPC)
 {
-    int32_t checkResult = CheckAuthAndParam(usage, parameter);
+    int32_t checkResult = CheckAuthAndParam(customHapticInfoIPC.usage, customHapticInfoIPC.parameter, identifier);
     if (checkResult != ERR_OK) {
         MISC_HILOGE("CheckAuthAndParam failed, ret:%{public}d", checkResult);
         close(fd);
@@ -625,16 +695,21 @@ int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, int32_t fd, in
         MISC_HILOGE("Decode effect error");
         return ERROR;
     }
-    MergeVibratorParmeters(parameter, package);
+    MergeVibratorParmeters(customHapticInfoIPC.parameter, package);
     package.Dump();
     VibrateInfo info = {
         .packageName = GetPackageName(GetCallingTokenID()),
         .pid = GetCallingPid(),
         .uid = GetCallingUid(),
-        .usage = usage,
-        .systemUsage = systemUsage,
+        .usage = customHapticInfoIPC.usage,
+        .systemUsage = customHapticInfoIPC.systemUsage,
         .package = package,
     };
+    VibratorCapacity g_capacity;
+    if(GetHapticCapacityInfo(identifier, g_capacity) != ERR_OK) {
+        MISC_HILOGE("GetVibratorCapacity failed");
+        return ERROR;
+    }
     if (g_capacity.isSupportHdHaptic) {
         info.mode = VIBRATE_CUSTOM_HD;
     } else if (g_capacity.isSupportPresetMapping) {
@@ -644,19 +719,23 @@ int32_t MiscdeviceService::PlayVibratorCustom(int32_t vibratorId, int32_t fd, in
     }
     std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
     std::string curVibrateTime = GetCurrentTime();
-    if (ShouldIgnoreVibrate(info)) {
-        MISC_HILOGE("%{public}s:vibration is ignored and high priority is vibrating", curVibrateTime.c_str());
-        return ERROR;
+    {
+        std::lock_guard<std::mutex> lock(devicesManageMutex_);
+        if (StartVibrateThreadControl(identifier, info) != ERR_OK) {
+            MISC_HILOGE("%{public}s:vibration is ignored and high priority is vibrating or no vibration found",
+                curVibrateTime.c_str());
+            return ERROR;
+        }
     }
-    StartVibrateThread(info);
     MISC_HILOGI("Start vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, usage:%{public}d,"
         "vibratorId:%{public}d, duration:%{public}d", curVibrateTime.c_str(), info.packageName.c_str(), info.pid,
-        info.usage, vibratorId, package.packageDuration);
+        info.usage, identifier.vibratorId, package.packageDuration);
     return NO_ERROR;
 }
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
-int32_t MiscdeviceService::CheckAuthAndParam(int32_t usage, const VibrateParameter &parameter)
+int32_t MiscdeviceService::CheckAuthAndParam(int32_t usage, const VibrateParameter &parameter, 
+    const VibratorIdentifierIPC& identifier)
 {
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
     int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
@@ -667,6 +746,11 @@ int32_t MiscdeviceService::CheckAuthAndParam(int32_t usage, const VibrateParamet
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
         MISC_HILOGE("CheckVibratePermission failed, ret:%{public}d", ret);
         return PERMISSION_DENIED;
+    }
+    VibratorCapacity g_capacity;
+    if(GetHapticCapacityInfo(identifier, g_capacity) != ERR_OK) {
+        MISC_HILOGE("GetVibratorCapacity failed");
+        return ERROR;
     }
     if (!(g_capacity.isSupportHdHaptic || g_capacity.isSupportPresetMapping || g_capacity.isSupportTimeDelay)) {
         MISC_HILOGE("The device does not support this operation");
@@ -811,10 +895,29 @@ int32_t MiscdeviceService::Dump(int32_t fd, const std::vector<std::u16string> &a
     return ERR_OK;
 }
 
-int32_t MiscdeviceService::PlayPattern(const VibratePattern &pattern, int32_t usage,
-    bool systemUsage, const VibrateParameter &parameter)
+int32_t MiscdeviceService::PerformVibrationControl(const VibratorIdentifierIPC& identifier, const VibratePattern& pattern,
+    VibrateInfo& info) 
 {
-    int32_t checkResult = PlayPatternCheckAuthAndParam(usage, parameter);
+    std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
+    std::string curVibrateTime = GetCurrentTime();
+    {
+        std::lock_guard<std::mutex> lock(devicesManageMutex_);
+        if (StartVibrateThreadControl(identifier, info) != ERR_OK) {
+            MISC_HILOGE("%{public}s:vibration is ignored and high priority is vibrating or no vibration found",
+                curVibrateTime.c_str());
+            return ERROR;
+        }
+    }
+    MISC_HILOGI("Start vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, usage:%{public}d,"
+        "duration:%{public}d", curVibrateTime.c_str(), info.packageName.c_str(), info.pid, info.usage,
+        pattern.patternDuration);
+    return ERR_OK;
+}
+
+int32_t MiscdeviceService::PlayPattern(const VibratorIdentifierIPC& identifier, const VibratePattern &pattern,
+    const CustomHapticInfoIPC& customHapticInfoIPC)
+{
+    int32_t checkResult = PlayPatternCheckAuthAndParam(customHapticInfoIPC.usage, customHapticInfoIPC.parameter);
     if (checkResult != ERR_OK) {
         MISC_HILOGE("CheckAuthAndParam failed, ret:%{public}d", checkResult);
         return checkResult;
@@ -826,45 +929,35 @@ int32_t MiscdeviceService::PlayPattern(const VibratePattern &pattern, int32_t us
     VibratePackage package = {
         .patterns = patterns
     };
-    MergeVibratorParmeters(parameter, package);
+    MergeVibratorParmeters(customHapticInfoIPC.parameter, package);
     package.Dump();
     VibrateInfo info = {
         .mode = VIBRATE_BUTT,
         .packageName = GetPackageName(GetCallingTokenID()),
         .pid = GetCallingPid(),
         .uid = GetCallingUid(),
-        .usage = usage,
-        .systemUsage = systemUsage
+        .usage = customHapticInfoIPC.usage,
+        .systemUsage = customHapticInfoIPC.systemUsage
     };
+    VibratorCapacity g_capacity;
+    if(GetHapticCapacityInfo(identifier, g_capacity) != ERR_OK) {
+        MISC_HILOGE("GetVibratorCapacity failed");
+        return ERROR;
+    }
     if (g_capacity.isSupportHdHaptic) {
-        std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
-        std::string curVibrateTime = GetCurrentTime();
-        if (ShouldIgnoreVibrate(info)) {
-            MISC_HILOGE("%{public}s:vibration is ignored and high priority is vibrating", curVibrateTime.c_str());
-            return ERROR;
+        int32_t result = PerformVibrationControl(identifier, pattern, info);
+        if (result != ERR_OK) {
+            MISC_HILOGE("PerformVibrationControl failed");
+            return result;
         }
-        StartVibrateThread(info);
-        MISC_HILOGI("Start vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, usage:%{public}d,"
-            "duration:%{public}d", curVibrateTime.c_str(), info.packageName.c_str(), info.pid, info.usage,
-            pattern.patternDuration);
-        return vibratorHdiConnection_.PlayPattern(package.patterns.front());
+        return vibratorHdiConnection_.PlayPattern(identifier, package.patterns.front());
     } else if (g_capacity.isSupportPresetMapping) {
         info.mode = VIBRATE_CUSTOM_COMPOSITE_EFFECT;
     } else if (g_capacity.isSupportTimeDelay) {
         info.mode = VIBRATE_CUSTOM_COMPOSITE_TIME;
     }
     info.package = package;
-    std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
-    std::string curVibrateTime = GetCurrentTime();
-    if (ShouldIgnoreVibrate(info)) {
-        MISC_HILOGE("%{public}s:vibration is ignored and high priority is vibrating", curVibrateTime.c_str());
-        return ERROR;
-    }
-    StartVibrateThread(info);
-    MISC_HILOGI("Start vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, usage:%{public}d,"
-        "duration:%{public}d", curVibrateTime.c_str(), info.packageName.c_str(), info.pid, info.usage,
-        pattern.patternDuration);
-    return ERR_OK;
+    return PerformVibrationControl(identifier, pattern, info);
 }
 
 int32_t MiscdeviceService::PlayPatternCheckAuthAndParam(int32_t usage, const VibrateParameter &parameter)
@@ -886,11 +979,16 @@ int32_t MiscdeviceService::PlayPatternCheckAuthAndParam(int32_t usage, const Vib
     return ERR_OK;
 }
 
-int32_t MiscdeviceService::GetDelayTime(int32_t &delayTime)
+int32_t MiscdeviceService::GetDelayTime(const VibratorIdentifierIPC& identifier, int32_t &delayTime)
 {
     std::string packageName = GetPackageName(GetCallingTokenID());
     MISC_HILOGD("GetDelayTime, package:%{public}s", packageName.c_str());
-    return vibratorHdiConnection_.GetDelayTime(g_capacity.GetVibrateMode(), delayTime);
+    VibratorCapacity g_capacity;
+    if(GetHapticCapacityInfo(identifier, g_capacity) != ERR_OK) {
+        MISC_HILOGE("GetVibratorCapacity failed");
+        return ERROR;
+    }
+    return vibratorHdiConnection_.GetDelayTime(identifier, g_capacity.GetVibrateMode(), delayTime);
 }
 
 bool MiscdeviceService::CheckVibratorParmeters(const VibrateParameter &parameter)
@@ -910,7 +1008,7 @@ void MiscdeviceService::MergeVibratorParmeters(const VibrateParameter &parameter
         MISC_HILOGD("The adjust parameter is not need to merge");
         return;
     }
-    parameter.Dump();
+    MISC_HILOGI("intensity:%{public}d, frequency:%{public}d", parameter.intensity, parameter.frequency);
     for (VibratePattern &pattern : package.patterns) {
         for (VibrateEvent &event : pattern.events) {
             float intensityScale = static_cast<float>(parameter.intensity) / INTENSITY_ADJUST_MAX;
@@ -927,6 +1025,42 @@ void MiscdeviceService::MergeVibratorParmeters(const VibrateParameter &parameter
                     point.frequency = std::max(std::min(point.frequency, FREQUENCY_ADJUST_MAX), FREQUENCY_ADJUST_MIN);
                 }
             }
+        }
+    }
+}
+
+void MiscdeviceService::SendMsgToClient(HdfVibratorPlugInfo info)
+{
+    std::lock_guard<std::mutex> lock(clientPidMapMutex_);
+    MISC_HILOGW("%{public}p, %{public}d, %{public}d", this, clientPidMap_.size(), info.status);
+    for (auto it = clientPidMap_.begin(); it != clientPidMap_.end(); ++it) {
+        const sptr<IRemoteObject>& key = it->first;
+
+        sptr<IVibratorClient> clientProxy = iface_cast<IVibratorClient>(key);
+        if (clientProxy != nullptr) {
+            clientProxy->ProcessPlugEvent(info.status, info.deviceId);
+        }
+    }
+    std::lock_guard<std::mutex> lockManage(devicesManageMutex_);
+    if(info.status == 0) {
+        auto it = devicesManageMap_.find(info.deviceId);
+        if (it != devicesManageMap_.end()) {
+            VibratorIdentifierIPC identifier;
+            identifier.deviceId = info.deviceId;
+            identifier.vibratorId = -1;
+            StopVibratorService(identifier);
+            devicesManageMap_.erase(it);
+            MISC_HILOGI("Device %{public}d is offline and removed from the map.", info.deviceId);
+        } else {
+            MISC_HILOGI("Device %{public}d is not in the map, so no action taken.", info.deviceId);
+        }
+    }else {
+        VibratorIdentifierIPC identifier;
+        identifier.deviceId = info.deviceId;
+        VibratorAllInfos newAllInfo({});
+        if (!UpdateVibratorAllInfo(identifier, info, newAllInfo)) {
+            MISC_HILOGE("Update new vibrator info failed");
+            return;
         }
     }
 }
@@ -948,17 +1082,31 @@ void MiscdeviceService::ProcessDeathObserver(const wptr<IRemoteObject> &object)
     sptr<IRemoteObject> client = object.promote();
     int32_t clientPid = FindClientPid(client);
     VibrateInfo info;
-    {
-        std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
-        if (vibratorThread_ == nullptr) {
-            vibratorThread_ = std::make_shared<VibratorThread>();
+    std::lock_guard<std::mutex> lock(devicesManageMutex_);
+    for (const auto& pair : devicesManageMap_) {
+        int deviceId = pair.first;
+        const VibratorControlInfo& vibratorControlInfo_ = pair.second.controlInfo;
+        MISC_HILOGI("Device ID:%{public}d, , Motor Count:%{public}d", deviceId, vibratorControlInfo_.motorCount);
+        for (const auto& motorPair : vibratorControlInfo_.vibratorThreads) {
+            int motorId = motorPair.first;
+            {
+                std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
+                auto vibratorThread_ = motorPair.second;
+                if (vibratorThread_ == nullptr) {
+                    MISC_HILOGE("MotorId:%{public}d, Vibrate thread no found in devicesManageMap_", motorId);
+                    vibratorThread_ = std::make_shared<VibratorThread>();
+                }
+                info = vibratorThread_->GetCurrentVibrateInfo();
+            }
+            int32_t vibratePid = info.pid;
+            MISC_HILOGI("ClientPid:%{public}d, VibratePid:%{public}d", clientPid, vibratePid);
+            if ((clientPid != INVALID_PID) && (clientPid == vibratePid)) {
+                VibratorIdentifierIPC identifier;
+                identifier.deviceId = deviceId;
+                identifier.vibratorId = motorId;
+                StopVibratorService(identifier);
+            }
         }
-        info = vibratorThread_->GetCurrentVibrateInfo();
-    }
-    int32_t vibratePid = info.pid;
-    MISC_HILOGI("ClientPid:%{public}d, VibratePid:%{public}d", clientPid, vibratePid);
-    if ((clientPid != INVALID_PID) && (clientPid == vibratePid)) {
-        StopVibratorService(VIBRATOR_ID);
     }
     UnregisterClientDeathRecipient(client);
 }
@@ -979,6 +1127,21 @@ void  MiscdeviceService::RegisterClientDeathRecipient(sptr<IRemoteObject> vibrat
     }
     vibratorServiceClient->AddDeathRecipient(clientDeathObserver_);
     SaveClientPid(vibratorServiceClient, pid);
+
+    // std::thread([this, vibratorServiceClient]() {
+    //     std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    //     std::lock_guard<std::mutex> lockManage(devicesManageMutex_);
+    //     if (devicesManageMap_.empty()) {
+    //         MISC_HILOGI("No vibrator device online");
+    //         return;
+    //     }
+    //     for (auto &value : devicesManageMap_) {
+    //         sptr<IVibratorClient> clientProxy = iface_cast<IVibratorClient>(vibratorServiceClient);
+    //         if (clientProxy != nullptr) {
+    //             clientProxy->ProcessPlugEvent(1, value.first);
+    //         }
+    //     }
+    // }).detach();
 }
 
 void MiscdeviceService::UnregisterClientDeathRecipient(sptr<IRemoteObject> vibratorServiceClient)
@@ -1037,16 +1200,16 @@ void MiscdeviceService::DestroyClientPid(const sptr<IRemoteObject> &vibratorServ
     clientPidMap_.erase(it);
 }
 
-int32_t MiscdeviceService::PlayPrimitiveEffect(int32_t vibratorId, const std::string &effect,
-    int32_t intensity, int32_t usage, bool systemUsage, int32_t count)
+int32_t MiscdeviceService::PlayPrimitiveEffect(const VibratorIdentifierIPC& identifier,
+    const std::string &effect, const PrimitiveEffectIPC& primitiveEffectIPC)
 {
-    int32_t checkResult = PlayPrimitiveEffectCheckAuthAndParam(intensity, usage);
+    int32_t checkResult = PlayPrimitiveEffectCheckAuthAndParam(primitiveEffectIPC.intensity, primitiveEffectIPC.usage);
     if (checkResult != ERR_OK) {
         MISC_HILOGE("CheckAuthAndParam failed, ret:%{public}d", checkResult);
         return checkResult;
     }
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
-    std::optional<HdfEffectInfo> effectInfo = vibratorHdiConnection_.GetEffectInfo(effect);
+    std::optional<HdfEffectInfo> effectInfo = vibratorHdiConnection_.GetEffectInfo(identifier, effect);
     if (!effectInfo) {
         MISC_HILOGE("GetEffectInfo fail");
         return ERROR;
@@ -1061,25 +1224,29 @@ int32_t MiscdeviceService::PlayPrimitiveEffect(int32_t vibratorId, const std::st
         .packageName = GetPackageName(GetCallingTokenID()),
         .pid = GetCallingPid(),
         .uid = GetCallingUid(),
-        .usage = usage,
-        .systemUsage = systemUsage,
+        .usage = primitiveEffectIPC.usage,
+        .systemUsage = primitiveEffectIPC.systemUsage,
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
         .duration = effectInfo->duration,
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
         .effect = effect,
-        .count = count,
-        .intensity = intensity
+        .count = primitiveEffectIPC.count,
+        .intensity = primitiveEffectIPC.intensity
     };
     std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
     std::string curVibrateTime = GetCurrentTime();
-    if (ShouldIgnoreVibrate(info)) {
-        MISC_HILOGE("%{public}s:vibration is ignored and high priority is vibrating", curVibrateTime.c_str());
-        return ERROR;
+    {
+        std::lock_guard<std::mutex> lock(devicesManageMutex_);
+        if (StartVibrateThreadControl(identifier, info) != ERR_OK) {
+            MISC_HILOGE("%{public}s:vibration is ignored and high priority is vibrating or no vibration found",
+                curVibrateTime.c_str());
+            return ERROR;
+        }
     }
-    StartVibrateThread(info);
     MISC_HILOGI("Start vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, usage:%{public}d,"
-        "vibratorId:%{public}d, duration:%{public}d, effect:%{public}s, intensity:%{public}d", curVibrateTime.c_str(),
-        info.packageName.c_str(), info.pid, info.usage, vibratorId, info.duration, info.effect.c_str(), info.intensity);
+        "deviceId:%{public}d, vibratorId:%{public}d, duration:%{public}d, effect:%{public}s, intensity:%{public}d",
+        curVibrateTime.c_str(), info.packageName.c_str(), info.pid, info.usage, identifier.deviceId,
+        identifier.vibratorId, info.duration, info.effect.c_str(), info.intensity);
     return NO_ERROR;
 }
 
@@ -1102,8 +1269,135 @@ int32_t MiscdeviceService::PlayPrimitiveEffectCheckAuthAndParam(int32_t intensit
     return ERR_OK;
 }
 
-int32_t MiscdeviceService::GetVibratorCapacity(VibratorCapacity &capacity)
+int32_t MiscdeviceService::GetVibratorIdList(const VibratorIdentifierIPC& identifier,
+    std::vector<VibratorInfoIPC>& vibratorInfoIPC)
 {
+    CALL_LOG_ENTER;
+    PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
+    int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
+    if (ret != PERMISSION_GRANTED) {
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
+            HiSysEvent::EventType::SECURITY, "PKG_NAME", "GetVibratorIdList", "ERROR_CODE", ret);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
+        MISC_HILOGE("CheckVibratePermission failed, ret:%{public}d", ret);
+        return PERMISSION_DENIED;
+    }
+    identifier.Dump();
+    if (devicesManageMap_.empty()) {
+        MISC_HILOGI("No vibrator device online");
+        return NO_ERROR;
+    }
+    if ((identifier.deviceId == -1 && identifier.vibratorId == -1) ||
+        (identifier.deviceId == -1 && identifier.vibratorId != -1)) {
+        for (auto &value : devicesManageMap_) {
+            vibratorInfoIPC.insert(vibratorInfoIPC.end(), value.second.baseInfo.begin(),
+                value.second.baseInfo.end());
+        }
+        return NO_ERROR;
+    } else if (identifier.deviceId != -1 && identifier.vibratorId == -1) {
+        auto it = devicesManageMap_.find(identifier.deviceId);
+        if (it == devicesManageMap_.end()) {
+            MISC_HILOGD("Device manager map has no vibrator info");
+            return NO_ERROR;
+        }
+        vibratorInfoIPC = it->second.baseInfo;
+        return NO_ERROR;
+    } else {
+        auto it = devicesManageMap_.find(identifier.deviceId);
+        if (it == devicesManageMap_.end()) {
+            MISC_HILOGD("Device manager map has no vibrator info");
+            return NO_ERROR;
+        }
+        for (auto &value : it->second.baseInfo) {
+            if (identifier.vibratorId == value.vibratorId) {
+                vibratorInfoIPC.emplace_back(value);
+            }
+        }
+        return NO_ERROR;
+    }
+    return NO_ERROR;
+}
+
+int32_t MiscdeviceService::GetEffectInfo(const VibratorIdentifierIPC& identifier, const std::string& effectType,
+    EffectInfoIPC& effectInfoIPC)
+{
+    CALL_LOG_ENTER;
+    PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
+    int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
+    if (ret != PERMISSION_GRANTED) {
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
+            HiSysEvent::EventType::SECURITY, "PKG_NAME", "GetEffectInfo", "ERROR_CODE", ret);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
+        MISC_HILOGE("CheckVibratePermission failed, ret:%{public}d", ret);
+        return PERMISSION_DENIED;
+    }
+    identifier.Dump();
+    if (devicesManageMap_.empty()) {
+        MISC_HILOGI("No vibrator device online");
+        return NO_ERROR;
+    }
+    VibratorIdentifierIPC localIdentifier;
+    if (identifier.deviceId == -1) {         
+        for (const auto& pair : devicesManageMap_) {
+            for (const auto& info : pair.second.baseInfo) {
+                info.isLocalVibrator ? (localIdentifier.deviceId = info.deviceId) : 0;
+            }
+        }
+    }
+    HdfEffectInfo hdfEffectInfo;
+    ret = vibratorHdiConnection_.GetEffectInfo((identifier.deviceId == -1) ? localIdentifier : identifier,
+                                                effectType, hdfEffectInfo);
+    if (ret != NO_ERROR) {
+        MISC_HILOGE("HDI::GetEffectInfo return error");
+        return ERROR;
+    }
+    effectInfoIPC.duration = hdfEffectInfo.duration;
+    effectInfoIPC.isSupportEffect = hdfEffectInfo.isSupportEffect;
+    effectInfoIPC.Dump();
+    return NO_ERROR;
+}
+
+int32_t MiscdeviceService::SubscribeVibratorPlugInfo(const sptr<IRemoteObject> &vibratorServiceClient)
+{
+    auto clientPid = GetCallingPid();
+    if (clientPid < 0) {
+        MISC_HILOGE("ClientPid is invalid, clientPid:%{public}d", clientPid);
+        return ERROR;
+    }
+    if(vibratorServiceClient == nullptr) {
+        MISC_HILOGD("VibratorServiceClient is nullptr");
+        return ERROR;
+    }
+    
+    std::thread([this, vibratorServiceClient]() {
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        std::lock_guard<std::mutex> lockManage(devicesManageMutex_);
+        if (devicesManageMap_.empty()) {
+            MISC_HILOGI("No vibrator device online");
+            return ERR_OK;
+        }
+
+        for (auto &value : devicesManageMap_) {
+            sptr<IVibratorClient> clientProxy = iface_cast<IVibratorClient>(vibratorServiceClient);
+            if (clientProxy != nullptr) {
+                clientProxy->ProcessPlugEvent(1, value.first);
+            }
+        }
+        return ERR_OK;
+    }).detach();
+    return ERR_OK;
+}
+
+int32_t MiscdeviceService::GetVibratorCapacity(const VibratorIdentifierIPC& identifier, VibratorCapacity &capacity)
+{
+    CALL_LOG_ENTER;
+    VibratorCapacity g_capacity;
+    if(GetHapticCapacityInfo(identifier, g_capacity) != ERR_OK) {
+        MISC_HILOGE("GetVibratorCapacity failed");
+        return ERROR;
+    }
     capacity = g_capacity;
     return ERR_OK;
 }
@@ -1119,5 +1413,277 @@ int32_t MiscdeviceService::FastVibratorEffect(const VibrateInfo &info)
     return NO_ERROR;
 }
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_PRESET_INFO
+
+std::shared_ptr<VibratorThread> MiscdeviceService::GetVibratorThread(const VibratorIdentifierIPC& identifier)
+{
+    CALL_LOG_ENTER;
+    auto deviceIt = devicesManageMap_.find(identifier.deviceId);
+    if (deviceIt != devicesManageMap_.end()) {
+        auto thread = deviceIt->second.controlInfo.GetVibratorThread(identifier.vibratorId);
+        if (thread) {
+            MISC_HILOGI("Success: Vibrate thread found.");
+            return thread;
+        } else {
+            MISC_HILOGE("Failed: Vibrate thread no found.");
+            return nullptr;
+        }
+    }
+    return nullptr;
+}
+
+int32_t MiscdeviceService::GetHapticCapacityInfo(const VibratorIdentifierIPC& identifier,
+    VibratorCapacity& capacityInfo)
+{
+    CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> lock(devicesManageMutex_);
+    if (identifier.deviceId == -1) {
+        for (const auto& pair : devicesManageMap_) {
+            for (const auto& info : pair.second.baseInfo) {
+                if (info.isLocalVibrator) {
+                    capacityInfo = pair.second.capacityInfo;
+                    return ERR_OK;
+                }
+            }
+        }
+    }else {
+        auto deviceIt = devicesManageMap_.find(identifier.deviceId);
+        if (deviceIt != devicesManageMap_.end()) {
+            capacityInfo = deviceIt->second.capacityInfo;
+            return ERR_OK;
+        }
+    }
+    MISC_HILOGE("No vibrator information found for device ID: %{public}d", identifier.deviceId);
+    return PARAMETER_ERROR;
+}
+
+int32_t MiscdeviceService::GetAllWaveInfo(const VibratorIdentifierIPC& identifier,
+    std::vector<HdfWaveInformation>& waveInfo)
+{
+    CALL_LOG_ENTER;
+    if (identifier.deviceId == -1) {
+        for (const auto& pair : devicesManageMap_) {
+            for (const auto& info : pair.second.baseInfo) {
+                if (info.isLocalVibrator) {
+                    waveInfo = pair.second.waveInfo;
+                    return ERR_OK;
+                }
+            }
+        }
+    }else {
+        auto deviceIt = devicesManageMap_.find(identifier.deviceId);
+        if (deviceIt != devicesManageMap_.end()) {
+            waveInfo = deviceIt->second.waveInfo;
+            return ERR_OK;
+        }
+    }
+    MISC_HILOGW("No vibrator information found for device ID: %{public}d", identifier.deviceId);
+    return ERR_OK;
+}
+
+int32_t MiscdeviceService::GetHapticStartUpTime(const VibratorIdentifierIPC& identifier, int32_t mode,
+    int32_t &startUpTime)
+{
+    CALL_LOG_ENTER;
+    auto ret = vibratorHdiConnection_.GetDelayTime(identifier, mode, startUpTime);
+    if (ret != NO_ERROR) {
+        MISC_HILOGE("HDI::GetHapticStartUpTime return error");
+        return ERROR;
+    }
+    return NO_ERROR;
+}
+
+bool MiscdeviceService::UpdateVibratorAllInfo(const VibratorIdentifierIPC &identifier,
+    const HdfVibratorPlugInfo &info, VibratorAllInfos &vibratorAllInfos)
+{
+    CALL_LOG_ENTER;
+    std::vector<HdfVibratorInfo> baseInfo;
+    std::vector<int> vibratorIdList;
+    int32_t ret = -1;
+    if (identifier.deviceId < 0 || (identifier.deviceId < 0 && identifier.vibratorId < 0)) {
+        ret = vibratorHdiConnection_.GetVibratorInfo(baseInfo);
+    } else {
+        ret = vibratorHdiConnection_.GetVibratorIdList(identifier, baseInfo);
+    }
+    if (ret != NO_ERROR || baseInfo.empty()) {
+        MISC_HILOGE("HDI::GetVibratorInfoList return error");
+        return false;
+    }
+    for (auto& value: baseInfo) {
+        vibratorIdList.push_back(value.vibratorId);
+    }
+    VibratorAllInfos tVibratorInfo(vibratorIdList);
+    vibratorAllInfos = tVibratorInfo;
+    VibratorCapacity vibratorCapacity;
+    ret = vibratorHdiConnection_.GetVibratorCapacity(identifier, vibratorCapacity);
+    if (ret != NO_ERROR) {
+        MISC_HILOGE("HDI::GetHapticCapacity return error");
+        return false;
+    }
+    std::vector<HdfWaveInformation> waveInfo;
+    ret = vibratorHdiConnection_.GetAllWaveInfo(identifier, waveInfo);
+    if (ret != NO_ERROR) {
+        MISC_HILOGE("HDI::GetAllWaveInfo return error");
+        return false;
+    }
+    (void)ConvertToServerInfos(baseInfo, vibratorCapacity, waveInfo, info, vibratorAllInfos);
+    devicesManageMap_.insert(std::make_pair(identifier.deviceId, vibratorAllInfos));
+    return true;
+}
+
+void MiscdeviceService::ConvertToServerInfos(const std::vector<HdfVibratorInfo> &baseVibratorInfo,
+    const VibratorCapacity &vibratorCapacity, const std::vector<HdfWaveInformation> &waveInfomation,
+    const HdfVibratorPlugInfo &info, VibratorAllInfos& vibratorAllInfos)
+{
+    CALL_LOG_ENTER;
+    VibratorInfoIPC vibratorInfo;
+    for (auto infos : baseVibratorInfo) {
+        vibratorInfo.deviceId = infos.deviceId;
+        vibratorInfo.vibratorId = infos.vibratorId;
+        vibratorInfo.deviceName = "LocalVibrator";
+        if (infos.isLocal != 1) {
+            vibratorInfo.deviceName = info.deviceName;
+        }
+        vibratorInfo.isSupportHdHaptic = vibratorCapacity.isSupportHdHaptic;
+        vibratorInfo.isLocalVibrator = infos.isLocal;
+        vibratorAllInfos.baseInfo.emplace_back(vibratorInfo);
+        MISC_HILOGW("HDI::HdfVibratorInfo deviceId:%{public}d, vibratorId:%{public}d, isLocalVibrator:%{public}d",
+            vibratorInfo.deviceId, vibratorInfo.vibratorId, vibratorInfo.isLocalVibrator);
+    }
+    vibratorAllInfos.capacityInfo = vibratorCapacity;
+    vibratorAllInfos.waveInfo = waveInfomation;
+}
+
+void MiscdeviceService::FirstGetLocalVibratorInfo()
+{
+    CALL_LOG_ENTER;
+    std::vector<HdfVibratorInfo> vibratorInfo;
+    auto ret = vibratorHdiConnection_.GetVibratorInfo(vibratorInfo);
+    if (ret != NO_ERROR || vibratorInfo.empty()) {
+        MISC_HILOGW("Device not contain the local vibrator");
+        return;
+    }
+    std::vector<HdfVibratorInfo> localInfo;
+    HdfVibratorPlugInfo mockInfo;
+    VibratorIdentifierIPC param;
+    for (auto &info : vibratorInfo) {
+        if (info.isLocal == 1) {
+            localInfo.emplace_back(info);
+            param.deviceId = info.deviceId;
+        }
+    }
+    VibratorCapacity capacity;
+    ret = vibratorHdiConnection_.GetVibratorCapacity(param, capacity);
+    if (ret != NO_ERROR) {
+        MISC_HILOGE("Get local hapticCapacity fail");
+        return;
+    }
+    std::vector<HdfWaveInformation> waveInfo;
+    ret = vibratorHdiConnection_.GetAllWaveInfo(param, waveInfo);
+    if (ret != NO_ERROR) {
+        MISC_HILOGE("Get local waveInfo fail");
+        return;
+    }
+    std::vector<int> vibratorIdList;
+    for (auto &value : localInfo) {
+        vibratorIdList.push_back(value.vibratorId);
+    }
+    VibratorAllInfos localVibratorInfo(vibratorIdList);
+    (void)ConvertToServerInfos(localInfo, capacity, waveInfo, mockInfo, localVibratorInfo);
+    devicesManageMap_.insert(std::make_pair(param.deviceId, localVibratorInfo));
+}
+
+int32_t MiscdeviceService::StartVibrateThreadControl(const VibratorIdentifierIPC& identifier, VibrateInfo& info)
+{
+    std::string curVibrateTime = GetCurrentTime();
+    std::vector<VibratorIdentifierIPC> result = CheckDeviceIdIsValid(identifier);
+    if (result.empty()) {
+        MISC_HILOGE("No vibration found");
+        return ERROR;
+    }
+
+    int32_t ignoreVibrateNum = 0;
+
+    const std::vector<std::string> specialModes = {
+        VIBRATE_CUSTOM_HD, VIBRATE_CUSTOM_COMPOSITE_EFFECT,
+        VIBRATE_CUSTOM_COMPOSITE_TIME, VIBRATE_BUTT
+    };
+
+    std::unordered_set<int32_t> uniqueIndices;
+    if (std::find(specialModes.begin(), specialModes.end(), info.mode) != specialModes.end()) {
+        for (const auto& pattern : info.package.patterns) {
+            for (const auto& event : pattern.events) {
+                uniqueIndices.insert(event.index);
+            }
+        }
+        for (const auto& index : uniqueIndices) {
+            MISC_HILOGD("Info mode:%{public}s, vibratorIndex:%{public}d", info.mode.c_str(), index);
+        }
+    }
+
+    for (const auto& paramIt : result) {
+        bool shouldProcess = uniqueIndices.empty() || 
+        uniqueIndices.find(0) != uniqueIndices.end() || 
+        uniqueIndices.find(paramIt.position) != uniqueIndices.end();
+
+        if (paramIt.isLocalVibrator && ShouldIgnoreVibrate(info, paramIt)) {
+            if (shouldProcess) {
+                ignoreVibrateNum++;
+                continue;
+            }
+        }
+        MISC_HILOGD("Info mode:111111111111111111111111");
+        if (shouldProcess) {
+            MISC_HILOGD("Info mode:222222222222222222222222");
+            StartVibrateThread(info, paramIt);
+        }
+    }
+
+    return (ignoreVibrateNum == result.size()) ? ERROR : ERR_OK;
+}
+
+std::vector<VibratorIdentifierIPC> MiscdeviceService::CheckDeviceIdIsValid(const VibratorIdentifierIPC& identifier)
+{
+    CALL_LOG_ENTER;
+    std::vector<VibratorIdentifierIPC> result;
+
+    auto addToResult = [&](const auto& info) {
+        VibratorIdentifierIPC newIdentifier;
+        newIdentifier.deviceId = identifier.deviceId == -1 ? info.deviceId : identifier.deviceId;
+        newIdentifier.vibratorId = info.vibratorId;
+        newIdentifier.position = info.position;
+        newIdentifier.isLocalVibrator = info.isLocalVibrator;
+        result.push_back(newIdentifier);
+        MISC_HILOGD("Push result in list,:%{public}d,:%{public}d", newIdentifier.deviceId, newIdentifier.vibratorId);
+    };
+
+    auto processDevice = [&](const auto& device) {
+        for (const auto& info : device.second.baseInfo) {
+            bool shouldAdd = true;
+            if (identifier.deviceId == -1 && identifier.vibratorId != -1) {
+                shouldAdd = info.isLocalVibrator && info.vibratorId == identifier.vibratorId;
+            } else if (identifier.deviceId != -1 && identifier.vibratorId != -1) {
+                shouldAdd = info.vibratorId == identifier.vibratorId;
+            } else if (identifier.deviceId == -1 && identifier.vibratorId == -1) {
+                shouldAdd = info.isLocalVibrator;
+            }
+
+            if (shouldAdd) {
+                addToResult(info);
+            }
+        }
+    };
+
+    if (identifier.deviceId != -1) {
+        auto deviceIt = devicesManageMap_.find(identifier.deviceId);
+        if (deviceIt != devicesManageMap_.end()) {
+            processDevice(*deviceIt);
+        }
+    } else {
+        for (const auto& pair : devicesManageMap_) {
+            processDevice(pair);
+        }
+    }
+    return result;
+}
 }  // namespace Sensors
 }  // namespace OHOS

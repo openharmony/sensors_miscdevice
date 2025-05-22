@@ -29,6 +29,7 @@
  */
 #ifndef VIBRATOR_AGENT_H
 #include <stdint.h>
+#include <vector>
 #include "vibrator_agent_type.h"
 #define VIBRATOR_AGENT_H
 
@@ -218,6 +219,227 @@ bool SetParameters(const VibratorParameter &parameter);
  * @since 12
  */
 int32_t PlayPrimitiveEffect(const char *effectId, int32_t intensity);
+
+/**
+ * @brief Controls this vibrator to perform a vibration with a preset vibration effect.
+ *
+ * @param effectId Indicates the preset vibration effect, which is described in {@link vibrator_agent_type.h}, for
+ * example:{@link VIBRATOR_TYPE_CLOCK_TIMER}: Describes the vibration effect of the vibrator when a user adjusts the
+ * timer.
+ * @param param Indicate the device and vibrator information that needs to be controlled, which is described in
+ *  {@link vibrator_agent_type.h}.
+ * @return Returns <b>0</b> if the vibrator vibrates as expected; returns <b>-1</b> otherwise, for example, the preset
+ * vibration effect is not supported.
+ *
+ * @since 18
+ */
+int32_t StartVibratorEnhanced(const VibratorIdentifier identifier, const char *effectId);
+
+/**
+ * @brief Controls this vibrator to perform a one-shot vibration at a given duration.
+ *
+ * @param duration Indicates the duration that the one-shot vibration lasts, in milliseconds.
+ * @param identifier Indicate the device and vibrator information that needs to be controlled, which is described in
+ *  {@link vibrator_agent_type.h}.
+ * @return Returns <b>0</b> if the vibrator vibrates as expected; returns <b>-1</b> otherwise, for example, the given
+ * duration for the one-shot vibration is invalid.
+ *
+ * @since 18
+ */
+int32_t StartVibratorOnceEnhanced(const VibratorIdentifier identifier, int32_t duration);
+
+/**
+ * @brief Query whether the device supports custom vibration.
+ * @param identifier Indicate the device and vibrator information that needs to be controlled, which is described in
+ *  {@link vibrator_agent_type.h}.
+ * @return Returning true indicates support; otherwise, it indicates no support.
+ *
+ * @since 18
+ */
+bool IsSupportVibratorCustomEnhanced(const VibratorIdentifier identifier);
+
+/**
+ * @brief Play a custom vibration sequence.
+ *
+ * @param identifier Indicate the device and vibrator information that needs to be controlled, which is described in
+ *  {@link vibrator_agent_type.h}.
+ * @param fd Indicates the file handle for custom vibration sequence.
+ * @param offset Indicates the starting address (in bytes) of the custom vibration sequence.
+ * @param length Indicates the total length (in bytes) of the custom vibration sequence.
+ * @return Returning 0 indicates success; otherwise, it indicates failure.
+ *
+ * @since 18
+ */
+int32_t PlayVibratorCustomEnhanced(const VibratorIdentifier identifier, int32_t fd, int64_t offset, int64_t length);
+
+/**
+ * @brief Sets the number of cycles for vibration.
+ * @param identifier Indicate the device and vibrator information that needs to be controlled, which is described in
+ *  {@link vibrator_agent_type.h}.
+ * @param count Indicates the number of cycles for vibration.
+ * @since 18
+ */
+bool SetLoopCountEnhanced(const VibratorIdentifier identifier, int32_t count);
+
+/**
+ * @brief Stop the motor vibration according to the input mode.
+ *
+ * @param identifier Indicate the device and vibrator information that needs to be controlled, which is described in
+ *  {@link vibrator_agent_type.h}.
+ * @param mode Indicates the mode of the vibration to stop. The values can be <b>time</b> and <b>preset</b>,
+ * respectively representing a one-shot vibration mode and a preset vibration mode.
+ * @return Returns <b>0</b> if the vibration is stopped as expected; returns <b>-1</b> otherwise.
+ * @since 18
+ */
+int32_t StopVibratorEnhanced(const VibratorIdentifier identifier, const char *mode);
+
+/**
+ * @brief Cancel the current motor vibration.
+ * @param identifier Indicate the device and vibrator information that needs to be controlled, which is described in
+ *  {@link vibrator_agent_type.h}.
+ * @return Returning 0 indicates success; otherwise, it indicates failure.
+ * @since 18
+ */
+int32_t CancelEnhanced(const VibratorIdentifier identifier);
+
+/**
+ * @brief Set the usage of vibration.
+ *
+ * @param identifier Indicate the device and vibrator information that needs to be controlled, which is described in
+ *  {@link vibrator_agent_type.h}.
+ * @param usage Indicates the vibration usage, which is described in {@link vibrator_agent_type.h},for
+ * example:{@link USAGE_ALARM}: Describes the vibration is used for alarm.
+ * @since 18
+ */
+bool SetUsageEnhanced(const VibratorIdentifier identifier, int32_t usage, bool systemUsage = false);
+
+/**
+ * @brief Query whether the HdHaptic is supported.
+ * @param identifier Indicate the device and vibrator information that needs to be controlled, which is described in
+ *  {@link vibrator_agent_type.h}.
+ * @return Returning true indicates support; otherwise, it indicates no support.
+ *
+ * @since 18
+ */
+bool IsHdHapticSupportedEnhanced(const VibratorIdentifier identifier);
+
+/**
+ * @brief Query whether a vibration effect is supported.
+ *
+ * @param identifier Indicate the device and vibrator information that needs to be controlled, which is described in
+ *  {@link vibrator_agent_type.h}.
+ * @param effectId Indicates the preset vibration effect, which is described in {@link vibrator_agent_type.h}, for
+ * example:{@link VIBRATOR_TYPE_CLOCK_TIMER}: Describes the vibration effect of the vibrator when a user adjusts the
+ * timer.
+ * @param state Indicates a pointer to the query result.
+ * @return Returning 0 indicates success; otherwise, it indicates failure.
+ *
+ * @since 18
+ */
+int32_t IsSupportEffectEnhanced(const VibratorIdentifier identifier, const char *effectId, bool *state);
+
+/**
+ * @brief Obtain the vibration delay, the time interval from the time the vibration is issued
+ *        to the time when the vibration is started, which can be used in the scene of sound
+ *        and vibration coordination.
+ * @param identifier Indicate the device and vibrator information that needs to be controlled, which is described in
+ *  {@link vibrator_agent_type.h}.
+ * @param delayTime: Out of the parameter, return the vibration time delay, the time interval
+ *        from the time the vibration is issued to the start of the vibration, in milliseconds.
+ * @return 0 indicates success, otherwise indicates failure.
+ * @since 18
+ */
+int32_t GetDelayTimeEnhanced(const VibratorIdentifier identifier, int32_t &delayTime);
+
+/**
+ * @brief Play the vibration sequence.
+ * @param identifier Indicate the device and vibrator information that needs to be controlled, which is described in
+ *  {@link vibrator_agent_type.h}.
+ * @param pattern: Vibration sequences, such as {@link VibratorPattern}.
+ * @return 0 indicates success, otherwise indicates failure.
+ * @since 18
+ */
+int32_t PlayPatternEnhanced(const VibratorIdentifier identifier, const VibratorPattern &pattern);
+
+/**
+ * @brief Set the vibration effect adjustment parameters.
+ * @param identifier Indicate the device and vibrator information that needs to be controlled, which is described in
+ *  {@link vibrator_agent_type.h}.
+ * @param parameter: Vibration adjustment parameter, such as {@link VibratorParameter}.
+ * @return true indicates success, otherwise indicates failure.
+ * @since 18
+ */
+bool SetParametersEnhanced(const VibratorIdentifier identifier, const VibratorParameter &parameter);
+
+/**
+ * @brief Control the vibrator to perform vibration with a preset vibration effect at a certain intensity.
+ *
+ * @param identifier Indicate the device and vibrator information that needs to be controlled, which is described in
+ *  {@link vibrator_agent_type.h}.
+ * @param effectId Indicates the preset vibration effect, which is described in {@link vibrator_agent_type.h}, for
+ * example:{@link VIBRATOR_TYPE_HARD}: Describes the hard vibration effect of the vibrator.
+ * @param intensity Indicates the intensity of vibration, ranging from 1 to 100.
+ * @return Returns <b>0</b> if the vibrator vibrates as expected; otherwise indicates failure.
+ *
+ * @since 18
+ */
+int32_t PlayPrimitiveEffectEnhanced(const VibratorIdentifier identifier, const char *effectId, int32_t intensity);
+
+/**
+ * @brief Retrieve a list of vibrator IDs available for the specified parameters.
+ *
+ * This function fetches the identifiers of all vibrators that match the given parameters.
+ *
+ * @param identifier Indicate the device and vibrator information that needs to be controlled, which is described in
+ *  {@link vibrator_agent_type.h}.
+ * @param vibratorInfo A reference to a vector that will be populated with available vibrator information,
+ *  each represented as a `VibratorInfos` structure.
+ * @return Returns <b>0</b> if the operation is successful; otherwise, indicates failure with an error code.
+ *
+ * @since 18
+ */
+int32_t GetVibratorIdList(const VibratorIdentifier& identifier, std::vector<VibratorInfos>& vibratorInfo);
+
+/**
+ * @brief Retrieve information about a specific vibration effect type.
+ *
+ * This function obtains detailed information regarding the specified vibration effect, such as its support status
+ * and duration.
+ *
+ * @param identifier Indicate the device and vibrator information that needs to be controlled, which is described in
+ *  {@link vibrator_agent_type.h}.
+ * @param effectType A string representing the type of vibration effect to query, as defined in
+ *  {@link vibrator_agent_type.h}.
+ * @param effectInfo A reference to an `EffectInfo` structure that will be populated with the effect's details.
+ * @return Returns <b>0</b> if the operation is successful; otherwise, indicates failure with an error code.
+ *
+ * @since 18
+ */
+int32_t GetEffectInfo(const VibratorIdentifier& identifier, const std::string& effectType, EffectInfo& effectInfo);
+
+/**
+ * @brief Subscribe a user to receive updates from the vibrator.
+ *
+ * This function registers a specified user to receive notifications about vibrator state changes or events.
+ *
+ * @param user The user information that needs to be subscribed to the vibrator notifications, defined as `VibratorUser`.
+ * @return Returns <b>0</b> if the subscription is successful; otherwise, indicates failure with an error code.
+ *
+ * @since 18
+ */
+int32_t SubscribeVibrator(const VibratorUser& user);
+
+/**
+ * @brief Unsubscribe a user from receiving updates from the vibrator.
+ *
+ * This function removes a specified user from receiving notifications about vibrator state changes or events.
+ *
+ * @param user The user information that needs to be unsubscribed from the vibrator notifications, defined as `VibratorUser`.
+ * @return Returns <b>0</b> if the unsubscription is successful; otherwise, indicates failure with an error code.
+ *
+ * @since 18
+ */
+int32_t UnSubscribeVibrator(const VibratorUser& user);
 } // namespace Sensors
 } // namespace OHOS
 #ifdef __cplusplus

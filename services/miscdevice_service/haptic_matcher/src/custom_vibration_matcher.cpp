@@ -54,11 +54,27 @@ CustomVibrationMatcher::CustomVibrationMatcher()
 {
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
     auto &VibratorDevice = VibratorHdiConnection::GetInstance();
-    int32_t ret = VibratorDevice.GetAllWaveInfo(hdfWaveInfos_);
+    VibratorIdentifierIPC identifier;
+    identifier.deviceId = -1;
+    identifier.vibratorId = -1;
+    int32_t ret = VibratorDevice.GetAllWaveInfo(identifier, hdfWaveInfos_);
     if (ret != ERR_OK) {
         MISC_HILOGE("GetAllWaveInfo failed infoSize:%{public}zu", hdfWaveInfos_.size());
         return;
     }
+    if (!hdfWaveInfos_.empty()) {
+        for (auto it = hdfWaveInfos_.begin(); it != hdfWaveInfos_.end(); ++it) {
+            MISC_HILOGI("waveId:%{public}d, intensity:%{public}f, frequency:%{public}f, duration:%{public}d",
+                it->waveId, it->intensity, it->frequency, it->duration);
+        }
+        NormalizedWaveInfo();
+    }
+}
+
+CustomVibrationMatcher::CustomVibrationMatcher(const VibratorIdentifierIPC& identifier,
+    std::vector<HdfWaveInformation> waveInfo)
+{
+    hdfWaveInfos_ = waveInfo;
     if (!hdfWaveInfos_.empty()) {
         for (auto it = hdfWaveInfos_.begin(); it != hdfWaveInfos_.end(); ++it) {
             MISC_HILOGI("waveId:%{public}d, intensity:%{public}f, frequency:%{public}f, duration:%{public}d",

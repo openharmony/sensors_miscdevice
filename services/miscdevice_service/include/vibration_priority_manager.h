@@ -80,7 +80,8 @@ class VibrationPriorityManager {
 public:
     DISALLOW_COPY_AND_MOVE(VibrationPriorityManager);
     bool Init();
-    VibrateStatus ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo, std::shared_ptr<VibratorThread> vibratorThread);
+    VibrateStatus ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo,
+		std::shared_ptr<VibratorThread> vibratorThread, const VibratorIdentifierIPC& identifier);
 #ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
     void InitDoNotDisturbData();
     void ReregisterCurrentUserObserver();
@@ -91,7 +92,8 @@ public:
 #endif
 
 private:
-    bool IsCurrentVibrate(std::shared_ptr<VibratorThread> vibratorThread) const;
+    bool IsCurrentVibrate(std::shared_ptr<VibratorThread> vibratorThread,
+        const VibratorIdentifierIPC& identifier) const;
     bool IsLoopVibrate(const VibrateInfo &vibrateInfo) const;
     VibrateStatus ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo, VibrateInfo currentVibrateInfo) const;
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
