@@ -25,47 +25,6 @@
 #include <unordered_map>
 #include <vector>
 #include <iostream>
-
-template<typename T>
-class NativeObjectWrapper {
-public:
-    static ani_object Create([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_class clazz)
-    {
-        T* nativePtr = new T;
-        return Wrap(env, clazz, nativePtr);
-    }
-
-    static ani_object Wrap([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_class clazz, T* nativePtr)
-    {
-        ani_method ctor;
-        if (ANI_OK != env->Class_FindMethod(clazz, "<ctor>", "J:V", &ctor)) {
-            std::cerr << "Not found '<ctor>'" << std::endl;
-            ani_object nullobj = nullptr;
-            return nullobj;
-        }
-
-        ani_object obj;
-        if (ANI_OK != env->Object_New(clazz, ctor, &obj, reinterpret_cast<ani_long>(nativePtr))) {
-            std::cerr << "Object_New failed" << std::endl;
-        }
-        return obj;
-    }
-
-    static T* Unwrap(ani_env *env, ani_object object, const char* propName = "nativePtr")
-    {
-        ani_long nativePtr;
-        if (ANI_OK != env->Object_GetFieldByName_Long(object, propName, &nativePtr)) {
-            return nullptr;
-        }
-        return reinterpret_cast<T*>(nativePtr);
-    }
-
-    static ani_status Attach(ani_env *env, ani_object object, T* nativePtr, const char* propName = "nativePtr")
-    {
-        return env->Object_SetFieldByName_Long(object, propName, reinterpret_cast<ani_long>(nativePtr));
-    }
-};
-
 class AniStringUtils {
 public:
     static std::string ToStd(ani_env *env, ani_string ani_str)
@@ -380,4 +339,226 @@ std::optional<std::string> OptionalAccessor::Convert<std::string>()
     std::string content = std::string(utf8_buffer);
     return content;
 }
+
+template <typename T, typename E>
+class expected {
+private:
+    std::variant<T, E> data_;
+    bool has_value_;
+
+public:
+    expected(const T &value)
+        : data_(value), has_value_(true)
+    {
+    }
+
+    expected(T &&value)
+        : data_(std::move(value)), has_value_(true)
+    {
+    }
+
+    expected(const E &error)
+        : data_(error), has_value_(false)
+    {
+    }
+
+    expected(E &&error)
+        : data_(std::move(error)), has_value_(false)
+    {
+    }
+
+    bool has_value() const noexcept
+    {
+        return has_value_;
+    }
+
+    explicit operator bool() const noexcept
+    {
+        return has_value();
+    }
+
+    T &value() &
+    {
+        if (!has_value()) {
+            std::terminate();
+        }
+        return std::get<T>(data_);
+    }
+
+    const T &value() const &
+    {
+        if (!has_value()) {
+            std::terminate();
+        }
+        return std::get<T>(data_);
+    }
+
+    T &&value() &&
+    {
+        if (!has_value()) {
+            std::terminate();
+        }
+        return std::get<T>(std::move(data_));
+    }
+
+    E &error() &
+    {
+        if (has_value()) {
+            std::terminate();
+        }
+        return std::get<E>(data_);
+    }
+
+    const E &error() const &
+    {
+        if (has_value()) {
+            std::terminate();
+        }
+        return std::get<E>(data_);
+    }
+
+    E &&error() &&
+    {
+        if (has_value()) {
+            std::terminate();
+        }
+        return std::get<E>(std::move(data_));
+    }
+
+    T &operator*() &
+    {
+        return value();
+    }
+
+    const T &operator*() const &
+    {
+        return value();
+    }
+
+    T &&operator*() &&
+    {
+        return std::move(*this).value();
+    }
+
+    T *operator->()
+    {
+        return &value();
+    }
+
+    const T *operator->() const
+    {
+        return &value();
+    }
+
+    template <typename U>
+    T value_or(U &&default_value) const &
+    {
+        return has_value() ? value() : static_cast<T>(std::forward<U>(default_value));
+    }
+
+    template <typename U>
+    T value_or(U &&default_value) &&
+    {
+        return has_value() ? std::move(*this).value() : static_cast<T>(std::forward<U>(default_value));
+    }
+};
+
+class EnumAccessor {
+    public:
+        EnumAccessor(ani_env *env, const char* className, ani_int index) : env_(env)
+        {
+            initStatus_ = ANI_ERROR;
+            ani_enum_item item;
+            initStatus_ = GetItem(className, index, item);
+            if (ANI_OK == initStatus_) {
+                item_ = item;
+            }
+        }
+
+        EnumAccessor(ani_env *env, ani_enum_item item) : env_(env), item_(item)
+        {
+            initStatus_ = ANI_ERROR;
+        }
+
+        template<typename T>
+        expected<T, ani_status> To()
+        {
+            int32_t value{};
+            ani_status status = ToInt(value);
+            if (ANI_OK != status) {
+                return status;
+            }
+            return static_cast<T>(value);
+        }
+
+        ani_status ToInt(int32_t &value)
+        {
+            if (!item_) {
+                return initStatus_;
+            }
+
+            ani_status status = env_->EnumItem_GetValue_Int(item_.value(), &value);
+            if (ANI_OK != status) {
+                return status;
+            }
+            return ANI_OK;
+        }
+
+        expected<int32_t, ani_status> ToInt()
+        {
+            int32_t value;
+            ani_status status = ToInt(value);
+            if (ANI_OK != status) {
+                return status;
+            }
+            return value;
+        }
+
+        ani_status ToString(std::string &value)
+        {
+            if (!item_) {
+                return initStatus_;
+            }
+
+            ani_string strValue;
+            ani_status status = env_->EnumItem_GetValue_String(item_.value(), &strValue);
+            if (ANI_OK != status) {
+                return status;
+            }
+            value = AniStringUtils::ToStd(env_, strValue);
+            return ANI_OK;
+        }
+
+        expected<std::string, ani_status> ToString()
+        {
+            std::string value;
+            ani_status status = ToString(value);
+            if (ANI_OK != status) {
+                return status;
+            }
+            return value;
+        }
+
+    private:
+        ani_status GetItem(const char* className, ani_int index, ani_enum_item &item)
+        {
+            ani_status status = ANI_ERROR;
+            ani_enum enumType;
+            status = env_->FindEnum(className, &enumType);
+            if (ANI_OK != status) {
+                return status;
+            }
+
+            status = env_->Enum_GetEnumItemByIndex(enumType, index, &item);
+            if (ANI_OK != status) {
+                return status;
+            }
+            return ANI_OK;
+        }
+
+    private:
+        ani_env *env_;
+        std::optional<ani_enum_item> item_;
+        ani_status initStatus_;
+};
 #endif
