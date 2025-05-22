@@ -97,7 +97,7 @@ export default namespace vibrator {
     systemUsage?: boolean;
   }
 
-  export type VibrateEffect = VibrateTime | VibratePreset | VibrateFromFile;
+  export type VibrateEffect = VibrateTime | VibratePreset | VibrateFromFile | VibrateFromPattern;
 
   export interface VibrateTime {
     type: 'time';
@@ -121,4 +121,36 @@ export default namespace vibrator {
     offset?: number;
     length?: number;
   }
+
+  export interface VibrateFromPattern {
+    type: 'pattern';
+    pattern: VibratorPattern;
+  }
+
+  export interface VibratorPattern {
+    time: number;
+    events: Array<VibratorEvent>;
+  }
+
+  export interface VibratorEvent {
+    eventType: VibratorEventType;
+    time: number;
+    duration?: number;
+    intensity?: number;
+    frequency?: number;
+    index?: number;
+    points?: Array<VibratorCurvePoint>;
+  }
+
+  export enum VibratorEventType {
+    CONTINUOUS = 0,
+    TRANSIENT = 1,
+  }
+
+  export interface VibratorCurvePoint {
+    time: number;
+    intensity?: number;
+    frequency?: number;
+  }
+
 }
