@@ -40,7 +40,7 @@ export default namespace vibrator {
   }
 
   export function startVibration(effect: VibrateEffect, attribute: VibrateAttribute): Promise<void> {
-    let p = new Promise<void>((resolve: (v: undefined) => void, reject: (error: Object) => void) : void => {
+    let p = new Promise<void>((resolve: (v: undefined) => void, reject: (error: Error) => void) : void => {
       let p1 = taskpool.execute(startVibrationIntSync, effect, attribute);
       p1.then((e: NullishType) : void =>{
           console.log("in Promise startVibration then. e is ", e)
@@ -73,7 +73,7 @@ export default namespace vibrator {
   }
 
   export function isSupportEffect(effectId: string): Promise<boolean> {
-    let p = new Promise<boolean>((resolve: (v: boolean) => void, reject: (error: Object) => void) : boolean => {
+    let p = new Promise<boolean>((resolve: (v: boolean) => void, reject: (error: Error) => void) : void => {
       let p1 = taskpool.execute(isSupportEffectInterally, effectId);
       p1.then((e: NullishType) : boolean=>{
         let r = e as boolean;
