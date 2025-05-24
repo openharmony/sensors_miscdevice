@@ -313,6 +313,8 @@ typedef enum VibratorPlugState {
 typedef struct VibratorDeviceInfo {
     VibratorPlugState type = PLUG_STATE_EVENT_UNKNOWN;
     int32_t deviceId = 0;
+    int32_t vibratorCnt = 0;
+    int64_t timestamp = 0;
 } VibratorDeviceInfo;
 
 /**

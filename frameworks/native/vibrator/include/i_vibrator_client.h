@@ -27,7 +27,7 @@ public:
     };
     IVibratorClient() = default;
     virtual ~IVibratorClient() = default;
-    virtual int ProcessPlugEvent(int32_t eventCode, int32_t deviceId) = 0;
+    virtual int ProcessPlugEvent(int32_t eventCode, int32_t deviceId, int32_t vibratorCnt) = 0;
     DECLARE_INTERFACE_DESCRIPTOR(u"IVibratorClient");
 };
 } // namespace Sensors

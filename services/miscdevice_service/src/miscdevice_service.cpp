@@ -1033,14 +1033,16 @@ void MiscdeviceService::SendMsgToClient(HdfVibratorPlugInfo info)
 {
     MISC_HILOGI("Device:%{public}d state change,state:%{public}d", info.deviceId, info.status);
     std::lock_guard<std::mutex> lock(clientPidMapMutex_);
-    MISC_HILOGI("Device:%{public}d state change,state:%{public}d, clientPidMap_.size::%{public}zu", info.deviceId, info.status, clientPidMap_.size());
+    MISC_HILOGI("Device:%{public}d state change,state:%{public}d, clientPidMap_.size::%{public}zu",
+        info.deviceId, info.status, clientPidMap_.size());
     for (auto it = clientPidMap_.begin(); it != clientPidMap_.end(); ++it) {
         const sptr<IRemoteObject>& key = it->first;
 
         sptr<IVibratorClient> clientProxy = iface_cast<IVibratorClient>(key);
         if (clientProxy != nullptr) {
-            MISC_HILOGI("Device:%{public}d state change,state:%{public}d, ProcessPlugEvent", info.deviceId, info.status);
-            clientProxy->ProcessPlugEvent(info.status, info.deviceId);
+            MISC_HILOGI("Device:%{public}d state change,state:%{public}d, ProcessPlugEvent", info.deviceId,
+                info.status, info.vibratorCnt);
+            clientProxy->ProcessPlugEvent(info.status, info.deviceId, info.vibratorCnt);
         }
     }
     std::lock_guard<std::mutex> lockManage(devicesManageMutex_);

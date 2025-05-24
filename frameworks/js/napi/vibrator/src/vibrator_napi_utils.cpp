@@ -78,6 +78,19 @@ bool CreateInt32Property(napi_env env, napi_value &eventObj, const char* name, i
     return true;
 }
 
+bool CreateInt64Property(napi_env env, napi_value &eventObj, const char* name, int64_t value)
+{
+    CALL_LOG_ENTER;
+    napi_value propValue = nullptr;
+    napi_status status = napi_create_int64(env, value, &propValue);
+    if (status != napi_ok) {
+        MISC_HILOGE("napi_create_int64 fail");
+        return false;
+    }
+    CHKCF((napi_set_named_property(env, eventObj, name, propValue) == napi_ok), "napi_set_named_property fail");
+    return true;
+}
+
 bool CreateStringProperty(napi_env env, napi_value &eventObj, const char* name,
     const char* value, int32_t valueLength)
 {
@@ -285,9 +298,7 @@ bool GetPropertyBool(const napi_env &env, const napi_value &value, const std::st
 std::map<int32_t, ConstructResultFunc> g_convertFuncList = {
     {COMMON_CALLBACK, ConstructCommonResult},
     {IS_SUPPORT_EFFECT_CALLBACK, ConstructIsSupportEffectResult},
-    // {GET_VIBRATOR_INFO_LIST, ConstructGetVibratorInfoListResult},
-    // {GET_EFFECT_INFO, ConstructIsSupportEffectInfoResult},
-    // {VIBRATOR_STATE_CHANGE, ConstructVibratorPlugInfoResult},
+    {VIBRATOR_STATE_CHANGE, ConstructVibratorPlugInfoResult},
 };
 
 bool ConvertErrorToResult(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo, napi_value &result)
@@ -359,7 +370,7 @@ napi_value ConvertToJsVibratorInfo(const napi_env& env, const VibratorInfos& vib
             MISC_HILOGE("Create vibratorInfo.deviceName failed");
         return jsObject;
     }
-    if (!CreateBooleanProperty(env, jsObject, "isSupportHdHaptic", vibratorInfo.isSupportHdHaptic)) {
+    if (!CreateBooleanProperty(env, jsObject, "isHdHapticSupported", vibratorInfo.isSupportHdHaptic)) {
         MISC_HILOGE("Create vibratorInfo.isSupportHdHaptic failed");
         return jsObject;
     }
@@ -377,7 +388,7 @@ napi_value ConvertToJsEffectInfo(const napi_env& env, const EffectInfo& effectIn
     if (status != napi_ok) {
         return jsObject;
     }
-    if (!CreateBooleanProperty(env, jsObject, "isSupportEffect", effectInfo.isSupportEffect)) {
+    if (!CreateBooleanProperty(env, jsObject, "isEffectSupported", effectInfo.isSupportEffect)) {
         MISC_HILOGE("Create effectInfo.isSupportEffect failed");
         return jsObject;
     }
@@ -400,7 +411,7 @@ napi_value ConvertToJsVibratorPlungInfo(const napi_env& env, const VibratorDevic
         plugFlag = false;
     }
     MISC_HILOGD("plugFlag = %{public}s", plugFlag? "true":"false");
-    if (!CreateBooleanProperty(env, jsObject, "VibratorPlugState", plugFlag)) {
+    if (!CreateBooleanProperty(env, jsObject, "isVibratorOnline", plugFlag)) {
         MISC_HILOGE("Create plugFlag failed");
         return jsObject;
     }
@@ -408,70 +419,36 @@ napi_value ConvertToJsVibratorPlungInfo(const napi_env& env, const VibratorDevic
         MISC_HILOGE("Create deviceInfo.deviceId failed");
         return jsObject;
     }
+    if (!CreateInt64Property(env, jsObject, "timestamp", deviceInfo.timestamp)) {
+        MISC_HILOGE("Create deviceInfo.timestamp failed");
+        return jsObject;
+    }
+    if (!CreateInt32Property(env, jsObject, "vibratorCnt", deviceInfo.vibratorCnt)) {
+        MISC_HILOGE("Create deviceInfo.vibratorCnt failed");
+        return jsObject;
+    }
 
     return jsObject;
 }
 
-// bool ConstructGetVibratorInfoListResult(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo,
-//     napi_value result[], int32_t length)
-// {
-//     CALL_LOG_ENTER;
-//     CHKPF(asyncCallbackInfo);
-//     CHKCF(length == RESULT_LENGTH, "Array length is different");
-//     if (asyncCallbackInfo->error.code != SUCCESS) {
-//         CHKCF(ConvertErrorToResult(env, asyncCallbackInfo, result[0]), "Create napi err fail in async work");
-//         CHKCF((napi_get_undefined(env, &result[1]) == napi_ok), "napi_get_undefined fail");
-//     } else {
-//         CHKCF((napi_get_undefined(env, &result[0]) == napi_ok), "napi_get_undefined fail");
-//         napi_value jsArray;
-//         CHKCF((napi_create_array(env, &jsArray) == napi_ok), "napi_set_element fail");
-//         for (size_t i = 0; i < asyncCallbackInfo->vibratorInfos.size(); ++i) {
-//             napi_value jsInfo = ConvertToJsVibratorInfo(env, asyncCallbackInfo->vibratorInfos[i]);
-//             CHKPF(jsInfo);
-//             CHKCF((napi_set_element(env, jsArray, i, jsInfo) == napi_ok), "napi_set_element fail");
-//         }
-//         result[1] = jsArray;
-//     }
-//     return true;
-// }
-
-// bool ConstructIsSupportEffectInfoResult(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo,
-//     napi_value result[], int32_t length)
-// {
-//     CALL_LOG_ENTER;
-//     CHKPF(asyncCallbackInfo);
-//     CHKCF(length == RESULT_LENGTH, "Array length is different");
-//     if (asyncCallbackInfo->error.code != SUCCESS) {
-//         CHKCF(ConvertErrorToResult(env, asyncCallbackInfo, result[0]), "Create napi err fail in async work");
-//         CHKCF((napi_get_undefined(env, &result[1]) == napi_ok), "napi_get_undefined fail");
-//     } else {
-//         CHKCF((napi_get_undefined(env, &result[0]) == napi_ok), "napi_get_undefined fail");
-//         napi_value jsEffectInfo;
-//         jsEffectInfo = ConvertToJsEffectInfo(env, asyncCallbackInfo->effectInfo);
-//         CHKPF(jsEffectInfo);
-//         result[1] = jsEffectInfo;
-//     }
-//     return true;
-// }
-
-// bool ConstructVibratorPlugInfoResult(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo,
-//     napi_value result[], int32_t length)
-// {
-//     CALL_LOG_ENTER;
-//     CHKPF(asyncCallbackInfo);
-//     CHKCF(length == RESULT_LENGTH, "Array length is different");
-//     if (asyncCallbackInfo->error.code != SUCCESS) {
-//         CHKCF(ConvertErrorToResult(env, asyncCallbackInfo, result[0]), "Create napi err fail in async work");
-//         CHKCF((napi_get_undefined(env, &result[1]) == napi_ok), "napi_get_undefined fail");
-//     } else {
-//         napi_value jsDevicePlugInfo;
-//         jsDevicePlugInfo = ConvertToJsVibratorPlungInfo(env, asyncCallbackInfo->deviceInfo);
-//         CHKPF(jsDevicePlugInfo);
-//         result[0] = jsDevicePlugInfo;
-//         CHKCF((napi_get_undefined(env, &result[1]) == napi_ok), "napi_get_undefined fail");
-//     }
-//     return true;
-// }
+bool ConstructVibratorPlugInfoResult(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo,
+    napi_value result[], int32_t length)
+{
+    CALL_LOG_ENTER;
+    CHKPF(asyncCallbackInfo);
+    CHKCF(length == RESULT_LENGTH, "Array length is different");
+    if (asyncCallbackInfo->error.code != SUCCESS) {
+        CHKCF(ConvertErrorToResult(env, asyncCallbackInfo, result[0]), "Create napi err fail in async work");
+        CHKCF((napi_get_undefined(env, &result[1]) == napi_ok), "napi_get_undefined fail");
+    } else {
+        napi_value jsDevicePlugInfo;
+        jsDevicePlugInfo = ConvertToJsVibratorPlungInfo(env, asyncCallbackInfo->deviceInfo);
+        CHKPF(jsDevicePlugInfo);
+        result[0] = jsDevicePlugInfo;
+        CHKCF((napi_get_undefined(env, &result[1]) == napi_ok), "napi_get_undefined fail");
+    }
+    return true;
+}
 
 void EmitSystemCallback(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo)
 {

@@ -28,7 +28,9 @@ public:
     virtual ~VibratorClientStub() = default;
     virtual int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
         MessageOption &option) override;
-    int ProcessPlugEvent(int32_t eventCode, int32_t deviceId) override;
+    int ProcessPlugEvent(int32_t eventCode, int32_t deviceId, int32_t vibratorCnt) override;
+private:
+    int64_t GetSystemTime();
 };
 } // namespace Sensors
 } // namespace OHOS

@@ -817,31 +817,6 @@ static napi_value GetVibratorListSync(napi_env env, napi_callback_info info)
     return jsArray;
 }
 
-// static napi_value GetVibratorList(napi_env env, napi_callback_info info)
-// {
-//     CALL_LOG_ENTER;
-//     size_t argc = 1;
-//     napi_value args[2] = {0};
-//     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, args, nullptr, nullptr));
-
-//     VibratorIdentifier identifier;
-//     if (argc > 0) {
-//         if (!ParseVibratorIdentifier(env, args[0], identifier)) {
-//             MISC_HILOGW("deviceId and vibratorId is undefined, set default value deviceId = -1 and vibratorId = -1");
-//         }
-//         MISC_HILOGD("identifier=[deviceId=%{public}d, vibratorId=%{pubilc}d]", identifier.deviceId, identifier.vibratorId);
-//     }
-
-//     sptr<AsyncCallbackInfo> asyncCallbackInfo = new (std::nothrow) AsyncCallbackInfo(env);
-//     CHKPP(asyncCallbackInfo);
-//     asyncCallbackInfo->callbackType = GET_VIBRATOR_INFO_LIST;
-//     asyncCallbackInfo->error.code = GetVibratorIdList(identifier, asyncCallbackInfo->vibratorInfos);
-//     if ((argc > 0) && IsMatchType(env, args[1], napi_function)) {
-//         return EmitAsyncWork(args[1], asyncCallbackInfo);
-//     }
-//     return EmitAsyncWork(nullptr, asyncCallbackInfo);
-// }
-
 static napi_value GetSupportEffectInfoSync(napi_env env, napi_callback_info info)
 {
     CALL_LOG_ENTER;
@@ -875,36 +850,6 @@ static napi_value GetSupportEffectInfoSync(napi_env env, napi_callback_info info
     }
     return jsEffectInfo;
 }
-
-// static napi_value IsSupportEffectInfo(napi_env env, napi_callback_info info)
-// {
-//     CALL_LOG_ENTER;
-//     size_t argc = 3;
-//     napi_value args[3];
-//     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, args, nullptr, nullptr));
-
-//     std::vector<char> buffer(64);
-//     NAPI_CALL(env, napi_get_value_string_utf8(env, args[0], buffer.data(), 64, nullptr));
-//     std::string effectType(buffer.data());
-//     MISC_HILOGD("effectType = %{public}s", effectType.c_str());
-
-//     VibratorIdentifier identifier;
-//     if (argc > 1) {
-//         if (!ParseVibratorIdentifier(env, args[1], identifier)) {
-//             MISC_HILOGW("deviceId and vibratorId is undefined, set default value deviceId = -1 and vibratorId = -1");
-//         }
-//         MISC_HILOGD("identifier=[deviceId=%{public}d, vibratorId=%{pubilc}d]", identifier.deviceId, identifier.vibratorId);
-//     }
-
-//     sptr<AsyncCallbackInfo> asyncCallbackInfo = new (std::nothrow) AsyncCallbackInfo(env);
-//     CHKPP(asyncCallbackInfo);
-//     asyncCallbackInfo->callbackType = GET_EFFECT_INFO;
-//     asyncCallbackInfo->error.code = GetEffectInfo(identifier, effectType, asyncCallbackInfo->effectInfo);
-//     if ((argc > 1) && (IsMatchType(env, args[2], napi_function))) {
-//         return EmitAsyncWork(args[2], asyncCallbackInfo);
-//     }
-//     return EmitAsyncWork(nullptr, asyncCallbackInfo);
-// }
 
 bool IsSameValue(const napi_env &env, const napi_value &lhs, const napi_value &rhs)
 {
@@ -975,6 +920,8 @@ static int32_t UpdatePlugInfo(VibratorDeviceInfo *deviceInfo, sptr<AsyncCallback
     }
     asyncCallbackInfo->deviceInfo.type = deviceInfo->type;
     asyncCallbackInfo->deviceInfo.deviceId = deviceInfo->deviceId;
+    asyncCallbackInfo->deviceInfo.timestamp = deviceInfo->timestamp;
+    asyncCallbackInfo->deviceInfo.vibratorCnt = deviceInfo->vibratorCnt;
     MISC_HILOGD("asyncCallbackInfo->deviceInfo : [ VibratorPlugState = %{public}d, deviceId = %{public}d]",
         asyncCallbackInfo->deviceInfo.type, asyncCallbackInfo->deviceInfo.deviceId);
     return 0;
@@ -1145,8 +1092,8 @@ static napi_value Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("isHdHapticSupported", IsHdHapticSupported),
         DECLARE_NAPI_FUNCTION("isSupportEffect", IsSupportEffect),
         DECLARE_NAPI_FUNCTION("isSupportEffectSync", IsSupportEffectSync),
-        DECLARE_NAPI_FUNCTION("getVibratorListSync", GetVibratorListSync),
-        DECLARE_NAPI_FUNCTION("getEffectSupportInfoSync", GetSupportEffectInfoSync),
+        DECLARE_NAPI_FUNCTION("getVibratorInfoSync", GetVibratorListSync),
+        DECLARE_NAPI_FUNCTION("getEffectInfoSync", GetSupportEffectInfoSync),
         DECLARE_NAPI_FUNCTION("on", On),
         DECLARE_NAPI_FUNCTION("off", Off),
     };

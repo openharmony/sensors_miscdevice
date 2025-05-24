@@ -17,6 +17,7 @@
 #define VIBRATOR_SERVICE_CLIENT_H
 
 #include <dlfcn.h>
+#include <time.h>
 #include <mutex>
 #include <map>
 #include <set>

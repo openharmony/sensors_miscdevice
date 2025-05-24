@@ -95,6 +95,7 @@ using ConstructResultFunc = bool(*)(const napi_env &env, sptr<AsyncCallbackInfo>
     napi_value result[], int32_t length);
 
 bool CreateInt32Property(napi_env env, napi_value &eventObj, const char* name, int32_t value);
+bool CreateInt64Property(napi_env env, napi_value &eventObj, const char* name, int64_t value);
 bool CreateStringProperty(napi_env env, napi_value &eventObj, const char* name,
     const char* value, int32_t valueLength);
 bool CreateBooleanProperty(napi_env env, napi_value &eventObj, const char* name, bool value);

@@ -30,7 +30,7 @@ class VibratorClientProxy : public IRemoteProxy<IVibratorClient> {
 public:
     explicit VibratorClientProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IVibratorClient>(impl){}
     virtual ~VibratorClientProxy() = default;
-    int ProcessPlugEvent(int32_t eventCode, int32_t deviceId) override
+    int ProcessPlugEvent(int32_t eventCode, int32_t deviceId, int32_t vibratorCnt) override
     {
         MessageOption option;
         MessageParcel dataParcel;
@@ -46,6 +46,10 @@ public:
         }
         if (!dataParcel.WriteInt32(deviceId)) {
             MISC_HILOGE("Failed to write deviceId to parcelable");
+            return PARAMETER_ERROR;
+        }
+        if (!dataParcel.WriteInt32(vibratorCnt)) {
+            MISC_HILOGE("Failed to write vibratorCnt to parcelable");
             return PARAMETER_ERROR;
         }
         int error = Remote()->SendRequest(TRANS_ID_PLUG_ABILITY, dataParcel, replyParcel, option);
