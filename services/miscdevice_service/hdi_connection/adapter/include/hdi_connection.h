@@ -17,14 +17,14 @@
 #define HDI_CONNECTION_H
 
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
-#include "v1_3/vibrator_interface_proxy.h"
+#include "v2_0/vibrator_interface_proxy.h"
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
 
 #include "death_recipient_template.h"
 #include "i_vibrator_hdi_connection.h"
 
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
-using OHOS::HDI::Vibrator::V1_3::IVibratorInterface;
+using OHOS::HDI::Vibrator::V2_0::IVibratorInterface;
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
 namespace OHOS {
 namespace Sensors {
@@ -41,7 +41,7 @@ public:
     bool IsVibratorRunning() override;
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     std::optional<HdfEffectInfo> GetEffectInfo(const std::string &effect) override;
-    int32_t Stop(HdfVibratorModeV1_2 mode) override;
+    int32_t Stop(HdfVibratorMode mode) override;
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
     int32_t GetDelayTime(int32_t mode, int32_t &delayTime) override;
     int32_t GetVibratorCapacity(VibratorCapacity &capacity) override;
