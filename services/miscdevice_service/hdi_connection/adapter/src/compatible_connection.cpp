@@ -43,7 +43,7 @@ std::unordered_map<std::string, int32_t> g_vibratorEffect = {
     {"haptic.notice.warning", 2200}
 };
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
-HdfVibratorModeV1_2 g_vibrateMode;
+HdfVibratorMode g_vibrateMode;
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
 constexpr int32_t VIBRATE_DELAY_TIME = 10;
 } // namespace
@@ -140,7 +140,7 @@ std::optional<HdfEffectInfo> CompatibleConnection::GetEffectInfo(const std::stri
     return effectInfo;
 }
 
-int32_t CompatibleConnection::Stop(HdfVibratorModeV1_2 mode)
+int32_t CompatibleConnection::Stop(HdfVibratorMode mode)
 {
     CALL_LOG_ENTER;
     if (mode < 0 || mode >= HDF_VIBRATOR_MODE_BUTT) {

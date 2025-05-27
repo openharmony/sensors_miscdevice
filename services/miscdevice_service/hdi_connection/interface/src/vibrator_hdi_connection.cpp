@@ -126,7 +126,7 @@ std::optional<HdfEffectInfo> VibratorHdiConnection::GetEffectInfo(const std::str
     return ret;
 }
 
-int32_t VibratorHdiConnection::Stop(HdfVibratorModeV1_2 mode)
+int32_t VibratorHdiConnection::Stop(HdfVibratorMode mode)
 {
     CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
