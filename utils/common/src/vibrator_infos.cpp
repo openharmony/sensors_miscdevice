@@ -98,16 +98,19 @@ VibratorCapacity* VibratorCapacity::Unmarshalling(Parcel &data)
     }
     if (!(data.ReadBool(capacity->isSupportHdHaptic))) {
         MISC_HILOGE("Read isSupportHdHaptic failed");
+        delete capacity;
         capacity = nullptr;
         return capacity;
     }
     if (!(data.ReadBool(capacity->isSupportPresetMapping))) {
         MISC_HILOGE("Read isSupportPresetMapping failed");
+        delete capacity;
         capacity = nullptr;
         return capacity;
     }
     if (!(data.ReadBool(capacity->isSupportTimeDelay))) {
         MISC_HILOGE("Read isSupportTimeDelay failed");
+        delete capacity;
         capacity = nullptr;
         return capacity;
     }
@@ -180,12 +183,16 @@ VibratePattern* VibratePattern::Unmarshalling(Parcel &data)
     auto pattern = new (std::nothrow) VibratePattern();
     if (pattern == nullptr || !(data.ReadInt32(pattern->startTime)) || !(data.ReadInt32(pattern->patternDuration))) {
         MISC_HILOGE("Read pattern basic info failed");
-        pattern = nullptr;
+        if (pattern != nullptr) {
+            delete pattern;
+            pattern = nullptr;
+        }
         return pattern;
     }
     int32_t eventSize{ 0 };
     if (!(data.ReadInt32(eventSize)) || eventSize > MAX_EVENT_SIZE) {
         MISC_HILOGE("Read eventSize failed or eventSize exceed the maximum");
+        delete pattern;
         pattern = nullptr;
         return pattern;
     }
@@ -194,6 +201,7 @@ VibratePattern* VibratePattern::Unmarshalling(Parcel &data)
         int32_t tag{ -1 };
         if (!data.ReadInt32(tag)) {
             MISC_HILOGE("Read type failed");
+            delete pattern;
             pattern = nullptr;
             return pattern;
         }
@@ -201,12 +209,14 @@ VibratePattern* VibratePattern::Unmarshalling(Parcel &data)
         if (!data.ReadInt32(event.time) || !data.ReadInt32(event.duration) || !data.ReadInt32(event.intensity) ||
             !data.ReadInt32(event.frequency) || !data.ReadInt32(event.index)) {
             MISC_HILOGE("Read events info failed");
+            delete pattern;
             pattern = nullptr;
             return pattern;
         }
         int32_t pointSize{ 0 };
         if (!data.ReadInt32(pointSize) || pointSize > MAX_POINT_SIZE) {
             MISC_HILOGE("Read pointSize failed or pointSize exceed the maximum");
+            delete pattern;
             pattern = nullptr;
             return pattern;
         }
@@ -215,6 +225,7 @@ VibratePattern* VibratePattern::Unmarshalling(Parcel &data)
             VibrateCurvePoint point;
             if (!data.ReadInt32(point.time) || !data.ReadInt32(point.intensity) || !data.ReadInt32(point.frequency)) {
                 MISC_HILOGE("Read points info time failed");
+                delete pattern;
                 pattern = nullptr;
                 return pattern;
             }
@@ -251,6 +262,7 @@ VibrateParameter* VibrateParameter::Unmarshalling(Parcel &data)
     }
     if (!(data.ReadInt32(parameter->intensity)) && !(data.ReadInt32(parameter->frequency))) {
         MISC_HILOGE("Read parameter's intensity failed");
+        delete parameter;
         parameter = nullptr;
     }
     return parameter;

@@ -74,6 +74,7 @@ LightAnimationIPC* LightAnimationIPC::Unmarshalling(Parcel &parcel)
     auto lightAnimation = new (std::nothrow) LightAnimationIPC();
     if (lightAnimation != nullptr && !lightAnimation->ReadFromParcel(parcel)) {
         MISC_HILOGE("ReadFromParcel is failed");
+        delete lightAnimation;
         lightAnimation = nullptr;
     }
     return lightAnimation;

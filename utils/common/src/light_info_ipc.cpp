@@ -88,6 +88,7 @@ LightInfoIPC* LightInfoIPC::Unmarshalling(Parcel &parcel)
     auto lightInfo = new (std::nothrow) LightInfoIPC();
     if (lightInfo != nullptr && !lightInfo->ReadFromParcel(parcel)) {
         MISC_HILOGE("ReadFromParcel is failed");
+        delete lightInfo;
         lightInfo = nullptr;
     }
     return lightInfo;
