@@ -29,6 +29,20 @@
 using namespace OHOS::Sensors;
 
 constexpr int32_t INTENSITY_ADJUST_MAX = 100;
+constexpr int32_t EVENT_START_TIME_MAX = 1800000;
+constexpr int32_t EVENT_NUM_MAX = 128;
+constexpr int32_t INTENSITY_MIN = 0;
+constexpr int32_t INTENSITY_MAX = 100;
+constexpr int32_t FREQUENCY_MIN = 0;
+constexpr int32_t FREQUENCY_MAX = 100;
+constexpr int32_t CURVE_POINT_INTENSITY_MAX = 100;
+constexpr int32_t CURVE_POINT_NUM_MIN = 4;
+constexpr int32_t CURVE_POINT_NUM_MAX = 16;
+constexpr int32_t CURVE_FREQUENCY_MIN = -100;
+constexpr int32_t CURVE_FREQUENCY_MAX = 100;
+constexpr int32_t CONTINUOUS_DURATION_MAX = 5000;
+constexpr int32_t EVENT_INDEX_MAX = 2;
+
 static std::map<std::string, int32_t> g_usageType = {
     {"unknown", USAGE_UNKNOWN},
     {"alarm", USAGE_ALARM},
@@ -285,6 +299,359 @@ static bool ParserParamFromVibrateAttribute(ani_env *env, ani_object attribute, 
     return true;
 }
 
+static bool GetPropertyAsDouble(ani_env* env, ani_object obj, const char* propertyName, ani_double* outValue)
+{
+    ani_ref propRef = nullptr;
+    ani_boolean isUndefined = false;
+
+    if (env->Object_GetPropertyByName_Ref(obj, propertyName, &propRef) != ANI_OK) {
+        MISC_HILOGE("GetPropertyAsDouble: Failed to get property '%{punlic}s'", propertyName);
+        return false;
+    }
+
+    env->Reference_IsUndefined(propRef, &isUndefined);
+    if (isUndefined) {
+        MISC_HILOGE("GetPropertyAsDouble: Property '%{punlic}s' is undefined", propertyName);
+        return false;
+    }
+
+    if (env->Object_CallMethodByName_Double(static_cast<ani_object>(propRef), "doubleValue", nullptr, outValue) !=
+        ANI_OK) {
+        MISC_HILOGE("GetPropertyAsDouble: Failed to call 'doubleValue' on property '%{punlic}s'", propertyName);
+        return false;
+    }
+
+    return true;
+}
+
+static bool ParseVibratorCurvePoint(ani_env *env, ani_object pointsArray, uint32_t index, VibratorCurvePoint &point)
+{
+    auto array = static_cast<ani_array_ref>(pointsArray);
+    ani_ref arrayRef;
+    if (env->Array_Get_Ref(array, index, &arrayRef) != ANI_OK) {
+        MISC_HILOGE("Array_Get_Ref Fail");
+        return false;
+    }
+    ani_double time = 0;
+    if (ANI_OK != env->Object_GetPropertyByName_Double(static_cast<ani_object>(arrayRef), "time", &time)) {
+        MISC_HILOGE("Object_GetPropertyByName_Double Fail");
+        return false;
+    }
+    point.time = static_cast<int32_t>(time);
+    MISC_HILOGD("ParseVibrateEvent point.time: %{public}d", point.time);
+
+    ani_double intensity = 0;
+    ani_double frequency = 0;
+    if (GetPropertyAsDouble(env, static_cast<ani_object>(arrayRef), "intensity", &intensity)) {
+        point.intensity = static_cast<int32_t>(intensity);
+        MISC_HILOGD("ParseVibrateEvent point.intensity: %{public}d", point.intensity);
+    }
+
+    if (GetPropertyAsDouble(env, static_cast<ani_object>(arrayRef), "frequency", &frequency)) {
+        point.frequency = static_cast<int32_t>(frequency);
+        MISC_HILOGD("ParseVibrateEvent point.frequency: %{public}d", point.frequency);
+    }
+
+    return true;
+}
+
+static bool ParseVibratorCurvePointArray(ani_env *env, ani_object pointsArray, uint32_t pointsLength,
+    VibratorEvent &event)
+{
+    if (pointsLength <= 0 || pointsLength > CURVE_POINT_NUM_MAX) {
+        MISC_HILOGE("pointsLength should not be less than or equal to 0 or greater than CURVE_POINT_NUM_MAX");
+        return false;
+    }
+    VibratorCurvePoint *points =
+        static_cast<VibratorCurvePoint *>(malloc(sizeof(VibratorCurvePoint) * pointsLength));
+    if (points == nullptr) {
+        MISC_HILOGE("malloc failed");
+        return false;
+    }
+    for (uint32_t i = 0; i < pointsLength; ++i) {
+        if (!ParseVibratorCurvePoint(env, pointsArray, i, points[i])) {
+            MISC_HILOGE("ParseVibratorCurvePoint failed");
+            free(points);
+            points = nullptr;
+            return false;
+        }
+    }
+    event.points = points;
+    return true;
+}
+
+static bool ParsePointsArray(ani_env *env, ani_object parentObject, VibratorEvent &event)
+{
+    ani_ref points = nullptr;
+    ani_boolean isUndefined = false;
+    if (env->Object_GetPropertyByName_Ref(parentObject, "points", &points) != ANI_OK) {
+        MISC_HILOGE("Can not find \"points\" property");
+        return false;
+    }
+
+    env->Reference_IsUndefined(points, &isUndefined);
+    if (isUndefined) {
+        MISC_HILOGE("\"points\" is undefined");
+        return true;
+    }
+
+    ani_size sizePoints = 0;
+    if (env->Array_GetLength(static_cast<ani_array>(points), &sizePoints) != ANI_OK) {
+        MISC_HILOGE("Get point array length failed");
+        return false;
+    }
+
+    event.pointNum = static_cast<uint32_t>(sizePoints);
+
+    if (static_cast<uint32_t>(sizePoints) > 0) {
+        if (!ParseVibratorCurvePointArray(env, static_cast<ani_object>(points),
+            static_cast<uint32_t>(sizePoints), event)) {
+            MISC_HILOGE("ParseVibratorCurvePointArray failed");
+            return false;
+        }
+    }
+
+    return true;
+}
+
+static bool ParseVibrateEvent(ani_env *env, ani_object eventArray, int32_t index, VibratorEvent &event)
+{
+    auto array = static_cast<ani_array_ref>(eventArray);
+    ani_ref arrayRef;
+    if (env->Array_Get_Ref(array, index, &arrayRef) != ANI_OK) {
+        MISC_HILOGE("Array_Get_Ref Fail");
+        return false;
+    }
+    ani_ref aniEventType;
+    if (ANI_OK != env->Object_GetPropertyByName_Ref(static_cast<ani_object>(arrayRef), "eventType", &aniEventType)) {
+        MISC_HILOGE("Can not find \"eventType\" property");
+        return false;
+    }
+
+    EnumAccessor eventTypeAccessor(env, static_cast<ani_enum_item>(aniEventType));
+    expected<VibratorEventType, ani_status> eventTypeExpected = eventTypeAccessor.To<VibratorEventType>();
+    if (!eventTypeExpected) {
+        return false;
+    }
+    VibratorEventType eventType = eventTypeExpected.value();
+    event.type = eventType;
+
+    ani_double time;
+    if (ANI_OK != env->Object_GetPropertyByName_Double(static_cast<ani_object>(arrayRef), "time", &time)) {
+        MISC_HILOGE("Failed to get property named time");
+        return false;
+    }
+    event.time = static_cast<double>(time);
+
+    ani_double duration;
+    if (GetPropertyAsDouble(env, static_cast<ani_object>(arrayRef), "duration", &duration)) {
+        event.duration = static_cast<int32_t>(duration);
+    }
+
+    ani_double intensity;
+    if (GetPropertyAsDouble(env, static_cast<ani_object>(arrayRef), "intensity", &intensity)) {
+        event.intensity = static_cast<int32_t>(intensity);
+        MISC_HILOGD("intensity: %{public}d", event.intensity);
+    }
+
+    ani_double frequency;
+    if (GetPropertyAsDouble(env, static_cast<ani_object>(arrayRef), "frequency", &frequency)) {
+        event.frequency = static_cast<int32_t>(frequency);
+        MISC_HILOGD("frequency: %{public}d", event.frequency);
+    }
+
+    ani_double aniIndex;
+    if (GetPropertyAsDouble(env, static_cast<ani_object>(arrayRef), "index", &aniIndex)) {
+        event.index = static_cast<int32_t>(aniIndex);
+        MISC_HILOGD("index: %{public}d", event.index);
+    }
+
+    if (!ParsePointsArray(env, static_cast<ani_object>(arrayRef), event)) {
+        return false;
+    }
+
+    return true;
+}
+
+static void PrintVibratorPattern(VibratorPattern &vibratorPattern)
+{
+    CALL_LOG_ENTER;
+    if (vibratorPattern.events == nullptr) {
+        MISC_HILOGE("Events is nullptr");
+        return;
+    }
+    MISC_HILOGD("PrintVibratorPattern, time:%{public}d, eventNum:%{public}d",
+        vibratorPattern.time, vibratorPattern.eventNum);
+    for (int32_t i = 0; i < vibratorPattern.eventNum; ++i) {
+        MISC_HILOGD("PrintVibratorPattern, type:%{public}d, time:%{public}d, duration:%{public}d, \
+            intensity:%{public}d, frequency:%{public}d, index:%{public}d, pointNum:%{public}d",
+            static_cast<int32_t>(vibratorPattern.events[i].type), vibratorPattern.events[i].time,
+            vibratorPattern.events[i].duration, vibratorPattern.events[i].intensity,
+            vibratorPattern.events[i].frequency, vibratorPattern.events[i].index, vibratorPattern.events[i].pointNum);
+        if (vibratorPattern.events[i].pointNum > 0) {
+            VibratorCurvePoint *point = vibratorPattern.events[i].points;
+            for (int32_t j = 0; j < vibratorPattern.events[i].pointNum; ++j) {
+                MISC_HILOGD("PrintVibratorPattern, time:%{public}d, intensity:%{public}d, frequency:%{public}d",
+                    point[j].time, point[j].intensity, point[j].frequency);
+            }
+        }
+    }
+}
+
+static bool CheckVibratorCurvePoint(const VibratorEvent &event)
+{
+    if ((event.pointNum < CURVE_POINT_NUM_MIN) || (event.pointNum > CURVE_POINT_NUM_MAX)) {
+        MISC_HILOGE("The points size is out of range, pointNum:%{public}d", event.pointNum);
+        return false;
+    }
+    for (int32_t j = 0; j < event.pointNum; ++j) {
+        if ((event.points[j].time < 0) || (event.points[j].time > event.duration)) {
+            MISC_HILOGE("time in points is out of range, time:%{public}d", event.points[j].time);
+            return false;
+        }
+        if ((event.points[j].intensity < 0) || (event.points[j].intensity > CURVE_POINT_INTENSITY_MAX)) {
+            MISC_HILOGE("intensity in points is out of range, intensity:%{public}d", event.points[j].intensity);
+            return false;
+        }
+        if ((event.points[j].frequency < CURVE_FREQUENCY_MIN) || (event.points[j].frequency > CURVE_FREQUENCY_MAX)) {
+            MISC_HILOGE("frequency in points is out of range, frequency:%{public}d", event.points[j].frequency);
+            return false;
+        }
+    }
+    return true;
+}
+
+static bool CheckVibratorEvent(const VibratorEvent &event)
+{
+    if ((event.time < 0) || (event.time > EVENT_START_TIME_MAX)) {
+        MISC_HILOGE("The event time is out of range, time:%{public}d", event.time);
+        return false;
+    }
+    if ((event.frequency < FREQUENCY_MIN) || (event.frequency > FREQUENCY_MAX)) {
+        MISC_HILOGE("The event frequency is out of range, frequency:%{public}d", event.frequency);
+        return false;
+    }
+    if ((event.intensity < INTENSITY_MIN) || (event.intensity > INTENSITY_MAX)) {
+        MISC_HILOGE("The event intensity is out of range, intensity:%{public}d", event.intensity);
+        return false;
+    }
+    if ((event.duration <= 0) || (event.duration > CONTINUOUS_DURATION_MAX)) {
+        MISC_HILOGE("The event duration is out of range, duration:%{public}d", event.duration);
+        return false;
+    }
+    if ((event.index < 0) || (event.index > EVENT_INDEX_MAX)) {
+        MISC_HILOGE("The event index is out of range, index:%{public}d", event.index);
+        return false;
+    }
+    if ((event.type == VibratorEventType::EVENT_TYPE_CONTINUOUS) && (event.pointNum > 0)) {
+        if (!CheckVibratorCurvePoint(event)) {
+            MISC_HILOGE("CheckVibratorCurvePoint failed");
+            return false;
+        }
+    }
+    return true;
+}
+
+static bool CheckVibratorPatternParameter(VibratorPattern &vibratorPattern)
+{
+    CALL_LOG_ENTER;
+    if (vibratorPattern.events == nullptr) {
+        MISC_HILOGE("Events is nullptr");
+        return false;
+    }
+    if ((vibratorPattern.eventNum <= 0) || (vibratorPattern.eventNum > EVENT_NUM_MAX)) {
+        MISC_HILOGE("The event num  is out of range, eventNum:%{public}d", vibratorPattern.eventNum);
+        return false;
+    }
+    for (int32_t i = 0; i < vibratorPattern.eventNum; ++i) {
+        if (!CheckVibratorEvent(vibratorPattern.events[i])) {
+            MISC_HILOGE("CheckVibratorEvent failed");
+            return false;
+        }
+    }
+    return true;
+}
+
+static bool ParseVibratorPatternEvents(ani_env *env, ani_object patternObj, VibratorPattern &pattern)
+{
+    ani_ref eventArray;
+    if (ANI_OK != env->Object_GetPropertyByName_Ref(static_cast<ani_object>(patternObj), "events", &eventArray)) {
+        MISC_HILOGE("Failed to get property named events");
+        return false;
+    }
+
+    ani_size size;
+    if (ANI_OK != env->Array_GetLength(static_cast<ani_array>(eventArray), &size)) {
+        MISC_HILOGE("Array_GetLength failed");
+        return false;
+    }
+
+    pattern.eventNum = static_cast<int32_t>(size);
+    MISC_HILOGD("ProcessVibratorPattern eventNum: %{public}d", pattern.eventNum);
+
+    if (size <= 0 || size > EVENT_NUM_MAX) {
+        MISC_HILOGE("length should not be less than or equal to 0 or greater than EVENT_NUM_MAX");
+        return false;
+    }
+    VibratorEvent *eventsAlloc =
+        static_cast<VibratorEvent *>(malloc(sizeof(VibratorEvent) * static_cast<double>(size)));
+    if (eventsAlloc == nullptr) {
+        MISC_HILOGE("Events is nullptr");
+        return false;
+    }
+
+    for (uint32_t j = 0; j < size; ++j) {
+        new (&eventsAlloc[j]) VibratorEvent();
+        if (!ParseVibrateEvent(env, static_cast<ani_object>(eventArray), j, eventsAlloc[j])) {
+            MISC_HILOGE("ParseVibrateEvent failed");
+            free(eventsAlloc);
+            eventsAlloc = nullptr;
+            return false;
+        }
+    }
+    pattern.events = eventsAlloc;
+    return true;
+}
+
+static bool ParserParamFromVibratePattern(ani_env *env, ani_object effect, VibrateInfo &vibrateInfo)
+{
+    MISC_HILOGD("ParserParamFromVibratePattern enter");
+    ani_ref type;
+    if (ANI_OK != env->Object_GetPropertyByName_Ref(effect, "type", &type)) {
+        MISC_HILOGE("Failed to get property named type");
+        return false;
+    }
+    auto typeStr = AniStringUtils::ToStd(env, static_cast<ani_string>(type));
+    vibrateInfo.type = typeStr;
+
+    ani_ref pattern;
+    if (ANI_OK != env->Object_GetPropertyByName_Ref(effect, "pattern", &pattern)) {
+        MISC_HILOGE("Failed to get property named pattern");
+        return false;
+    }
+
+    ani_double time;
+    if (ANI_OK != env->Object_GetPropertyByName_Double(static_cast<ani_object>(pattern), "time", &time)) {
+        MISC_HILOGE("Failed to get property named time");
+        return false;
+    }
+
+    vibrateInfo.vibratorPattern.time = static_cast<int32_t>(time);
+    MISC_HILOGD("ProcessVibratorPattern time: %{public}d", vibrateInfo.vibratorPattern.time);
+
+    if (!ParseVibratorPatternEvents(env, static_cast<ani_object>(pattern), vibrateInfo.vibratorPattern)) {
+        return false;
+    }
+
+    PrintVibratorPattern(vibrateInfo.vibratorPattern);
+
+    if (!CheckVibratorPatternParameter(vibrateInfo.vibratorPattern)) {
+        MISC_HILOGE("CheckVibratorPatternParameter fail");
+        return false;
+    }
+    return true;
+}
+
 bool SetUsage(const std::string &usage, bool systemUsage)
 {
     if (auto iter = g_usageType.find(usage); iter == g_usageType.end()) {
@@ -328,6 +695,60 @@ ani_class FindClassInNamespace(ani_env *env, ani_namespace &ns, const char *clas
     return cls;
 }
 
+static bool ParseEffectTypeAndParameters(ani_env *env, ani_object effect, VibrateInfo &vibrateInfo)
+{
+    ani_namespace ns;
+    static const char *namespaceName = "L@ohos/vibrator/vibrator;";
+    if (ANI_OK != env->FindNamespace(namespaceName, &ns)) {
+        MISC_HILOGE("Not found '%{public}s'", namespaceName);
+        return false;
+    }
+
+    ani_class vibrateTimeClass = FindClassInNamespace(env, ns, "LVibrateTime;");
+    ani_class vibratePresetClass = FindClassInNamespace(env, ns, "LVibratePreset;");
+    ani_class vibrateFromFileClass = FindClassInNamespace(env, ns, "LVibrateFromFile;");
+    ani_class vibratePatternClass = FindClassInNamespace(env, ns, "LVibrateFromPattern;");
+    if (!vibrateTimeClass || !vibratePresetClass || !vibrateFromFileClass || !vibratePatternClass) {
+        return false;
+    }
+
+    ani_boolean isInstanceOfTime = ANI_FALSE;
+    env->Object_InstanceOf(effect, vibrateTimeClass, &isInstanceOfTime);
+    ani_boolean isInstanceOfPreset = ANI_FALSE;
+    env->Object_InstanceOf(effect, vibratePresetClass, &isInstanceOfPreset);
+    ani_boolean isInstanceOfFile = ANI_FALSE;
+    env->Object_InstanceOf(effect, vibrateFromFileClass, &isInstanceOfFile);
+    ani_boolean isInstanceOfPattern = ANI_FALSE;
+    env->Object_InstanceOf(effect, vibratePatternClass, &isInstanceOfPattern);
+
+    if (isInstanceOfTime) {
+        if (!ParserParamFromVibrateTime(env, effect, vibrateInfo)) {
+            ThrowBusinessError(env, PARAMETER_ERROR, "ParserParamFromVibrateTime failed!");
+            return false;
+        }
+    } else if (isInstanceOfPreset) {
+        if (!ParserParamFromVibratePreset(env, effect, vibrateInfo)) {
+            ThrowBusinessError(env, PARAMETER_ERROR, "ParserParamFromVibratePreset failed!");
+            return false;
+        }
+    } else if (isInstanceOfFile) {
+        if (!ParserParamFromVibrateFromFile(env, effect, vibrateInfo)) {
+            ThrowBusinessError(env, PARAMETER_ERROR, "ParserParamFromVibrateFromFile failed!");
+            return false;
+        }
+    } else if (isInstanceOfPattern) {
+        if (!ParserParamFromVibratePattern(env, effect, vibrateInfo)) {
+            ThrowBusinessError(env, PARAMETER_ERROR, "ParserParamFromVibratePattern failed!");
+            return false;
+        }
+    } else {
+        ThrowBusinessError(env, PARAMETER_ERROR, "Unknown effect type");
+        return false;
+    }
+
+    return true;
+}
+
 static void StartVibrationSync([[maybe_unused]] ani_env *env, ani_object effect, ani_object attribute)
 {
     ani_namespace ns;
@@ -337,38 +758,15 @@ static void StartVibrationSync([[maybe_unused]] ani_env *env, ani_object effect,
         return;
     }
 
-    ani_class vibrateTimeClass = FindClassInNamespace(env, ns, "LVibrateTime;");
-    ani_class vibratePresetClass = FindClassInNamespace(env, ns, "LVibratePreset;");
-    ani_class vibrateFromFileClass = FindClassInNamespace(env, ns, "LVibrateFromFile;");
     ani_class vibrateAttributeClass = FindClassInNamespace(env, ns, "LVibrateAttribute;");
-    if (!vibrateTimeClass || !vibratePresetClass || !vibrateFromFileClass || !vibrateAttributeClass) {
+    if (!vibrateAttributeClass) {
         return;
     }
 
     VibrateInfo vibrateInfo;
-    ani_boolean isInstanceOfTime = ANI_FALSE;
-    env->Object_InstanceOf(effect, vibrateTimeClass, &isInstanceOfTime);
-    ani_boolean isInstanceOfPreset = ANI_FALSE;
-    env->Object_InstanceOf(effect, vibratePresetClass, &isInstanceOfPreset);
-    ani_boolean isInstanceOfFile = ANI_FALSE;
-    env->Object_InstanceOf(effect, vibrateFromFileClass, &isInstanceOfFile);
-    if (isInstanceOfTime) {
-        if (!ParserParamFromVibrateTime(env, effect, vibrateInfo)) {
-            ThrowBusinessError(env, PARAMETER_ERROR, "ParserParamFromVibrateTime failed!");
-            return;
-        }
-    } else if (isInstanceOfPreset) {
-        if (!ParserParamFromVibratePreset(env, effect, vibrateInfo)) {
-            ThrowBusinessError(env, PARAMETER_ERROR, "ParserParamFromVibratePreset failed!");
-            return;
-        }
-    } else if (isInstanceOfFile) {
-        if (!ParserParamFromVibrateFromFile(env, effect, vibrateInfo)) {
-            ThrowBusinessError(env, PARAMETER_ERROR, "ParserParamFromVibrateFromFile failed!");
-            return;
-        }
+    if (!ParseEffectTypeAndParameters(env, effect, vibrateInfo)) {
+        return;
     }
-
     if (!ParserParamFromVibrateAttribute(env, attribute, vibrateInfo)) {
         ThrowBusinessError(env, PARAMETER_ERROR, "ParserParamFromVibrateAttribute failed!");
         return;
