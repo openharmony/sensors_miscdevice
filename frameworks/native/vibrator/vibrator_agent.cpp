@@ -46,9 +46,6 @@ static int32_t NormalizeErrCode(int32_t code)
         case IS_NOT_SUPPORTED: {
             return IS_NOT_SUPPORTED;
         }
-        case CALLBACK_UNSUBSCRIBED : {
-            return CALLBACK_UNSUBSCRIBED;
-        }
         default: {
             return DEVICE_OPERATION_FAILED;
         }
@@ -416,14 +413,14 @@ int32_t PlayPrimitiveEffectEnhanced(const VibratorIdentifier identifier, const c
     return SUCCESS;
 }
 
-int32_t GetVibratorIdList(const VibratorIdentifier& identifier, std::vector<VibratorInfos>& vibratorInfo)
+int32_t GetVibratorList(const VibratorIdentifier& identifier, std::vector<VibratorInfos>& vibratorInfo)
 {
     CALL_LOG_ENTER;
     CHKCR(&identifier, PARAMETER_ERROR, "Invalid parameters");
     MISC_HILOGD("VibratorIdentifier = [deviceId = %{public}d, vibratorId = %{public}d]", identifier.deviceId,
         identifier.vibratorId);
     auto &client = VibratorServiceClient::GetInstance();
-    int32_t ret = client.GetVibratorIdList(identifier, vibratorInfo);
+    int32_t ret = client.GetVibratorList(identifier, vibratorInfo);
     if (ret != ERR_OK) {
         MISC_HILOGE("Get vibrator list failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
@@ -446,20 +443,20 @@ int32_t GetEffectInfo(const VibratorIdentifier& identifier, const std::string& e
     return SUCCESS;
 }
 
-int32_t SubscribeVibrator(const VibratorUser& user)
+int32_t SubscribeVibratorPlug(const VibratorUser& user)
 {
     CALL_LOG_ENTER;
     CHKCR(user.callback, PARAMETER_ERROR, "Invalid parameters");
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.SubscribeVibratorPlugInfo(&user);
     if (ret != ERR_OK) {
-        MISC_HILOGE("SubscribeVibrator failed, ret:%{public}d", ret);
+        MISC_HILOGE("SubscribeVibratorPlug failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
     return SUCCESS;
 }
 
-int32_t UnSubscribeVibrator(const VibratorUser& user)
+int32_t UnSubscribeVibratorPlug(const VibratorUser& user)
 {
     CALL_LOG_ENTER;
     CHKCR(user.callback, PARAMETER_ERROR, "Invalid parameters");

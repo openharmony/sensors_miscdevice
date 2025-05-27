@@ -76,7 +76,7 @@ public:
     virtual int32_t GetVibratorInfo(std::vector<HdfVibratorInfo> &hdfVibratorInfo) = 0;
     virtual int32_t GetAllWaveInfo(const VibratorIdentifierIPC &identifier,
         std::vector<HdfWaveInformation> &waveInfos) = 0;
-    virtual int32_t GetVibratorIdList(const VibratorIdentifierIPC &identifier,
+    virtual int32_t GetVibratorList(const VibratorIdentifierIPC &identifier,
         std::vector<HdfVibratorInfo> &hdfVibratorInfo) = 0;
     virtual int32_t GetEffectInfo(const VibratorIdentifierIPC &identifier, const std::string &effectType,
         HdfEffectInfo &effectInfo) = 0;

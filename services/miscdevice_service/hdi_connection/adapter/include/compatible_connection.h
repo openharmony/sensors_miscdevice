@@ -49,7 +49,7 @@ public:
     int32_t GetVibratorInfo(std::vector<HdfVibratorInfo> &hdfVibratorInfo) override;
     int32_t GetAllWaveInfo(const VibratorIdentifierIPC &identifier,
         std::vector<HdfWaveInformation> &waveInfos) override;
-    int32_t GetVibratorIdList(const VibratorIdentifierIPC &identifier,
+    int32_t GetVibratorList(const VibratorIdentifierIPC &identifier,
         std::vector<HdfVibratorInfo> &vibratorInfoIpc) override;
     int32_t GetEffectInfo(const VibratorIdentifierIPC &identifier, const std::string &effectType, 
         HdfEffectInfo &effectInfo) override;

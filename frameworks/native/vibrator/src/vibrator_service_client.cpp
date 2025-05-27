@@ -704,7 +704,7 @@ int32_t VibratorServiceClient::UnsubscribeVibratorPlugInfo(const VibratorUser *u
     std::lock_guard<std::recursive_mutex> subscribeLock(subscribeMutex_);
     if (subscribeSet_.find(user) == subscribeSet_.end()) {
         MISC_HILOGD("Deactivate user first");
-        return OHOS::Sensors::CALLBACK_UNSUBSCRIBED;
+        return OHOS::Sensors::ERROR;
     }
     subscribeSet_.erase(user);
     return OHOS::Sensors::SUCCESS;
@@ -724,13 +724,13 @@ std::set<RecordVibratorPlugCallback> VibratorServiceClient::GetSubscribeUserCall
     return callback;
 }
 
-bool VibratorServiceClient::HandleVibratorData(VibratorDeviceInfo info) __attribute__((no_sanitize("cfi")))
+bool VibratorServiceClient::HandleVibratorData(VibratorStatusEvent statusEvent) __attribute__((no_sanitize("cfi")))
 {
     CALL_LOG_ENTER;
-    if(info.type == PLUG_STATE_EVENT_PLUG_OUT) {
+    if(statusEvent.type == PLUG_STATE_EVENT_PLUG_OUT) {
         std::lock_guard<std::mutex> VibratorEffectLock(vibratorEffectMutex_);
         for (auto it = vibratorEffectMap_.begin(); it != vibratorEffectMap_.end(); ) {
-            if (it->first.deviceId == info.deviceId) {
+            if (it->first.deviceId == statusEvent.deviceId) {
                 it = vibratorEffectMap_.erase(it);
             } else {
                 ++it;
@@ -738,13 +738,13 @@ bool VibratorServiceClient::HandleVibratorData(VibratorDeviceInfo info) __attrib
         }
     }
     std::lock_guard<std::recursive_mutex> subscribeLock(subscribeMutex_);
-    auto callbacks = GetSubscribeUserCallback(info.deviceId);
+    auto callbacks = GetSubscribeUserCallback(statusEvent.deviceId);
     MISC_HILOGD("callbacks.size() = %{public}d", callbacks.size());
-    MISC_HILOGD("VibratorDeviceInfo = [type = %{public}d, deviceId = %{public}d]", info.type, info.deviceId);
+    MISC_HILOGD("VibratorStatusEvent = [type = %{public}d, deviceId = %{public}d]", statusEvent.type, statusEvent.deviceId);
     for (const auto &callback : callbacks) {
         MISC_HILOGD("callback is run");
         if(callback != nullptr)
-            callback(&info);
+            callback(&statusEvent);
     }
     return true;
 }
@@ -893,7 +893,7 @@ bool VibratorServiceClient::SkipEventAndConvertVibratorEvent(const VibratorEvent
     return false;
 }
 
-int32_t VibratorServiceClient::GetVibratorIdList(const VibratorIdentifier& identifier,
+int32_t VibratorServiceClient::GetVibratorList(const VibratorIdentifier& identifier,
     std::vector<VibratorInfos>& vibratorInfo)
 {
     CALL_LOG_ENTER;
@@ -911,10 +911,10 @@ int32_t VibratorServiceClient::GetVibratorIdList(const VibratorIdentifier& ident
     param.vibratorId = identifier.vibratorId;
     std::vector<VibratorInfoIPC> vibratorInfoList;
 #ifdef HIVIEWDFX_HITRACE_ENABLE
-    StartTrace(HITRACE_TAG_SENSORS, "GetVibratorIdList");
+    StartTrace(HITRACE_TAG_SENSORS, "GetVibratorList");
 #endif // HIVIEWDFX_HITRACE_ENABLE
-    ret = miscdeviceProxy_->GetVibratorIdList(param, vibratorInfoList);
-    WriteOtherHiSysIPCEvent(IMiscdeviceServiceIpcCode::COMMAND_GET_VIBRATOR_ID_LIST, ret);
+    ret = miscdeviceProxy_->GetVibratorList(param, vibratorInfoList);
+    WriteOtherHiSysIPCEvent(IMiscdeviceServiceIpcCode::COMMAND_GET_VIBRATOR_LIST, ret);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
 #endif // HIVIEWDFX_HITRACE_ENABLE
@@ -923,8 +923,8 @@ int32_t VibratorServiceClient::GetVibratorIdList(const VibratorIdentifier& ident
             vibratorId = %{public}d]", ret, identifier.deviceId, identifier.vibratorId);
         return ret;
     }
-    VibratorInfos resInfo;
     for (auto &info : vibratorInfoList) {
+        VibratorInfos resInfo;
         resInfo.deviceId = info.deviceId;
         resInfo.vibratorId = info.vibratorId;
         resInfo.deviceName = info.deviceName;
@@ -997,9 +997,9 @@ void VibratorServiceClient::WriteVibratorHiSysIPCEvent(IMiscdeviceServiceIpcCode
                 HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
                     HiSysEvent::EventType::FAULT, "PKG_NAME", "GetVibratorCapacity", "ERROR_CODE", ret);
                 break;
-            case IMiscdeviceServiceIpcCode::COMMAND_GET_VIBRATOR_ID_LIST:
+            case IMiscdeviceServiceIpcCode::COMMAND_GET_VIBRATOR_LIST:
                 HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
-                    HiSysEvent::EventType::FAULT, "PKG_NAME", "GetVibratorIdList", "ERROR_CODE", ret);
+                    HiSysEvent::EventType::FAULT, "PKG_NAME", "GetVibratorList", "ERROR_CODE", ret);
             break;
             case IMiscdeviceServiceIpcCode::COMMAND_GET_EFFECT_INFO:
                 HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",

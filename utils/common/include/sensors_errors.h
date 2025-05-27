@@ -30,7 +30,6 @@ enum ErrorCode : int32_t {
     PARAMETER_ERROR = 401, // Use this error code when the input parameter type or range does not match.
     IS_NOT_SUPPORTED = 801, // Use this error code when capability not supported.
     DEVICE_OPERATION_FAILED = 14600101, // Use this error code when operating the device fail.
-    CALLBACK_UNSUBSCRIBED = 14600102, //Use this error code when the user callback function is deregistered repeatedly.
 };
 
 enum {

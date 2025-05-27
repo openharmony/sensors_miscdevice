@@ -118,6 +118,14 @@ bool CreateBooleanProperty(napi_env env, napi_value &eventObj, const char* name,
     return true;
 }
 
+bool IsSameValue(const napi_env &env, const napi_value &lhs, const napi_value &rhs)
+{
+    CALL_LOG_ENTER;
+    bool result = false;
+    CHKNRF(env, napi_strict_equals(env, lhs, rhs, &result), "napi_strict_equals");
+    return result;
+}
+
 bool IsMatchArrayType(const napi_env &env, const napi_value &value)
 {
     bool result = false;
@@ -395,9 +403,9 @@ napi_value ConvertToJsEffectInfo(const napi_env& env, const EffectInfo& effectIn
     return jsObject;
 }
 
-napi_value ConvertToJsVibratorPlungInfo(const napi_env& env, const VibratorDeviceInfo& deviceInfo) {  
+napi_value ConvertToJsVibratorPlungInfo(const napi_env& env, const VibratorStatusEvent& statusEvent) {  
     CALL_LOG_ENTER;
-    MISC_HILOGD("deviceInfo: [type = %{public}d, deviceId = %{public}d]", deviceInfo.type, deviceInfo.deviceId);
+    MISC_HILOGD("statusEvent: [type = %{public}d, deviceId = %{public}d]", statusEvent.type, statusEvent.deviceId);
     bool plugFlag = false;
     napi_value jsObject = nullptr;  
     napi_status status = napi_create_object(env, &jsObject);  
@@ -405,9 +413,9 @@ napi_value ConvertToJsVibratorPlungInfo(const napi_env& env, const VibratorDevic
         napi_throw_error(env, nullptr, "Failed to create JS object");  
         return jsObject;  
     }  
-    if (deviceInfo.type == PLUG_STATE_EVENT_PLUG_IN) {
+    if (statusEvent.type == PLUG_STATE_EVENT_PLUG_IN) {
         plugFlag = true;
-    } else if (deviceInfo.type == PLUG_STATE_EVENT_PLUG_OUT) {
+    } else if (statusEvent.type == PLUG_STATE_EVENT_PLUG_OUT) {
         plugFlag = false;
     }
     MISC_HILOGD("plugFlag = %{public}s", plugFlag? "true":"false");
@@ -415,16 +423,16 @@ napi_value ConvertToJsVibratorPlungInfo(const napi_env& env, const VibratorDevic
         MISC_HILOGE("Create plugFlag failed");
         return jsObject;
     }
-    if (!CreateInt32Property(env, jsObject, "deviceId", deviceInfo.deviceId)) {
-        MISC_HILOGE("Create deviceInfo.deviceId failed");
+    if (!CreateInt32Property(env, jsObject, "deviceId", statusEvent.deviceId)) {
+        MISC_HILOGE("Create statusEvent.deviceId failed");
         return jsObject;
     }
-    if (!CreateInt64Property(env, jsObject, "timestamp", deviceInfo.timestamp)) {
-        MISC_HILOGE("Create deviceInfo.timestamp failed");
+    if (!CreateInt64Property(env, jsObject, "timestamp", statusEvent.timestamp)) {
+        MISC_HILOGE("Create statusEvent.timestamp failed");
         return jsObject;
     }
-    if (!CreateInt32Property(env, jsObject, "vibratorCnt", deviceInfo.vibratorCnt)) {
-        MISC_HILOGE("Create deviceInfo.vibratorCnt failed");
+    if (!CreateInt32Property(env, jsObject, "vibratorCnt", statusEvent.vibratorCnt)) {
+        MISC_HILOGE("Create statusEvent.vibratorCnt failed");
         return jsObject;
     }
 
@@ -442,7 +450,7 @@ bool ConstructVibratorPlugInfoResult(const napi_env &env, sptr<AsyncCallbackInfo
         CHKCF((napi_get_undefined(env, &result[1]) == napi_ok), "napi_get_undefined fail");
     } else {
         napi_value jsDevicePlugInfo;
-        jsDevicePlugInfo = ConvertToJsVibratorPlungInfo(env, asyncCallbackInfo->deviceInfo);
+        jsDevicePlugInfo = ConvertToJsVibratorPlungInfo(env, asyncCallbackInfo->statusEvent);
         CHKPF(jsDevicePlugInfo);
         result[0] = jsDevicePlugInfo;
         CHKCF((napi_get_undefined(env, &result[1]) == napi_ok), "napi_get_undefined fail");
@@ -515,6 +523,82 @@ void ExecuteCallBack(napi_env env, void *data)
     if (asyncCallbackInfo->flag == "preset") {
         asyncCallbackInfo->error.code = PlayPrimitiveEffect(asyncCallbackInfo->info.effectId.c_str(),
             asyncCallbackInfo->info.intensity);
+    }
+}
+
+void EmitUvEventLoop(sptr<AsyncCallbackInfo> asyncCallbackInfo)
+{
+    CHKPV(asyncCallbackInfo);
+    uv_loop_s *loop(nullptr);
+    CHKCV((napi_get_uv_event_loop(asyncCallbackInfo->env, &loop) == napi_ok), "napi_get_uv_event_loop fail");
+    CHKPV(loop);
+    uv_work_t *work = new(std::nothrow) uv_work_t;
+    CHKPV(work);
+    asyncCallbackInfo->IncStrongRef(nullptr);
+    work->data = asyncCallbackInfo.GetRefPtr();
+    int32_t ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) { }, [] (uv_work_t *work, int status) {
+        CHKPV(work);
+        sptr<AsyncCallbackInfo> asyncCallbackInfo(static_cast<AsyncCallbackInfo *>(work->data));
+        DeleteWork(work);
+        /**
+         * After the asynchronous task is created, the asyncCallbackInfo reference count is reduced
+         * to 0 destruction, so you need to add 1 to the asyncCallbackInfo reference count when the
+         * asynchronous task is created, and subtract 1 from the reference count after the naked
+         * pointer is converted to a pointer when the asynchronous task is executed, the reference
+         * count of the smart pointer is guaranteed to be 1.
+         */
+        asyncCallbackInfo->DecStrongRef(nullptr);
+        napi_env env = asyncCallbackInfo->env;
+        napi_value callback = nullptr;
+        if (napi_get_reference_value(env, asyncCallbackInfo->callback[0], &callback) != napi_ok) {
+            MISC_HILOGE("napi_get_reference_value fail");
+            napi_throw_error(env, nullptr, "napi_get_reference_value fail");
+            ReleaseCallback(asyncCallbackInfo);
+            return;
+        }
+        napi_value callResult = nullptr;
+        napi_value result[RESULT_LENGTH] = {0};
+        if (!(g_convertFuncList.find(asyncCallbackInfo->callbackType) != g_convertFuncList.end())) {
+            MISC_HILOGE("asyncCallbackInfo type is invalid");
+            napi_throw_error(env, nullptr, "asyncCallbackInfo type is invalid");
+            ReleaseCallback(asyncCallbackInfo);
+            return;
+        }
+        bool state = g_convertFuncList[asyncCallbackInfo->callbackType](env, asyncCallbackInfo, result,
+            sizeof(result) / sizeof(napi_value));
+        CHKCV(state, "Create napi data fail in async work");
+        if (napi_call_function(env, nullptr, callback, 2, result, &callResult) != napi_ok) {
+            MISC_HILOGE("napi_call_function callback fail");
+            napi_throw_error(env, nullptr, "napi_call_function callback fail");
+            ReleaseCallback(asyncCallbackInfo);
+            return;
+        }
+        ReleaseCallback(asyncCallbackInfo);
+    }, uv_qos_default);
+    if (ret != 0) {
+        MISC_HILOGE("uv_queue_work_with_qos fail");
+        asyncCallbackInfo->DecStrongRef(nullptr);
+        DeleteWork(work);
+    }
+}
+
+void DeleteWork(uv_work_t *work)
+{
+    CHKPV(work);
+    delete work;
+    work = nullptr;
+}
+
+void ReleaseCallback(sptr<AsyncCallbackInfo> asyncCallbackInfo)
+{
+    CHKPV(asyncCallbackInfo);
+    if (asyncCallbackInfo->callbackType == VIBRATOR_STATE_CHANGE) {
+        napi_env env = asyncCallbackInfo->env;
+        CHKPV(env);
+        napi_ref callback = asyncCallbackInfo->callback[0];
+        if (callback != nullptr) {
+            napi_delete_reference(env, callback);
+        }
     }
 }
 

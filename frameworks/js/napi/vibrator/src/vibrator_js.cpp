@@ -790,8 +790,11 @@ static napi_value GetVibratorListSync(napi_env env, napi_callback_info info)
     CALL_LOG_ENTER;
     size_t argc = 1;
     napi_value args[1] = {0};
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, args, nullptr, nullptr));
-
+    napi_status status = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
+    if (status != napi_ok) {
+        MISC_HILOGE("napi_get_cb_info get params failed");
+        return nullptr;
+    }
     VibratorIdentifier identifier;
     if (argc > 0) {
         if (!ParseVibratorIdentifier(env, args[0], identifier)) {
@@ -801,19 +804,25 @@ static napi_value GetVibratorListSync(napi_env env, napi_callback_info info)
             identifier.deviceId, identifier.vibratorId);
     }
     napi_value jsArray = nullptr;
-    NAPI_CALL(env, napi_create_array(env, &jsArray));
+    status = napi_create_array(env, &jsArray);
+    if (status != napi_ok) {
+        MISC_HILOGE("napi_create_array failed");
+        return jsArray;
+    }
     std::vector<VibratorInfos> vibratorInfo;
-    int32_t ret = GetVibratorIdList(identifier, vibratorInfo);
+    int32_t ret = GetVibratorList(identifier, vibratorInfo);
     if (ret == SUCCESS) {
         int32_t length = 0;
         for (auto& info : vibratorInfo) {
             napi_value jsInfo = ConvertToJsVibratorInfo(env, info);
-            NAPI_CALL(env, napi_set_element(env, jsArray, length++, jsInfo));
+            status = napi_set_element(env, jsArray, length++, jsInfo);
+            if (status != napi_ok) {
+                MISC_HILOGE("napi construct JS result array failed");
+                jsArray = nullptr;
+                break;
+            }
         }
-    } else {
-        ThrowErr(env, ret, "Failed to get vibrator list");
-        return nullptr;
-    }
+    } 
     return jsArray;
 }
 
@@ -822,14 +831,20 @@ static napi_value GetSupportEffectInfoSync(napi_env env, napi_callback_info info
     CALL_LOG_ENTER;
     size_t argc = 2;
     napi_value args[2] = {0};
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, args, nullptr, nullptr));
+    napi_status status = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
+    if (status != napi_ok) {
+        MISC_HILOGE("napi_get_cb_info get params failed");
+        return nullptr;
+    }
     if ((argc == 0) || !IsMatchType(env, args[0], napi_string)) {
         MISC_HILOGW("Parameter error, expect string");
         return nullptr;
     }
-    std::vector<char> buffer(STRING_LENGTH_MAX);
-    NAPI_CALL(env, napi_get_value_string_utf8(env, args[0], buffer.data(), STRING_LENGTH_MAX, nullptr));
-    std::string effectType(buffer.data());
+    std::string effectType;
+    if(!GetStringValue(env, args[0], effectType)) {
+        MISC_HILOGE("GetStringValue fail");
+        return nullptr;
+    }
     MISC_HILOGD("effectType = %{public}s", effectType.c_str());
 
     VibratorIdentifier identifier;
@@ -851,20 +866,12 @@ static napi_value GetSupportEffectInfoSync(napi_env env, napi_callback_info info
     return jsEffectInfo;
 }
 
-bool IsSameValue(const napi_env &env, const napi_value &lhs, const napi_value &rhs)
-{
-    CALL_LOG_ENTER;
-    bool result = false;
-    CHKNRF(env, napi_strict_equals(env, lhs, rhs, &result), "napi_strict_equals");
-    return result;
-}
-
 static bool IsSubscribed(const napi_env& env, std::string vibratorEvent, napi_value callback)
 {
     CALL_LOG_ENTER;
     MISC_HILOGD("g_onCallbackInfos.size() = %{public}d", g_onCallbackInfos.size());
     if (g_onCallbackInfos.empty()){
-        return true;
+        return false;
     }
     if (auto iter = g_onCallbackInfos.find(vibratorEvent); iter == g_onCallbackInfos.end()) {
         MISC_HILOGW("No client subscribe, vibratorEvent:%{public}s", vibratorEvent.c_str());
@@ -890,7 +897,10 @@ static void UpdateCallbackInfos(const napi_env& env, std::string& vibratorEvent,
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> onSubcribeLock(g_Mutex);
-    CHKCV(IsSubscribed(env, vibratorEvent, callback), "The callback has been subscribed");
+    if (IsSubscribed(env, vibratorEvent, callback)) {
+        MISC_HILOGW("The callback has been subscribed");
+        return;
+    } 
     sptr<AsyncCallbackInfo> asyncCallbackInfo = new (std::nothrow) AsyncCallbackInfo(env);
     CHKPV(asyncCallbackInfo);
 
@@ -902,35 +912,31 @@ static void UpdateCallbackInfos(const napi_env& env, std::string& vibratorEvent,
         ThrowErr(env, PARAMETER_ERROR, "napi_create_reference fail");
         return;
     }
-
-    std::vector<sptr<AsyncCallbackInfo>> callbackInfos = g_onCallbackInfos[vibratorEvent];
-    callbackInfos.push_back(asyncCallbackInfo);
-    g_onCallbackInfos[vibratorEvent] = callbackInfos;
+    g_onCallbackInfos[vibratorEvent].push_back(asyncCallbackInfo);
 }
 
-static int32_t UpdatePlugInfo(VibratorDeviceInfo *deviceInfo, sptr<AsyncCallbackInfo> &asyncCallbackInfo) 
+static int32_t UpdatePlugInfo(VibratorStatusEvent *statusEvent, sptr<AsyncCallbackInfo> &asyncCallbackInfo) 
 {
     CALL_LOG_ENTER;
-    MISC_HILOGD("deviceInfo : [ type = %{public}d, deviceId = %{public}d]", deviceInfo->type, deviceInfo->deviceId);
-    CHKPR(deviceInfo, PARAMETER_ERROR);
-    if (deviceInfo->type == PLUG_STATE_EVENT_UNKNOWN ||
-        deviceInfo->deviceId == -1) {
+    MISC_HILOGD("statusEvent : [ type = %{public}d, deviceId = %{public}d]", statusEvent->type, statusEvent->deviceId);
+    CHKPR(statusEvent, PARAMETER_ERROR);
+    if (statusEvent->type == PLUG_STATE_EVENT_UNKNOWN) {
         MISC_HILOGE("UpdatePlugInfo failed");
         return PARAMETER_ERROR;
     }
-    asyncCallbackInfo->deviceInfo.type = deviceInfo->type;
-    asyncCallbackInfo->deviceInfo.deviceId = deviceInfo->deviceId;
-    asyncCallbackInfo->deviceInfo.timestamp = deviceInfo->timestamp;
-    asyncCallbackInfo->deviceInfo.vibratorCnt = deviceInfo->vibratorCnt;
-    MISC_HILOGD("asyncCallbackInfo->deviceInfo : [ VibratorPlugState = %{public}d, deviceId = %{public}d]",
-        asyncCallbackInfo->deviceInfo.type, asyncCallbackInfo->deviceInfo.deviceId);
-    return 0;
+    asyncCallbackInfo->statusEvent.type = statusEvent->type;
+    asyncCallbackInfo->statusEvent.deviceId = statusEvent->deviceId;
+    asyncCallbackInfo->statusEvent.timestamp = statusEvent->timestamp;
+    asyncCallbackInfo->statusEvent.vibratorCnt = statusEvent->vibratorCnt;
+    MISC_HILOGD("asyncCallbackInfo->statusEvent : [ VibratorPlugState = %{public}d, deviceId = %{public}d]",
+        asyncCallbackInfo->statusEvent.type, asyncCallbackInfo->statusEvent.deviceId);
+    return SUCCESS;
 }
 
-void DataCallbackImpl(VibratorDeviceInfo *deviceInfo)
+void DataCallbackImpl(VibratorStatusEvent *statusEvent)
 {
     CALL_LOG_ENTER;
-    CHKPV(deviceInfo);
+    CHKPV(statusEvent);
     std::lock_guard<std::mutex> CallbackLock(g_plugCallbackMutex);
     std::vector<sptr<AsyncCallbackInfo>> callBackArry;
     for (auto& allCallBack : g_onCallbackInfos) {
@@ -938,8 +944,8 @@ void DataCallbackImpl(VibratorDeviceInfo *deviceInfo)
         for (auto& callback : callBackArry) {
             if (callback->callbackType == VIBRATOR_STATE_CHANGE) {
                 MISC_HILOGD("VIBRATOR_STATE_CHANGE");
-                callback->error.code = UpdatePlugInfo(deviceInfo, callback);
-                EmitAsyncCallbackWork(callback);
+                callback->error.code = UpdatePlugInfo(statusEvent, callback);
+                EmitUvEventLoop(callback);
             }
         }
     }
@@ -948,17 +954,6 @@ void DataCallbackImpl(VibratorDeviceInfo *deviceInfo)
 const VibratorUser user = {
     .callback = DataCallbackImpl
 };
-
-int32_t SubscribeVibrator(RecordVibratorPlugCallback callback)
-{
-    CALL_LOG_ENTER;
-    int32_t ret = SubscribeVibrator(user);
-    if (ret != ERR_OK) {
-        MISC_HILOGE("SubscribeVibrator failed");
-        return ret;
-    }
-    return ret;
-}
 
 static napi_value On(napi_env env, napi_callback_info info) {
     CALL_LOG_ENTER;
@@ -980,9 +975,9 @@ static napi_value On(napi_env env, napi_callback_info info) {
     }
     MISC_HILOGD("eventType = %{public}s", eventType.c_str());
 
-    int32_t ret = SubscribeVibrator(DataCallbackImpl);
+    int32_t ret = SubscribeVibratorPlug(user);
     if (ret != ERR_OK) {
-        ThrowErr(env, ret, "SubscribeVibrator fail");
+        ThrowErr(env, ret, "SubscribeVibratorPlug fail");
         return nullptr;
     }
     UpdateCallbackInfos(env, eventType, args[1]);
@@ -1005,6 +1000,38 @@ static int32_t RemoveAllCallback(const napi_env& env, std::string& eventType)
     if (callbackInfos.empty()) {
         MISC_HILOGD("No subscription to change");
         g_onCallbackInfos.erase(eventType);
+        return callbackInfos.size();
+    }
+    g_onCallbackInfos[eventType] = callbackInfos;
+    return callbackInfos.size();
+}
+
+static int32_t RemoveCallback(napi_env env, std::string& eventType, napi_value callback)
+{
+    CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> onCallbackLock(g_Mutex);
+    std::vector<sptr<AsyncCallbackInfo>> callbackInfos = g_onCallbackInfos[eventType];
+    for (auto iter = callbackInfos.begin(); iter != callbackInfos.end();) {
+        CHKPC(*iter);
+        if ((*iter)->env != env) {
+            continue;
+        }
+        napi_value VibratorCallback = nullptr;
+        if (napi_get_reference_value(env, (*iter)->callback[0], &VibratorCallback) != napi_ok) {
+            MISC_HILOGE("napi_get_reference_value fail");
+            continue;
+        }
+        if (IsSameValue(env, callback, VibratorCallback)) {
+            iter = callbackInfos.erase(iter);
+            MISC_HILOGD("Remove callback success");
+            break;
+        } else {
+            ++iter;
+        }
+    }
+    if (callbackInfos.empty()) {
+        MISC_HILOGD("No subscription to change data");
+        g_onCallbackInfos.erase(eventType);
         return 0;
     }
     g_onCallbackInfos[eventType] = callbackInfos;
@@ -1015,11 +1042,11 @@ static napi_value Off(napi_env env, napi_callback_info info) {
     size_t argc = 2;
     napi_value args[2];
     napi_status status = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
-    if (status != napi_ok || argc < 2) {
+    if (status != napi_ok) {
         ThrowErr(env, PARAMETER_ERROR, "napi_get_cb_info fail or number of parameter invalid");
         return nullptr;
     }
-    if ((!IsMatchType(env, args[0], napi_string)) || (!IsMatchType(env, args[1], napi_function))) {
+    if ((!IsMatchType(env, args[0], napi_string))) {
         ThrowErr(env, PARAMETER_ERROR, "Wrong argument type");
         return nullptr;
     }
@@ -1029,23 +1056,19 @@ static napi_value Off(napi_env env, napi_callback_info info) {
         return nullptr;
     }
     int32_t subscribeSize = -1;
-    if (IsMatchType(env, args[1], napi_function)) {
+    if (argc == 1 || !(IsMatchType(env, args[1], napi_function))) {
         subscribeSize = RemoveAllCallback(env, eventType);
-    } else {
-        ThrowErr(env, PARAMETER_ERROR, "Wrong argument type, args[1] should is napi_function");
-        return nullptr;
+    } else if (IsMatchType(env, args[1], napi_function)) {
+        subscribeSize = RemoveCallback(env, eventType, args[1]);
     }
     if (subscribeSize > 0) {
         MISC_HILOGW("There are other client subscribe system js api as well, not need unsubscribe");
         return nullptr;
     }
 
-    int32_t ret = UnSubscribeVibrator(user);
-    if (ret != ERR_OK && ret != CALLBACK_UNSUBSCRIBED) {
+    int32_t ret = UnSubscribeVibratorPlug(user);
+    if (ret != ERR_OK) {
         ThrowErr(env, ret, "User callback unsubscribe fail");
-        return nullptr;
-    } else if (ret == CALLBACK_UNSUBSCRIBED) {
-        ThrowErr(env, ret, "User callback deregistered repeatedly");
         return nullptr;
     }
     return nullptr;

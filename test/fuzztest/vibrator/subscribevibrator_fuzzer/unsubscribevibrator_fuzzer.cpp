@@ -23,7 +23,7 @@
 #include "vibrator_agent.h"
 
 namespace OHOS {
-void CallbackTest(VibratorDeviceInfo *deviceInfo){
+void CallbackTest(VibratorStatusEvent *statusEvent){
     return;
 }
 
@@ -33,7 +33,7 @@ bool UnSubscribeVibratorFuzzTest(const uint8_t *data, size_t size)
         .callback = CallbackTest,
         .userData = nullptr,
     };
-    int32_t ret = OHOS::Sensors::UnSubscribeVibrator(user);
+    int32_t ret = OHOS::Sensors::UnSubscribeVibratorPlug(user);
     if (ret == 0) {
         return false;
     }

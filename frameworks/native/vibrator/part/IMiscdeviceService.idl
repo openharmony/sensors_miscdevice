@@ -40,7 +40,7 @@ interface OHOS.Sensors.IMiscdeviceService {
     void TransferClientRemoteObject([in] IRemoteObject vibratorClient);
     void PlayPrimitiveEffect([in] VibratorIdentifierIPC identifier, [in] String effect, [in] PrimitiveEffectIPC primitiveEffectIPC);
     void GetVibratorCapacity([in] VibratorIdentifierIPC identifier, [out] VibratorCapacity capacity);
-    void GetVibratorIdList([in] VibratorIdentifierIPC identifier, [out] VibratorInfoIPC[] vibratorInfoIPC);
+    void GetVibratorList([in] VibratorIdentifierIPC identifier, [out] VibratorInfoIPC[] vibratorInfoIPC);
     void GetEffectInfo([in] VibratorIdentifierIPC identifier, [in] String effectType, [out] EffectInfoIPC effectInfoIPC);
     void SubscribeVibratorPlugInfo();
 }

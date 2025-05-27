@@ -207,11 +207,11 @@ int32_t VibratorHdiConnection::GetAllWaveInfo(const VibratorIdentifierIPC &ident
     return iVibratorHdiConnection_->GetAllWaveInfo(identifier, waveInfos);
 }
 
-int32_t VibratorHdiConnection::GetVibratorIdList(const VibratorIdentifierIPC &identifier,
+int32_t VibratorHdiConnection::GetVibratorList(const VibratorIdentifierIPC &identifier,
     std::vector<HdfVibratorInfo> &vibratorInfo)
 {
     CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
-    return iVibratorHdiConnection_->GetVibratorIdList(identifier, vibratorInfo);
+    return iVibratorHdiConnection_->GetVibratorList(identifier, vibratorInfo);
 }
 
 int32_t VibratorHdiConnection::GetEffectInfo(const VibratorIdentifierIPC &identifier, const std::string &effectType,

@@ -23,7 +23,7 @@ namespace Sensors {
 class IVibratorClient : public IRemoteBroker {
 public:
     enum VibratorClientInterfaceId {
-        TRANS_ID_PLUG_ABILITY = 5,
+        TRANS_ID_PLUG_ABILITY = 0,
     };
     IVibratorClient() = default;
     virtual ~IVibratorClient() = default;

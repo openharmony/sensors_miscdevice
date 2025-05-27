@@ -53,6 +53,20 @@ enum VibrateCustomMode {
     VIBRATE_MODE_TIMES = 2,
 };
 
+typedef struct VibratorEffectParameter {
+    int32_t loopCount = 1;
+    int32_t usage = USAGE_UNKNOWN;
+    bool systemUsage = false;
+    VibratorParameter vibratorParameter;
+}VibratorEffectParameter;
+
+typedef struct PrimitiveEffect {
+    int32_t intensity = 0;
+    int32_t usage = 0;
+    bool systemUsage;
+    int32_t count = 0;
+} PrimitiveEffect;
+
 struct VibrateCurvePoint {
     bool operator<(const VibrateCurvePoint &rhs) const
     {

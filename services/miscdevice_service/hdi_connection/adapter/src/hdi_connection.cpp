@@ -388,7 +388,7 @@ int32_t HdiConnection::GetAllWaveInfo(const VibratorIdentifierIPC &identifier, s
     return ret;
 }
 
-int32_t HdiConnection::GetVibratorIdList(const VibratorIdentifierIPC &identifier,
+int32_t HdiConnection::GetVibratorList(const VibratorIdentifierIPC &identifier,
             std::vector<HdfVibratorInfo> &vibratorInfo)
 {
     CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
@@ -398,7 +398,7 @@ int32_t HdiConnection::GetVibratorIdList(const VibratorIdentifierIPC &identifier
     };
     int32_t ret = vibratorInterface_->GetDeviceVibratorInfo(deviceVibratorInfo, vibratorInfo);
     if (ret != ERR_OK) {
-        MISC_HILOGE("GetVibratorIdList failed");
+        MISC_HILOGE("GetVibratorList failed");
     }
     return ret;
 }
@@ -413,7 +413,7 @@ int32_t HdiConnection::GetEffectInfo(const VibratorIdentifierIPC &identifier, co
     };
     int32_t ret = vibratorInterface_->GetEffectInfo(deviceVibratorInfo, effectType, effectInfo);
     if (ret != ERR_OK) {
-        MISC_HILOGE("GetVibratorIdList failed");
+        MISC_HILOGE("GetVibratorList failed");
     }
     return ret;
 }

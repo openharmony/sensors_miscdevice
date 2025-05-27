@@ -398,7 +398,7 @@ int32_t PlayPrimitiveEffectEnhanced(const VibratorIdentifier identifier, const c
  *
  * @since 18
  */
-int32_t GetVibratorIdList(const VibratorIdentifier& identifier, std::vector<VibratorInfos>& vibratorInfo);
+int32_t GetVibratorList(const VibratorIdentifier& identifier, std::vector<VibratorInfos>& vibratorInfo);
 
 /**
  * @brief Retrieve information about a specific vibration effect type.
@@ -427,7 +427,7 @@ int32_t GetEffectInfo(const VibratorIdentifier& identifier, const std::string& e
  *
  * @since 18
  */
-int32_t SubscribeVibrator(const VibratorUser& user);
+int32_t SubscribeVibratorPlug(const VibratorUser& user);
 
 /**
  * @brief Unsubscribe a user from receiving updates from the vibrator.
@@ -439,7 +439,7 @@ int32_t SubscribeVibrator(const VibratorUser& user);
  *
  * @since 18
  */
-int32_t UnSubscribeVibrator(const VibratorUser& user);
+int32_t UnSubscribeVibratorPlug(const VibratorUser& user);
 } // namespace Sensors
 } // namespace OHOS
 #ifdef __cplusplus

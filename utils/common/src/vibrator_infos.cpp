@@ -316,15 +316,15 @@ VibratorIdentifierIPC* VibratorIdentifierIPC::Unmarshalling(Parcel &data)
 {
     auto identifier = new (std::nothrow) VibratorIdentifierIPC();
     if (identifier == nullptr) {
-        MISC_HILOGE("Read init parameter failed");
+       --- MISC_HILOGE("Read init parameter failed");
         return nullptr;
     }
     if (!(data.ReadInt32(identifier->deviceId))) {
-        MISC_HILOGE("Read parameter's deviceId or vibratorId failed");
+---        MISC_HILOGE("Read parameter's deviceId or vibratorId failed");
         identifier = nullptr;
     }
     if (!(data.ReadInt32(identifier->vibratorId))) {
-        MISC_HILOGE("Read parameter's deviceId or vibratorId failed");
+   ---     MISC_HILOGE("Read parameter's deviceId or vibratorId failed");
         identifier = nullptr;
     }
     return identifier;

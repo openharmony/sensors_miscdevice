@@ -30,6 +30,7 @@
 #include "miscdevice_service_proxy.h"
 #include "vibrator_agent_type.h"
 #include "vibrator_client_stub.h"
+#include "miscdevice_common.h"
 
 namespace OHOS {
 namespace Sensors {
@@ -84,12 +85,12 @@ public:
     int32_t SubscribeVibratorPlugInfo(const VibratorUser *user);
     int32_t UnsubscribeVibratorPlugInfo(const VibratorUser *user);
     std::set<RecordVibratorPlugCallback> GetSubscribeUserCallback(int32_t deviceId);
-    bool HandleVibratorData(VibratorDeviceInfo info);
+    bool HandleVibratorData(VibratorStatusEvent statusEvent);
     void SetUsage(const VibratorIdentifier &identifier, int32_t usage, bool systemUsage);
     void SetLoopCount(const VibratorIdentifier &identifier, int32_t count);
     void SetParameters(const VibratorIdentifier &identifier, const VibratorParameter &parameter);
     VibratorEffectParameter GetVibratorEffectParameter(const VibratorIdentifier &identifier);
-    int32_t GetVibratorIdList(const VibratorIdentifier& identifier, std::vector<VibratorInfos>& vibratorInfo);
+    int32_t GetVibratorList(const VibratorIdentifier& identifier, std::vector<VibratorInfos>& vibratorInfo);
     int32_t GetEffectInfo(const VibratorIdentifier& identifier,const std::string& effectType, EffectInfo& effectInfo);
 
 private:

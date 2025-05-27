@@ -40,8 +40,8 @@ struct VibratorControlInfo {
     int motorCount;
     std::unordered_map<int, std::shared_ptr<VibratorThread>> vibratorThreads;
 
-    VibratorControlInfo(const std::vector<int>& motorIds) : motorCount(static_cast<int>(motorIds.size())) {
-        for (int motorId : motorIds) {
+    VibratorControlInfo(const std::vector<int>& vibratorIds) : motorCount(static_cast<int>(vibratorIds.size())) {
+        for (int motorId : vibratorIds) {
             vibratorThreads[motorId] = std::make_shared<VibratorThread>();
         }
     }
@@ -60,7 +60,7 @@ struct VibratorAllInfos{
     VibratorControlInfo controlInfo;
     VibratorCapacity capacityInfo; 
     std::vector<HdfWaveInformation> waveInfo;
-    VibratorAllInfos(const std::vector<int>& motorIds) : controlInfo(motorIds) {}
+    VibratorAllInfos(const std::vector<int>& vibratorIds) : controlInfo(vibratorIds) {}
 };
 
 class MiscdeviceService : public SystemAbility, public MiscdeviceServiceStub {
@@ -98,7 +98,7 @@ public:
     virtual int32_t PlayPrimitiveEffect(const VibratorIdentifierIPC& identifier, const std::string &effect,
         const PrimitiveEffectIPC& primitiveEffectIPC) override;
     virtual int32_t GetVibratorCapacity(const VibratorIdentifierIPC& identifier, VibratorCapacity &capacity) override;
-    virtual int32_t GetVibratorIdList(const VibratorIdentifierIPC& identifier,
+    virtual int32_t GetVibratorList(const VibratorIdentifierIPC& identifier,
         std::vector<VibratorInfoIPC>& vibratorInfoIPC) override;
     virtual int32_t GetEffectInfo(const VibratorIdentifierIPC& identifier, const std::string& effectType,
         EffectInfoIPC& effectInfoIPC) override;
@@ -141,7 +141,7 @@ private:
     int32_t GetHapticCapacityInfo(const VibratorIdentifierIPC& identifier, VibratorCapacity& capacityInfo);
     int32_t GetAllWaveInfo(const VibratorIdentifierIPC& identifier, std::vector<HdfWaveInformation>& waveInfo);
     int32_t GetHapticStartUpTime(const VibratorIdentifierIPC& identifier, int32_t mode, int32_t &startUpTime);
-    void FirstGetLocalVibratorInfo();
+    void GetLocalVibratorInfo();
     std::vector<VibratorIdentifierIPC> CheckDeviceIdIsValid(const VibratorIdentifierIPC& identifier);
     int32_t StartVibrateThreadControl(const VibratorIdentifierIPC& identifier, VibrateInfo& info);
     bool UpdateVibratorAllInfo(const VibratorIdentifierIPC &identifier, const HdfVibratorPlugInfo &info,

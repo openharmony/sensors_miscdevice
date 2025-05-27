@@ -1473,12 +1473,12 @@ describe("VibratorJsTest", function () {
     */
     it("VibratorJsTest023", 0, function (done) {
         try {
-            const validCallback = function (deviceInfo) {
-                console.info('Valid callback executed with deviceInfo:', deviceInfo);
-                expect(deviceInfo).toBeDefined();
-                expect(typeof deviceInfo).toBe('object');
+            const validCallback = function (statusEvent) {
+                console.info('Valid callback executed with statusEvent:', statusEvent);
+                expect(statusEvent).toBeDefined();
+                expect(typeof statusEvent).toBe('object');
             };
-            on(VibratorStateEventType.VIBRATOR_DEVICE_STATE_CHANGE, validCallback);
+            on("VibratorStateChange", validCallback);
             done();
         } catch (error) {
             console.error('VibratorJsTest023 failed with error:', error);
@@ -1493,7 +1493,7 @@ describe("VibratorJsTest", function () {
     * @tc.number: SUB_SensorSystem_Vibrator_JsTest_0230
     */
     it("VibratorJsTest012", 0, function (done) {
-        const eventType = VibratorStateEventType.VIBRATOR_DEVICE_STATE_CHANG
+        const eventType = "VibratorStateChange";
         const callback = jest.fn((info) => {
             vibratorInfo = info;
         });

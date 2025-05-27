@@ -2709,7 +2709,7 @@ HWTEST_F(VibratorAgentTest, GetVibratorIdList_001, TestSize.Level1)
         .vibratorId = -1,
     };
     std::vector<VibratorInfos> result;
-    int32_t ret = GetVibratorIdList(identifier, result);
+    int32_t ret = GetVibratorList(identifier, result);
     ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
 }
 
@@ -2721,7 +2721,7 @@ HWTEST_F(VibratorAgentTest, GetVibratorIdList_002, TestSize.Level1)
         .vibratorId = 1,
     };
     std::vector<VibratorInfos> result;
-    int32_t ret = GetVibratorIdList(identifier, result);
+    int32_t ret = GetVibratorList(identifier, result);
     ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
 }
 
@@ -2733,7 +2733,7 @@ HWTEST_F(VibratorAgentTest, GetVibratorIdList_003, TestSize.Level1)
         .vibratorId = -1,
     };
     std::vector<VibratorInfos> result;
-    int32_t ret = GetVibratorIdList(identifier, result);
+    int32_t ret = GetVibratorList(identifier, result);
     ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
 }
 
@@ -2745,7 +2745,7 @@ HWTEST_F(VibratorAgentTest, GetVibratorIdList_004, TestSize.Level1)
         .vibratorId = 1,
     };
     std::vector<VibratorInfos> result;
-    int32_t ret = GetVibratorIdList(identifier, result);
+    int32_t ret = GetVibratorList(identifier, result);
     ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
 }
 
@@ -2757,7 +2757,7 @@ HWTEST_F(VibratorAgentTest, GetVibratorIdList_005, TestSize.Level1)
         .vibratorId = 1,
     };
     std::vector<VibratorInfos> result;
-    int32_t ret = GetVibratorIdList(identifier, result);
+    int32_t ret = GetVibratorList(identifier, result);
     ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
 }
 
@@ -2790,7 +2790,7 @@ HWTEST_F(VibratorAgentTest, GetEffectInfo_002, TestSize.Level1)
 HWTEST_F(VibratorAgentTest, SubscribeVibrator_001, TestSize.Level1)
 {
     MISC_HILOGI("SubscribeVibrator_001 in");
-    int32_t ret = SubscribeVibrator(testUser);
+    int32_t ret = SubscribeVibratorPlug(testUser);
     ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
 }
 
@@ -2800,16 +2800,16 @@ HWTEST_F(VibratorAgentTest, SubscribeVibrator_002, TestSize.Level1)
         .callback = nullptr,
     };
     MISC_HILOGI("SubscribeVibrator_002 in");
-    int32_t ret = SubscribeVibrator(invalidUser);
+    int32_t ret = SubscribeVibratorPlug(invalidUser);
     ASSERT_EQ(ret, OHOS::Sensors::ERROR);
 }
 
 HWTEST_F(VibratorAgentTest, UnSubscribeVibrator_001, TestSize.Level1)
 {
     MISC_HILOGI("UnSubscribeVibrator_001 in");
-    int32_t ret = UnSubscribeVibrator(testUser);
+    int32_t ret = UnSubscribeVibratorPlug(testUser);
     ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
-    ret = UnSubscribeVibrator(testUser);
+    ret = UnSubscribeVibratorPlug(testUser);
     ASSERT_EQ(ret, OHOS::Sensors::CALLBACK_UNSUBSCRIBED);
 }
 } // namespace Sensors

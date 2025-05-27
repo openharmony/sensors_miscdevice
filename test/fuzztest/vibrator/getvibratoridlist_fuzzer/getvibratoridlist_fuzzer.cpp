@@ -35,7 +35,7 @@ bool GetVibratorIdListFuzzTest(const uint8_t *data, size_t size)
         std::memcpy(&identifier.vibratorId, data + sizeof(int32_t), sizeof(int32_t));
     }
     std::vector<VibratorInfos> vibratorInfo;
-    int32_t ret = OHOS::Sensors::GetVibratorIdList(identifier, vibratorInfo);
+    int32_t ret = OHOS::Sensors::GetVibratorList(identifier, vibratorInfo);
     if (ret == 0) {
         return false;
     }

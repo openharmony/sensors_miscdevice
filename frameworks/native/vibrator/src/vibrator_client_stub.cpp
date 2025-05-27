@@ -68,7 +68,7 @@ int64_t VibratorClientStub::GetSystemTime()
 {
     struct timespec ts = { 0, 0 };
     if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
-        MMI_HILOGD("clock_gettime failed:%{public}d", errno);
+        MISC_HILOGE("clock_gettime failed:%{public}d", errno);
         return 0;
     }
     return (ts.tv_sec * TIME_CONVERSION_UNIT * TIME_CONVERSION_UNIT) + (ts.tv_nsec / TIME_CONVERSION_UNIT);
@@ -78,17 +78,17 @@ int VibratorClientStub::ProcessPlugEvent(int32_t eventCode, int32_t deviceId, in
 {
     MISC_HILOGD("Begin, eventCode=%{public}d, deviceId:%{public}d, vibratorCnt:%{public}d",
         eventCode, deviceId, vibratorCnt);
-    VibratorDeviceInfo info = {
+    VibratorStatusEvent statusEvent = {
         .type = static_cast<VibratorPlugState>(eventCode),
         .deviceId = deviceId,
+        .vibratorCnt = vibratorCnt,
         .timestamp = GetSystemTime(),
-        .vibratorCnt = vibratorCnt
     };
     auto &client = VibratorServiceClient::GetInstance();
-    bool ret = client.HandleVibratorData(info);
+    bool ret = client.HandleVibratorData(statusEvent);
     if (!ret) {
         MISC_HILOGE("Handle bibrator data failed, ret:%{public}d", ret);
-        return PARAMETER_ERROR;
+        return DEVICE_OPERATION_FAILED;
     }
     MISC_HILOGD("Success to process plug event");
     return NO_ERROR;

@@ -231,7 +231,7 @@ int32_t CompatibleConnection::GetAllWaveInfo(const VibratorIdentifierIPC &identi
     return ERR_OK;
 }
 
-int32_t CompatibleConnection::GetVibratorIdList(const VibratorIdentifierIPC &identifier,
+int32_t CompatibleConnection::GetVibratorList(const VibratorIdentifierIPC &identifier,
     std::vector<HdfVibratorInfo> &vibratorInfoIpc)
 {
     CALL_LOG_ENTER;

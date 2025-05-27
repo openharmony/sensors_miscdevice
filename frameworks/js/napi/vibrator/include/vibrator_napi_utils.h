@@ -19,6 +19,7 @@
 #include <iostream>
 #include <map>
 #include <optional>
+#include <uv.h>
 
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
@@ -46,8 +47,6 @@ enum CallbackType {
     SYSTEM_VIBRATE_CALLBACK = 1,
     COMMON_CALLBACK,
     IS_SUPPORT_EFFECT_CALLBACK,
-    GET_VIBRATOR_INFO_LIST,
-    GET_EFFECT_INFO,
     VIBRATOR_STATE_CHANGE,
 };
 
@@ -78,6 +77,7 @@ public:
     napi_env env = nullptr;
     napi_async_work asyncWork = nullptr;
     napi_deferred deferred = nullptr;
+    uv_work_t *work = nullptr;
     napi_ref callback[CALLBACK_NUM] = {0};
     AsyncCallbackError error;
     CallbackType callbackType = COMMON_CALLBACK;
@@ -85,7 +85,7 @@ public:
     std::vector<VibratorInfos> vibratorInfos;
     int32_t arrayLength;
     EffectInfo effectInfo;
-    VibratorDeviceInfo deviceInfo;
+    VibratorStatusEvent statusEvent;
     std::string flag;
     AsyncCallbackInfo(napi_env env) : env(env) {}
     ~AsyncCallbackInfo();
@@ -101,6 +101,7 @@ bool CreateStringProperty(napi_env env, napi_value &eventObj, const char* name,
 bool CreateBooleanProperty(napi_env env, napi_value &eventObj, const char* name, bool value);
 bool IsMatchArrayType(const napi_env &env, const napi_value &value);
 bool IsMatchType(const napi_env &env, const napi_value &value, const napi_valuetype &type);
+bool IsSameValue(const napi_env &env, const napi_value &lhs, const napi_value &rhs);
 bool GetNapiInt32(const napi_env &env, const int32_t value, napi_value &result);
 bool GetInt32Value(const napi_env &env, const napi_value &value, int32_t &result);
 bool GetDoubleValue(const napi_env &env, const napi_value &value, double &result);
@@ -127,7 +128,10 @@ bool ConstructVibratorPlugInfoResult(const napi_env &env, sptr<AsyncCallbackInfo
     napi_value result[], int32_t length);
 void EmitAsyncCallbackWork(sptr<AsyncCallbackInfo> async_callback_info);
 void EmitPromiseWork(sptr<AsyncCallbackInfo> asyncCallbackInfo);
+void EmitUvEventLoop(sptr<AsyncCallbackInfo> asyncCallbackInfo);
 bool ClearVibratorPattern(VibratorPattern &vibratorPattern);
+void DeleteWork(uv_work_t *work);
+void ReleaseCallback(sptr<AsyncCallbackInfo> asyncCallbackInfo);
 } // namespace Sensors
 } // namespace OHOS
 #endif // VIBRATOR_NAPI_UTILS_H

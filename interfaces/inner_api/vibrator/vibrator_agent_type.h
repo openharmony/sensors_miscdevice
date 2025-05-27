@@ -265,18 +265,6 @@ typedef struct VibratorIdentifier {
 } VibratorIdentifier;
 
 /**
- * @brief Represents the parameters for playing primitive effect.
- *
- * @since 18
- */
-typedef struct PrimitiveEffect {
-    int32_t intensity = 0;
-    int32_t usage = 0;
-    bool systemUsage;
-    int32_t count = 0;
-} PrimitiveEffect;
-
-/**
  * @brief Defines the vibration effect information.
  *
  * The information include the capability to set the effect and the vibration duration of the effect.
@@ -310,19 +298,19 @@ typedef enum VibratorPlugState {
  *
  * @since 18
  */
-typedef struct VibratorDeviceInfo {
+typedef struct VibratorStatusEvent {
     VibratorPlugState type = PLUG_STATE_EVENT_UNKNOWN;
     int32_t deviceId = 0;
     int32_t vibratorCnt = 0;
     int64_t timestamp = 0;
-} VibratorDeviceInfo;
+} VibratorStatusEvent;
 
 /**
  * @brief Defines the callback for data reporting by the sensor agent.
  *
  * @since 18
  */
-typedef void (*RecordVibratorPlugCallback)(VibratorDeviceInfo *deviceInfo);
+typedef void (*RecordVibratorPlugCallback)(VibratorStatusEvent *statusEvent);
 
 /**
  * @brief Defines a reserved field for the sensor data subscriber.
@@ -342,18 +330,6 @@ typedef struct VibratorUser {
     RecordVibratorPlugCallback callback;       /* Callback for reporting sensor data */
     UserData *userData = nullptr;              /* Reserved field for the sensor data subscriber */
 } VibratorUser;
-
-/**
- * @brief Defines information about vibrator effects
- *
- * @since 18
- */
-typedef struct VibratorEffectParameter {
-    int32_t loopCount = 1;
-    int32_t usage = USAGE_UNKNOWN;
-    bool systemUsage = false;
-    VibratorParameter vibratorParameter;
-}VibratorEffectParameter;
 /** @} */
 #ifdef __cplusplus
 };
