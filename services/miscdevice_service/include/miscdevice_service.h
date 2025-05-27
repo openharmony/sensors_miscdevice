@@ -40,13 +40,15 @@ struct VibratorControlInfo {
     int motorCount;
     std::unordered_map<int, std::shared_ptr<VibratorThread>> vibratorThreads;
 
-    VibratorControlInfo(const std::vector<int>& vibratorIds) : motorCount(static_cast<int>(vibratorIds.size())) {
+    VibratorControlInfo(const std::vector<int>& vibratorIds) : motorCount(static_cast<int>(vibratorIds.size()))
+    {
         for (int motorId : vibratorIds) {
             vibratorThreads[motorId] = std::make_shared<VibratorThread>();
         }
     }
 
-    std::shared_ptr<VibratorThread> GetVibratorThread(int motorId) const {
+    std::shared_ptr<VibratorThread> GetVibratorThread(int motorId) const
+    {
         auto it = vibratorThreads.find(motorId);
         if (it != vibratorThreads.end()) {
             return it->second;
@@ -55,10 +57,10 @@ struct VibratorControlInfo {
     }
 };
 
-struct VibratorAllInfos{
+struct VibratorAllInfos {
     std::vector<VibratorInfoIPC> baseInfo;
     VibratorControlInfo controlInfo;
-    VibratorCapacity capacityInfo; 
+    VibratorCapacity capacityInfo;
     std::vector<HdfWaveInformation> waveInfo;
     VibratorAllInfos(const std::vector<int>& vibratorIds) : controlInfo(vibratorIds) {}
 };
@@ -168,7 +170,7 @@ private:
     std::mutex miscDeviceIdMapMutex_;
     std::mutex lightInfosMutex_;
     std::mutex devicesManageMutex_;
-    static std::map<int32_t , VibratorAllInfos> devicesManageMap_;
+    static std::map<int32_t, VibratorAllInfos> devicesManageMap_;
 };
 }  // namespace Sensors
 }  // namespace OHOS

@@ -15,8 +15,8 @@
 
 #ifndef VIBRATOR_AGENT_TYPE_H
 #define VIBRATOR_AGENT_TYPE_H
-#include<string>
-#include<vector>
+#include <string>
+#include <vector>
 
 #ifdef __cplusplus
 extern "C" {
@@ -238,7 +238,7 @@ typedef struct VibratorParameter {
 /**
  * @brief Represents the information about a vibrator device in the system.
  *
- * @since 18
+ * @since 19
  */
 typedef struct VibratorInfos {
     int32_t deviceId;
@@ -251,12 +251,13 @@ typedef struct VibratorInfos {
 /**
  * @brief Represents the parameters for querying vibrator information.
  *
- * @since 18
+ * @since 19
  */
 typedef struct VibratorIdentifier {
     int32_t deviceId = -1;
     int32_t vibratorId = -1;
-    bool operator<(const VibratorIdentifier& other) const {
+    bool operator<(const VibratorIdentifier& other) const
+    {
         if (deviceId != other.deviceId) {
             return deviceId < other.deviceId;
         }
@@ -269,7 +270,7 @@ typedef struct VibratorIdentifier {
  *
  * The information include the capability to set the effect and the vibration duration of the effect.
  *
- * @since 18
+ * @since 19
  */
 typedef struct EffectInfo {
     bool isSupportEffect;
@@ -281,7 +282,7 @@ typedef struct EffectInfo {
  * This enumeration represents the various plug and unplug state events
  * that can occur with the vibrator device, including its connection status.
  *
- * @since 18
+ * @since 19
  */
 typedef enum VibratorPlugState {
     PLUG_STATE_EVENT_UNKNOWN = -1,  /* Unknown plug and unplug state event */
@@ -296,7 +297,7 @@ typedef enum VibratorPlugState {
  * unique identifier. It is used to monitor and manage the vibrator's connectivity
  * and operational mode.
  *
- * @since 18
+ * @since 19
  */
 typedef struct VibratorStatusEvent {
     VibratorPlugState type = PLUG_STATE_EVENT_UNKNOWN;
@@ -308,14 +309,14 @@ typedef struct VibratorStatusEvent {
 /**
  * @brief Defines the callback for data reporting by the sensor agent.
  *
- * @since 18
+ * @since 19
  */
 typedef void (*RecordVibratorPlugCallback)(VibratorStatusEvent *statusEvent);
 
 /**
  * @brief Defines a reserved field for the sensor data subscriber.
  *
- * @since 18
+ * @since 19
  */
 typedef struct UserData {
     char userData[VIBRATOR_USER_DATA_SIZE];  /* Reserved for the sensor data subscriber */
@@ -324,7 +325,7 @@ typedef struct UserData {
 /**
  * @brief Defines information about the sensor data subscriber.
  *
- * @since 18
+ * @since 19
  */
 typedef struct VibratorUser {
     RecordVibratorPlugCallback callback;       /* Callback for reporting sensor data */

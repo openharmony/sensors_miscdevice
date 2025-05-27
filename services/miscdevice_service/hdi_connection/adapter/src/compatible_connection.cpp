@@ -90,7 +90,6 @@ int32_t CompatibleConnection::Start(const VibratorIdentifierIPC &identifier, con
     return ERR_OK;
 }
 
-
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 int32_t CompatibleConnection::EnableCompositeEffect(const VibratorIdentifierIPC &identifier,

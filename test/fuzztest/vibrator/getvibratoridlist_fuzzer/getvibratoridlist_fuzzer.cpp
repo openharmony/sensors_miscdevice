@@ -20,19 +20,38 @@
 #include <cstring>
 #include <string>
 
+#include "securec.h"
+
 #include "vibrator_agent.h"
 
 namespace OHOS {
+namespace {
+constexpr size_t U32_AT_SIZE = 8;
+} // namespace
+template<class T>
+size_t GetObject(const uint8_t *data, size_t size, T &object)
+{
+    size_t objectSize = sizeof(object);
+    if (objectSize > size) {
+        return 0;
+    }
+    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
+    if (ret != EOK) {
+        return 0;
+    }
+    return objectSize;
+}
+
 bool GetVibratorIdListFuzzTest(const uint8_t *data, size_t size)
 {
     VibratorIdentifier identifier;
- 
-    if (size < sizeof(int32_t) * 2) {
-        identifier.deviceId = -1;  
-        identifier.vibratorId = -1;  
+    if (size < U32_AT_SIZE) {
+        identifier.deviceId = -1;
+        identifier.vibratorId = -1;
     } else {
-        std::memcpy(&identifier.deviceId, data, sizeof(int32_t));
-        std::memcpy(&identifier.vibratorId, data + sizeof(int32_t), sizeof(int32_t));
+        size_t startPos = 0;
+        startPos += GetObject<int32_t>(data + startPos, size - startPos, identifier.deviceId);
+        GetObject<int32_t>(data + startPos, size - startPos, identifier.vibratorId);
     }
     std::vector<VibratorInfos> vibratorInfo;
     int32_t ret = OHOS::Sensors::GetVibratorList(identifier, vibratorInfo);

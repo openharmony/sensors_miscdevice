@@ -13,28 +13,27 @@
  * limitations under the License.
  */
 
- #ifndef VIBRATOR_PLUG_CALLBACK_H
- #define VIBRATOR_PLUG_CALLBACK_H
- 
- #include <nocopyable.h>
- #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
- #include "v2_0/ivibrator_interface.h"
- #include "v2_0/ivibrator_plug_callback.h"
- #include "v2_0/vibrator_types.h"
- #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
- 
- #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
- using OHOS::HDI::Vibrator::V2_0::IVibratorPlugCallback;
- #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
- 
- namespace OHOS {
- namespace Sensors {
- class VibratorPlugCallback : public IVibratorPlugCallback {
- public:
-     virtual ~VibratorPlugCallback() {}
-     int32_t OnVibratorPlugEvent(const HdfVibratorPlugInfo &vibratorPlugInfo) override;
- };
- } // namespace Sensors
- } // namespace OHOS
- #endif // VIBRATOR_PLUG_CALLBACK_H
- 
+#ifndef VIBRATOR_PLUG_CALLBACK_H
+#define VIBRATOR_PLUG_CALLBACK_H
+
+#include <nocopyable.h>
+#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
+#include "v2_0/ivibrator_interface.h"
+#include "v2_0/ivibrator_plug_callback.h"
+#include "v2_0/vibrator_types.h"
+#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
+
+#ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
+using OHOS::HDI::Vibrator::V2_0::IVibratorPlugCallback;
+#endif // HDF_DRIVERS_INTERFACE_VIBRATOR
+
+namespace OHOS {
+namespace Sensors {
+class VibratorPlugCallback : public IVibratorPlugCallback {
+public:
+    virtual ~VibratorPlugCallback() {}
+    int32_t OnVibratorPlugEvent(const HdfVibratorPlugInfo &vibratorPlugInfo) override;
+};
+} // namespace Sensors
+} // namespace OHOS
+#endif // VIBRATOR_PLUG_CALLBACK_H

@@ -42,5 +42,5 @@ interface OHOS.Sensors.IMiscdeviceService {
     void GetVibratorCapacity([in] VibratorIdentifierIPC identifier, [out] VibratorCapacity capacity);
     void GetVibratorList([in] VibratorIdentifierIPC identifier, [out] VibratorInfoIPC[] vibratorInfoIPC);
     void GetEffectInfo([in] VibratorIdentifierIPC identifier, [in] String effectType, [out] EffectInfoIPC effectInfoIPC);
-    void SubscribeVibratorPlugInfo();
+    void SubscribeVibratorPlugInfo([in] IRemoteObject vibratorClient);
 }

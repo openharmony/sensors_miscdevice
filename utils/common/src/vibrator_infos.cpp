@@ -98,16 +98,19 @@ VibratorCapacity* VibratorCapacity::Unmarshalling(Parcel &data)
     }
     if (!(data.ReadBool(capacity->isSupportHdHaptic))) {
         MISC_HILOGE("Read isSupportHdHaptic failed");
+        delete capacity;
         capacity = nullptr;
         return capacity;
     }
     if (!(data.ReadBool(capacity->isSupportPresetMapping))) {
         MISC_HILOGE("Read isSupportPresetMapping failed");
+        delete capacity;
         capacity = nullptr;
         return capacity;
     }
     if (!(data.ReadBool(capacity->isSupportTimeDelay))) {
         MISC_HILOGE("Read isSupportTimeDelay failed");
+        delete capacity;
         capacity = nullptr;
         return capacity;
     }
@@ -180,12 +183,16 @@ VibratePattern* VibratePattern::Unmarshalling(Parcel &data)
     auto pattern = new (std::nothrow) VibratePattern();
     if (pattern == nullptr || !(data.ReadInt32(pattern->startTime)) || !(data.ReadInt32(pattern->patternDuration))) {
         MISC_HILOGE("Read pattern basic info failed");
-        pattern = nullptr;
+        if (pattern != nullptr) {
+            delete pattern;
+            pattern = nullptr;
+        }
         return pattern;
     }
     int32_t eventSize{ 0 };
     if (!(data.ReadInt32(eventSize)) || eventSize > MAX_EVENT_SIZE) {
         MISC_HILOGE("Read eventSize failed or eventSize exceed the maximum");
+        delete pattern;
         pattern = nullptr;
         return pattern;
     }
@@ -194,6 +201,7 @@ VibratePattern* VibratePattern::Unmarshalling(Parcel &data)
         int32_t tag{ -1 };
         if (!data.ReadInt32(tag)) {
             MISC_HILOGE("Read type failed");
+            delete pattern;
             pattern = nullptr;
             return pattern;
         }
@@ -201,12 +209,14 @@ VibratePattern* VibratePattern::Unmarshalling(Parcel &data)
         if (!data.ReadInt32(event.time) || !data.ReadInt32(event.duration) || !data.ReadInt32(event.intensity) ||
             !data.ReadInt32(event.frequency) || !data.ReadInt32(event.index)) {
             MISC_HILOGE("Read events info failed");
+            delete pattern;
             pattern = nullptr;
             return pattern;
         }
         int32_t pointSize{ 0 };
         if (!data.ReadInt32(pointSize) || pointSize > MAX_POINT_SIZE) {
             MISC_HILOGE("Read pointSize failed or pointSize exceed the maximum");
+            delete pattern;
             pattern = nullptr;
             return pattern;
         }
@@ -215,6 +225,7 @@ VibratePattern* VibratePattern::Unmarshalling(Parcel &data)
             VibrateCurvePoint point;
             if (!data.ReadInt32(point.time) || !data.ReadInt32(point.intensity) || !data.ReadInt32(point.frequency)) {
                 MISC_HILOGE("Read points info time failed");
+                delete pattern;
                 pattern = nullptr;
                 return pattern;
             }
@@ -222,6 +233,39 @@ VibratePattern* VibratePattern::Unmarshalling(Parcel &data)
         }
     }
     return pattern;
+}
+
+void VibrateParameter::Dump() const
+{
+    MISC_HILOGI("intensity:%{public}d, frequency:%{public}d", intensity, frequency);
+}
+
+bool VibrateParameter::Marshalling(Parcel &parcel) const
+{
+    if (!parcel.WriteInt32(intensity)) {
+        MISC_HILOGE("Write parameter's intensity failed");
+        return false;
+    }
+    if (!parcel.WriteInt32(frequency)) {
+        MISC_HILOGE("Write parameter's frequency failed");
+        return false;
+    }
+    return true;
+}
+
+VibrateParameter* VibrateParameter::Unmarshalling(Parcel &data)
+{
+    auto parameter = new (std::nothrow) VibrateParameter();
+    if (parameter == nullptr) {
+        MISC_HILOGE("Read init parameter failed");
+        return nullptr;
+    }
+    if (!(data.ReadInt32(parameter->intensity)) && !(data.ReadInt32(parameter->frequency))) {
+        MISC_HILOGE("Read parameter's intensity failed");
+        delete parameter;
+        parameter = nullptr;
+    }
+    return parameter;
 }
 
 bool VibratorInfoIPC::Marshalling(Parcel &parcel) const
@@ -286,7 +330,7 @@ VibratorInfoIPC* VibratorInfoIPC::Unmarshalling(Parcel &data)
 
 void VibratorInfoIPC::Dump() const
 {
-    std::string retStr;
+    std::string retStr = "";
     retStr = "deviceId: "+ std::to_string(deviceId) + " ";
     retStr += ("vibratorId: " + std::to_string(vibratorId) + " ");
     retStr += ("deviceName: " + deviceName + " ");
@@ -316,15 +360,15 @@ VibratorIdentifierIPC* VibratorIdentifierIPC::Unmarshalling(Parcel &data)
 {
     auto identifier = new (std::nothrow) VibratorIdentifierIPC();
     if (identifier == nullptr) {
-       --- MISC_HILOGE("Read init parameter failed");
+        MISC_HILOGE("Read init parameter failed");
         return nullptr;
     }
     if (!(data.ReadInt32(identifier->deviceId))) {
----        MISC_HILOGE("Read parameter's deviceId or vibratorId failed");
+        MISC_HILOGE("Read parameter's deviceId or vibratorId failed");
         identifier = nullptr;
     }
     if (!(data.ReadInt32(identifier->vibratorId))) {
-   ---     MISC_HILOGE("Read parameter's deviceId or vibratorId failed");
+        MISC_HILOGE("Read parameter's deviceId or vibratorId failed");
         identifier = nullptr;
     }
     return identifier;
@@ -365,7 +409,7 @@ EffectInfoIPC* EffectInfoIPC::Unmarshalling(Parcel &data)
 
 void EffectInfoIPC::Dump() const
 {
-    std::string retStr;
+    std::string retStr = "";
     retStr = "duration: "+ std::to_string(duration) + " ";
     retStr += ("isSupportEffect: " + (isSupportEffect? std::string("true"):std::string("false")));
     MISC_HILOGI("EffectInfoIPC: [%{public}s]", retStr.c_str());
@@ -433,7 +477,7 @@ CustomHapticInfoIPC* CustomHapticInfoIPC::Unmarshalling(Parcel &data)
 
 void CustomHapticInfoIPC::Dump() const
 {
-    std::string retStr;
+    std::string retStr = "";
     retStr = "usage: "+ std::to_string(usage) + " ";
     retStr += "systemUsage: " + std::to_string(systemUsage)  + " ";
     retStr += "parameter.intensity: " + std::to_string(parameter.intensity)  + " ";
@@ -497,7 +541,7 @@ PrimitiveEffectIPC* PrimitiveEffectIPC::Unmarshalling(Parcel &data)
 
 void PrimitiveEffectIPC::Dump() const
 {
-    std::string retStr;
+    std::string retStr = "";
     retStr = "intensity: "+ std::to_string(intensity) + " ";
     retStr += "usage: " + std::to_string(usage)  + " ";
     retStr += "systemUsage: " + std::to_string(systemUsage)  + " ";

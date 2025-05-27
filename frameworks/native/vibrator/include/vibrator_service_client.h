@@ -91,7 +91,7 @@ public:
     void SetParameters(const VibratorIdentifier &identifier, const VibratorParameter &parameter);
     VibratorEffectParameter GetVibratorEffectParameter(const VibratorIdentifier &identifier);
     int32_t GetVibratorList(const VibratorIdentifier& identifier, std::vector<VibratorInfos>& vibratorInfo);
-    int32_t GetEffectInfo(const VibratorIdentifier& identifier,const std::string& effectType, EffectInfo& effectInfo);
+    int32_t GetEffectInfo(const VibratorIdentifier& identifier, const std::string& effectType, EffectInfo& effectInfo);
 
 private:
     int32_t InitServiceClient();

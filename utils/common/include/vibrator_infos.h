@@ -53,20 +53,6 @@ enum VibrateCustomMode {
     VIBRATE_MODE_TIMES = 2,
 };
 
-typedef struct VibratorEffectParameter {
-    int32_t loopCount = 1;
-    int32_t usage = USAGE_UNKNOWN;
-    bool systemUsage = false;
-    VibratorParameter vibratorParameter;
-}VibratorEffectParameter;
-
-typedef struct PrimitiveEffect {
-    int32_t intensity = 0;
-    int32_t usage = 0;
-    bool systemUsage;
-    int32_t count = 0;
-} PrimitiveEffect;
-
 struct VibrateCurvePoint {
     bool operator<(const VibrateCurvePoint &rhs) const
     {
@@ -142,16 +128,19 @@ struct VibrateInfo {
     VibratePackage package;
 };
 
-struct VibrateParameter {
+struct VibrateParameter : public Parcelable {
     int32_t intensity = 100;  // from 0 to 100
     int32_t frequency = 0;    // from -100 to 100
     int32_t reserved = 0;
+    void Dump() const;
+    bool Marshalling(Parcel &parcel) const;
+    static VibrateParameter* Unmarshalling(Parcel &data);
 };
 
 
-struct VibratorInfoIPC : public Parcelable{
+struct VibratorInfoIPC : public Parcelable {
     int32_t deviceId = -1;
-    int32_t vibratorId = -1; 
+    int32_t vibratorId = -1;
     std::string deviceName = "";
     bool isSupportHdHaptic;
     bool isLocalVibrator;
@@ -171,7 +160,7 @@ struct VibratorIdentifierIPC : public Parcelable {
     static VibratorIdentifierIPC* Unmarshalling(Parcel &data);
 };
 
-struct EffectInfoIPC : public Parcelable{
+struct EffectInfoIPC : public Parcelable {
     int32_t duration = -1;
     bool isSupportEffect;
     void Dump() const;
@@ -179,7 +168,7 @@ struct EffectInfoIPC : public Parcelable{
     static EffectInfoIPC* Unmarshalling(Parcel &data);
 };
 
-struct CustomHapticInfoIPC : public Parcelable{
+struct CustomHapticInfoIPC : public Parcelable {
     int32_t usage = 0;
     bool systemUsage;
     VibrateParameter parameter;
@@ -188,7 +177,7 @@ struct CustomHapticInfoIPC : public Parcelable{
     static CustomHapticInfoIPC* Unmarshalling(Parcel &data);
 };
 
-struct PrimitiveEffectIPC : public Parcelable{
+struct PrimitiveEffectIPC : public Parcelable {
     int32_t intensity = 0;
     int32_t usage = 0;
     bool systemUsage;

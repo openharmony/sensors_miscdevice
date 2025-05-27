@@ -88,7 +88,7 @@ int32_t StartVibratorEnhanced(const VibratorIdentifier identifier, const char *e
     auto &client = VibratorServiceClient::GetInstance();
     VibratorEffectParameter vibratorEffectParameter = client.GetVibratorEffectParameter(identifier);
     int32_t ret = client.Vibrate(identifier, effectId, vibratorEffectParameter.loopCount,
-            vibratorEffectParameter.usage, vibratorEffectParameter.systemUsage);
+        vibratorEffectParameter.usage, vibratorEffectParameter.systemUsage);
     client.SetUsage(identifier, USAGE_UNKNOWN, false);
     client.SetLoopCount(identifier, 1);
     if (ret != ERR_OK) {
@@ -115,7 +115,8 @@ int32_t StartVibratorOnceEnhanced(const VibratorIdentifier identifier, int32_t d
     }
     auto &client = VibratorServiceClient::GetInstance();
     VibratorEffectParameter vibratorEffectParameter = client.GetVibratorEffectParameter(identifier);
-    int32_t ret = client.Vibrate(identifier, duration, vibratorEffectParameter.usage, vibratorEffectParameter.systemUsage);
+    int32_t ret = client.Vibrate(identifier, duration, vibratorEffectParameter.usage,
+        vibratorEffectParameter.systemUsage);
     client.SetUsage(identifier, USAGE_UNKNOWN, false);
     if (ret != ERR_OK) {
         MISC_HILOGD("Vibrate duration failed, ret:%{public}d", ret);
@@ -164,8 +165,8 @@ int32_t PlayVibratorCustomEnhanced(const VibratorIdentifier identifier, int32_t 
         .length = length
     };
     VibratorEffectParameter vibratorEffectParameter = client.GetVibratorEffectParameter(identifier);
-    int32_t ret = client.PlayVibratorCustom(identifier, rawFd, vibratorEffectParameter.usage, 
-            vibratorEffectParameter.systemUsage, vibratorEffectParameter.vibratorParameter);
+    int32_t ret = client.PlayVibratorCustom(identifier, rawFd, vibratorEffectParameter.usage,
+        vibratorEffectParameter.systemUsage, vibratorEffectParameter.vibratorParameter);
     vibratorEffectParameter.vibratorParameter.intensity = INTENSITY_ADJUST_MAX;
     vibratorEffectParameter.vibratorParameter.frequency = 0;
     client.SetUsage(identifier, USAGE_UNKNOWN, false);
@@ -326,8 +327,8 @@ int32_t PlayPatternEnhanced(const VibratorIdentifier identifier, const VibratorP
 {
     auto &client = VibratorServiceClient::GetInstance();
     VibratorEffectParameter vibratorEffectParameter = client.GetVibratorEffectParameter(identifier);
-    int32_t ret = client.PlayPattern(identifier, pattern, vibratorEffectParameter.usage, vibratorEffectParameter.systemUsage, 
-        vibratorEffectParameter.vibratorParameter);
+    int32_t ret = client.PlayPattern(identifier, pattern, vibratorEffectParameter.usage,
+        vibratorEffectParameter.systemUsage, vibratorEffectParameter.vibratorParameter);
     vibratorEffectParameter.vibratorParameter.intensity = INTENSITY_ADJUST_MAX;
     vibratorEffectParameter.vibratorParameter.frequency = 0;
     client.SetUsage(identifier, USAGE_UNKNOWN, false);

@@ -674,7 +674,7 @@ int32_t VibratorServiceClient::SubscribeVibratorPlugInfo(const VibratorUser *use
     auto status = subscribeSet_.insert(user);
     if (!status.second) {
         MISC_HILOGD("User has been subscribed");
-    }else {
+    } else {
         std::lock_guard<std::mutex> clientLock(clientMutex_);
         auto remoteObject = vibratorClient_->AsObject();
         CHKPR(remoteObject, MISC_NATIVE_GET_SERVICE_ERR);
@@ -727,9 +727,9 @@ std::set<RecordVibratorPlugCallback> VibratorServiceClient::GetSubscribeUserCall
 bool VibratorServiceClient::HandleVibratorData(VibratorStatusEvent statusEvent) __attribute__((no_sanitize("cfi")))
 {
     CALL_LOG_ENTER;
-    if(statusEvent.type == PLUG_STATE_EVENT_PLUG_OUT) {
+    if (statusEvent.type == PLUG_STATE_EVENT_PLUG_OUT) {
         std::lock_guard<std::mutex> VibratorEffectLock(vibratorEffectMutex_);
-        for (auto it = vibratorEffectMap_.begin(); it != vibratorEffectMap_.end(); ) {
+        for (auto it = vibratorEffectMap_.begin(); it != vibratorEffectMap_.end();) {
             if (it->first.deviceId == statusEvent.deviceId) {
                 it = vibratorEffectMap_.erase(it);
             } else {
@@ -739,11 +739,12 @@ bool VibratorServiceClient::HandleVibratorData(VibratorStatusEvent statusEvent) 
     }
     std::lock_guard<std::recursive_mutex> subscribeLock(subscribeMutex_);
     auto callbacks = GetSubscribeUserCallback(statusEvent.deviceId);
-    MISC_HILOGD("callbacks.size() = %{public}d", callbacks.size());
-    MISC_HILOGD("VibratorStatusEvent = [type = %{public}d, deviceId = %{public}d]", statusEvent.type, statusEvent.deviceId);
+    MISC_HILOGD("callbacks.size() = %{public}zu", callbacks.size());
+    MISC_HILOGD("VibratorStatusEvent = [type = %{public}d, deviceId = %{public}d]",
+                statusEvent.type, statusEvent.deviceId);
     for (const auto &callback : callbacks) {
         MISC_HILOGD("callback is run");
-        if(callback != nullptr)
+        if (callback != nullptr)
             callback(&statusEvent);
     }
     return true;
@@ -906,7 +907,7 @@ int32_t VibratorServiceClient::GetVibratorList(const VibratorIdentifier& identif
     }
     CHKPR(miscdeviceProxy_, OHOS::Sensors::ERROR);
 
-    VibratorIdentifierIPC param; 
+    VibratorIdentifierIPC param;
     param.deviceId = identifier.deviceId;
     param.vibratorId = identifier.vibratorId;
     std::vector<VibratorInfoIPC> vibratorInfoList;
@@ -947,7 +948,7 @@ int32_t VibratorServiceClient::GetEffectInfo(const VibratorIdentifier& identifie
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
     CHKPR(miscdeviceProxy_, OHOS::Sensors::ERROR);
-    VibratorIdentifierIPC param; 
+    VibratorIdentifierIPC param;
     param.deviceId = identifier.deviceId;
     param.vibratorId = identifier.vibratorId;
     EffectInfoIPC resInfo;
@@ -1000,11 +1001,11 @@ void VibratorServiceClient::WriteVibratorHiSysIPCEvent(IMiscdeviceServiceIpcCode
             case IMiscdeviceServiceIpcCode::COMMAND_GET_VIBRATOR_LIST:
                 HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
                     HiSysEvent::EventType::FAULT, "PKG_NAME", "GetVibratorList", "ERROR_CODE", ret);
-            break;
+                break;
             case IMiscdeviceServiceIpcCode::COMMAND_GET_EFFECT_INFO:
                 HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
                     HiSysEvent::EventType::FAULT, "PKG_NAME", "GetEffectInfo", "ERROR_CODE", ret);
-            break; 
+                break;
             default:
                 MISC_HILOGW("Code does not exist, code:%{public}d", static_cast<int32_t>(code));
                 break;

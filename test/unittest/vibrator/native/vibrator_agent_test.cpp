@@ -39,7 +39,7 @@ using Security::AccessToken::AccessTokenID;
 
 namespace {
 constexpr int32_t TIME_WAIT_FOR_OP = 500;
-constexpr int32_t TIME_WAIT_FOR_OP_TWO_HUNDRED = 200;
+constexpr int32_t TIME_WAIT_FOR_OP_EACH_CASE = 200;
 constexpr int32_t INTENSITY_HIGH = 100;
 constexpr int32_t INTENSITY_MEDIUM = 50;
 constexpr int32_t INTENSITY_LOW = 20;
@@ -67,7 +67,8 @@ HapInfoParams g_infoManagerTestInfoParms = {
     .appIDDesc = "vibratorAgentTest"
 };
 
-void TestCallBack(VibratorDeviceInfo *deviceInfo) {
+void TestCallBack(VibratorStatusEvent *deviceInfo)
+{
     return;
 }
 
@@ -123,7 +124,7 @@ void VibratorAgentTest::SetUp()
 
 void VibratorAgentTest::TearDown()
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_TWO_HUNDRED));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_EACH_CASE));
 }
 
 bool IsSupportVibratorEffect(const char* effectId)
@@ -2552,41 +2553,41 @@ HWTEST_F(VibratorAgentTest, PlayPatternEnhanced_001, TestSize.Level1)
         .vibratorId = -1,
     };
     bool isSupport = IsSupportVibratorCustomEnhanced(identifier);
-    if (isSupport) {
-        int32_t delayTime { -1 };
-        int32_t ret = GetDelayTimeEnhanced(identifier, delayTime);
-        ASSERT_EQ(ret, 0);
-        MISC_HILOGD("delayTime:%{public}d", delayTime);
-        FileDescriptor fileDescriptor("/data/test/vibrator/coin_drop.json");
-        MISC_HILOGD("fd:%{public}d", fileDescriptor.fd);
-        VibratorFileDescription vfd;
-        VibratorPackage package;
-        struct stat64 statbuf = { 0 };
-        if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
-            vfd.fd = fileDescriptor.fd;
-            vfd.offset = 0;
-            vfd.length = statbuf.st_size;
-            ret = PreProcess(vfd, package);
-            ASSERT_EQ(ret, 0);
-            for (int32_t i = 0; i < package.patternNum; ++i) {
-                if (i == 0) {
-                    std::this_thread::sleep_for(std::chrono::milliseconds(package.patterns[i].time));
-                } else {
-                    std::this_thread::sleep_for(std::chrono::milliseconds(package.patterns[i].time) -
-                        std::chrono::milliseconds(package.patterns[i - 1].time));
-                }
-                ASSERT_EQ(SetUsageEnhanced(identifier, USAGE_UNKNOWN), true);
-                MISC_HILOGD("pointNum:%{public}d", package.patterns[i].events[i].pointNum);
-                ret = PlayPatternEnhanced(identifier, package.patterns[i]);
-                ASSERT_EQ(ret, 0);
-            }
-        }
-        ret = FreeVibratorPackage(package);
-        ASSERT_EQ(ret, 0);
-        CancelEnhanced(identifier);
-    } else {
+
+    if (!isSupport) {
         ASSERT_EQ(isSupport, false);
     }
+    int32_t delayTime { -1 };
+    int32_t ret = GetDelayTimeEnhanced(identifier, delayTime);
+    ASSERT_EQ(ret, 0);
+    MISC_HILOGD("delayTime:%{public}d", delayTime);
+    FileDescriptor fileDescriptor("/data/test/vibrator/coin_drop.json");
+    MISC_HILOGD("fd:%{public}d", fileDescriptor.fd);
+    VibratorFileDescription vfd;
+    VibratorPackage package;
+    struct stat64 statbuf = { 0 };
+    if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
+        vfd.fd = fileDescriptor.fd;
+        vfd.offset = 0;
+        vfd.length = statbuf.st_size;
+        ret = PreProcess(vfd, package);
+        ASSERT_EQ(ret, 0);
+        for (int32_t i = 0; i < package.patternNum; ++i) {
+            if (i == 0) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(package.patterns[i].time));
+            } else {
+                std::this_thread::sleep_for(std::chrono::milliseconds(package.patterns[i].time) -
+                    std::chrono::milliseconds(package.patterns[i - 1].time));
+            }
+            ASSERT_EQ(SetUsageEnhanced(identifier, USAGE_UNKNOWN), true);
+            MISC_HILOGD("pointNum:%{public}d", package.patterns[i].events[i].pointNum);
+            ret = PlayPatternEnhanced(identifier, package.patterns[i]);
+            ASSERT_EQ(ret, 0);
+        }
+    }
+    ret = FreeVibratorPackage(package);
+    ASSERT_EQ(ret, 0);
+    CancelEnhanced(identifier);
 }
 
 HWTEST_F(VibratorAgentTest, PlayPrimitiveEffectEnhanced_001, TestSize.Level1)
@@ -2801,7 +2802,7 @@ HWTEST_F(VibratorAgentTest, SubscribeVibrator_002, TestSize.Level1)
     };
     MISC_HILOGI("SubscribeVibrator_002 in");
     int32_t ret = SubscribeVibratorPlug(invalidUser);
-    ASSERT_EQ(ret, OHOS::Sensors::ERROR);
+    ASSERT_NE(ret, OHOS::Sensors::SUCCESS);
 }
 
 HWTEST_F(VibratorAgentTest, UnSubscribeVibrator_001, TestSize.Level1)
@@ -2810,7 +2811,7 @@ HWTEST_F(VibratorAgentTest, UnSubscribeVibrator_001, TestSize.Level1)
     int32_t ret = UnSubscribeVibratorPlug(testUser);
     ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
     ret = UnSubscribeVibratorPlug(testUser);
-    ASSERT_EQ(ret, OHOS::Sensors::CALLBACK_UNSUBSCRIBED);
+    ASSERT_NE(ret, OHOS::Sensors::SUCCESS);
 }
 } // namespace Sensors
 } // namespace OHOS

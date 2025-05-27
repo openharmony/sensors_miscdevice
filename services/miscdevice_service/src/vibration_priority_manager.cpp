@@ -470,7 +470,6 @@ void VibrationPriorityManager::MiscCrownIntensityFeedbackInit(void)
         MISC_HILOGE("Get intensity failed");
     }
     miscIntensity_ = intensity;
-    return;
 }
  
 bool VibrationPriorityManager::ShouldIgnoreByIntensity(const VibrateInfo &vibrateInfo)
@@ -599,7 +598,6 @@ void VibrationPriorityManager::UpdateStatus()
         miscIntensity_ = intensity;
     }
 #endif
-    return;
 }
 
 bool VibrationPriorityManager::IsSystemServiceCalling()
@@ -724,8 +722,8 @@ VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &v
     return ShouldIgnoreVibrate(vibrateInfo, vibratorThread->GetCurrentVibrateInfo());
 }
 
-bool VibrationPriorityManager::IsCurrentVibrate(std::shared_ptr<VibratorThread> vibratorThread, 
-            const VibratorIdentifierIPC& identifier) const
+bool VibrationPriorityManager::IsCurrentVibrate(std::shared_ptr<VibratorThread> vibratorThread,
+    const VibratorIdentifierIPC& identifier) const
 {
 #if defined(OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM) && defined(HDF_DRIVERS_INTERFACE_VIBRATOR)
     return ((vibratorThread != nullptr) && (vibratorThread->IsRunning() ||

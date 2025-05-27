@@ -23,7 +23,8 @@
 #include "vibrator_agent.h"
 
 namespace OHOS {
-void CallbackTest(VibratorStatusEvent *statusEvent){
+void CallbackTest(VibratorStatusEvent *statusEvent)
+{
     return;
 }
 
@@ -46,5 +47,3 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     OHOS::UnSubscribeVibratorFuzzTest(data, size);
     return 0;
 }
-
-

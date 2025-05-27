@@ -79,7 +79,7 @@ bool OnRemoteRequestFuzzTest(const uint8_t *data, size_t size)
     g_service->OnStartFuzz();
     size_t startPos = 0;
     int32_t delayTime;
-    VibratorIdentifier identifier;
+    VibratorIdentifierIPC identifier;
     startPos += GetObject<int32_t>(data + startPos, size - startPos, identifier.deviceId);
     startPos += GetObject<int32_t>(data + startPos, size - startPos, identifier.vibratorId);
     GetObject<int32_t>(data + startPos, size - startPos, delayTime);

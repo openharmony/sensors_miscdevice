@@ -28,7 +28,7 @@ namespace OHOS {
 namespace Sensors {
 class VibratorClientProxy : public IRemoteProxy<IVibratorClient> {
 public:
-    explicit VibratorClientProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IVibratorClient>(impl){}
+    explicit VibratorClientProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IVibratorClient>(impl) {}
     virtual ~VibratorClientProxy() = default;
     int ProcessPlugEvent(int32_t eventCode, int32_t deviceId, int32_t vibratorCnt) override
     {

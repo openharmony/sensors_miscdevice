@@ -38,7 +38,7 @@ int32_t VibratorClientStub::OnRemoteRequest(uint32_t code, MessageParcel &data, 
         MISC_HILOGE("Client and service descriptors are inconsistent");
         return OBJECT_NULL;
     }
-	MISC_HILOGD("Begin, cmd:%{public}u", code);
+    MISC_HILOGD("Begin, cmd:%{public}u", code);
     switch (code) {
         case TRANS_ID_PLUG_ABILITY: {
             int32_t eventCode = 0;
@@ -60,6 +60,7 @@ int32_t VibratorClientStub::OnRemoteRequest(uint32_t code, MessageParcel &data, 
             reply.WriteInt32(result);
             return NO_ERROR;
         }
+        default: break;
     }
     return NO_ERROR;
 }

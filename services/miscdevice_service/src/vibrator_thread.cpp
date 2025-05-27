@@ -42,7 +42,8 @@ bool VibratorThread::Run()
     VibrateInfo info = GetCurrentVibrateInfo();
     VibratorIdentifierIPC identifier = GetCurrentVibrateParams();
     std::vector<HdfWaveInformation> waveInfos = GetCurrentWaveInfo();
-    MISC_HILOGD("info.mode:%{public}s, deviceId:%{public}d, vibratorId:%{public}d", info.mode.c_str(), identifier.deviceId, identifier.vibratorId);
+    MISC_HILOGD("info.mode:%{public}s, deviceId:%{public}d, vibratorId:%{public}d",
+                info.mode.c_str(), identifier.deviceId, identifier.vibratorId);
     if (info.mode == VIBRATE_TIME) {
         int32_t ret = PlayOnce(info, identifier);
         if (ret != SUCCESS) {
@@ -167,7 +168,8 @@ int32_t VibratorThread::PlayCustomByHdHptic(const VibrateInfo &info, const Vibra
     return SUCCESS;
 }
 
-VibrateInfo VibratorThread::copyInfoWithIndexEvents(const VibrateInfo& originalInfo, const VibratorIdentifierIPC& identifier) 
+VibrateInfo VibratorThread::copyInfoWithIndexEvents(const VibrateInfo& originalInfo,
+    const VibratorIdentifierIPC& identifier)
 {
     VibrateInfo newInfo = originalInfo;
     VibratePackage newPackage;
@@ -177,19 +179,19 @@ VibrateInfo VibratorThread::copyInfoWithIndexEvents(const VibrateInfo& originalI
         VibratePattern newPattern;
         newPattern.startTime = pattern.startTime;
         newPattern.patternDuration = pattern.patternDuration;
-        
+
         for (const auto& event : pattern.events) {
             if (event.index == 0 || event.index == identifier.position) {
                 newPattern.events.push_back(event);
                 parseDuration = event.duration;
             }
         }
-        
+
         if (!newPattern.events.empty()) {
             newPackage.patterns.push_back(newPattern);
         }
     }
-    
+
     newInfo.package = newPackage;
     newInfo.package.packageDuration = parseDuration;
     return newInfo;
@@ -220,7 +222,7 @@ int32_t VibratorThread::PlayCustomByCompositeEffect(const VibrateInfo &info, con
     return PlayCompositeEffect(newInfo, hdfCompositeEffect, identifier);
 }
 
-int32_t VibratorThread::PlayCompositeEffect(const VibrateInfo &info, const HdfCompositeEffect &hdfCompositeEffect, 
+int32_t VibratorThread::PlayCompositeEffect(const VibrateInfo &info, const HdfCompositeEffect &hdfCompositeEffect,
     const VibratorIdentifierIPC& identifier)
 {
     std::unique_lock<std::mutex> vibrateLck(vibrateMutex_);

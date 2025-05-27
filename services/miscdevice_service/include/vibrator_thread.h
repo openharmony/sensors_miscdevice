@@ -46,7 +46,7 @@ private:
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
     int32_t PlayCustomByCompositeEffect(const VibrateInfo &info, const VibratorIdentifierIPC& identifier,
         std::vector<HdfWaveInformation> waveInfo);
-    int32_t PlayCompositeEffect(const VibrateInfo &info, const HdfCompositeEffect &hdfCompositeEffect, 
+    int32_t PlayCompositeEffect(const VibrateInfo &info, const HdfCompositeEffect &hdfCompositeEffect,
         const VibratorIdentifierIPC& identifier);
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
     std::mutex currentVibrationMutex_;

@@ -80,7 +80,7 @@ bool OnRemoteRequestFuzzTest(const uint8_t *data, size_t size)
     size_t startPos = 0;
     std::string effect = "";
     bool state = false;
-    VibratorIdentifier identifier;
+    VibratorIdentifierIPC identifier;
     startPos += GetObject<int32_t>(data + startPos, size - startPos, identifier.deviceId);
     startPos += GetObject<int32_t>(data + startPos, size - startPos, identifier.vibratorId);
     GetObject<bool>(data + startPos, size - startPos, state);

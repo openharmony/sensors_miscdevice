@@ -45,7 +45,7 @@ size_t GetObject(const uint8_t *data, size_t size, T &object)
 bool SetUsageEnhancedFuzzTest(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size < DATA_MIN_SIZE) {
-        return;
+        return false;
     }
     VibratorIdentifier identifier;
     size_t startPos = 0;

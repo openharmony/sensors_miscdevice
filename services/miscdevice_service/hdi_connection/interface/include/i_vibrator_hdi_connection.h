@@ -30,6 +30,7 @@ using OHOS::HDI::Vibrator::V2_0::HDF_VIBRATOR_MODE_PRESET;
 using OHOS::HDI::Vibrator::V2_0::HDF_VIBRATOR_MODE_HDHAPTIC;
 using OHOS::HDI::Vibrator::V2_0::HDF_VIBRATOR_MODE_BUTT;
 using OHOS::HDI::Vibrator::V2_0::CurvePoint;
+using OHOS::HDI::Vibrator::V2_0::DeviceVibratorInfo;
 using OHOS::HDI::Vibrator::V2_0::EVENT_TYPE;
 using OHOS::HDI::Vibrator::V2_0::HapticCapacity;
 using OHOS::HDI::Vibrator::V2_0::HapticPaket;

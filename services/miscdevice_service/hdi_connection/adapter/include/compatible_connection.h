@@ -51,12 +51,12 @@ public:
         std::vector<HdfWaveInformation> &waveInfos) override;
     int32_t GetVibratorList(const VibratorIdentifierIPC &identifier,
         std::vector<HdfVibratorInfo> &vibratorInfoIpc) override;
-    int32_t GetEffectInfo(const VibratorIdentifierIPC &identifier, const std::string &effectType, 
+    int32_t GetEffectInfo(const VibratorIdentifierIPC &identifier, const std::string &effectType,
         HdfEffectInfo &effectInfo) override;
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
     int32_t RegisterVibratorPlugCallback(DevicePlugCallback cb) override;
     DevicePlugCallback GetVibratorPlugCb() override;
-    
+
 private:
     DISALLOW_COPY_AND_MOVE(CompatibleConnection);
     std::thread vibrateThread_;

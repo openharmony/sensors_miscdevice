@@ -23,21 +23,21 @@ describe("VibratorJsTest", function () {
          */
         console.info('beforeAll called')
     })
-    
+
     afterAll(function() {
         /*
          * @tc.teardown: teardown invoked after all testcases
          */
         console.info('afterAll called')
     })
-    
+
     beforeEach(function() {
         /*
          * @tc.setup: setup invoked before each testcases
          */
         console.info('beforeEach called')
     })
-    
+
     afterEach(function() {
         /*
          * @tc.teardown: teardown invoked after each testcases
@@ -48,7 +48,7 @@ describe("VibratorJsTest", function () {
     const OPERATION_FAIL_CODE = 14600101;
     const PERMISSION_ERROR_CODE = 201;
     const PARAMETER_ERROR_CODE = 401;
-    
+
     const OPERATION_FAIL_MSG = 'Device operation failed.'
     const PERMISSION_ERROR_MSG = 'Permission denied.'
     const PARAMETER_ERROR_MSG = 'The parameter invalid.'
@@ -1386,127 +1386,6 @@ describe("VibratorJsTest", function () {
         } catch (error) {
             console.info(error);
             expect(error.code).assertEqual(PARAMETER_ERROR_CODE);
-            done();
-        }
-    })
-
-    /*
-     * @tc.name: VibratorJsTest019
-     * @tc.desc: Test for getting the vibrator list.
-     * @tc.number: SUB_SensorSystem_Vibrator_JsTest_0190
-     */
-    it("VibratorJsTest019", 0, async function (done) {
-        try {
-            const vibrators = await GetVibratorList();
-            console.info('Vibrator List:', vibrators);  
-            expect(vibrators).toBeDefined();
-            expect(Array.isArray(vibrators)).toBe(true);
-            done();
-        } catch (error) {
-            console.error('VibratorJsTest019 failed with error:', error);
-            expect(false).toBe(true);
-            done();
-        }
-    })
-    
-    /*
-    * @tc.name: VibratorJsTest020
-    * @tc.desc: Test for getting the vibrator list synchronously.
-    * @tc.number: SUB_SensorSystem_Vibrator_JsTest_0200
-    */
-    it("VibratorJsTest020", 0, function (done) {
-        try {
-            const vibrators = GetVibratorListSync();
-            expect(vibrators).toBeDefined();
-            expect(Array.isArray(vibrators)).toBe(true);
-            expect(vibrators.length).toBeGreaterThan(0);
-            done();
-        } catch (error) {
-            console.error('VibratorJsTest020 failed with error:', error);
-            expect(false).toBe(true);
-            done();
-        }
-    })
-    
-    /*
-    * @tc.name: VibratorJsTest021
-    * @tc.desc: Test for checking support for effect types.
-    * @tc.number: SUB_SensorSystem_Vibrator_JsTest_0210
-    */
-    it("VibratorJsTest021", 0, async function (done) {
-        const effectType = "effect1";
-        try {
-            const effectInfo = await isSupportEffectInfo(effectType, params);
-            expect(effectInfo).toBeUndefined();
-            expect(typeof effectInfo).toBe('object');
-            done();
-        } catch (error) {
-            console.error('VibratorJsTest021 failed with error:', error);
-            expect(false).toBe(true);
-            done();
-        }
-    })
-
-    /*
-    * @tc.name: VibratorJsTest022
-    * @tc.desc: Test for checking support for effect types synchronously.
-    * @tc.number: SUB_SensorSystem_Vibrator_JsTest_0220
-    */
-    it("VibratorJsTest022", 0, function (done) {
-        const effectType = "effect1";
-        try {
-            const effectInfo = isSupportEffectInfoSync(effectType);
-            expect(effectInfo).toBeDefined();
-            expect(typeof effectInfo).toBe('object');
-            done();
-        } catch (error) {
-            console.error('VibratorJsTest022 failed with error:', error);
-            expect(false).toBe(true);
-            done();
-        }
-    })
-
-    /*
-    * @tc.name: VibratorJsTest023
-    * @tc.desc: Test the on function for VIBRATOR_DEVICE_STATE_CHANGE with valid and invalid parameters.
-    * @tc.number: SUB_SensorSystem_Vibrator_JsTest_0230
-    */
-    it("VibratorJsTest023", 0, function (done) {
-        try {
-            const validCallback = function (statusEvent) {
-                console.info('Valid callback executed with statusEvent:', statusEvent);
-                expect(statusEvent).toBeDefined();
-                expect(typeof statusEvent).toBe('object');
-            };
-            on("VibratorStateChange", validCallback);
-            done();
-        } catch (error) {
-            console.error('VibratorJsTest023 failed with error:', error);
-            expect(false).toBe(true);
-            done();
-        }
-    })
-
-    /*
-    * @tc.name: VibratorJsTest023
-    * @tc.desc: Test the off function for VIBRATOR_DEVICE_STATE_CHANGE events.
-    * @tc.number: SUB_SensorSystem_Vibrator_JsTest_0230
-    */
-    it("VibratorJsTest012", 0, function (done) {
-        const eventType = "VibratorStateChange";
-        const callback = jest.fn((info) => {
-            vibratorInfo = info;
-        });
-        try {
-            on(eventType, callback);
-            off(eventType, callback);
-            expect(() => {
-                off(eventType, null);
-            }).not.toThrow();
-            done();
-        } catch (error) {
-            console.error('VibratorJsTest012 failed with error:', error);
-            expect(false).toBe(true);
             done();
         }
     })

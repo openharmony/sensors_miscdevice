@@ -121,7 +121,7 @@ bool ConstructCommonResult(const napi_env &env, sptr<AsyncCallbackInfo> asyncCal
 bool ConstructIsSupportEffectResult(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo,
     napi_value result[], int32_t length);
 bool ConstructGetVibratorInfoListResult(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo,
-    napi_value result[], int32_t length);  
+    napi_value result[], int32_t length);
 bool ConstructIsSupportEffectInfoResult(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo,
     napi_value result[], int32_t length);
 bool ConstructVibratorPlugInfoResult(const napi_env &env, sptr<AsyncCallbackInfo> asyncCallbackInfo,
@@ -131,7 +131,6 @@ void EmitPromiseWork(sptr<AsyncCallbackInfo> asyncCallbackInfo);
 void EmitUvEventLoop(sptr<AsyncCallbackInfo> asyncCallbackInfo);
 bool ClearVibratorPattern(VibratorPattern &vibratorPattern);
 void DeleteWork(uv_work_t *work);
-void ReleaseCallback(sptr<AsyncCallbackInfo> asyncCallbackInfo);
 } // namespace Sensors
 } // namespace OHOS
 #endif // VIBRATOR_NAPI_UTILS_H
