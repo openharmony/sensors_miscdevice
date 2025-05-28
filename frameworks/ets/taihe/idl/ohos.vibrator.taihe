@@ -26,11 +26,11 @@ struct VibratePreset {
     /**
      * The value is "preset", which triggers motor vibration according to preset vibration effect.
      *
-     * @type { 'preset' }
+     * @type { String }
      * @syscap SystemCapability.Sensors.MiscDevice
      * @since 9
      */
-    type: 'preset';
+    type: String;
 
     /**
      * Preset type vibration.
@@ -91,12 +91,12 @@ struct VibrateTime {
     /**
      * The value is "time", which triggers the motor vibration according to the specified duration.
      *
-     * @type { 'time' }
+     * @type { String }
      * @syscap SystemCapability.Sensors.MiscDevice
      * @atomicservice
      * @since 11
      */
-    type: 'time';
+    type: String;
 
     /**
      * The duration of the vibration, in ms.
@@ -210,7 +210,7 @@ enum EffectId: String {
      * @syscap SystemCapability.Sensors.MiscDevice
      * @since 8
      */
-    EFFECT_CLOCK_TIMER = 'haptic.clock.timer'
+    EFFECT_CLOCK_TIMER = "haptic.clock.timer"
 }
 
 /**
@@ -227,7 +227,7 @@ enum VibratorStopMode: String {
      * @syscap SystemCapability.Sensors.MiscDevice
      * @since 8
      */
-    VIBRATOR_STOP_MODE_TIME = 'time',
+    VIBRATOR_STOP_MODE_TIME = "time",
 
     /**
      * Indicates the mode of stopping a preset vibration effect.
@@ -235,7 +235,7 @@ enum VibratorStopMode: String {
      * @syscap SystemCapability.Sensors.MiscDevice
      * @since 8
      */
-    VIBRATOR_STOP_MODE_PRESET = 'preset'
+    VIBRATOR_STOP_MODE_PRESET = "preset"
 }
 
 /**
@@ -249,11 +249,11 @@ struct VibrateFromPattern {
     /**
      * The value is "pattern", which triggers motor vibration based on the combination pattern.
      *
-     * @type { 'pattern' }
+     * @type { String }
      * @syscap SystemCapability.Sensors.MiscDevice
      * @since 18
      */
-    type: 'pattern';
+    type: String;
 
     /**
      * Customize the sequence of motor vibration events, the VibratorPattern object returned by the build() method.
@@ -553,11 +553,11 @@ struct VibrateFromFile {
     /**
      * The value is "file", which triggers motor vibration according to the vibration profile.
      *
-     * @type { 'file' }
+     * @type { String }
      * @syscap SystemCapability.Sensors.MiscDevice
      * @since 10
      */
-    type: 'file';
+    type: String;
 
     /**
      * Haptic file descriptor, some formats are supported.
