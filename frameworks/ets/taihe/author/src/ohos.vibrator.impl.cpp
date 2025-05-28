@@ -75,7 +75,8 @@ struct VibrateInfo {
     VibratorPattern vibratorPattern;
 };
 
-void stopVibrationByModeSync(::ohos::vibrator::VibratorStopMode stopMode) {
+void stopVibrationByModeSync(::ohos::vibrator::VibratorStopMode stopMode)
+{
     CALL_LOG_ENTER;
     StopVibrator(stopMode.get_value());
 }
@@ -154,7 +155,8 @@ static bool ParseVibratorPattern(::ohos::vibrator::VibratorPattern pattern, Vibr
         MISC_HILOGE("length should not be less than or equal to 0 or greater than EVENT_NUM_MAX");
         return false;
     }
-    VibratorEvent *events = static_cast<VibratorEvent *>(malloc(sizeof(VibratorEvent) * vibrateInfo.vibratorPattern.eventNum));
+    VibratorEvent *events =
+        static_cast<VibratorEvent *>(malloc(sizeof(VibratorEvent) * vibrateInfo.vibratorPattern.eventNum));
     if (events == nullptr) {
         MISC_HILOGE("Events is nullptr");
         return false;
@@ -203,7 +205,8 @@ static void PrintVibratorPattern(::ohos::vibrator::VibratorPattern &vibratorPatt
 static bool CheckVibratorCurvePoint(const ::ohos::vibrator::VibratorEvent &event)
 {
     CALL_LOG_ENTER;
-    if ((!event.points.has_value()) || (event.points.value().size() < CURVE_POINT_NUM_MIN) || (event.points.value().size() > CURVE_POINT_NUM_MAX)) {
+    if ((!event.points.has_value()) || (event.points.value().size() < CURVE_POINT_NUM_MIN) ||
+        (event.points.value().size() > CURVE_POINT_NUM_MAX)) {
         MISC_HILOGE("The points size is out of range, pointNum:%{public}u", event.points.value().size());
         return false;
     }
@@ -296,7 +299,8 @@ bool ParseParameter(::ohos::vibrator::VibrateEffect const& effect, ::ohos::vibra
         ::ohos::vibrator::VibratePreset vibratePreset = effect.get_VibratePreset_type_ref();
         vibrateInfo.effectId = vibratePreset.effectId;
         vibrateInfo.count = vibratePreset.count.has_value() ? vibratePreset.count.value() : 1;
-        vibrateInfo.intensity = vibratePreset.intensity.has_value() ? vibratePreset.intensity.value() : INTENSITY_ADJUST_MAX;
+        vibrateInfo.intensity = vibratePreset.intensity.has_value() ? vibratePreset.intensity.value() :
+            INTENSITY_ADJUST_MAX;
     } else if (effect.holds_VibrateFromFile_type()) {
         vibrateInfo.type = "file";
         ::ohos::vibrator::VibrateFromFile vibrateFromFile = effect.get_VibrateFromFile_type_ref();
@@ -304,7 +308,8 @@ bool ParseParameter(::ohos::vibrator::VibrateEffect const& effect, ::ohos::vibra
         vibrateInfo.offset = vibrateFromFile.hapticFd.offset.has_value() ? vibrateFromFile.hapticFd.offset.value() : 0;
         int64_t fdSize = GetFileSize(vibrateInfo.fd);
         CHKCR((vibrateInfo.offset >= 0) && (vibrateInfo.offset <= fdSize), false, "The parameter of offset is invalid");
-        vibrateInfo.length = vibrateFromFile.hapticFd.length.has_value() ? vibrateFromFile.hapticFd.length.value() : fdSize - vibrateInfo.offset;
+        vibrateInfo.length = vibrateFromFile.hapticFd.length.has_value() ? vibrateFromFile.hapticFd.length.value() :
+            fdSize - vibrateInfo.offset;
     } else if (effect.holds_VibrateFromPattern_type()) {
         vibrateInfo.type = "pattern";
         ::ohos::vibrator::VibrateFromPattern vibrateFromPattern = effect.get_VibrateFromPattern_type_ref();
@@ -379,7 +384,8 @@ bool ClearVibratorPattern(VibratorPattern &vibratorPattern)
     return true;
 }
 
-void startVibrationSync(::ohos::vibrator::VibrateEffect const& effect, ::ohos::vibrator::VibrateAttribute const& attribute)
+void startVibrationSync(::ohos::vibrator::VibrateEffect const& effect,
+    ::ohos::vibrator::VibrateAttribute const& attribute)
 {
     CALL_LOG_ENTER;
     VibrateInfo vibrateInfo = {};
@@ -412,12 +418,14 @@ void startVibrationSync(::ohos::vibrator::VibrateEffect const& effect, ::ohos::v
     }
 }
 
-bool isHdHapticSupported() {
+bool isHdHapticSupported()
+{
     CALL_LOG_ENTER;
     return IsHdHapticSupported();
 }
 
-void stopVibrationSync() {
+void stopVibrationSync()
+{
     CALL_LOG_ENTER;
     int32_t ret = Cancel();
     if (ret != SUCCESS) {
@@ -425,7 +433,8 @@ void stopVibrationSync() {
     }
 }
 
-bool isSupportEffectSync(::taihe::string_view effectId) {
+bool isSupportEffectSync(::taihe::string_view effectId)
+{
     CALL_LOG_ENTER;
     bool isSupportEffect = false;
     int32_t ret = IsSupportEffect(effectId.c_str(), &isSupportEffect);
