@@ -179,11 +179,11 @@ static void PrintVibratorPattern(::ohos::vibrator::VibratorPattern &vibratorPatt
         MISC_HILOGE("Events is empty");
         return;
     }
-    MISC_HILOGD("PrintVibratorPattern, time:%{public}d, eventNum:%{public}lu",
+    MISC_HILOGD("PrintVibratorPattern, time:%{public}d, eventNum:%{public}u",
         vibratorPattern.time, vibratorPattern.events.size());
     for (int32_t i = 0; i < vibratorPattern.events.size(); ++i) {
         MISC_HILOGD("PrintVibratorPattern, type:%{public}d, time:%{public}d, duration:%{public}d, \
-            intensity:%{public}d, frequency:%{public}d, index:%{public}d, pointNum:%{public}lu",
+            intensity:%{public}d, frequency:%{public}d, index:%{public}d, pointNum:%{public}u",
             static_cast<int32_t>(vibratorPattern.events[i].eventType), vibratorPattern.events[i].time,
             vibratorPattern.events[i].duration.value(), vibratorPattern.events[i].intensity.value(),
             vibratorPattern.events[i].frequency.value(), vibratorPattern.events[i].index.value(),
@@ -204,7 +204,7 @@ static bool CheckVibratorCurvePoint(const ::ohos::vibrator::VibratorEvent &event
 {
     CALL_LOG_ENTER;
     if ((!event.points.has_value()) || (event.points.value().size() < CURVE_POINT_NUM_MIN) || (event.points.value().size() > CURVE_POINT_NUM_MAX)) {
-        MISC_HILOGE("The points size is out of range, pointNum:%{public}lu", event.points.value().size());
+        MISC_HILOGE("The points size is out of range, pointNum:%{public}u", event.points.value().size());
         return false;
     }
     for (int32_t j = 0; j < event.points.value().size(); ++j) {
@@ -271,7 +271,7 @@ static bool CheckVibratorPatternParameter(::ohos::vibrator::VibratorPattern &vib
         return false;
     }
     if ((vibratorPattern.events.size() <= 0) || (vibratorPattern.events.size() > EVENT_NUM_MAX)) {
-        MISC_HILOGE("The event num  is out of range, eventNum:%{public}lu", vibratorPattern.events.size());
+        MISC_HILOGE("The event num  is out of range, eventNum:%{public}u", vibratorPattern.events.size());
         return false;
     }
     for (int32_t i = 0; i < vibratorPattern.events.size(); ++i) {
