@@ -103,7 +103,7 @@ ohos_prebuilt_etc("vibrator_etc") {
   subsystem_name = "$subsystem_name"
   deps = [
     ":vibrator_abc",
-    ":vibrator_test"
+    # ":vibrator_test"
   ]
 }
 
