@@ -1,0 +1,115 @@
+# Copyright (c) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/config/components/ets_frontend/ets2abc_config.gni")
+import("./../../../miscdevice.gni")
+import("//build/ohos.gni")
+import("//build/ohos/taihe_idl/taihe.gni")
+
+subsystem_name = "sensors"
+part_name = "miscdevice"
+taihe_generated_file_path = "$taihe_file_path/out/$subsystem_name/$part_name"
+
+copy_taihe_idl("copy_taihe") {
+  sources = [
+    "idl/ohos.vibrator.taihe",
+  ]
+
+  external_deps = []
+}
+
+ohos_taihe("run_taihe") {
+  taihe_generated_file_path = "$taihe_generated_file_path"
+  deps = [ ":copy_taihe" ]
+  outputs = [
+    "$taihe_generated_file_path/src/ohos.vibrator.abi.c",
+    "$taihe_generated_file_path/src/ohos.vibrator.ani.cpp",
+  ]
+}
+
+taihe_shared_library("vibrator_taihe_native") {
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    integer_overflow = true
+    ubsan = true
+  }
+  taihe_generated_file_path = "$taihe_generated_file_path"
+  subsystem_name = "$subsystem_name"
+  part_name = "$part_name"
+  include_dirs = [
+    "$SUBSYSTEM_DIR/interfaces/inner_api/vibrator",
+    "$SUBSYSTEM_DIR/frameworks/js/napi/vibrator/include",
+    "$SUBSYSTEM_DIR/utils/common/include",
+  ]
+  defines = [
+    "APP_LOG_TAG = \"VibratorImpl\"",
+    "LOG_DOMAIN = 0xD002700",
+  ]
+  sources = get_target_outputs(":run_taihe")
+  sources += [
+    "author/src/ani_constructor.cpp",
+    "author/src/ohos.vibrator.impl.cpp",
+  ]
+  deps = [
+    ":run_taihe",
+    "$SUBSYSTEM_DIR/frameworks/native/vibrator:vibrator_interface_native",
+    "$SUBSYSTEM_DIR/utils/common:libmiscdevice_utils",
+  ]
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+  ]
+}
+
+generate_static_abc("vibrator_abc") {
+  base_url = "$taihe_generated_file_path"
+  files = [
+    "$taihe_generated_file_path/@ohos.base.ets",
+    "$taihe_generated_file_path/@ohos.vibrator.ets",
+  ]
+  is_boot_abc = "True"
+  device_dst_file = "/system/framework/vibrator_abc.abc"
+  dependencies = [ ":run_taihe" ]
+}
+
+generate_static_abc("vibrator_test") {
+  base_url = "user"
+  files = [
+    "user/main.ets",
+  ]
+  is_boot_abc = "True"
+  device_dst_file = "/system/framework/vibrator_test.abc"
+  dependencies = [ ":run_taihe" ]
+}
+
+ohos_prebuilt_etc("vibrator_etc") {
+  source = "$target_out_dir/vibrator_abc.abc"
+  module_install_dir = "framework"
+  part_name = "$part_name"
+  subsystem_name = "$subsystem_name"
+  deps = [
+    ":vibrator_abc",
+    # ":vibrator_test"
+  ]
+}
+
+group("vibrator_taihe") {
+  deps = [
+    ":vibrator_etc",
+    ":vibrator_taihe_native",
+  ]
+}
