@@ -92,11 +92,6 @@ int32_t VibratorServiceClient::InitServiceClient()
             MISC_HILOGE("TransferClientRemoteObject failed, ret:%{public}d", ret);
             return ERROR;
         }
-        ret = GetVibratorCapacity();
-        if (ret != ERR_OK) {
-            MISC_HILOGE("GetVibratorCapacity failed, ret:%{public}d", ret);
-            return ERROR;
-        }
         return ERR_OK;
     }
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
@@ -123,9 +118,11 @@ int32_t VibratorServiceClient::TransferClientRemoteObject()
     return ret;
 }
 
-int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, int32_t timeOut, int32_t usage, bool systemUsage)
+int32_t VibratorServiceClient::Vibrate(const VibratorIdentifier &identifier, int32_t timeOut, int32_t usage,
+    bool systemUsage)
 {
-    MISC_HILOGD("Vibrate begin, time:%{public}d, usage:%{public}d", timeOut, usage);
+    MISC_HILOGD("Vibrate begin, time:%{public}d, usage:%{public}d, deviceId:%{public}d, vibratorId:%{public}d",
+        timeOut, usage, identifier.deviceId, identifier.vibratorId);
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
@@ -136,7 +133,10 @@ int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, int32_t timeOut, int3
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "VibrateTime");
 #endif // HIVIEWDFX_HITRACE_ENABLE
-    ret = miscdeviceProxy_->Vibrate(vibratorId, timeOut, usage, systemUsage);
+    VibratorIdentifierIPC vibrateIdentifier;
+    vibrateIdentifier.deviceId = identifier.deviceId;
+    vibrateIdentifier.vibratorId = identifier.vibratorId;
+    ret = miscdeviceProxy_->Vibrate(vibrateIdentifier, timeOut, usage, systemUsage);
     WriteVibratorHiSysIPCEvent(IMiscdeviceServiceIpcCode::COMMAND_VIBRATE, ret);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
@@ -147,7 +147,7 @@ int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, int32_t timeOut, int3
     return ret;
 }
 
-int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, const std::string &effect,
+int32_t VibratorServiceClient::Vibrate(const VibratorIdentifier &identifier, const std::string &effect,
     int32_t loopCount, int32_t usage, bool systemUsage)
 {
     MISC_HILOGD("Vibrate begin, effect:%{public}s, loopCount:%{public}d, usage:%{public}d",
@@ -162,7 +162,10 @@ int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, const std::string &ef
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "VibrateEffect");
 #endif // HIVIEWDFX_HITRACE_ENABLE
-    ret = miscdeviceProxy_->PlayVibratorEffect(vibratorId, effect, loopCount, usage, systemUsage);
+    VibratorIdentifierIPC vibrateIdentifier;
+    vibrateIdentifier.deviceId = identifier.deviceId;
+    vibrateIdentifier.vibratorId = identifier.vibratorId;
+    ret = miscdeviceProxy_->PlayVibratorEffect(vibrateIdentifier, effect, loopCount, usage, systemUsage);
     WriteVibratorHiSysIPCEvent(IMiscdeviceServiceIpcCode::COMMAND_PLAY_VIBRATOR_EFFECT, ret);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
@@ -175,8 +178,8 @@ int32_t VibratorServiceClient::Vibrate(int32_t vibratorId, const std::string &ef
 }
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-int32_t VibratorServiceClient::PlayVibratorCustom(int32_t vibratorId, const RawFileDescriptor &rawFd, int32_t usage,
-    bool systemUsage, const VibratorParameter &parameter)
+int32_t VibratorServiceClient::PlayVibratorCustom(const VibratorIdentifier &identifier, const RawFileDescriptor &rawFd,
+    int32_t usage, bool systemUsage, const VibratorParameter &parameter)
 {
     MISC_HILOGD("Vibrate begin, fd:%{public}d, offset:%{public}lld, length:%{public}lld, usage:%{public}d",
         rawFd.fd, static_cast<long long>(rawFd.offset), static_cast<long long>(rawFd.length), usage);
@@ -190,11 +193,16 @@ int32_t VibratorServiceClient::PlayVibratorCustom(int32_t vibratorId, const RawF
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "PlayVibratorCustom");
 #endif // HIVIEWDFX_HITRACE_ENABLE
-    VibrateParameter vibateParameter;
-    vibateParameter.intensity = parameter.intensity;
-    vibateParameter.frequency = parameter.frequency;
-    ret = miscdeviceProxy_->PlayVibratorCustom(vibratorId, rawFd.fd, rawFd.offset, rawFd.length, usage, systemUsage,
-        vibateParameter);
+    CustomHapticInfoIPC customHapticInfoIPC;
+    customHapticInfoIPC.usage = usage;
+    customHapticInfoIPC.systemUsage = systemUsage;
+    customHapticInfoIPC.parameter.intensity = parameter.intensity;
+    customHapticInfoIPC.parameter.frequency = parameter.frequency;
+    VibratorIdentifierIPC vibrateIdentifier;
+    vibrateIdentifier.deviceId = identifier.deviceId;
+    vibrateIdentifier.vibratorId = identifier.vibratorId;
+    ret = miscdeviceProxy_->PlayVibratorCustom(vibrateIdentifier, rawFd.fd, rawFd.offset,
+        rawFd.length, customHapticInfoIPC);
     WriteVibratorHiSysIPCEvent(IMiscdeviceServiceIpcCode::COMMAND_PLAY_VIBRATOR_CUSTOM, ret);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
@@ -206,9 +214,10 @@ int32_t VibratorServiceClient::PlayVibratorCustom(int32_t vibratorId, const RawF
 }
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
-int32_t VibratorServiceClient::StopVibrator(int32_t vibratorId, const std::string &mode)
+int32_t VibratorServiceClient::StopVibrator(const VibratorIdentifier &identifier, const std::string &mode)
 {
-    MISC_HILOGD("StopVibrator begin, vibratorId:%{public}d, mode:%{public}s", vibratorId, mode.c_str());
+    MISC_HILOGD("StopVibrator begin, deviceId:%{public}d, vibratorId:%{public}d, mode:%{public}s", identifier.deviceId,
+        identifier.vibratorId, mode.c_str());
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
@@ -219,7 +228,10 @@ int32_t VibratorServiceClient::StopVibrator(int32_t vibratorId, const std::strin
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "StopVibratorByMode");
 #endif // HIVIEWDFX_HITRACE_ENABLE
-    ret = miscdeviceProxy_->StopVibratorByMode(vibratorId, mode);
+    VibratorIdentifierIPC vibrateIdentifier;
+    vibrateIdentifier.deviceId = identifier.deviceId;
+    vibrateIdentifier.vibratorId = identifier.vibratorId;
+    ret = miscdeviceProxy_->StopVibratorByMode(vibrateIdentifier, mode);
     WriteVibratorHiSysIPCEvent(IMiscdeviceServiceIpcCode::COMMAND_STOP_VIBRATOR_BY_MODE, ret);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
@@ -230,9 +242,10 @@ int32_t VibratorServiceClient::StopVibrator(int32_t vibratorId, const std::strin
     return ret;
 }
 
-int32_t VibratorServiceClient::StopVibrator(int32_t vibratorId)
+int32_t VibratorServiceClient::StopVibrator(const VibratorIdentifier &identifier)
 {
-    MISC_HILOGD("StopVibrator begin, vibratorId:%{public}d", vibratorId);
+    MISC_HILOGD("StopVibrator begin, deviceId:%{public}d, vibratorId:%{public}d", identifier.deviceId,
+        identifier.vibratorId);
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
@@ -243,7 +256,10 @@ int32_t VibratorServiceClient::StopVibrator(int32_t vibratorId)
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "StopVibratorAll");
 #endif // HIVIEWDFX_HITRACE_ENABLE
-    ret = miscdeviceProxy_->StopVibrator(vibratorId);
+    VibratorIdentifierIPC vibrateIdentifier;
+    vibrateIdentifier.deviceId = identifier.deviceId;
+    vibrateIdentifier.vibratorId = identifier.vibratorId;
+    ret = miscdeviceProxy_->StopVibrator(vibrateIdentifier);
     WriteVibratorHiSysIPCEvent(IMiscdeviceServiceIpcCode::COMMAND_STOP_VIBRATOR, ret);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
@@ -254,7 +270,7 @@ int32_t VibratorServiceClient::StopVibrator(int32_t vibratorId)
     return ret;
 }
 
-bool VibratorServiceClient::IsHdHapticSupported()
+bool VibratorServiceClient::IsHdHapticSupported(const VibratorIdentifier &identifier)
 {
     CALL_LOG_ENTER;
     int32_t ret = InitServiceClient();
@@ -262,10 +278,24 @@ bool VibratorServiceClient::IsHdHapticSupported()
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
+    VibratorCapacity capacity_;
+    std::lock_guard<std::mutex> clientLock(clientMutex_);
+    CHKPR(miscdeviceProxy_, ERROR);
+#ifdef HIVIEWDFX_HITRACE_ENABLE
+    StartTrace(HITRACE_TAG_SENSORS, "IsHdHapticSupported");
+#endif // HIVIEWDFX_HITRACE_ENABLE
+    ret = GetVibratorCapacity(identifier, capacity_);
+#ifdef HIVIEWDFX_HITRACE_ENABLE
+    FinishTrace(HITRACE_TAG_SENSORS);
+#endif // HIVIEWDFX_HITRACE_ENABLE
+    if (ret != ERR_OK) {
+        MISC_HILOGE("IsHdHapticSupported failed, ret:%{public}d", ret);
+    }
     return capacity_.isSupportHdHaptic;
 }
 
-int32_t VibratorServiceClient::IsSupportEffect(const std::string &effect, bool &state)
+int32_t VibratorServiceClient::IsSupportEffect(const VibratorIdentifier &identifier, const std::string &effect,
+    bool &state)
 {
     MISC_HILOGD("IsSupportEffect begin, effect:%{public}s", effect.c_str());
     int32_t ret = InitServiceClient();
@@ -278,7 +308,10 @@ int32_t VibratorServiceClient::IsSupportEffect(const std::string &effect, bool &
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "VibrateEffect");
 #endif // HIVIEWDFX_HITRACE_ENABLE
-    ret = miscdeviceProxy_->IsSupportEffect(effect, state);
+    VibratorIdentifierIPC vibrateIdentifier;
+    vibrateIdentifier.deviceId = identifier.deviceId;
+    vibrateIdentifier.vibratorId = identifier.vibratorId;
+    ret = miscdeviceProxy_->IsSupportEffect(vibrateIdentifier, effect, state);
     WriteOtherHiSysIPCEvent(IMiscdeviceServiceIpcCode::COMMAND_IS_SUPPORT_EFFECT, ret);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
@@ -364,7 +397,7 @@ int32_t VibratorServiceClient::PreProcess(const VibratorFileDescription &fd, Vib
     return ConvertVibratorPackage(pkg, package);
 }
 
-int32_t VibratorServiceClient::GetDelayTime(int32_t &delayTime)
+int32_t VibratorServiceClient::GetDelayTime(const VibratorIdentifier &identifier, int32_t &delayTime)
 {
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
@@ -376,7 +409,10 @@ int32_t VibratorServiceClient::GetDelayTime(int32_t &delayTime)
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "GetDelayTime");
 #endif // HIVIEWDFX_HITRACE_ENABLE
-    ret = miscdeviceProxy_->GetDelayTime(delayTime);
+    VibratorIdentifierIPC vibrateIdentifier;
+    vibrateIdentifier.deviceId = identifier.deviceId;
+    vibrateIdentifier.vibratorId = identifier.vibratorId;
+    ret = miscdeviceProxy_->GetDelayTime(vibrateIdentifier, delayTime);
     WriteOtherHiSysIPCEvent(IMiscdeviceServiceIpcCode::COMMAND_GET_DELAY_TIME, ret);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
@@ -387,8 +423,8 @@ int32_t VibratorServiceClient::GetDelayTime(int32_t &delayTime)
     return ret;
 }
 
-int32_t VibratorServiceClient::InitPlayPattern(const VibratorPattern &pattern, int32_t usage,
-    bool systemUsage, const VibratorParameter &parameter)
+int32_t VibratorServiceClient::InitPlayPattern(const VibratorIdentifier &identifier, const VibratorPattern &pattern,
+    int32_t usage, bool systemUsage, const VibratorParameter &parameter)
 {
     VibratePattern vibratePattern = {};
     vibratePattern.startTime = pattern.time;
@@ -418,18 +454,23 @@ int32_t VibratorServiceClient::InitPlayPattern(const VibratorPattern &pattern, i
         vibratePattern.events.emplace_back(event);
         vibratePattern.patternDuration = pattern.patternDuration;
     }
-    VibrateParameter vibateParameter;
-    vibateParameter.intensity = parameter.intensity;
-    vibateParameter.frequency = parameter.frequency;
+    CustomHapticInfoIPC customHapticInfoIPC;
+    customHapticInfoIPC.usage = usage;
+    customHapticInfoIPC.systemUsage = systemUsage;
+    customHapticInfoIPC.parameter.intensity = parameter.intensity;
+    customHapticInfoIPC.parameter.frequency = parameter.frequency;
+    VibratorIdentifierIPC vibrateIdentifier;
+    vibrateIdentifier.deviceId = identifier.deviceId;
+    vibrateIdentifier.vibratorId = identifier.vibratorId;
     std::lock_guard<std::mutex> clientLock(clientMutex_);
     CHKPR(miscdeviceProxy_, ERROR);
-    int32_t ret = miscdeviceProxy_->PlayPattern(vibratePattern, usage, systemUsage, vibateParameter);
+    int32_t ret = miscdeviceProxy_->PlayPattern(vibrateIdentifier, vibratePattern, customHapticInfoIPC);
     WriteOtherHiSysIPCEvent(IMiscdeviceServiceIpcCode::COMMAND_PLAY_PATTERN, ret);
     return ret;
 }
 
-int32_t VibratorServiceClient::PlayPattern(const VibratorPattern &pattern, int32_t usage,
-    bool systemUsage, const VibratorParameter &parameter)
+int32_t VibratorServiceClient::PlayPattern(const VibratorIdentifier &identifier, const VibratorPattern &pattern,
+    int32_t usage, bool systemUsage, const VibratorParameter &parameter)
 {
     MISC_HILOGD("Vibrate begin, usage:%{public}d", usage);
     int32_t ret = InitServiceClient();
@@ -440,7 +481,7 @@ int32_t VibratorServiceClient::PlayPattern(const VibratorPattern &pattern, int32
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "PlayPattern");
 #endif // HIVIEWDFX_HITRACE_ENABLE
-    ret = InitPlayPattern(pattern, usage, systemUsage, parameter);
+    ret = InitPlayPattern(identifier, pattern, usage, systemUsage, parameter);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
 #endif // HIVIEWDFX_HITRACE_ENABLE
@@ -532,11 +573,11 @@ int32_t VibratorServiceClient::FreeVibratorPackage(VibratorPackage &package)
     return ERR_OK;
 }
 
-int32_t VibratorServiceClient::PlayPrimitiveEffect(int32_t vibratorId, const std::string &effect, int32_t intensity,
-    int32_t usage, bool systemUsage, int32_t count)
+int32_t VibratorServiceClient::PlayPrimitiveEffect(const VibratorIdentifier &identifier, const std::string &effect,
+    const PrimitiveEffect &primitiveEffect)
 {
     MISC_HILOGD("Vibrate begin, effect:%{public}s, intensity:%{public}d, usage:%{public}d, count:%{public}d",
-        effect.c_str(), intensity, usage, count);
+        effect.c_str(), primitiveEffect.intensity, primitiveEffect.usage, primitiveEffect.count);
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
@@ -547,38 +588,64 @@ int32_t VibratorServiceClient::PlayPrimitiveEffect(int32_t vibratorId, const std
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "PlayPrimitiveEffect");
 #endif // HIVIEWDFX_HITRACE_ENABLE
-    ret = miscdeviceProxy_->PlayPrimitiveEffect(vibratorId, effect, intensity, usage, systemUsage, count);
+    PrimitiveEffectIPC primitiveEffectIPC;
+    primitiveEffectIPC.intensity = primitiveEffect.intensity;
+    primitiveEffectIPC.usage = primitiveEffect.usage;
+    primitiveEffectIPC.systemUsage = primitiveEffect.systemUsage;
+    primitiveEffectIPC.count = primitiveEffect.count;
+    VibratorIdentifierIPC vibrateIdentifier;
+    vibrateIdentifier.deviceId = identifier.deviceId;
+    vibrateIdentifier.vibratorId = identifier.vibratorId;
+    ret = miscdeviceProxy_->PlayPrimitiveEffect(vibrateIdentifier, effect, primitiveEffectIPC);
     WriteOtherHiSysIPCEvent(IMiscdeviceServiceIpcCode::COMMAND_PLAY_PRIMITIVE_EFFECT, ret);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
 #endif // HIVIEWDFX_HITRACE_ENABLE
     if (ret != ERR_OK) {
         MISC_HILOGE("Play primitive effect failed, ret:%{public}d, effect:%{public}s, intensity:%{public}d,"
-            "usage:%{public}d, count:%{public}d", ret, effect.c_str(), intensity, usage, count);
+            "usage:%{public}d, count:%{public}d", ret, effect.c_str(), primitiveEffect.intensity,
+            primitiveEffect.usage, primitiveEffect.count);
     }
     return ret;
 }
 
-int32_t VibratorServiceClient::GetVibratorCapacity()
+int32_t VibratorServiceClient::GetVibratorCapacity(const VibratorIdentifier &identifier, VibratorCapacity &capacity)
 {
     CHKPR(miscdeviceProxy_, ERROR);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "GetVibratorCapacity");
 #endif // HIVIEWDFX_HITRACE_ENABLE
-    int32_t ret = miscdeviceProxy_->GetVibratorCapacity(capacity_);
+    VibratorIdentifierIPC vibrateIdentifier;
+    vibrateIdentifier.deviceId = identifier.deviceId;
+    vibrateIdentifier.vibratorId = identifier.vibratorId;
+    int32_t ret = miscdeviceProxy_->GetVibratorCapacity(vibrateIdentifier, capacity);
     WriteVibratorHiSysIPCEvent(IMiscdeviceServiceIpcCode::COMMAND_GET_VIBRATOR_CAPACITY, ret);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
 #endif // HIVIEWDFX_HITRACE_ENABLE
-    capacity_.Dump();
+    capacity.Dump();
     return ret;
 }
 
-bool VibratorServiceClient::IsSupportVibratorCustom()
+bool VibratorServiceClient::IsSupportVibratorCustom(const VibratorIdentifier &identifier)
 {
+    MISC_HILOGD("Vibrate begin");
     int32_t ret = InitServiceClient();
     if (ret != ERR_OK) {
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
+    }
+    VibratorCapacity capacity_;
+    std::lock_guard<std::mutex> clientLock(clientMutex_);
+    CHKPR(miscdeviceProxy_, ERROR);
+#ifdef HIVIEWDFX_HITRACE_ENABLE
+    StartTrace(HITRACE_TAG_SENSORS, "IsSupportVibratorCustom");
+#endif // HIVIEWDFX_HITRACE_ENABLE
+    ret = GetVibratorCapacity(identifier, capacity_);
+#ifdef HIVIEWDFX_HITRACE_ENABLE
+    FinishTrace(HITRACE_TAG_SENSORS);
+#endif // HIVIEWDFX_HITRACE_ENABLE
+    if (ret != ERR_OK) {
+        MISC_HILOGE("Is support vibrator custom, ret:%{public}d", ret);
     }
     return (capacity_.isSupportHdHaptic || capacity_.isSupportPresetMapping || capacity_.isSupportTimeDelay);
 }
@@ -589,6 +656,152 @@ int32_t VibratorServiceClient::SeekTimeOnPackage(int32_t seekTime, const Vibrato
     VibratePackage convertPackage = {};
     ConvertSeekVibratorPackage(completePackage, convertPackage, seekTime);
     return ConvertVibratorPackage(convertPackage, seekPackage);
+}
+
+int32_t VibratorServiceClient::SubscribeVibratorPlugInfo(const VibratorUser *user)
+{
+    MISC_HILOGD("In, SubscribeVibratorPlugInfo");
+    CHKPR(user, OHOS::Sensors::ERROR);
+    CHKPR(user->callback, OHOS::Sensors::ERROR);
+
+    int32_t ret = InitServiceClient();
+    if (ret != ERR_OK) {
+        MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
+        return MISC_NATIVE_GET_SERVICE_ERR;
+    }
+
+    std::lock_guard<std::recursive_mutex> subscribeLock(subscribeMutex_);
+    auto status = subscribeSet_.insert(user);
+    if (!status.second) {
+        MISC_HILOGD("User has been subscribed");
+    } else {
+        std::lock_guard<std::mutex> clientLock(clientMutex_);
+        auto remoteObject = vibratorClient_->AsObject();
+        CHKPR(remoteObject, MISC_NATIVE_GET_SERVICE_ERR);
+        CHKPR(miscdeviceProxy_, ERROR);
+#ifdef HIVIEWDFX_HITRACE_ENABLE
+        StartTrace(HITRACE_TAG_SENSORS, "SubscribeVibratorPlugInfo");
+#endif // HIVIEWDFX_HITRACE_ENABLE
+        ret = miscdeviceProxy_->SubscribeVibratorPlugInfo(remoteObject);
+        WriteOtherHiSysIPCEvent(IMiscdeviceServiceIpcCode::COMMAND_SUBSCRIBE_VIBRATOR_PLUG_INFO, ret);
+#ifdef HIVIEWDFX_HITRACE_ENABLE
+        FinishTrace(HITRACE_TAG_SENSORS);
+#endif // HIVIEWDFX_HITRACE_ENABLE
+        if (ret != ERR_OK) {
+            MISC_HILOGE("Subscribe vibrator plug info failed");
+            return ret;
+        }
+    }
+    return OHOS::Sensors::SUCCESS;
+}
+
+int32_t VibratorServiceClient::UnsubscribeVibratorPlugInfo(const VibratorUser *user)
+{
+    MISC_HILOGD("In, UnsubscribeVibratorPlugInfo");
+    CHKPR(user, OHOS::Sensors::ERROR);
+    CHKPR(user->callback, OHOS::Sensors::ERROR);
+
+    std::lock_guard<std::recursive_mutex> subscribeLock(subscribeMutex_);
+    if (subscribeSet_.find(user) == subscribeSet_.end()) {
+        MISC_HILOGD("Deactivate user first");
+        return OHOS::Sensors::ERROR;
+    }
+    subscribeSet_.erase(user);
+    return OHOS::Sensors::SUCCESS;
+}
+
+std::set<RecordVibratorPlugCallback> VibratorServiceClient::GetSubscribeUserCallback(int32_t deviceId)
+{
+    CALL_LOG_ENTER;
+    std::lock_guard<std::recursive_mutex> subscribeLock(subscribeMutex_);
+    std::set<RecordVibratorPlugCallback> callback;
+    for (const auto &it : subscribeSet_) {
+        auto ret = callback.insert(it->callback);
+        if (!ret.second) {
+            MISC_HILOGD("callback insert fail");
+        }
+    }
+    return callback;
+}
+
+bool VibratorServiceClient::HandleVibratorData(VibratorStatusEvent statusEvent) __attribute__((no_sanitize("cfi")))
+{
+    CALL_LOG_ENTER;
+    if (statusEvent.type == PLUG_STATE_EVENT_PLUG_OUT) {
+        std::lock_guard<std::mutex> VibratorEffectLock(vibratorEffectMutex_);
+        for (auto it = vibratorEffectMap_.begin(); it != vibratorEffectMap_.end();) {
+            if (it->first.deviceId == statusEvent.deviceId) {
+                it = vibratorEffectMap_.erase(it);
+            } else {
+                ++it;
+            }
+        }
+    }
+    std::lock_guard<std::recursive_mutex> subscribeLock(subscribeMutex_);
+    auto callbacks = GetSubscribeUserCallback(statusEvent.deviceId);
+    MISC_HILOGD("callbacks.size() = %{public}zu", callbacks.size());
+    MISC_HILOGD("VibratorStatusEvent = [type = %{public}d, deviceId = %{public}d]",
+                statusEvent.type, statusEvent.deviceId);
+    for (const auto &callback : callbacks) {
+        MISC_HILOGD("callback is run");
+        if (callback != nullptr)
+            callback(&statusEvent);
+    }
+    return true;
+}
+
+void VibratorServiceClient::SetUsage(const VibratorIdentifier &identifier, int32_t usage, bool systemUsage)
+{
+    std::lock_guard<std::mutex> VibratorEffectLock(vibratorEffectMutex_);
+    auto it = vibratorEffectMap_.find(identifier);
+    if (it != vibratorEffectMap_.end()) {
+        it->second.usage = usage;
+        it->second.systemUsage = systemUsage;
+    } else {
+        VibratorEffectParameter param = {
+            .usage = usage,
+            .systemUsage = systemUsage,
+        };
+        vibratorEffectMap_[identifier] = param;
+    }
+}
+
+void VibratorServiceClient::SetLoopCount(const VibratorIdentifier &identifier, int32_t count)
+{
+    std::lock_guard<std::mutex> VibratorEffectLock(vibratorEffectMutex_);
+    auto it = vibratorEffectMap_.find(identifier);
+    if (it != vibratorEffectMap_.end()) {
+        it->second.loopCount = count;
+    } else {
+        VibratorEffectParameter param = {
+            .loopCount = count,
+        };
+        vibratorEffectMap_[identifier] = param;
+    }
+}
+
+void VibratorServiceClient::SetParameters(const VibratorIdentifier &identifier, const VibratorParameter &parameter)
+{
+    std::lock_guard<std::mutex> VibratorEffectLock(vibratorEffectMutex_);
+    auto it = vibratorEffectMap_.find(identifier);
+    if (it != vibratorEffectMap_.end()) {
+        it->second.vibratorParameter = parameter;
+    } else {
+        VibratorEffectParameter param = {
+            .vibratorParameter = parameter,
+        };
+        vibratorEffectMap_[identifier] = param;
+    }
+}
+
+VibratorEffectParameter VibratorServiceClient::GetVibratorEffectParameter(const VibratorIdentifier &identifier)
+{
+    std::lock_guard<std::mutex> VibratorEffectLock(vibratorEffectMutex_);
+    auto it = vibratorEffectMap_.find(identifier);
+    if (it != vibratorEffectMap_.end()) {
+        return it->second;
+    }
+    return VibratorEffectParameter();
 }
 
 void VibratorServiceClient::ConvertSeekVibratorPackage(const VibratorPackage &completePackage,
@@ -681,6 +894,81 @@ bool VibratorServiceClient::SkipEventAndConvertVibratorEvent(const VibratorEvent
     return false;
 }
 
+int32_t VibratorServiceClient::GetVibratorList(const VibratorIdentifier& identifier,
+    std::vector<VibratorInfos>& vibratorInfo)
+{
+    CALL_LOG_ENTER;
+    MISC_HILOGD("VibratorIdentifier = [deviceId = %{public}d, vibratorId = %{public}d]", identifier.deviceId,
+        identifier.vibratorId);
+    int32_t ret = InitServiceClient();
+    if (ret != ERR_OK) {
+        MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
+        return MISC_NATIVE_GET_SERVICE_ERR;
+    }
+    CHKPR(miscdeviceProxy_, OHOS::Sensors::ERROR);
+
+    VibratorIdentifierIPC param;
+    param.deviceId = identifier.deviceId;
+    param.vibratorId = identifier.vibratorId;
+    std::vector<VibratorInfoIPC> vibratorInfoList;
+#ifdef HIVIEWDFX_HITRACE_ENABLE
+    StartTrace(HITRACE_TAG_SENSORS, "GetVibratorList");
+#endif // HIVIEWDFX_HITRACE_ENABLE
+    ret = miscdeviceProxy_->GetVibratorList(param, vibratorInfoList);
+    WriteOtherHiSysIPCEvent(IMiscdeviceServiceIpcCode::COMMAND_GET_VIBRATOR_LIST, ret);
+#ifdef HIVIEWDFX_HITRACE_ENABLE
+    FinishTrace(HITRACE_TAG_SENSORS);
+#endif // HIVIEWDFX_HITRACE_ENABLE
+    if (ret != ERR_OK) {
+        MISC_HILOGE("Get vibrator info list failed, [ret = %{public}d, deviceId = %{public}d,\
+            vibratorId = %{public}d]", ret, identifier.deviceId, identifier.vibratorId);
+        return ret;
+    }
+    for (auto &info : vibratorInfoList) {
+        VibratorInfos resInfo;
+        resInfo.deviceId = info.deviceId;
+        resInfo.vibratorId = info.vibratorId;
+        resInfo.deviceName = info.deviceName;
+        resInfo.isSupportHdHaptic = info.isSupportHdHaptic;
+        resInfo.isLocalVibrator = info.isLocalVibrator;
+        vibratorInfo.push_back(resInfo);
+    }
+    return OHOS::Sensors::SUCCESS;
+}
+
+int32_t VibratorServiceClient::GetEffectInfo(const VibratorIdentifier& identifier,
+    const std::string& effectType, EffectInfo& effectInfo)
+{
+    CALL_LOG_ENTER;
+    MISC_HILOGD("VibratorIdentifier = [deviceId = %{public}d, vibratorId = %{public}d, effectType = %{public}s]",
+        identifier.deviceId, identifier.vibratorId, effectType.c_str());
+    int32_t ret = InitServiceClient();
+    if (ret != OHOS::Sensors::SUCCESS) {
+        MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
+        return MISC_NATIVE_GET_SERVICE_ERR;
+    }
+    CHKPR(miscdeviceProxy_, OHOS::Sensors::ERROR);
+    VibratorIdentifierIPC param;
+    param.deviceId = identifier.deviceId;
+    param.vibratorId = identifier.vibratorId;
+    EffectInfoIPC resInfo;
+#ifdef HIVIEWDFX_HITRACE_ENABLE
+    StartTrace(HITRACE_TAG_SENSORS, "GetEffectInfo");
+#endif // HIVIEWDFX_HITRACE_ENABLE
+    ret = miscdeviceProxy_->GetEffectInfo(param, effectType, resInfo);
+    WriteOtherHiSysIPCEvent(IMiscdeviceServiceIpcCode::COMMAND_GET_EFFECT_INFO, ret);
+#ifdef HIVIEWDFX_HITRACE_ENABLE
+    FinishTrace(HITRACE_TAG_SENSORS);
+#endif // HIVIEWDFX_HITRACE_ENABLE
+    if (ret != ERR_OK) {
+        MISC_HILOGE("Get effect info failed, [ret = %{public}d, deviceId = %{public}d, vibratorId = %{public}d,\
+            effectType = %{public}s]", ret, identifier.deviceId, identifier.vibratorId, effectType.c_str());
+        return ret;
+    }
+    effectInfo.isSupportEffect = resInfo.isSupportEffect;
+    return OHOS::Sensors::SUCCESS;
+}
+
 void VibratorServiceClient::WriteVibratorHiSysIPCEvent(IMiscdeviceServiceIpcCode code, int32_t ret)
 {
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
@@ -709,6 +997,14 @@ void VibratorServiceClient::WriteVibratorHiSysIPCEvent(IMiscdeviceServiceIpcCode
             case IMiscdeviceServiceIpcCode::COMMAND_GET_VIBRATOR_CAPACITY:
                 HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
                     HiSysEvent::EventType::FAULT, "PKG_NAME", "GetVibratorCapacity", "ERROR_CODE", ret);
+                break;
+            case IMiscdeviceServiceIpcCode::COMMAND_GET_VIBRATOR_LIST:
+                HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+                    HiSysEvent::EventType::FAULT, "PKG_NAME", "GetVibratorList", "ERROR_CODE", ret);
+                break;
+            case IMiscdeviceServiceIpcCode::COMMAND_GET_EFFECT_INFO:
+                HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+                    HiSysEvent::EventType::FAULT, "PKG_NAME", "GetEffectInfo", "ERROR_CODE", ret);
                 break;
             default:
                 MISC_HILOGW("Code does not exist, code:%{public}d", static_cast<int32_t>(code));

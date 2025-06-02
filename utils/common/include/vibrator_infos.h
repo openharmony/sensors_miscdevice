@@ -136,6 +136,56 @@ struct VibrateParameter : public Parcelable {
     bool Marshalling(Parcel &parcel) const;
     static VibrateParameter* Unmarshalling(Parcel &data);
 };
+
+
+struct VibratorInfoIPC : public Parcelable {
+    int32_t deviceId = -1;
+    int32_t vibratorId = -1;
+    std::string deviceName = "";
+    bool isSupportHdHaptic;
+    bool isLocalVibrator;
+    int32_t position = 0;
+    void Dump() const;
+    bool Marshalling(Parcel &parcel) const;
+    static VibratorInfoIPC* Unmarshalling(Parcel &data);
+};
+
+struct VibratorIdentifierIPC : public Parcelable {
+    int32_t deviceId = -1;
+    int32_t vibratorId = -1;
+    int32_t position = 0;
+    bool isLocalVibrator;
+    void Dump() const;
+    bool Marshalling(Parcel &parcel) const;
+    static VibratorIdentifierIPC* Unmarshalling(Parcel &data);
+};
+
+struct EffectInfoIPC : public Parcelable {
+    int32_t duration = -1;
+    bool isSupportEffect;
+    void Dump() const;
+    bool Marshalling(Parcel &parcel) const;
+    static EffectInfoIPC* Unmarshalling(Parcel &data);
+};
+
+struct CustomHapticInfoIPC : public Parcelable {
+    int32_t usage = 0;
+    bool systemUsage;
+    VibrateParameter parameter;
+    void Dump() const;
+    bool Marshalling(Parcel &parcel) const;
+    static CustomHapticInfoIPC* Unmarshalling(Parcel &data);
+};
+
+struct PrimitiveEffectIPC : public Parcelable {
+    int32_t intensity = 0;
+    int32_t usage = 0;
+    bool systemUsage;
+    int32_t count = 0;
+    void Dump() const;
+    bool Marshalling(Parcel &parcel) const;
+    static PrimitiveEffectIPC* Unmarshalling(Parcel &data);
+};
 } // namespace Sensors
 } // namespace OHOS
 #endif // VIBRATOR_INFOS_H

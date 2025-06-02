@@ -31,9 +31,10 @@ namespace Sensors {
 using namespace Security::AccessToken;
 using Security::AccessToken::AccessTokenID;
 namespace {
-constexpr size_t U32_AT_SIZE = 4;
+constexpr size_t U32_AT_SIZE = 12;
 auto g_service = MiscdeviceDelayedSpSingleton<MiscdeviceService>::GetInstance();
 const std::u16string VIBRATOR_INTERFACE_TOKEN = u"IMiscdeviceService";
+static sptr<IRemoteObject> g_remote = new (std::nothrow) IPCObjectStub();
 } // namespace
 
 template<class T>
@@ -79,8 +80,12 @@ bool OnRemoteRequestFuzzTest(const uint8_t *data, size_t size)
     g_service->OnStartFuzz();
     size_t startPos = 0;
     VibratorCapacity capacity;
+    VibratorIdentifierIPC identifier;
+    startPos += GetObject<int32_t>(data + startPos, size - startPos, identifier.deviceId);
+    startPos += GetObject<int32_t>(data + startPos, size - startPos, identifier.vibratorId);
     GetObject<bool>(data + startPos, size - startPos, capacity.isSupportHdHaptic);
-    g_service->GetVibratorCapacity(capacity);
+    g_service->GetVibratorCapacity(identifier, capacity);
+    g_service->TransferClientRemoteObject(g_remote);
     return true;
 }
 } // namespace Sensors

@@ -36,6 +36,35 @@ enum class MiscdeviceServiceState {
     STATE_RUNNING,
 };
 
+struct VibratorControlInfo {
+    int motorCount;
+    std::unordered_map<int, std::shared_ptr<VibratorThread>> vibratorThreads;
+
+    VibratorControlInfo(const std::vector<int>& vibratorIds) : motorCount(static_cast<int>(vibratorIds.size()))
+    {
+        for (int motorId : vibratorIds) {
+            vibratorThreads[motorId] = std::make_shared<VibratorThread>();
+        }
+    }
+
+    std::shared_ptr<VibratorThread> GetVibratorThread(int motorId) const
+    {
+        auto it = vibratorThreads.find(motorId);
+        if (it != vibratorThreads.end()) {
+            return it->second;
+        }
+        return nullptr;
+    }
+};
+
+struct VibratorAllInfos {
+    std::vector<VibratorInfoIPC> baseInfo;
+    VibratorControlInfo controlInfo;
+    VibratorCapacity capacityInfo;
+    std::vector<HdfWaveInformation> waveInfo;
+    VibratorAllInfos(const std::vector<int>& vibratorIds) : controlInfo(vibratorIds) {}
+};
+
 class MiscdeviceService : public SystemAbility, public MiscdeviceServiceStub {
     DECLARE_SYSTEM_ABILITY(MiscdeviceService)
     MISCDEVICE_DECLARE_DELAYED_SP_SINGLETON(MiscdeviceService);
@@ -49,26 +78,33 @@ public:
     bool IsLightAnimationValid(const LightAnimationIPC &animation);
     int32_t Dump(int32_t fd, const std::vector<std::u16string> &args) override;
     void ProcessDeathObserver(const wptr<IRemoteObject> &object);
-    virtual int32_t Vibrate(int32_t vibratorId, int32_t timeOut, int32_t usage, bool systemUsage) override;
-    virtual int32_t PlayVibratorEffect(int32_t vibratorId, const std::string &effect,
-                                       int32_t loopCount, int32_t usage, bool systemUsage) override;
+    virtual int32_t Vibrate(const VibratorIdentifierIPC& identifier, int32_t timeOut,
+        int32_t usage, bool systemUsage) override;
+    virtual int32_t PlayVibratorEffect(const VibratorIdentifierIPC& identifier, const std::string &effect,
+        int32_t loopCount, int32_t usage, bool systemUsage) override;
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    virtual int32_t PlayVibratorCustom(int32_t vibratorId, int32_t fd, int64_t offset, int64_t length, int32_t usage,
-        bool systemUsage, const VibrateParameter &parameter) override;
+    virtual int32_t PlayVibratorCustom(const VibratorIdentifierIPC& identifier, int32_t fd, int64_t offset,
+        int64_t length, const CustomHapticInfoIPC& customHapticInfoIPC) override;
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    virtual int32_t StopVibrator(int32_t vibratorId) override;
-    virtual int32_t StopVibratorByMode(int32_t vibratorId, const std::string &mode) override;
-    virtual int32_t IsSupportEffect(const std::string &effect, bool &state) override;
+    virtual int32_t StopVibrator(const VibratorIdentifierIPC& identifier) override;
+    virtual int32_t StopVibratorByMode(const VibratorIdentifierIPC& identifier, const std::string &mode) override;
+    virtual int32_t IsSupportEffect(const VibratorIdentifierIPC& identifier, const std::string &effect,
+        bool &state) override;
     virtual int32_t GetLightList(std::vector<LightInfoIPC> &lightInfoIpcList) override;
     virtual int32_t TurnOn(int32_t lightId, int32_t singleColor, const LightAnimationIPC &animation) override;
     virtual int32_t TurnOff(int32_t lightId) override;
-    virtual int32_t PlayPattern(const VibratePattern &pattern, int32_t usage,
-        bool systemUsage, const VibrateParameter &parameter) override;
-    virtual int32_t GetDelayTime(int32_t &delayTime) override;
+    virtual int32_t PlayPattern(const VibratorIdentifierIPC& identifier, const VibratePattern &pattern,
+        const CustomHapticInfoIPC& customHapticInfoIPC) override;
+    virtual int32_t GetDelayTime(const VibratorIdentifierIPC& identifier, int32_t &delayTime) override;
     virtual int32_t TransferClientRemoteObject(const sptr<IRemoteObject> &vibratorServiceClient) override;
-    virtual int32_t PlayPrimitiveEffect(int32_t vibratorId, const std::string &effect, int32_t intensity,
-                                        int32_t usage, bool systemUsage, int32_t count) override;
-    virtual int32_t GetVibratorCapacity(VibratorCapacity &capacity) override;
+    virtual int32_t PlayPrimitiveEffect(const VibratorIdentifierIPC& identifier, const std::string &effect,
+        const PrimitiveEffectIPC& primitiveEffectIPC) override;
+    virtual int32_t GetVibratorCapacity(const VibratorIdentifierIPC& identifier, VibratorCapacity &capacity) override;
+    virtual int32_t GetVibratorList(const VibratorIdentifierIPC& identifier,
+        std::vector<VibratorInfoIPC>& vibratorInfoIPC) override;
+    virtual int32_t GetEffectInfo(const VibratorIdentifierIPC& identifier, const std::string& effectType,
+        EffectInfoIPC& effectInfoIPC) override;
+    virtual int32_t SubscribeVibratorPlugInfo(const sptr<IRemoteObject> &vibratorServiceClient) override;
 
 private:
     DISALLOW_COPY_AND_MOVE(MiscdeviceService);
@@ -76,12 +112,15 @@ private:
     bool InitLightInterface();
     std::string GetPackageName(AccessTokenID tokenId);
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_PRESET_INFO
-    int32_t FastVibratorEffect(const VibrateInfo &info);
+    int32_t FastVibratorEffect(const VibrateInfo &info, const VibratorIdentifierIPC& identifier);
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_PRESET_INFO
-    void StartVibrateThread(VibrateInfo info);
-    int32_t StopVibratorService(int32_t vibratorId);
-    void StopVibrateThread();
-    bool ShouldIgnoreVibrate(const VibrateInfo &info);
+    void StartVibrateThread(VibrateInfo info, const VibratorIdentifierIPC& identifier);
+    int32_t StopVibratorService(const VibratorIdentifierIPC& identifier);
+    void SendMsgToClient(HdfVibratorPlugInfo info);
+    int32_t RegisterVibratorPlugCb();
+    std::shared_ptr<VibratorThread> GetVibratorThread(const VibratorIdentifierIPC& identifier);
+    void StopVibrateThread(std::shared_ptr<VibratorThread> vibratorThread);
+    bool ShouldIgnoreVibrate(const VibrateInfo &info, const VibratorIdentifierIPC& identifier);
     std::string GetCurrentTime();
     void MergeVibratorParmeters(const VibrateParameter &parameter, VibratePackage &package);
     bool CheckVibratorParmeters(const VibrateParameter &parameter);
@@ -96,10 +135,24 @@ private:
 #ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
     void OnReceiveUserSwitchEvent(const EventFwk::CommonEventData &data);
 #endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
-    int32_t CheckAuthAndParam(int32_t usage, const VibrateParameter &parameter);
+    int32_t CheckAuthAndParam(int32_t usage, const VibrateParameter &parameter,
+        const VibratorIdentifierIPC& identifier);
     int32_t PlayPatternCheckAuthAndParam(int32_t usage, const VibrateParameter &parameter);
     int32_t PlayPrimitiveEffectCheckAuthAndParam(int32_t intensity, int32_t usage);
     int32_t PlayVibratorEffectCheckAuthAndParam(int32_t count, int32_t usage);
+    int32_t GetHapticCapacityInfo(const VibratorIdentifierIPC& identifier, VibratorCapacity& capacityInfo);
+    int32_t GetAllWaveInfo(const VibratorIdentifierIPC& identifier, std::vector<HdfWaveInformation>& waveInfo);
+    int32_t GetHapticStartUpTime(const VibratorIdentifierIPC& identifier, int32_t mode, int32_t &startUpTime);
+    void GetLocalVibratorInfo();
+    std::vector<VibratorIdentifierIPC> CheckDeviceIdIsValid(const VibratorIdentifierIPC& identifier);
+    int32_t StartVibrateThreadControl(const VibratorIdentifierIPC& identifier, VibrateInfo& info);
+    bool UpdateVibratorAllInfo(const VibratorIdentifierIPC &identifier, const HdfVibratorPlugInfo &info,
+        VibratorAllInfos &vibratorAllInfos);
+    void ConvertToServerInfos(const std::vector<HdfVibratorInfo> &baseVibratorInfo,
+        const VibratorCapacity &vibratorCapacity, const std::vector<HdfWaveInformation> &waveInfomation,
+        const HdfVibratorPlugInfo &info, VibratorAllInfos &vibratorAllInfos);
+    int32_t PerformVibrationControl(const VibratorIdentifierIPC& identifier, const VibratePattern& pattern,
+        VibrateInfo& info);
     std::mutex isVibrationPriorityReadyMutex_;
     static bool isVibrationPriorityReady_;
     VibratorHdiConnection &vibratorHdiConnection_ = VibratorHdiConnection::GetInstance();
@@ -109,14 +162,15 @@ private:
     std::vector<LightInfoIPC> lightInfos_;
     std::map<MiscdeviceDeviceId, bool> miscDeviceIdMap_;
     MiscdeviceServiceState state_;
-    std::shared_ptr<VibratorThread> vibratorThread_ = nullptr;
     std::mutex vibratorThreadMutex_;
     sptr<IRemoteObject::DeathRecipient> clientDeathObserver_ = nullptr;
     std::mutex clientDeathObserverMutex_;
-    std::map<sptr<IRemoteObject>, int32_t> clientPidMap_;
+    static std::map<sptr<IRemoteObject>, int32_t> clientPidMap_;
     std::mutex clientPidMapMutex_;
     std::mutex miscDeviceIdMapMutex_;
     std::mutex lightInfosMutex_;
+    std::mutex devicesManageMutex_;
+    static std::map<int32_t, VibratorAllInfos> devicesManageMap_;
 };
 }  // namespace Sensors
 }  // namespace OHOS

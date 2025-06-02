@@ -23,21 +23,21 @@ describe("VibratorJsTest", function () {
          */
         console.info('beforeAll called')
     })
-    
+
     afterAll(function() {
         /*
          * @tc.teardown: teardown invoked after all testcases
          */
         console.info('afterAll called')
     })
-    
+
     beforeEach(function() {
         /*
          * @tc.setup: setup invoked before each testcases
          */
         console.info('beforeEach called')
     })
-    
+
     afterEach(function() {
         /*
          * @tc.teardown: teardown invoked after each testcases
@@ -48,7 +48,7 @@ describe("VibratorJsTest", function () {
     const OPERATION_FAIL_CODE = 14600101;
     const PERMISSION_ERROR_CODE = 201;
     const PARAMETER_ERROR_CODE = 401;
-    
+
     const OPERATION_FAIL_MSG = 'Device operation failed.'
     const PERMISSION_ERROR_MSG = 'Permission denied.'
     const PARAMETER_ERROR_MSG = 'The parameter invalid.'

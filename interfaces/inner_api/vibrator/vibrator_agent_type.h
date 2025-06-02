@@ -15,10 +15,19 @@
 
 #ifndef VIBRATOR_AGENT_TYPE_H
 #define VIBRATOR_AGENT_TYPE_H
+#include <string>
+#include <vector>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#ifndef NAME_MAX_LEN
+#define NAME_MAX_LEN 128
+#endif /* NAME_MAX_LEN */
+#ifndef VIBRATOR_USER_DATA_SIZE
+#define VIBRATOR_USER_DATA_SIZE 104
+#endif /* VIBRATOR_USER_DATA_SIZE */
 
 /**
  * @brief Describes the vibration effect of the vibrator when a user adjusts the timer.
@@ -225,6 +234,103 @@ typedef struct VibratorParameter {
     int32_t frequency = 0;    // from -100 to 100
     int32_t reserved = 0;
 } VibratorParameter;
+
+/**
+ * @brief Represents the information about a vibrator device in the system.
+ *
+ * @since 19
+ */
+typedef struct VibratorInfos {
+    int32_t deviceId;
+    int32_t vibratorId;
+    std::string deviceName;
+    bool isSupportHdHaptic;
+    bool isLocalVibrator;
+} VibratorInfos;
+
+/**
+ * @brief Represents the parameters for querying vibrator information.
+ *
+ * @since 19
+ */
+typedef struct VibratorIdentifier {
+    int32_t deviceId = -1;
+    int32_t vibratorId = -1;
+    bool operator<(const VibratorIdentifier& other) const
+    {
+        if (deviceId != other.deviceId) {
+            return deviceId < other.deviceId;
+        }
+        return vibratorId < other.vibratorId;
+    }
+} VibratorIdentifier;
+
+/**
+ * @brief Defines the vibration effect information.
+ *
+ * The information include the capability to set the effect and the vibration duration of the effect.
+ *
+ * @since 19
+ */
+typedef struct EffectInfo {
+    bool isSupportEffect;
+} EffectInfo;
+
+/**
+ * @brief Defines the plug state events for the vibrator device.
+ *
+ * This enumeration represents the various plug and unplug state events
+ * that can occur with the vibrator device, including its connection status.
+ *
+ * @since 19
+ */
+typedef enum VibratorPlugState {
+    PLUG_STATE_EVENT_UNKNOWN = -1,  /* Unknown plug and unplug state event */
+    PLUG_STATE_EVENT_PLUG_OUT = 0,  /* Event indicating that the vibrator is unplugged */
+    PLUG_STATE_EVENT_PLUG_IN = 1,   /* Event indicating that the vibrator is plugged in */
+} VibratorPlugState;
+
+/**
+ * @brief Contains information about a vibrator device's status.
+ *
+ * This structure holds the current plug state of the vibrator device and its
+ * unique identifier. It is used to monitor and manage the vibrator's connectivity
+ * and operational mode.
+ *
+ * @since 19
+ */
+typedef struct VibratorStatusEvent {
+    VibratorPlugState type = PLUG_STATE_EVENT_UNKNOWN;
+    int32_t deviceId = 0;
+    int32_t vibratorCnt = 0;
+    int64_t timestamp = 0;
+} VibratorStatusEvent;
+
+/**
+ * @brief Defines the callback for data reporting by the sensor agent.
+ *
+ * @since 19
+ */
+typedef void (*RecordVibratorPlugCallback)(VibratorStatusEvent *statusEvent);
+
+/**
+ * @brief Defines a reserved field for the sensor data subscriber.
+ *
+ * @since 19
+ */
+typedef struct UserData {
+    char userData[VIBRATOR_USER_DATA_SIZE];  /* Reserved for the sensor data subscriber */
+} UserData;
+
+/**
+ * @brief Defines information about the sensor data subscriber.
+ *
+ * @since 19
+ */
+typedef struct VibratorUser {
+    RecordVibratorPlugCallback callback;       /* Callback for reporting sensor data */
+    UserData *userData = nullptr;              /* Reserved field for the sensor data subscriber */
+} VibratorUser;
 /** @} */
 #ifdef __cplusplus
 };

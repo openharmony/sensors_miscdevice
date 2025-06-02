@@ -16,6 +16,8 @@
 #ifndef MISCDEVICE_COMMON_H
 #define MISCDEVICE_COMMON_H
 
+#include "vibrator_agent_type.h"
+
 namespace OHOS {
 namespace Sensors {
 // These LightId correspond to logical lights
@@ -30,6 +32,22 @@ enum LightId {
 
 // MISC device support id
 enum class MiscdeviceDeviceId { LED = 0, VIBRATOR, UNKNOWN };
+
+constexpr int32_t THREADSLEEPTIME = 500;
+
+typedef struct VibratorEffectParameter {
+    int32_t loopCount = 1;
+    int32_t usage = USAGE_UNKNOWN;
+    bool systemUsage = false;
+    VibratorParameter vibratorParameter;
+}VibratorEffectParameter;
+
+typedef struct PrimitiveEffect {
+    int32_t intensity = 0;
+    int32_t usage = 0;
+    bool systemUsage;
+    int32_t count = 0;
+} PrimitiveEffect;
 
 class MiscdeviceCommon {
 public:

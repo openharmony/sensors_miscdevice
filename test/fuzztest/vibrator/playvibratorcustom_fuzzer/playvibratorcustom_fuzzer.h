@@ -16,7 +16,7 @@
 #ifndef SENSOR_DISABLE_FUZZER_H
 #define SENSOR_DISABLE_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "issupporteffect_fuzzer"
+#define FUZZ_PROJECT_NAME "playvibratorcustom_fuzzer"
 
 #endif // SENSOR_DISABLE_FUZZER_H
 

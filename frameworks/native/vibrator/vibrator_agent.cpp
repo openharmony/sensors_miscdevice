@@ -27,11 +27,6 @@ namespace Sensors {
 using OHOS::Sensors::VibratorServiceClient;
 
 namespace {
-constexpr int32_t DEFAULT_VIBRATOR_ID = 123;
-int32_t g_loopCount = 1;
-int32_t g_usage = USAGE_UNKNOWN;
-bool g_systemUsage = false;
-VibratorParameter g_vibratorParameter;
 const std::string PHONE_TYPE = "phone";
 const int32_t INTENSITY_ADJUST_MIN = 0;
 const int32_t INTENSITY_ADJUST_MAX = 100;
@@ -59,23 +54,43 @@ static int32_t NormalizeErrCode(int32_t code)
 
 bool SetLoopCount(int32_t count)
 {
+    VibratorIdentifier identifier = {
+        .deviceId = -1,
+        .vibratorId = -1
+    };
+    return SetLoopCountEnhanced(identifier, count);
+}
+
+bool SetLoopCountEnhanced(const VibratorIdentifier identifier, int32_t count)
+{
     if (count <= 0) {
         MISC_HILOGE("Input invalid, count is %{public}d", count);
         return false;
     }
-    g_loopCount = count;
+    auto &client = VibratorServiceClient::GetInstance();
+    client.SetLoopCount(identifier, count);
     return true;
 }
 
 int32_t StartVibrator(const char *effectId)
 {
+    VibratorIdentifier identifier = {
+        .deviceId = -1,
+        .vibratorId = -1
+    };
+    return StartVibratorEnhanced(identifier, effectId);
+}
+
+int32_t StartVibratorEnhanced(const VibratorIdentifier identifier, const char *effectId)
+{
     MISC_HILOGD("Time delay measurement:start time");
     CHKPR(effectId, PARAMETER_ERROR);
     auto &client = VibratorServiceClient::GetInstance();
-    int32_t ret = client.Vibrate(DEFAULT_VIBRATOR_ID, effectId, g_loopCount, g_usage, g_systemUsage);
-    g_loopCount = 1;
-    g_usage = USAGE_UNKNOWN;
-    g_systemUsage = false;
+    VibratorEffectParameter vibratorEffectParameter = client.GetVibratorEffectParameter(identifier);
+    int32_t ret = client.Vibrate(identifier, effectId, vibratorEffectParameter.loopCount,
+        vibratorEffectParameter.usage, vibratorEffectParameter.systemUsage);
+    client.SetUsage(identifier, USAGE_UNKNOWN, false);
+    client.SetLoopCount(identifier, 1);
     if (ret != ERR_OK) {
         MISC_HILOGD("Vibrate effectId failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
@@ -85,14 +100,24 @@ int32_t StartVibrator(const char *effectId)
 
 int32_t StartVibratorOnce(int32_t duration)
 {
+    VibratorIdentifier identifier = {
+        .deviceId = -1,
+        .vibratorId = -1
+    };
+    return StartVibratorOnceEnhanced(identifier, duration);
+}
+
+int32_t StartVibratorOnceEnhanced(const VibratorIdentifier identifier, int32_t duration)
+{
     if (duration <= 0) {
         MISC_HILOGE("duration is invalid");
         return PARAMETER_ERROR;
     }
     auto &client = VibratorServiceClient::GetInstance();
-    int32_t ret = client.Vibrate(DEFAULT_VIBRATOR_ID, duration, g_usage, g_systemUsage);
-    g_usage = USAGE_UNKNOWN;
-    g_systemUsage = false;
+    VibratorEffectParameter vibratorEffectParameter = client.GetVibratorEffectParameter(identifier);
+    int32_t ret = client.Vibrate(identifier, duration, vibratorEffectParameter.usage,
+        vibratorEffectParameter.systemUsage);
+    client.SetUsage(identifier, USAGE_UNKNOWN, false);
     if (ret != ERR_OK) {
         MISC_HILOGD("Vibrate duration failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
@@ -102,11 +127,29 @@ int32_t StartVibratorOnce(int32_t duration)
 
 bool IsSupportVibratorCustom()
 {
+    VibratorIdentifier identifier = {
+        .deviceId = -1,
+        .vibratorId = -1
+    };
+    return IsSupportVibratorCustomEnhanced(identifier);
+}
+
+bool IsSupportVibratorCustomEnhanced(const VibratorIdentifier identifier)
+{
     auto &client = VibratorServiceClient::GetInstance();
-    return client.IsSupportVibratorCustom();
+    return client.IsSupportVibratorCustom(identifier);
 }
 
 int32_t PlayVibratorCustom(int32_t fd, int64_t offset, int64_t length)
+{
+    VibratorIdentifier identifier = {
+        .deviceId = -1,
+        .vibratorId = -1
+    };
+    return PlayVibratorCustomEnhanced(identifier, fd, offset, length);
+}
+
+int32_t PlayVibratorCustomEnhanced(const VibratorIdentifier identifier, int32_t fd, int64_t offset, int64_t length)
 {
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     MISC_HILOGD("Time delay measurement:start time");
@@ -121,11 +164,13 @@ int32_t PlayVibratorCustom(int32_t fd, int64_t offset, int64_t length)
         .offset = offset,
         .length = length
     };
-    int32_t ret = client.PlayVibratorCustom(DEFAULT_VIBRATOR_ID, rawFd, g_usage, g_systemUsage, g_vibratorParameter);
-    g_usage = USAGE_UNKNOWN;
-    g_systemUsage = false;
-    g_vibratorParameter.intensity = INTENSITY_ADJUST_MAX;
-    g_vibratorParameter.frequency = 0;
+    VibratorEffectParameter vibratorEffectParameter = client.GetVibratorEffectParameter(identifier);
+    int32_t ret = client.PlayVibratorCustom(identifier, rawFd, vibratorEffectParameter.usage,
+        vibratorEffectParameter.systemUsage, vibratorEffectParameter.vibratorParameter);
+    vibratorEffectParameter.vibratorParameter.intensity = INTENSITY_ADJUST_MAX;
+    vibratorEffectParameter.vibratorParameter.frequency = 0;
+    client.SetUsage(identifier, USAGE_UNKNOWN, false);
+    client.SetParameters(identifier, vibratorEffectParameter.vibratorParameter);
     if (ret != ERR_OK) {
         MISC_HILOGD("PlayVibratorCustom failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
@@ -139,13 +184,22 @@ int32_t PlayVibratorCustom(int32_t fd, int64_t offset, int64_t length)
 
 int32_t StopVibrator(const char *mode)
 {
+    VibratorIdentifier identifier = {
+        .deviceId = -1,
+        .vibratorId = -1
+    };
+    return StopVibratorEnhanced(identifier, mode);
+}
+
+int32_t StopVibratorEnhanced(const VibratorIdentifier identifier, const char *mode)
+{
     CHKPR(mode, PARAMETER_ERROR);
     if (strcmp(mode, "time") != 0 && strcmp(mode, "preset") != 0) {
         MISC_HILOGE("Input parameter invalid, mode is %{public}s", mode);
         return PARAMETER_ERROR;
     }
     auto &client = VibratorServiceClient::GetInstance();
-    int32_t ret = client.StopVibrator(DEFAULT_VIBRATOR_ID, mode);
+    int32_t ret = client.StopVibrator(identifier, mode);
     if (ret != ERR_OK) {
         MISC_HILOGD("StopVibrator by mode failed, ret:%{public}d, mode:%{public}s", ret, mode);
         return NormalizeErrCode(ret);
@@ -155,8 +209,17 @@ int32_t StopVibrator(const char *mode)
 
 int32_t Cancel()
 {
+    VibratorIdentifier identifier = {
+        .deviceId = -1,
+        .vibratorId = -1
+    };
+    return CancelEnhanced(identifier);
+}
+
+int32_t CancelEnhanced(const VibratorIdentifier identifier)
+{
     auto &client = VibratorServiceClient::GetInstance();
-    int32_t ret = client.StopVibrator(DEFAULT_VIBRATOR_ID);
+    int32_t ret = client.StopVibrator(identifier);
     if (ret != ERR_OK) {
         MISC_HILOGD("StopVibrator failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
@@ -166,26 +229,53 @@ int32_t Cancel()
 
 bool SetUsage(int32_t usage, bool systemUsage)
 {
+    VibratorIdentifier identifier = {
+        .deviceId = -1,
+        .vibratorId = -1
+    };
+    return SetUsageEnhanced(identifier, usage, systemUsage);
+}
+
+bool SetUsageEnhanced(const VibratorIdentifier identifier, int32_t usage, bool systemUsage)
+{
     if ((usage < 0) || (usage >= USAGE_MAX)) {
         MISC_HILOGE("Input invalid, usage is %{public}d", usage);
         return false;
     }
-    g_usage = usage;
-    g_systemUsage = systemUsage;
+    auto &client = VibratorServiceClient::GetInstance();
+    client.SetUsage(identifier, usage, systemUsage);
     return true;
 }
 
 bool IsHdHapticSupported()
 {
+    VibratorIdentifier identifier = {
+        .deviceId = -1,
+        .vibratorId = -1
+    };
+    return IsHdHapticSupportedEnhanced(identifier);
+}
+
+bool IsHdHapticSupportedEnhanced(const VibratorIdentifier identifier)
+{
     auto &client = VibratorServiceClient::GetInstance();
-    return client.IsHdHapticSupported();
+    return client.IsHdHapticSupported(identifier);
 }
 
 int32_t IsSupportEffect(const char *effectId, bool *state)
 {
+    VibratorIdentifier identifier = {
+        .deviceId = -1,
+        .vibratorId = -1
+    };
+    return IsSupportEffectEnhanced(identifier, effectId, state);
+}
+
+int32_t IsSupportEffectEnhanced(const VibratorIdentifier identifier, const char *effectId, bool *state)
+{
     CHKPR(effectId, PARAMETER_ERROR);
     auto &client = VibratorServiceClient::GetInstance();
-    int32_t ret = client.IsSupportEffect(effectId, *state);
+    int32_t ret = client.IsSupportEffect(identifier, effectId, *state);
     if (ret != ERR_OK) {
         MISC_HILOGD("Query effect support failed, ret:%{public}d, effectId:%{public}s", ret, effectId);
         return NormalizeErrCode(ret);
@@ -206,8 +296,17 @@ int32_t PreProcess(const VibratorFileDescription &fd, VibratorPackage &package)
 
 int32_t GetDelayTime(int32_t &delayTime)
 {
+    VibratorIdentifier identifier = {
+        .deviceId = -1,
+        .vibratorId = -1
+    };
+    return GetDelayTimeEnhanced(identifier, delayTime);
+}
+
+int32_t GetDelayTimeEnhanced(const VibratorIdentifier identifier, int32_t &delayTime)
+{
     auto &client = VibratorServiceClient::GetInstance();
-    int32_t ret = client.GetDelayTime(delayTime);
+    int32_t ret = client.GetDelayTime(identifier, delayTime);
     if (ret != ERR_OK) {
         MISC_HILOGD("GetDelayTime failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
@@ -217,12 +316,23 @@ int32_t GetDelayTime(int32_t &delayTime)
 
 int32_t PlayPattern(const VibratorPattern &pattern)
 {
+    VibratorIdentifier identifier = {
+        .deviceId = -1,
+        .vibratorId = -1
+    };
+    return PlayPatternEnhanced(identifier, pattern);
+}
+
+int32_t PlayPatternEnhanced(const VibratorIdentifier identifier, const VibratorPattern &pattern)
+{
     auto &client = VibratorServiceClient::GetInstance();
-    int32_t ret = client.PlayPattern(pattern, g_usage, g_systemUsage, g_vibratorParameter);
-    g_usage = USAGE_UNKNOWN;
-    g_systemUsage = false;
-    g_vibratorParameter.intensity = INTENSITY_ADJUST_MAX;
-    g_vibratorParameter.frequency = 0;
+    VibratorEffectParameter vibratorEffectParameter = client.GetVibratorEffectParameter(identifier);
+    int32_t ret = client.PlayPattern(identifier, pattern, vibratorEffectParameter.usage,
+        vibratorEffectParameter.systemUsage, vibratorEffectParameter.vibratorParameter);
+    vibratorEffectParameter.vibratorParameter.intensity = INTENSITY_ADJUST_MAX;
+    vibratorEffectParameter.vibratorParameter.frequency = 0;
+    client.SetUsage(identifier, USAGE_UNKNOWN, false);
+    client.SetParameters(identifier, vibratorEffectParameter.vibratorParameter);
     if (ret != ERR_OK) {
         MISC_HILOGD("PlayPattern failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
@@ -254,28 +364,107 @@ int32_t FreeVibratorPackage(VibratorPackage &package)
 
 bool SetParameters(const VibratorParameter &parameter)
 {
+    VibratorIdentifier identifier = {
+        .deviceId = -1,
+        .vibratorId = -1
+    };
+    return SetParametersEnhanced(identifier, parameter);
+}
+
+bool SetParametersEnhanced(const VibratorIdentifier identifier, const VibratorParameter &parameter)
+{
     if ((parameter.intensity < INTENSITY_ADJUST_MIN) || (parameter.intensity > INTENSITY_ADJUST_MAX) ||
         (parameter.frequency < FREQUENCY_ADJUST_MIN) || (parameter.frequency > FREQUENCY_ADJUST_MAX)) {
         MISC_HILOGE("Input invalid, intensity parameter is %{public}d, frequency parameter is %{public}d",
             parameter.intensity, parameter.frequency);
         return false;
     }
-    g_vibratorParameter = parameter;
+    auto &client = VibratorServiceClient::GetInstance();
+    client.SetParameters(identifier, parameter);
     return true;
 }
 
 int32_t PlayPrimitiveEffect(const char *effectId, int32_t intensity)
 {
+    VibratorIdentifier identifier = {
+        .deviceId = -1,
+        .vibratorId = -1
+    };
+    return PlayPrimitiveEffectEnhanced(identifier, effectId, intensity);
+}
+
+int32_t PlayPrimitiveEffectEnhanced(const VibratorIdentifier identifier, const char *effectId, int32_t intensity)
+{
     MISC_HILOGD("Time delay measurement:start time");
     CHKPR(effectId, PARAMETER_ERROR);
     auto &client = VibratorServiceClient::GetInstance();
-    int32_t ret = client.PlayPrimitiveEffect(DEFAULT_VIBRATOR_ID, effectId, intensity,
-        g_usage, g_systemUsage, g_loopCount);
-    g_loopCount = 1;
-    g_usage = USAGE_UNKNOWN;
-    g_systemUsage = false;
+    VibratorEffectParameter vibratorEffectParameter = client.GetVibratorEffectParameter(identifier);
+    PrimitiveEffect primitiveEffect;
+    primitiveEffect.intensity = intensity;
+    primitiveEffect.usage = vibratorEffectParameter.usage;
+    primitiveEffect.systemUsage = vibratorEffectParameter.systemUsage;
+    primitiveEffect.count = vibratorEffectParameter.loopCount;
+    int32_t ret = client.PlayPrimitiveEffect(identifier, effectId, primitiveEffect);
+    client.SetUsage(identifier, USAGE_UNKNOWN, false);
+    client.SetLoopCount(identifier, 1);
     if (ret != ERR_OK) {
         MISC_HILOGD("Play primitive effect failed, ret:%{public}d", ret);
+        return NormalizeErrCode(ret);
+    }
+    return SUCCESS;
+}
+
+int32_t GetVibratorList(const VibratorIdentifier& identifier, std::vector<VibratorInfos>& vibratorInfo)
+{
+    CALL_LOG_ENTER;
+    CHKCR(&identifier, PARAMETER_ERROR, "Invalid parameters");
+    MISC_HILOGD("VibratorIdentifier = [deviceId = %{public}d, vibratorId = %{public}d]", identifier.deviceId,
+        identifier.vibratorId);
+    auto &client = VibratorServiceClient::GetInstance();
+    int32_t ret = client.GetVibratorList(identifier, vibratorInfo);
+    if (ret != ERR_OK) {
+        MISC_HILOGE("Get vibrator list failed, ret:%{public}d", ret);
+        return NormalizeErrCode(ret);
+    }
+    return SUCCESS;
+}
+
+int32_t GetEffectInfo(const VibratorIdentifier& identifier, const std::string& effectType, EffectInfo& effectInfo)
+{
+    CALL_LOG_ENTER;
+    CHKCR(&identifier, PARAMETER_ERROR, "Invalid parameters");
+    MISC_HILOGD("VibratorIdentifier = [deviceId = %{public}d, vibratorId = %{public}d]", identifier.deviceId,
+        identifier.vibratorId);
+    auto &client = VibratorServiceClient::GetInstance();
+    int32_t ret = client.GetEffectInfo(identifier, effectType, effectInfo);
+    if (ret != ERR_OK) {
+        effectInfo.isSupportEffect = false;
+        MISC_HILOGW("Get effect info failed, ret:%{public}d", ret);
+    }
+    return SUCCESS;
+}
+
+int32_t SubscribeVibratorPlug(const VibratorUser& user)
+{
+    CALL_LOG_ENTER;
+    CHKCR(user.callback, PARAMETER_ERROR, "Invalid parameters");
+    auto &client = VibratorServiceClient::GetInstance();
+    int32_t ret = client.SubscribeVibratorPlugInfo(&user);
+    if (ret != ERR_OK) {
+        MISC_HILOGE("SubscribeVibratorPlug failed, ret:%{public}d", ret);
+        return NormalizeErrCode(ret);
+    }
+    return SUCCESS;
+}
+
+int32_t UnSubscribeVibratorPlug(const VibratorUser& user)
+{
+    CALL_LOG_ENTER;
+    CHKCR(user.callback, PARAMETER_ERROR, "Invalid parameters");
+    auto &client = VibratorServiceClient::GetInstance();
+    int32_t ret = client.UnsubscribeVibratorPlugInfo(&user);
+    if (ret != ERR_OK) {
+        MISC_HILOGE("UnsubscribeVibratorPlugInfo failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
     return SUCCESS;

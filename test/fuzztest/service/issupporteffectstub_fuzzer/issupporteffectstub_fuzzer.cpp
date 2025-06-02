@@ -31,7 +31,7 @@ namespace Sensors {
 using namespace Security::AccessToken;
 using Security::AccessToken::AccessTokenID;
 namespace {
-constexpr size_t U32_AT_SIZE = 4;
+constexpr size_t U32_AT_SIZE = 12;
 auto g_service = MiscdeviceDelayedSpSingleton<MiscdeviceService>::GetInstance();
 const std::u16string VIBRATOR_INTERFACE_TOKEN = u"IMiscdeviceService";
 } // namespace
@@ -80,8 +80,11 @@ bool OnRemoteRequestFuzzTest(const uint8_t *data, size_t size)
     size_t startPos = 0;
     std::string effect = "";
     bool state = false;
+    VibratorIdentifierIPC identifier;
+    startPos += GetObject<int32_t>(data + startPos, size - startPos, identifier.deviceId);
+    startPos += GetObject<int32_t>(data + startPos, size - startPos, identifier.vibratorId);
     GetObject<bool>(data + startPos, size - startPos, state);
-    g_service->IsSupportEffect(effect, state);
+    g_service->IsSupportEffect(identifier, effect, state);
     return true;
 }
 } // namespace Sensors

@@ -50,13 +50,13 @@ int32_t VibratorHdiConnection::ConnectHdi()
     return ret;
 }
 
-int32_t VibratorHdiConnection::StartOnce(uint32_t duration)
+int32_t VibratorHdiConnection::StartOnce(const VibratorIdentifierIPC &identifier, uint32_t duration)
 {
     CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "StartOnce");
 #endif // HIVIEWDFX_HITRACE_ENABLE
-    int32_t ret = iVibratorHdiConnection_->StartOnce(duration);
+    int32_t ret = iVibratorHdiConnection_->StartOnce(identifier, duration);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
 #endif // HIVIEWDFX_HITRACE_ENABLE
@@ -67,13 +67,13 @@ int32_t VibratorHdiConnection::StartOnce(uint32_t duration)
     return ERR_OK;
 }
 
-int32_t VibratorHdiConnection::Start(const std::string &effectType)
+int32_t VibratorHdiConnection::Start(const VibratorIdentifierIPC &identifier, const std::string &effectType)
 {
     CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "Start");
 #endif // HIVIEWDFX_HITRACE_ENABLE
-    int32_t ret = iVibratorHdiConnection_->Start(effectType);
+    int32_t ret = iVibratorHdiConnection_->Start(identifier, effectType);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
 #endif // HIVIEWDFX_HITRACE_ENABLE
@@ -86,13 +86,14 @@ int32_t VibratorHdiConnection::Start(const std::string &effectType)
 
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-int32_t VibratorHdiConnection::EnableCompositeEffect(const HdfCompositeEffect &hdfCompositeEffect)
+int32_t VibratorHdiConnection::EnableCompositeEffect(const VibratorIdentifierIPC &identifier,
+    const HdfCompositeEffect &hdfCompositeEffect)
 {
     CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "EnableCompositeEffect");
 #endif // HIVIEWDFX_HITRACE_ENABLE
-    int32_t ret = iVibratorHdiConnection_->EnableCompositeEffect(hdfCompositeEffect);
+    int32_t ret = iVibratorHdiConnection_->EnableCompositeEffect(identifier, hdfCompositeEffect);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
 #endif // HIVIEWDFX_HITRACE_ENABLE
@@ -103,14 +104,15 @@ int32_t VibratorHdiConnection::EnableCompositeEffect(const HdfCompositeEffect &h
     return ERR_OK;
 }
 
-bool VibratorHdiConnection::IsVibratorRunning()
+bool VibratorHdiConnection::IsVibratorRunning(const VibratorIdentifierIPC &identifier)
 {
     CHKPR(iVibratorHdiConnection_, false);
-    return iVibratorHdiConnection_->IsVibratorRunning();
+    return iVibratorHdiConnection_->IsVibratorRunning(identifier);
 }
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
-std::optional<HdfEffectInfo> VibratorHdiConnection::GetEffectInfo(const std::string &effect)
+std::optional<HdfEffectInfo> VibratorHdiConnection::GetEffectInfo(const VibratorIdentifierIPC &identifier,
+    const std::string &effect)
 {
     if (iVibratorHdiConnection_ == nullptr) {
         MISC_HILOGE("Connect hdi failed");
@@ -119,20 +121,20 @@ std::optional<HdfEffectInfo> VibratorHdiConnection::GetEffectInfo(const std::str
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "GetEffectInfo");
 #endif // HIVIEWDFX_HITRACE_ENABLE
-    std::optional<HdfEffectInfo> ret = iVibratorHdiConnection_->GetEffectInfo(effect);
+    std::optional<HdfEffectInfo> ret = iVibratorHdiConnection_->GetEffectInfo(identifier, effect);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
 #endif // HIVIEWDFX_HITRACE_ENABLE
     return ret;
 }
 
-int32_t VibratorHdiConnection::Stop(HdfVibratorMode mode)
+int32_t VibratorHdiConnection::Stop(const VibratorIdentifierIPC &identifier, HdfVibratorMode mode)
 {
     CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "Stop");
 #endif // HIVIEWDFX_HITRACE_ENABLE
-    int32_t ret = iVibratorHdiConnection_->Stop(mode);
+    int32_t ret = iVibratorHdiConnection_->Stop(identifier, mode);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
 #endif // HIVIEWDFX_HITRACE_ENABLE
@@ -144,22 +146,22 @@ int32_t VibratorHdiConnection::Stop(HdfVibratorMode mode)
 }
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
 
-int32_t VibratorHdiConnection::GetDelayTime(int32_t mode, int32_t &delayTime)
+int32_t VibratorHdiConnection::GetDelayTime(const VibratorIdentifierIPC &identifier, int32_t mode, int32_t &delayTime)
 {
     CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
-    return iVibratorHdiConnection_->GetDelayTime(mode, delayTime);
+    return iVibratorHdiConnection_->GetDelayTime(identifier, mode, delayTime);
 }
 
-int32_t VibratorHdiConnection::GetVibratorCapacity(VibratorCapacity &capacity)
+int32_t VibratorHdiConnection::GetVibratorCapacity(const VibratorIdentifierIPC &identifier, VibratorCapacity &capacity)
 {
     CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
-    return iVibratorHdiConnection_->GetVibratorCapacity(capacity);
+    return iVibratorHdiConnection_->GetVibratorCapacity(identifier, capacity);
 }
     
-int32_t VibratorHdiConnection::PlayPattern(const VibratePattern &pattern)
+int32_t VibratorHdiConnection::PlayPattern(const VibratorIdentifierIPC &identifier, const VibratePattern &pattern)
 {
     CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
-    return iVibratorHdiConnection_->PlayPattern(pattern);
+    return iVibratorHdiConnection_->PlayPattern(identifier, pattern);
 }
 
 int32_t VibratorHdiConnection::DestroyHdiConnection()
@@ -173,13 +175,14 @@ int32_t VibratorHdiConnection::DestroyHdiConnection()
     return ERR_OK;
 }
 
-int32_t VibratorHdiConnection::StartByIntensity(const std::string &effect, int32_t intensity)
+int32_t VibratorHdiConnection::StartByIntensity(const VibratorIdentifierIPC &identifier, const std::string &effect,
+    int32_t intensity)
 {
     CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "StartByIntensity");
 #endif // HIVIEWDFX_HITRACE_ENABLE
-    int32_t ret = iVibratorHdiConnection_->StartByIntensity(effect, intensity);
+    int32_t ret = iVibratorHdiConnection_->StartByIntensity(identifier, effect, intensity);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
 #endif // HIVIEWDFX_HITRACE_ENABLE
@@ -191,12 +194,55 @@ int32_t VibratorHdiConnection::StartByIntensity(const std::string &effect, int32
 }
 
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
-int32_t VibratorHdiConnection::GetAllWaveInfo(std::vector<HdfWaveInformation> &waveInfos)
+int32_t VibratorHdiConnection::GetVibratorInfo(std::vector<HdfVibratorInfo> &hdfVibratorInfo)
 {
     CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
-    return iVibratorHdiConnection_->GetAllWaveInfo(waveInfos);
+    return iVibratorHdiConnection_->GetVibratorInfo(hdfVibratorInfo);
+}
+
+int32_t VibratorHdiConnection::GetAllWaveInfo(const VibratorIdentifierIPC &identifier,
+    std::vector<HdfWaveInformation> &waveInfos)
+{
+    CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
+    return iVibratorHdiConnection_->GetAllWaveInfo(identifier, waveInfos);
+}
+
+int32_t VibratorHdiConnection::GetVibratorList(const VibratorIdentifierIPC &identifier,
+    std::vector<HdfVibratorInfo> &vibratorInfo)
+{
+    CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
+    return iVibratorHdiConnection_->GetVibratorList(identifier, vibratorInfo);
+}
+
+int32_t VibratorHdiConnection::GetEffectInfo(const VibratorIdentifierIPC &identifier, const std::string &effectType,
+    HdfEffectInfo &effectInfo)
+{
+    CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
+    return iVibratorHdiConnection_->GetEffectInfo(identifier, effectType, effectInfo);
 }
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
 
+int32_t VibratorHdiConnection::RegisterVibratorPlugCallback(DevicePlugCallback cb)
+{
+    CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
+#ifdef HIVIEWDFX_HITRACE_ENABLE
+    StartTrace(HITRACE_TAG_SENSORS, "RegisterVibratorPlugCallback");
+#endif // HIVIEWDFX_HITRACE_ENABLE
+    int32_t ret = iVibratorHdiConnection_->RegisterVibratorPlugCallback(cb);
+#ifdef HIVIEWDFX_HITRACE_ENABLE
+    FinishTrace(HITRACE_TAG_SENSORS);
+#endif // HIVIEWDFX_HITRACE_ENABLE
+    if (ret != 0) {
+        MISC_HILOGE("RegisterVibratorPlugCallback failed");
+        return VIBRATOR_ON_ERR;
+    }
+    return ERR_OK;
+}
+
+DevicePlugCallback VibratorHdiConnection::GetVibratorPlugCb()
+{
+    CHKPP(iVibratorHdiConnection_);
+    return NULL;
+}
 }  // namespace Sensors
 }  // namespace OHOS
