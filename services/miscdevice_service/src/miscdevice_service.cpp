@@ -1537,7 +1537,6 @@ bool MiscdeviceService::UpdateVibratorAllInfo(const VibratorIdentifierIPC &ident
     ret = vibratorHdiConnection_.GetAllWaveInfo(identifier, waveInfo);
     if (ret != NO_ERROR) {
         MISC_HILOGE("HDI::GetAllWaveInfo return error");
-        return false;
     }
     (void)ConvertToServerInfos(baseInfo, vibratorCapacity, waveInfo, info, vibratorAllInfos);
     devicesManageMap_.insert(std::make_pair(identifier.deviceId, vibratorAllInfos));
@@ -1593,7 +1592,6 @@ void MiscdeviceService::GetLocalVibratorInfo()
     ret = vibratorHdiConnection_.GetAllWaveInfo(param, waveInfo);
     if (ret != NO_ERROR) {
         MISC_HILOGE("Get local waveInfo fail");
-        return;
     }
     std::vector<int> vibratorIdList;
     for (auto &value : localInfo) {
