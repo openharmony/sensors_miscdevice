@@ -45,7 +45,8 @@
         "os_account",
         "safwk",
         "samgr",
-        "cJSON"
+        "cJSON",
+        "runtime_core"
       ],
       "third_party": [
       ]
@@ -55,6 +56,7 @@
         "base_group": [],
         "fwk_group": [
           "//base/sensors/miscdevice/frameworks/js/napi:vibrator_js_target",
+          "//base/sensors/miscdevice/frameworks/js/ani:vibrator_ani_target",
           "//base/sensors/miscdevice/frameworks/cj:vibrator_cj_target",
           "//base/sensors/miscdevice/frameworks/native/vibrator:vibrator_target",
           "//base/sensors/miscdevice/frameworks/native/light:light_target",
