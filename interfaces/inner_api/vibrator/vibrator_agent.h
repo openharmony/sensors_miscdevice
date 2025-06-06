@@ -193,7 +193,7 @@ int32_t SeekTimeOnPackage(int32_t seekTime, const VibratorPackage &completePacka
  * @param beforeModulationPackage: Weaveform to be modulated.
  * @param afterModulationPackage: Result weaveform after modulation.
  * @return 0 indicates success, otherwise indicates failure.
- * @since 19
+ * @since 20
  */
 int32_t ModulatePackage(const VibratorCurvePoint* modulationCurve, const int32_t curvePointNum, const int32_t duration,
     const VibratorPackage &beforeModulationPackage, VibratorPackage &afterModulationPackage);

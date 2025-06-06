@@ -56,12 +56,12 @@ struct VibratorDecodeHandle {
     }
 };
 
-typedef struct VibratorCurveInterval {
+struct VibratorCurveInterval {
     int32_t beginTime;
     int32_t endTime;
     int32_t intensity;
     int32_t frequency;
-} VibratorCurveInterval;
+};
 
 class VibratorServiceClient : public Singleton<VibratorServiceClient> {
 public:

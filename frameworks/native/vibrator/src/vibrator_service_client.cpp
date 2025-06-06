@@ -14,13 +14,14 @@
  */
 
 #include "vibrator_service_client.h"
-#include "securec.h"
 
 #include <algorithm>
 #include <vector>
 #include <set>
 #include <climits>
 #include <thread>
+
+#include "securec.h"
 
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
 #include "hisysevent.h"
@@ -961,7 +962,7 @@ void VibratorServiceClient::FreePartiallyAllocatedVibratorPatterns(VibratorPatte
         MISC_HILOGW("FreePartiallyAllocatedVibratorPatterns failed because patterns is null");
         return;
     }
-    for (int32_t i = partialIdx; i >= 0 ; i--) {
+    for (int32_t i = partialIdx; i >= 0; i--) {
         VibratorServiceClient::FreePartiallyAllocatedVibratorEvents(patterns[i].events, patterns[i].eventNum - 1);
         patterns[i].events = nullptr;
     }
@@ -975,7 +976,7 @@ void VibratorServiceClient::FreePartiallyAllocatedVibratorEvents(VibratorEvent*&
         MISC_HILOGW("FreePartiallyAllocatedVibratorEvents failed because events is null");
         return;
     }
-    for (int32_t i = partialIdx; i >= 0 ; i--) {
+    for (int32_t i = partialIdx; i >= 0; i--) {
         free(events[i].points);
         events[i].points = nullptr;
     }
