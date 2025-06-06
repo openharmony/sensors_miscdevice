@@ -15,8 +15,13 @@
 
 #include "vibrator_service_client.h"
 
+#include <algorithm>
+#include <vector>
+#include <set>
 #include <climits>
 #include <thread>
+
+#include "securec.h"
 
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
 #include "hisysevent.h"
@@ -37,6 +42,13 @@
 namespace OHOS {
 namespace Sensors {
 static constexpr int32_t MIN_VIBRATOR_EVENT_TIME = 100;
+static constexpr int32_t FREQUENCY_UPPER_BOUND = 100;
+static constexpr int32_t FREQUENCY_LOWER_BOUND = -100;
+static constexpr int32_t INTENSITY_UPPERBOUND = 100;
+static constexpr int32_t INTENSITY_LOWERBOUND = 0;
+constexpr int32_t CURVE_FREQUENCY_NO_MODIFICATION = 0;
+constexpr int32_t CURVE_INTENSITY_NO_MODIFICATION = 100;
+constexpr int32_t CURVE_TIME_NO_MODIFICATION = 0;
 using namespace OHOS::HiviewDFX;
 
 namespace {
@@ -871,6 +883,319 @@ void VibratorServiceClient::ConvertVibratorPattern(const VibratorPattern &vibrat
             vibrateEvent.points.emplace_back(vibrateCurvePoint);
         }
         vibratePattern.events.emplace_back(vibrateEvent);
+    }
+}
+
+int32_t VibratorServiceClient::ModulatePackage(const VibratorEvent &modulationCurve,
+    const VibratorPackage &beforeModulationPackage, VibratorPackage &afterModulationPackage)
+{
+    if (beforeModulationPackage.patternNum <= 0 || beforeModulationPackage.patterns == nullptr) {
+        MISC_HILOGE("ModulatePackage failed: patternNum is less than 0 or patterns is null");
+        return ERROR;
+    }
+    if (modulationCurve.time < 0 || modulationCurve.duration < 0 || modulationCurve.pointNum <= 0
+        || modulationCurve.points == nullptr) {
+        MISC_HILOGE("ModulatePackage failed: invalid modulationCurve");
+        return ERROR;
+    }
+    afterModulationPackage = beforeModulationPackage;
+    afterModulationPackage.patterns = nullptr;
+    VibratorPattern *vibratePattern = nullptr;
+    vibratePattern = (VibratorPattern *)malloc(beforeModulationPackage.patternNum * sizeof(VibratorPattern));
+    if (vibratePattern == nullptr) {
+        MISC_HILOGE("ModulatePackage failed: failure of memory allocation for VibratePattern");
+        return ERROR;
+    }
+    for (int32_t i = 0; i < beforeModulationPackage.patternNum; i++) {
+        const VibratorPattern &beforeModPattern = beforeModulationPackage.patterns[i];
+        VibratorPattern &afterModPattern = vibratePattern[i];
+        afterModPattern.events = nullptr;
+        if (VibratorServiceClient::ModulateVibratorPattern(
+            modulationCurve, beforeModPattern, afterModPattern) != ERR_OK) {
+            MISC_HILOGE("ModulatePackage failed: failure of ModulateVibratorPattern");
+            VibratorServiceClient::FreePartiallyAllocatedVibratorPatterns(vibratePattern, i);
+            return ERROR;
+        }
+    }
+    afterModulationPackage.patterns = vibratePattern;
+    return ERR_OK;
+}
+
+/**
+ * fields 'time' in VibratorPattern,VibratorEvent and VibratorCurvePoint is shown in following figure
+ *        |--------------------------------|-------------------------|-------------------------|----------------
+ *   VibratorPattern.time          when event happens     when curve point 1 happens    when curve point 2 happens
+ *        |<-------VibratorEvent.time----->|
+ *                                                                   |<--curvePoint 1's time-->|
+ *                                                                    (VibratorCurvePoint.time)
+ */
+int32_t VibratorServiceClient::ModulateVibratorPattern(const VibratorEvent &modulationCurve,
+    const VibratorPattern &beforeModulationPattern, VibratorPattern &afterModulationPattern)
+{
+    if (beforeModulationPattern.eventNum <= 0 || beforeModulationPattern.events == nullptr) {
+        MISC_HILOGE("ModulatePackage failed due to invalid parameter");
+        return ERROR;
+    }
+    VibratorEvent* eventsAfterMod = (VibratorEvent*)malloc(beforeModulationPattern.eventNum * sizeof(VibratorEvent));
+    if (eventsAfterMod == nullptr) {
+        MISC_HILOGE("ModulatePackage failed due to failure of memory allocation for VibratorEvent");
+        return ERROR;
+    }
+    for (int i = 0; i < beforeModulationPattern.eventNum; i++) {
+        eventsAfterMod[i].points = nullptr;
+        if (VibratorServiceClient::ModulateVibratorEvent(modulationCurve, beforeModulationPattern.time,
+            beforeModulationPattern.events[i], eventsAfterMod[i]) != ERR_OK) {
+            MISC_HILOGE("ModulatePackage failed due to failure of handling VibrateEvent");
+            VibratorServiceClient::FreePartiallyAllocatedVibratorEvents(eventsAfterMod, i);
+            afterModulationPattern.events = nullptr;
+            return ERROR;
+        }
+    }
+    afterModulationPattern = beforeModulationPattern;
+    afterModulationPattern.events = eventsAfterMod;
+    return ERR_OK;
+}
+
+void VibratorServiceClient::FreePartiallyAllocatedVibratorPatterns(VibratorPattern*& patterns, const int32_t partialIdx)
+{
+    if (patterns == nullptr) {
+        MISC_HILOGW("FreePartiallyAllocatedVibratorPatterns failed because patterns is null");
+        return;
+    }
+    for (int32_t i = partialIdx; i >= 0; i--) {
+        VibratorServiceClient::FreePartiallyAllocatedVibratorEvents(patterns[i].events, patterns[i].eventNum - 1);
+        patterns[i].events = nullptr;
+    }
+    free(patterns);
+    patterns = nullptr;
+}
+
+void VibratorServiceClient::FreePartiallyAllocatedVibratorEvents(VibratorEvent*& events, const int32_t partialIdx)
+{
+    if (events == nullptr) {
+        MISC_HILOGW("FreePartiallyAllocatedVibratorEvents failed because events is null");
+        return;
+    }
+    for (int32_t i = partialIdx; i >= 0; i--) {
+        free(events[i].points);
+        events[i].points = nullptr;
+    }
+    free(events);
+    events = nullptr;
+}
+
+int32_t VibratorServiceClient::ModulateVibratorEvent(const VibratorEvent &modulationCurve, const int patternStartTime,
+    const VibratorEvent &beforeModulationEvent, VibratorEvent &afterModulationEvent)
+{
+    if (beforeModulationEvent.type != EVENT_TYPE_CONTINUOUS) {
+        return VibratorServiceClient::CopyNonContinuousVibratorEvent(beforeModulationEvent, afterModulationEvent);
+    }
+    VibratorCurvePoint* curvePoints = nullptr;
+    if (beforeModulationEvent.pointNum <= 0 || beforeModulationEvent.points == nullptr) {
+        // For VibratorEvent with VibratorEvent::type == EVENT_TYPE_CONTINUOUS, at lease one VibratorCurvePoint
+        // shoule be assigned to VibratorEvent::points for subsequent process
+        curvePoints = (VibratorCurvePoint*)malloc(sizeof(VibratorCurvePoint));
+        if (curvePoints == nullptr) {
+            MISC_HILOGE("ModulateVibratorEvent failed: failed to allocate memory for VibratorCurvePoint");
+            return ERROR;
+        }
+        curvePoints->frequency = CURVE_FREQUENCY_NO_MODIFICATION;
+        curvePoints->intensity = CURVE_INTENSITY_NO_MODIFICATION;
+        curvePoints->time = CURVE_TIME_NO_MODIFICATION;
+    }
+    VibratorEvent beforeModulationEventCopy = beforeModulationEvent;
+    if (beforeModulationEventCopy.pointNum == 0 || beforeModulationEventCopy.points == nullptr) {
+        beforeModulationEventCopy.points = curvePoints;
+        beforeModulationEventCopy.pointNum = 1;
+    }
+    if (VibratorServiceClient::ModulateContinuousVibratorEvent(
+        modulationCurve, patternStartTime, beforeModulationEventCopy, afterModulationEvent) != ERR_OK) {
+        MISC_HILOGE("ModulateVibratorEvent failed due to failure of ModulateContinuousVibratorEvent");
+        free(curvePoints);
+        curvePoints = nullptr;
+        return ERROR;
+    }
+    free(curvePoints);
+    curvePoints = nullptr;
+    return ERR_OK;
+}
+
+int32_t VibratorServiceClient::CopyNonContinuousVibratorEvent(const VibratorEvent &event, VibratorEvent &eventCopy)
+{
+    eventCopy = event;
+    if (event.pointNum <= 0 || event.points == nullptr) {
+        eventCopy.pointNum = 0;
+        eventCopy.points = nullptr;
+        return ERR_OK;
+    }
+    int32_t curveMemSize = event.pointNum * sizeof(VibratorCurvePoint);
+    VibratorCurvePoint* curvePointsCopy = (VibratorCurvePoint*)malloc(curveMemSize);
+    if (curvePointsCopy == nullptr) {
+        MISC_HILOGE("ModulateVibratorEvent failed: failed to allocate memory for VibratorCurvePoint");
+        return ERROR;
+    }
+    if (memcpy_s(curvePointsCopy, curveMemSize, event.points, curveMemSize) != 0) {
+        free(curvePointsCopy);
+        curvePointsCopy = nullptr;
+        MISC_HILOGE("ModulateVibratorEvent failed: failed to memcpy for VibratorCurvePoint");
+        return ERROR;
+    }
+    eventCopy.points = curvePointsCopy;
+    return ERR_OK;
+}
+
+// absoluteTime = VibratorPattern::time + VibratorEvent::time + VibratorCurvePoint::time
+int32_t VibratorServiceClient::ModulateContinuousVibratorEvent(const VibratorEvent &modulationCurve,
+    const int patternStartTime, const VibratorEvent &beforeModulationEvent, VibratorEvent &afterModulationEvent)
+{
+    std::vector<VibratorCurveInterval> currentInterval;
+    std::vector<VibratorCurveInterval> modInterval;
+    VibratorServiceClient::ConvertVibratorEventsToCurveIntervals(beforeModulationEvent,
+        patternStartTime, currentInterval);
+    VibratorServiceClient::ConvertVibratorEventsToCurveIntervals(modulationCurve, 0, modInterval);
+    std::set<int32_t> intervalEdges;
+    for (auto iter = currentInterval.begin(); iter != currentInterval.end() ; iter++) {
+        intervalEdges.insert(iter->beginTime);
+        intervalEdges.insert(iter->endTime);
+    }
+    for (auto iter = modInterval.begin(); iter != modInterval.end() ; iter++) {
+        intervalEdges.insert(iter->beginTime);
+        intervalEdges.insert(iter->endTime);
+    }
+    VibratorCurvePoint* curvePoints = nullptr;
+    int32_t curveNum = 0;
+    if (VibratorServiceClient::GetCurveListAfterModulation(intervalEdges, currentInterval, modInterval,
+        patternStartTime + beforeModulationEvent.time, curvePoints, curveNum) != ERR_OK) {
+        MISC_HILOGE("ModulateContinuousVibratorEvent failed due to failure of GetCurveListAfterModulation");
+        return ERROR;
+    }
+    afterModulationEvent = beforeModulationEvent;
+    afterModulationEvent.points = curvePoints;
+    afterModulationEvent.pointNum = curveNum;
+    return ERR_OK;
+}
+
+int32_t VibratorServiceClient::GetCurveListAfterModulation(const std::set<int32_t>& intervalEdges,
+    const std::vector<VibratorCurveInterval>& currentInterval, const std::vector<VibratorCurveInterval>& modInterval,
+    const int offset, VibratorCurvePoint*& curve, int32_t& curveNum)
+{
+    // There are atmost (modulationCurve.pointNum + beforeModulationEvent.pointNum + 1)
+    // VibratorCurvePoints after modulation
+    VibratorCurvePoint* curvePoints = (VibratorCurvePoint*)malloc(
+        sizeof(VibratorCurvePoint) * (currentInterval.size() + modInterval.size() + 1));
+    if (curvePoints == nullptr) {
+        MISC_HILOGE("ModulateVibratorEvent failed due to failure of memory allocation for VibratorCurvePoint");
+        return ERROR;
+    }
+    int32_t curvePointsIdx = 0;
+    const int32_t originalEventStartTime = currentInterval.begin()->beginTime;
+    const int32_t originalEventEndTime = currentInterval.rbegin()->endTime;
+    const int32_t modEventStartTime = modInterval.begin()->beginTime;
+    int32_t originalIdx = 0;
+    int32_t modIdx = 0;
+    int32_t pointStartTime = originalEventStartTime;
+    for (auto iter = intervalEdges.begin(); iter != intervalEdges.end(); iter++) {
+        int32_t edge = *iter;
+        if (edge <= originalEventStartTime) {
+            continue;
+        }
+        if (edge > originalEventEndTime) {
+            break;
+        }
+        if (!VibratorServiceClient::BinarySearchInterval(currentInterval, edge, originalIdx)) {
+            MISC_HILOGE("ModulateContinuousVibratorEvent failed due to failure of BinarySearchInterval");
+            free(curvePoints);
+            curvePoints = nullptr;
+            return ERROR;
+        }
+        VibratorCurvePoint& currentPoint = curvePoints[curvePointsIdx++];
+        if (edge <= modEventStartTime || !VibratorServiceClient::BinarySearchInterval(modInterval, edge, modIdx)) {
+            currentPoint.frequency = currentInterval[originalIdx].frequency;
+            currentPoint.intensity = currentInterval[originalIdx].intensity;
+        } else {
+            VibratorServiceClient::ModulateSingleCurvePoint(
+                modInterval[modIdx], currentInterval[originalIdx], currentPoint);
+        }
+        currentPoint.time = pointStartTime - offset;
+        pointStartTime = edge;
+    }
+    curve = curvePoints;
+    curveNum = curvePointsIdx;
+    return ERR_OK;
+}
+
+bool VibratorServiceClient::BinarySearchInterval(
+    const std::vector<VibratorCurveInterval>& interval, const int32_t val, int32_t& idx)
+{
+    if (val < interval.begin()->beginTime || val > interval.rbegin()->endTime) {
+        return false;
+    }
+    if (val >= interval.begin()->beginTime && val <= interval.begin()->endTime) {
+        idx = 0;
+        return true;
+    }
+    int32_t headIdx = 0;
+    int32_t tailIdx = interval.size() - 1;
+    while (tailIdx - headIdx > 1) {
+        int32_t middleIdx = ((tailIdx - headIdx) / 2) + headIdx;
+        if (interval[middleIdx].endTime < val) {
+            headIdx = middleIdx;
+        } else {
+            tailIdx = middleIdx;
+        }
+    }
+    idx = tailIdx;
+    return true;
+}
+
+void VibratorServiceClient::ConvertVibratorEventsToCurveIntervals(
+    const VibratorEvent &vibratorEvent, const int patternTimeOffset, std::vector<VibratorCurveInterval>& curveInterval)
+{
+    int32_t fullOffset = patternTimeOffset + vibratorEvent.time;
+    const VibratorCurvePoint* curvePoints = vibratorEvent.points;
+    for (int32_t i = 0; i < vibratorEvent.pointNum; i++) {
+        if (curvePoints[i].time < vibratorEvent.duration) {
+            int32_t beginTime = fullOffset + curvePoints[i].time;
+            int32_t endTime = fullOffset + ((i + 1) < vibratorEvent.pointNum ?
+                std::min(curvePoints[i + 1].time, vibratorEvent.duration) : vibratorEvent.duration);
+            int32_t frequency = curvePoints[i].frequency;
+            int32_t intensity = curvePoints[i].intensity;
+            curveInterval.emplace_back(VibratorCurveInterval{
+                .beginTime = beginTime, .endTime = endTime, .intensity = intensity, .frequency = frequency});
+        } else {
+            break;
+        }
+    }
+}
+
+void VibratorServiceClient::ModulateSingleCurvePoint(const VibratorCurveInterval &modulationInterval,
+    const VibratorCurveInterval &originalInterval, VibratorCurvePoint& point)
+{
+    point.frequency = VibratorServiceClient::RestrictFrequencyRange(
+        modulationInterval.frequency + originalInterval.frequency);
+    point.intensity = VibratorServiceClient::RestrictIntensityRange(
+        modulationInterval.intensity * originalInterval.intensity / (INTENSITY_UPPERBOUND - INTENSITY_LOWERBOUND));
+}
+
+int32_t VibratorServiceClient::RestrictFrequencyRange(int32_t frequency)
+{
+    if (frequency > FREQUENCY_UPPER_BOUND) {
+        return FREQUENCY_UPPER_BOUND;
+    } else if (frequency < FREQUENCY_LOWER_BOUND) {
+        return FREQUENCY_LOWER_BOUND;
+    } else {
+        return frequency;
+    }
+}
+
+int32_t VibratorServiceClient::RestrictIntensityRange(int32_t intensity)
+{
+    if (intensity > INTENSITY_UPPERBOUND) {
+        return INTENSITY_UPPERBOUND;
+    } else if (intensity < INTENSITY_LOWERBOUND) {
+        return INTENSITY_LOWERBOUND;
+    } else {
+        return intensity;
     }
 }
 

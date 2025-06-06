@@ -38,4 +38,10 @@
             <option name="push" value="json_file/test_128_event.json -> /data/test/vibrator" src="res"/>
         </preparer>
     </target>
+    <target name="VibratorAgentModulationTest">
+        <preparer>
+            <option name="push" value="json_file/modulation_curve.json -> /data/test/vibrator" src="res"/>
+            <option name="push" value="json_file/package_before_modulation.json -> /data/test/vibrator" src="res"/>
+        </preparer>
+    </target>
 </configuration>

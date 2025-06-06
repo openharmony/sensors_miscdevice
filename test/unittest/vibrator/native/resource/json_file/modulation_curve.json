@@ -1,0 +1,146 @@
+{
+    "MetaData": {
+        "Create": "2025-01-14",
+        "Description": "a modulation curve testcase",
+        "Version": 1.0,
+        "ChannelNumber": 1
+    },
+    "Channels": [
+        {
+            "Parameters": {
+                "Index": 0
+            },
+            "Pattern": [
+                {
+                    "Event": {
+                        "Type": "continuous",
+                        "StartTime": 0,
+                        "Duration": 30,
+                        "Parameters": {
+                            "Frequency": 0,
+                            "Intensity": 0,
+                            "Curve": [
+                                {
+                                    "Time": 0,
+                                    "Frequency": 0,
+                                    "Intensity": 0
+                                },
+                                {
+                                    "Time": 10,
+                                    "Frequency": -10,
+                                    "Intensity": 0.15
+                                },
+                                {
+                                    "Time": 15,
+                                    "Frequency": -10,
+                                    "Intensity": 0.25
+                                },
+                                {
+                                    "Time": 20,
+                                    "Frequency": -10,
+                                    "Intensity": 0.35
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Event": {
+                        "Type": "continuous",
+                        "StartTime": 410,
+                        "Duration": 254,
+                        "Parameters": {
+                            "Frequency": 30,
+                            "Intensity": 38,
+                            "Curve": [
+                                {
+                                    "Time": 0,
+                                    "Frequency": -10,
+                                    "Intensity": 0.17
+                                },
+                                {
+                                    "Time": 100,
+                                    "Frequency": 10,
+                                    "Intensity": 1
+                                },
+                                {
+                                    "Time": 150,
+                                    "Frequency": 10,
+                                    "Intensity": 0.5
+                                },
+                                {
+                                    "Time": 210,
+                                    "Frequency": -20,
+                                    "Intensity": 0.89
+                                },
+                                {
+                                    "Time": 234,
+                                    "Frequency": 20,
+                                    "Intensity": 0.77
+                                },
+                                {
+                                    "Time": 254,
+                                    "Frequency": 20,
+                                    "Intensity": 0
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Event": {
+                        "Type": "continuous",
+                        "StartTime": 940,
+                        "Duration": 300,
+                        "Parameters": {
+                            "Frequency": 30,
+                            "Intensity": 38,
+                            "Curve": [
+                                {
+                                    "Time": 0,
+                                    "Frequency": 20,
+                                    "Intensity": 0.1
+                                },
+                                {
+                                    "Time": 20,
+                                    "Frequency": -30,
+                                    "Intensity": 0.2
+                                },
+                                {
+                                    "Time": 80,
+                                    "Frequency": 40,
+                                    "Intensity": 0.3
+                                },
+                                {
+                                    "Time": 100,
+                                    "Frequency": -50,
+                                    "Intensity": 0.4
+                                },
+                                {
+                                    "Time": 150,
+                                    "Frequency": 20,
+                                    "Intensity": 0.6
+                                },
+                                {
+                                    "Time": 200,
+                                    "Frequency": -30,
+                                    "Intensity": 0.7
+                                },
+                                {
+                                    "Time": 240,
+                                    "Frequency": 40,
+                                    "Intensity": 0.8
+                                },
+                                {
+                                    "Time": 280,
+                                    "Frequency": -50,
+                                    "Intensity": 0.9
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

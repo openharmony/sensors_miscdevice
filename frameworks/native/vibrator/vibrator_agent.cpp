@@ -92,7 +92,7 @@ int32_t StartVibratorEnhanced(const VibratorIdentifier identifier, const char *e
     client.SetUsage(identifier, USAGE_UNKNOWN, false);
     client.SetLoopCount(identifier, 1);
     if (ret != ERR_OK) {
-        MISC_HILOGD("Vibrate effectId failed, ret:%{public}d", ret);
+        MISC_HILOGE("Vibrate effectId failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
     return SUCCESS;
@@ -119,7 +119,7 @@ int32_t StartVibratorOnceEnhanced(const VibratorIdentifier identifier, int32_t d
         vibratorEffectParameter.systemUsage);
     client.SetUsage(identifier, USAGE_UNKNOWN, false);
     if (ret != ERR_OK) {
-        MISC_HILOGD("Vibrate duration failed, ret:%{public}d", ret);
+        MISC_HILOGE("Vibrate duration failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
     return SUCCESS;
@@ -172,7 +172,7 @@ int32_t PlayVibratorCustomEnhanced(const VibratorIdentifier identifier, int32_t 
     client.SetUsage(identifier, USAGE_UNKNOWN, false);
     client.SetParameters(identifier, vibratorEffectParameter.vibratorParameter);
     if (ret != ERR_OK) {
-        MISC_HILOGD("PlayVibratorCustom failed, ret:%{public}d", ret);
+        MISC_HILOGE("PlayVibratorCustom failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
     return SUCCESS;
@@ -201,7 +201,7 @@ int32_t StopVibratorEnhanced(const VibratorIdentifier identifier, const char *mo
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.StopVibrator(identifier, mode);
     if (ret != ERR_OK) {
-        MISC_HILOGD("StopVibrator by mode failed, ret:%{public}d, mode:%{public}s", ret, mode);
+        MISC_HILOGE("StopVibrator by mode failed, ret:%{public}d, mode:%{public}s", ret, mode);
         return NormalizeErrCode(ret);
     }
     return SUCCESS;
@@ -221,7 +221,7 @@ int32_t CancelEnhanced(const VibratorIdentifier identifier)
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.StopVibrator(identifier);
     if (ret != ERR_OK) {
-        MISC_HILOGD("StopVibrator failed, ret:%{public}d", ret);
+        MISC_HILOGE("StopVibrator failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
     return SUCCESS;
@@ -277,7 +277,7 @@ int32_t IsSupportEffectEnhanced(const VibratorIdentifier identifier, const char 
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.IsSupportEffect(identifier, effectId, *state);
     if (ret != ERR_OK) {
-        MISC_HILOGD("Query effect support failed, ret:%{public}d, effectId:%{public}s", ret, effectId);
+        MISC_HILOGE("Query effect support failed, ret:%{public}d, effectId:%{public}s", ret, effectId);
         return NormalizeErrCode(ret);
     }
     return SUCCESS;
@@ -288,7 +288,7 @@ int32_t PreProcess(const VibratorFileDescription &fd, VibratorPackage &package)
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.PreProcess(fd, package);
     if (ret != ERR_OK) {
-        MISC_HILOGD("DecodeVibratorFile failed, ret:%{public}d", ret);
+        MISC_HILOGE("DecodeVibratorFile failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
     return SUCCESS;
@@ -308,7 +308,7 @@ int32_t GetDelayTimeEnhanced(const VibratorIdentifier identifier, int32_t &delay
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.GetDelayTime(identifier, delayTime);
     if (ret != ERR_OK) {
-        MISC_HILOGD("GetDelayTime failed, ret:%{public}d", ret);
+        MISC_HILOGE("GetDelayTime failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
     return SUCCESS;
@@ -334,7 +334,7 @@ int32_t PlayPatternEnhanced(const VibratorIdentifier identifier, const VibratorP
     client.SetUsage(identifier, USAGE_UNKNOWN, false);
     client.SetParameters(identifier, vibratorEffectParameter.vibratorParameter);
     if (ret != ERR_OK) {
-        MISC_HILOGD("PlayPattern failed, ret:%{public}d", ret);
+        MISC_HILOGE("PlayPattern failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
     return SUCCESS;
@@ -345,7 +345,22 @@ int32_t SeekTimeOnPackage(int32_t seekTime, const VibratorPackage &completePacka
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.SeekTimeOnPackage(seekTime, completePackage, seekPackage);
     if (ret != ERR_OK) {
-        MISC_HILOGD("SeekTimeOnPackage failed, ret:%{public}d", ret);
+        MISC_HILOGE("SeekTimeOnPackage failed, ret:%{public}d", ret);
+        return NormalizeErrCode(ret);
+    }
+    return SUCCESS;
+}
+
+int32_t ModulatePackage(const VibratorCurvePoint* modulationCurve, const int32_t curvePointNum, const int32_t duration,
+    const VibratorPackage &beforeModulationPackage, VibratorPackage &afterModulationPackage)
+{
+    VibratorEvent modulationEvent{.type = EVENT_TYPE_CONTINUOUS, .time = 0, .duration = duration,
+        .intensity = -1, .frequency = -1, .index = 0, .pointNum = curvePointNum,
+        .points = const_cast<VibratorCurvePoint*>(modulationCurve)};
+    int32_t ret = VibratorServiceClient::ModulatePackage(
+        modulationEvent, beforeModulationPackage, afterModulationPackage);
+    if (ret != ERR_OK) {
+        MISC_HILOGE("ModulatePackage failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
     return SUCCESS;
@@ -353,10 +368,9 @@ int32_t SeekTimeOnPackage(int32_t seekTime, const VibratorPackage &completePacka
 
 int32_t FreeVibratorPackage(VibratorPackage &package)
 {
-    auto &client = VibratorServiceClient::GetInstance();
-    int32_t ret = client.FreeVibratorPackage(package);
+    int32_t ret = VibratorServiceClient::FreeVibratorPackage(package);
     if (ret != ERR_OK) {
-        MISC_HILOGD("FreeVibratorPackage failed, ret:%{public}d", ret);
+        MISC_HILOGE("FreeVibratorPackage failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
     return SUCCESS;
@@ -408,7 +422,7 @@ int32_t PlayPrimitiveEffectEnhanced(const VibratorIdentifier identifier, const c
     client.SetUsage(identifier, USAGE_UNKNOWN, false);
     client.SetLoopCount(identifier, 1);
     if (ret != ERR_OK) {
-        MISC_HILOGD("Play primitive effect failed, ret:%{public}d", ret);
+        MISC_HILOGE("Play primitive effect failed, ret:%{public}d", ret);
         return NormalizeErrCode(ret);
     }
     return SUCCESS;
