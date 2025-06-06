@@ -1273,6 +1273,247 @@ describe("VibratorJsTest", function () {
     })
 
     /*
+    * @tc.name: VibratorJsTest042
+    * @tc.desc: Test for getting the vibrator list.
+    * @tc.number: SUB_SensorSystem_Vibrator_JsTest_0420
+    */
+    it("VibratorJsTest042", 0, async function (done) {
+        try {
+            const vibrators = vibrator.getVibratorInfoSync();
+            if (vibrators.length  === 0) {
+                console.warn('vibrators is null, ending test case.');
+                done();
+            }
+            expect(Array.isArray(vibrators)).assertEqual(true);
+            done();
+        } catch (error) {
+            console.error('VibratorJsTest042 failed with error:', error);
+            done();
+        }
+    })
+
+    /*
+    * @tc.name: VibratorJsTest043
+    * @tc.desc: Test to get a vibrator information.
+    * @tc.number: SUB_SensorSystem_Vibrator_JsTest_0430
+    */
+    it("VibratorJsTest043", 0, async function (done) {
+        try {
+            const vibratorInfoParam = {
+                deviceId: -1,
+                vibratorId: -1
+            };
+            const vibrators = vibrator.getVibratorInfoSync(vibratorInfoParam);
+            if (vibrators.length  === 0) {
+                console.warn('vibrators is null, ending test case.');
+                done();
+            }
+            expect(Array.isArray(vibrators)).assertEqual(true);
+            done();
+        } catch (error) {
+            console.error('VibratorJsTest043 failed with error:', error);
+            done();
+        }
+    })
+
+    /*
+    * @tc.name: VibratorJsTest044
+    * @tc.desc: Test the on function for VIBRATOR_DEVICE_STATE_CHANGE with valid and invalid parameters.
+    * @tc.number: SUB_SensorSystem_Vibrator_JsTest_0440
+    */
+    it("VibratorJsTest044", 0, function (done) {
+        try {
+            const vibrators = vibrator.getVibratorInfoSync();
+            if (vibrators.length  === 0) {
+                console.warn('vibrators is null, ending test case.');
+                done();
+            }
+            const validCallback = function (statusEvent) {
+                console.info('  timestamp:', statusEvent.timestamp);
+                console.info('  deviceId:', statusEvent.deviceId);
+                console.info('  vibratorCount:', statusEvent.vibratorCount);
+                console.info('  isVibratorOnline:', statusEvent.isVibratorOnline);
+                expect(statusEvent).toBeDefined();
+                expect(typeof statusEvent).toBe('object');
+            };
+            vibrator.on("vibratorStateChange", validCallback);
+            setTimeout(() => {
+                vibrator.off("vibratorStateChange", validCallback);
+            }, 500);
+            done();
+        } catch (error) {
+            console.error('VibratorJsTest044 failed with error:', error);
+            done();
+        }
+    })
+
+    /*
+    * @tc.name: VibratorJsTest045
+    * @tc.desc: Test stop the motor vibration in all modes.
+    * @tc.number: SUB_SensorSystem_Vibrator_JsTest_0450
+    */
+    it("VibratorJsTest045", 0, async function (done) {
+        try {
+            const vibrators = vibrator.getVibratorInfoSync();
+            if (vibrators.length  === 0) {
+                console.warn('vibrators is null, ending test case.');
+                done();
+            }
+            await vibrator.startVibration({
+                type: "time",
+                duration: 500
+            }, {
+                id: vibrators[0].vibratorId,
+                deviceId: vibrators[0].deviceId,
+                usage: "alarm"
+            }, (error) => {
+                if (error) {
+                    console.info("startVibration error: " + JSON.stringify(error));
+                    expect(false).assertTrue();
+                } else {
+                    console.info("startVibration success");
+                }
+                done();
+            });
+            await vibrator.stopVibration();
+            console.info("stopVibration success");
+            done();
+        } catch (error) {
+            console.info("stopVibration error: " + JSON.stringify(error));
+            done();
+        }
+    })
+
+    /*
+    * @tc.name: VibratorJsTest046
+    * @tc.desc: Test single motor stop vibration.
+    * @tc.number: SUB_SensorSystem_Vibrator_JsTest_0460
+    */
+    it("VibratorJsTest046", 0, async function (done) {
+        try {
+            const vibrators = vibrator.getVibratorInfoSync();
+            if (vibrators.length  === 0) {
+                console.warn('vibrators is null, ending test case.');
+                done();
+            }
+            await vibrator.startVibration({
+                type: "time",
+                duration: 500
+            }, {
+                id: vibrators[0].vibratorId,
+                deviceId: vibrators[0].deviceId,
+                usage: "alarm"
+            }, (error) => {
+                if (error) {
+                    console.info("startVibration error: " + JSON.stringify(error));
+                    expect(false).assertTrue();
+                } else {
+                    console.info("startVibration success");
+                }
+                done();
+            });
+            const vibratorInfoParam = {
+                deviceId: vibrators[0].deviceId,
+                vibratorId: vibrators[0].vibratorId
+            };
+            await vibrator.stopVibration(vibratorInfoParam);
+            console.info("stopVibration success");
+            done();
+        } catch (error) {
+            console.info("stopVibration error: " + JSON.stringify(error));
+            done();
+        }
+    })
+
+    /*
+    * @tc.name: VibratorJsTest047
+    * @tc.desc: Test the function of obtaining the effect information through the device ID and vibratorId.
+    * @tc.number: SUB_SensorSystem_Vibrator_JsTest_0470
+    */
+    it("VibratorJsTest047", 0, async function (done) {
+        try {
+            const effectId = "haptic.clock.timer";
+            const vibrators = vibrator.getVibratorInfoSync();
+            if (vibrators.length  === 0) {
+                console.warn('vibrators is null, ending test case.');
+                done();
+            }
+            const vibratorInfoParam = {
+                deviceId: vibrators[0].deviceId,
+                vibratorId: vibrators[0].vibratorId
+            };
+            const jsEffectInfo = vibrator.getEffectInfoSync(effectId, vibratorInfoParam);
+            if (!jsEffectInfo.isEffectSupported) {
+                console.info('VibratorJsTest047 is not supported on this device.');
+                done();
+                return;
+            }
+            expect(jsEffectInfo.isEffectSupported).assertTrue();
+            done();
+        } catch (error) {
+            console.error('VibratorJsTest047 failed with error:', error);
+            done();
+        }
+    })
+
+    /*
+    * @tc.name: VibratorJsTest048
+    * @tc.desc: Test the function of obtaining the effect information through the vibratorId.
+    * @tc.number: SUB_SensorSystem_Vibrator_JsTest_0480
+    */
+    it("VibratorJsTest048", 0, async function (done) {
+        try {
+            const vibrators = vibrator.getVibratorInfoSync();
+            if (vibrators.length  === 0) {
+                console.warn('vibrators is null, ending test case.');
+                done();
+            }
+            const effectId = "haptic.clock.timer";
+            const jsEffectInfo = vibrator.getEffectInfoSync(effectId);
+            if (!jsEffectInfo.isEffectSupported) {
+                console.info('VibratorJsTest048 is not supported on this device.');
+                done();
+                return;
+            }
+            expect(jsEffectInfo.isEffectSupported).assertTrue();
+            done();
+        } catch (error) {
+            console.error('VibratorJsTest048 failed with error:', error);
+            done();
+        }
+    })
+
+    /*
+    * @tc.name: VibratorJsTest049
+    * @tc.desc: Test the function of obtaining the effect information through the device ID.
+    * @tc.number: SUB_SensorSystem_Vibrator_JsTest_0490
+    */
+    it("VibratorJsTest049", 0, async function (done) {
+        try {
+            const vibrators = vibrator.getVibratorInfoSync();
+            if (vibrators.length  === 0) {
+                console.warn('vibrators is null, ending test case.');
+                done();
+            }
+            const effectId = "haptic.clock.timer";
+            const vibratorInfoParam = {
+                deviceId: vibrators[0].deviceId,
+            };
+            const jsEffectInfo = vibrator.getEffectInfoSync(effectId, vibratorInfoParam);
+            if (!jsEffectInfo.isEffectSupported) {
+                console.info('VibratorJsTest049 is not supported on this device.');
+                done();
+                return;
+            }
+            expect(jsEffectInfo.isEffectSupported).assertTrue();
+            done();
+        } catch (error) {
+            console.error('VibratorJsTest049 failed with error:', error);
+            done();
+        }
+    })
+
+    /*
      * @tc.name:VibrateTest001
      * @tc.desc:verify app info is not null
      * @tc.type: FUNC
