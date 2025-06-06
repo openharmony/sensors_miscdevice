@@ -707,16 +707,16 @@ int32_t MiscdeviceService::PlayVibratorCustom(const VibratorIdentifierIPC& ident
         .systemUsage = customHapticInfoIPC.systemUsage,
         .package = package,
     };
-    VibratorCapacity g_capacity;
-    if (GetHapticCapacityInfo(identifier, g_capacity) != ERR_OK) {
+    VibratorCapacity capacity;
+    if (GetHapticCapacityInfo(identifier, capacity) != ERR_OK) {
         MISC_HILOGE("GetVibratorCapacity failed");
         return ERROR;
     }
-    if (g_capacity.isSupportHdHaptic) {
+    if (capacity.isSupportHdHaptic) {
         info.mode = VIBRATE_CUSTOM_HD;
-    } else if (g_capacity.isSupportPresetMapping) {
+    } else if (capacity.isSupportPresetMapping) {
         info.mode = VIBRATE_CUSTOM_COMPOSITE_EFFECT;
-    } else if (g_capacity.isSupportTimeDelay) {
+    } else if (capacity.isSupportTimeDelay) {
         info.mode = VIBRATE_CUSTOM_COMPOSITE_TIME;
     }
     std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
@@ -749,12 +749,12 @@ int32_t MiscdeviceService::CheckAuthAndParam(int32_t usage, const VibrateParamet
         MISC_HILOGE("CheckVibratePermission failed, ret:%{public}d", ret);
         return PERMISSION_DENIED;
     }
-    VibratorCapacity g_capacity;
-    if (GetHapticCapacityInfo(identifier, g_capacity) != ERR_OK) {
+    VibratorCapacity capacity;
+    if (GetHapticCapacityInfo(identifier, capacity) != ERR_OK) {
         MISC_HILOGE("GetVibratorCapacity failed");
         return ERROR;
     }
-    if (!(g_capacity.isSupportHdHaptic || g_capacity.isSupportPresetMapping || g_capacity.isSupportTimeDelay)) {
+    if (!(capacity.isSupportHdHaptic || capacity.isSupportPresetMapping || capacity.isSupportTimeDelay)) {
         MISC_HILOGE("The device does not support this operation");
         return IS_NOT_SUPPORTED;
     }
@@ -941,21 +941,21 @@ int32_t MiscdeviceService::PlayPattern(const VibratorIdentifierIPC& identifier, 
         .usage = customHapticInfoIPC.usage,
         .systemUsage = customHapticInfoIPC.systemUsage
     };
-    VibratorCapacity g_capacity;
-    if (GetHapticCapacityInfo(identifier, g_capacity) != ERR_OK) {
+    VibratorCapacity capacity;
+    if (GetHapticCapacityInfo(identifier, capacity) != ERR_OK) {
         MISC_HILOGE("GetVibratorCapacity failed");
         return ERROR;
     }
-    if (g_capacity.isSupportHdHaptic) {
+    if (capacity.isSupportHdHaptic) {
         int32_t result = PerformVibrationControl(identifier, pattern, info);
         if (result != ERR_OK) {
             MISC_HILOGE("PerformVibrationControl failed");
             return result;
         }
         return vibratorHdiConnection_.PlayPattern(identifier, package.patterns.front());
-    } else if (g_capacity.isSupportPresetMapping) {
+    } else if (capacity.isSupportPresetMapping) {
         info.mode = VIBRATE_CUSTOM_COMPOSITE_EFFECT;
-    } else if (g_capacity.isSupportTimeDelay) {
+    } else if (capacity.isSupportTimeDelay) {
         info.mode = VIBRATE_CUSTOM_COMPOSITE_TIME;
     }
     info.package = package;
@@ -985,12 +985,12 @@ int32_t MiscdeviceService::GetDelayTime(const VibratorIdentifierIPC& identifier,
 {
     std::string packageName = GetPackageName(GetCallingTokenID());
     MISC_HILOGD("GetDelayTime, package:%{public}s", packageName.c_str());
-    VibratorCapacity g_capacity;
-    if (GetHapticCapacityInfo(identifier, g_capacity) != ERR_OK) {
+    VibratorCapacity capacity;
+    if (GetHapticCapacityInfo(identifier, capacity) != ERR_OK) {
         MISC_HILOGE("GetVibratorCapacity failed");
         return ERROR;
     }
-    return vibratorHdiConnection_.GetDelayTime(identifier, g_capacity.GetVibrateMode(), delayTime);
+    return vibratorHdiConnection_.GetDelayTime(identifier, capacity.GetVibrateMode(), delayTime);
 }
 
 bool MiscdeviceService::CheckVibratorParmeters(const VibrateParameter &parameter)
@@ -1395,15 +1395,16 @@ int32_t MiscdeviceService::SubscribeVibratorPlugInfo(const sptr<IRemoteObject> &
     return ERR_OK;
 }
 
-int32_t MiscdeviceService::GetVibratorCapacity(const VibratorIdentifierIPC& identifier, VibratorCapacity &capacity)
+int32_t MiscdeviceService::GetVibratorCapacity(const VibratorIdentifierIPC& identifier,
+    VibratorCapacity &vibratorCapacity)
 {
     CALL_LOG_ENTER;
-    VibratorCapacity g_capacity;
-    if (GetHapticCapacityInfo(identifier, g_capacity) != ERR_OK) {
+    VibratorCapacity capacity;
+    if (GetHapticCapacityInfo(identifier, capacity) != ERR_OK) {
         MISC_HILOGE("GetVibratorCapacity failed");
         return ERROR;
     }
-    capacity = g_capacity;
+    vibratorCapacity = capacity;
     return ERR_OK;
 }
 
@@ -1447,8 +1448,8 @@ int32_t MiscdeviceService::GetHapticCapacityInfo(const VibratorIdentifierIPC& id
             capacityInfo = deviceIt->second.capacityInfo;
             return ERR_OK;
         }
-        MISC_HILOGE("No vibrator information found for device ID: %{public}d", identifier.deviceId);
-        return PARAMETER_ERROR;
+        MISC_HILOGW("No vibrator capacity information found for device ID: %{public}d", identifier.deviceId);
+        return ERR_OK;
     }
     for (const auto& pair : devicesManageMap_) {
         for (const auto& info : pair.second.baseInfo) {
@@ -1458,8 +1459,8 @@ int32_t MiscdeviceService::GetHapticCapacityInfo(const VibratorIdentifierIPC& id
             }
         }
     }
-    MISC_HILOGE("No vibrator information found for device ID: %{public}d", identifier.deviceId);
-    return PARAMETER_ERROR;
+    MISC_HILOGW("No local vibrator capacity information found for device ID: %{public}d", identifier.deviceId);
+    return ERR_OK;
 }
 
 int32_t MiscdeviceService::GetAllWaveInfo(const VibratorIdentifierIPC& identifier,
@@ -1527,18 +1528,17 @@ bool MiscdeviceService::UpdateVibratorAllInfo(const VibratorIdentifierIPC &ident
     }
     VibratorAllInfos tVibratorInfo(vibratorIdList);
     vibratorAllInfos = tVibratorInfo;
-    VibratorCapacity vibratorCapacity;
-    ret = vibratorHdiConnection_.GetVibratorCapacity(identifier, vibratorCapacity);
+    VibratorCapacity capacity;
+    ret = vibratorHdiConnection_.GetVibratorCapacity(identifier, capacity);
     if (ret != NO_ERROR) {
-        MISC_HILOGE("HDI::GetHapticCapacity return error");
-        return false;
+        MISC_HILOGW("HDI::GetHapticCapacity return error, then fill the default capacity");
     }
     std::vector<HdfWaveInformation> waveInfo;
     ret = vibratorHdiConnection_.GetAllWaveInfo(identifier, waveInfo);
     if (ret != NO_ERROR) {
         MISC_HILOGW("HDI::GetAllWaveInfo return error");
     }
-    (void)ConvertToServerInfos(baseInfo, vibratorCapacity, waveInfo, info, vibratorAllInfos);
+    (void)ConvertToServerInfos(baseInfo, capacity, waveInfo, info, vibratorAllInfos);
     devicesManageMap_.insert(std::make_pair(identifier.deviceId, vibratorAllInfos));
     return true;
 }
@@ -1575,18 +1575,23 @@ void MiscdeviceService::GetLocalVibratorInfo()
     std::vector<HdfVibratorInfo> localInfo;
     HdfVibratorPlugInfo mockInfo;
     mockInfo.deviceName = "";
-    VibratorIdentifierIPC param;
     for (auto &info : vibratorInfo) {
         if (info.isLocal == 1) {
             localInfo.emplace_back(info);
+        }
+    }
+    VibratorIdentifierIPC param;
+    for (auto &info : vibratorInfo) {
+        if (info.isLocal == 1) {
             param.deviceId = info.deviceId;
+            param.vibratorId = info.vibratorId;
+            break;
         }
     }
     VibratorCapacity capacity;
     ret = vibratorHdiConnection_.GetVibratorCapacity(param, capacity);
     if (ret != NO_ERROR) {
-        MISC_HILOGE("Get local hapticCapacity fail");
-        return;
+        MISC_HILOGW("HDI::Get local hapticCapacity fail, then fill the default capacity");
     }
     std::vector<HdfWaveInformation> waveInfo;
     ret = vibratorHdiConnection_.GetAllWaveInfo(param, waveInfo);
