@@ -56,6 +56,13 @@ struct VibratorDecodeHandle {
     }
 };
 
+typedef struct VibratorCurveInterval {
+    int32_t beginTime;
+    int32_t endTime;
+    int32_t intensity;
+    int32_t frequency;
+} VibratorCurveInterval;
+
 class VibratorServiceClient : public Singleton<VibratorServiceClient> {
 public:
     ~VibratorServiceClient() override;
@@ -77,7 +84,7 @@ public:
         bool systemUsage, const VibratorParameter &parameter);
     int32_t PlayPattern(const VibratorIdentifier &identifier, const VibratorPattern &pattern, int32_t usage,
         bool systemUsage, const VibratorParameter &parameter);
-    int32_t FreeVibratorPackage(VibratorPackage &package);
+    static int32_t FreeVibratorPackage(VibratorPackage &package);
     int32_t PlayPrimitiveEffect(const VibratorIdentifier &identifier, const std::string &effect,
         const PrimitiveEffect &primitiveEffect);
     bool IsSupportVibratorCustom(const VibratorIdentifier &identifier);
@@ -92,6 +99,8 @@ public:
     VibratorEffectParameter GetVibratorEffectParameter(const VibratorIdentifier &identifier);
     int32_t GetVibratorList(const VibratorIdentifier& identifier, std::vector<VibratorInfos>& vibratorInfo);
     int32_t GetEffectInfo(const VibratorIdentifier& identifier, const std::string& effectType, EffectInfo& effectInfo);
+    static int32_t ModulatePackage(const VibratorEvent &modulationCurve,
+        const VibratorPackage &beforeModulationPackage, VibratorPackage &afterModulationPackage);
 
 private:
     int32_t InitServiceClient();
@@ -104,6 +113,27 @@ private:
     void ConvertVibratorPattern(const VibratorPattern &vibratorPattern, VibratePattern &vibratePattern);
     bool SkipEventAndConvertVibratorEvent(const VibratorEvent &vibratorEvent, VibratePattern &vibratePattern,
         int32_t patternStartTime, VibrateEvent &vibrateEvent);
+    static int32_t GetCurveListAfterModulation(
+        const std::set<int32_t>& intervalEdges, const std::vector<VibratorCurveInterval>& currentInterval,
+        const std::vector<VibratorCurveInterval>& modInterval, const int offset, VibratorCurvePoint*& curve,
+        int32_t& curveNum);
+    static int32_t CopyNonContinuousVibratorEvent(const VibratorEvent &event, VibratorEvent &eventCopy);
+    static void FreePartiallyAllocatedVibratorPatterns(VibratorPattern*& patterns, const int32_t partialIdx);
+    static int32_t ModulateVibratorPattern(const VibratorEvent &modulationCurve,
+        const VibratorPattern &beforeModulationPattern, VibratorPattern &afterModulationPattern);
+    static void FreePartiallyAllocatedVibratorEvents(VibratorEvent*& events, const int32_t partialIdx);
+    static int32_t ModulateVibratorEvent(const VibratorEvent &modulationCurve, const int patternStartTime,
+        const VibratorEvent &beforeModulationEvent, VibratorEvent &afterModulationEvent);
+    static int32_t ModulateContinuousVibratorEvent(const VibratorEvent &modulationCurve, const int patternStartTime,
+        const VibratorEvent &beforeModulationEvent, VibratorEvent &afterModulationEvent);
+    static bool BinarySearchInterval(const std::vector<VibratorCurveInterval>& interval,
+        const int32_t val, int32_t& idx);
+    static void ConvertVibratorEventsToCurveIntervals(const VibratorEvent &vibratorEvent, const int patternTimeOffset,
+        std::vector<VibratorCurveInterval>& curveInterval);
+    static void ModulateSingleCurvePoint(const VibratorCurveInterval &modulationInterval,
+        const VibratorCurveInterval &originalInterval, VibratorCurvePoint& point);
+    static int32_t RestrictIntensityRange(int32_t intensity);
+    static int32_t RestrictFrequencyRange(int32_t frequency);
     void WriteVibratorHiSysIPCEvent(IMiscdeviceServiceIpcCode code, int32_t ret);
     void WriteOtherHiSysIPCEvent(IMiscdeviceServiceIpcCode code, int32_t ret);
     sptr<IRemoteObject::DeathRecipient> serviceDeathObserver_ = nullptr;

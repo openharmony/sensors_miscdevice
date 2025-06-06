@@ -185,6 +185,20 @@ int32_t PreProcess(const VibratorFileDescription &fd, VibratorPackage &package);
 int32_t SeekTimeOnPackage(int32_t seekTime, const VibratorPackage &completePackage, VibratorPackage &seekPackage);
 
 /**
+ * @brief Modulate a series of weaveform with another weaveform.
+ * @param modulationCurve: A weaveform indicating how to modulate, only modulationCurve.points,
+ * modulationCurve.pointNum, modulationCurve.time and modulationCurve.duration are used.
+ * @param curvePointNum: count of curvePoints
+ * @param duration: duration of curvePoints
+ * @param beforeModulationPackage: Weaveform to be modulated.
+ * @param afterModulationPackage: Result weaveform after modulation.
+ * @return 0 indicates success, otherwise indicates failure.
+ * @since 19
+ */
+int32_t ModulatePackage(const VibratorCurvePoint* modulationCurve, const int32_t curvePointNum, const int32_t duration,
+    const VibratorPackage &beforeModulationPackage, VibratorPackage &afterModulationPackage);
+
+/**
  * @brief Free up the vibration sequence package memory.
  * @param package: Vibration sequence packages, such as {@link VibrationPackage}.
  * @return 0 indicates success, otherwise indicates failure.

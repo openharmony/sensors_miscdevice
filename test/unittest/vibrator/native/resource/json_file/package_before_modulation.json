@@ -1,0 +1,198 @@
+{
+    "MetaData": {
+        "Create": "2025-01-14",
+        "Description": "a haptic testcase",
+        "Version": 1.0,
+        "ChannelNumber": 1
+    },
+    "Channels": [
+        {
+            "Parameters": {
+                "Index": 0
+            },
+            "Pattern": [
+                {
+                    "Event": {
+                        "Type": "transient",
+                        "StartTime": 0,
+                        "Parameters": {
+                            "Frequency": 31,
+                            "Intensity": 100
+                        }
+                    }
+                },
+                {
+                    "Event": {
+                        "Type": "continuous",
+                        "StartTime": 40,
+                        "Duration": 54,
+                        "Parameters": {
+                            "Frequency": 30,
+                            "Intensity": 38,
+                            "Curve": [
+                                {
+                                    "Time": 0,
+                                    "Frequency": 0,
+                                    "Intensity": 0
+                                },
+                                {
+                                    "Time": 1,
+                                    "Frequency": 0,
+                                    "Intensity": 1
+                                },
+                                {
+                                    "Time": 40,
+                                    "Frequency": 0,
+                                    "Intensity": 1
+                                },
+                                {
+                                    "Time": 54,
+                                    "Frequency": 0,
+                                    "Intensity": 0
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Event": {
+                        "Type": "transient",
+                        "StartTime": 103,
+                        "Parameters": {
+                            "Frequency": 69,
+                            "Intensity": 79
+                        }
+                    }
+                },
+                {
+                    "Event": {
+                        "Type": "transient",
+                        "StartTime": 180,
+                        "Parameters": {
+                            "Frequency": 82,
+                            "Intensity": 53
+                        }
+                    }
+                },
+                {
+                    "Event": {
+                        "Type": "transient",
+                        "StartTime": 239,
+                        "Parameters": {
+                            "Frequency": 82,
+                            "Intensity": 51
+                        }
+                    }
+                },
+                {
+                    "Event": {
+                        "Type": "transient",
+                        "StartTime": 319,
+                        "Parameters": {
+                            "Frequency": 74,
+                            "Intensity": 37
+                        }
+                    }
+                },
+                {
+                    "Event": {
+                        "Type": "transient",
+                        "StartTime": 350,
+                        "Parameters": {
+                            "Frequency": 44,
+                            "Intensity": 24
+                        }
+                    }
+                },
+                {
+                    "Event": {
+                        "Type": "continuous",
+                        "StartTime": 410,
+                        "Duration": 254,
+                        "Parameters": {
+                            "Frequency": 30,
+                            "Intensity": 38,
+                            "Curve": [
+                                {
+                                    "Time": 0,
+                                    "Frequency": 0,
+                                    "Intensity": 0
+                                },
+                                {
+                                    "Time": 100,
+                                    "Frequency": 0,
+                                    "Intensity": 1
+                                },
+                                {
+                                    "Time": 200,
+                                    "Frequency": 0,
+                                    "Intensity": 1
+                                },
+                                {
+                                    "Time": 254,
+                                    "Frequency": 0,
+                                    "Intensity": 0
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Event": {
+                        "Type": "continuous",
+                        "StartTime": 670,
+                        "Duration": 254,
+                        "Parameters": {
+                            "Frequency": 30,
+                            "Intensity": 38,
+                            "Curve": [
+                                {
+                                    "Time": 0,
+                                    "Frequency": 0,
+                                    "Intensity": 0
+                                },
+                                {
+                                    "Time": 100,
+                                    "Frequency": 0,
+                                    "Intensity": 1
+                                },
+                                {
+                                    "Time": 200,
+                                    "Frequency": 0,
+                                    "Intensity": 1
+                                },
+                                {
+                                    "Time": 254,
+                                    "Frequency": 0,
+                                    "Intensity": 0
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Event": {
+                        "Type": "continuous",
+                        "StartTime": 940,
+                        "Duration": 160,
+                        "Parameters": {
+                            "Frequency": 37,
+                            "Intensity": 74
+                        }
+                    }
+                },
+                {
+                    "Event": {
+                        "Type": "continuous",
+                        "StartTime": 1100,
+                        "Duration": 100,
+                        "Parameters": {
+                            "Frequency": 44,
+                            "Intensity": 24
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
