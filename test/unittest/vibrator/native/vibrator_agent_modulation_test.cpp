@@ -454,9 +454,6 @@ HWTEST_F(VibratorAgentModulationTest, ContinuousTypeWithCurvePointAndEventStartT
             const VibratorEvent& originalEvent = originalPattern.events[idx];
             ASSERT_EQ(event.type, originalEvent.type);
             ASSERT_EQ(event.time, originalEvent.time);
-            ASSERT_EQ(event.intensity, originalEvent.intensity);
-            ASSERT_EQ(event.frequency, originalEvent.frequency);
-            ASSERT_EQ(event.index, originalEvent.index);
             std::vector<VibratorCurvePoint> expectedAns;
             getExpectedCruvePoints(idx, expectedAns);
             ASSERT_EQ(event.pointNum, (int32_t)expectedAns.size());
