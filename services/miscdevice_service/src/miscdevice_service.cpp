@@ -293,7 +293,7 @@ bool MiscdeviceService::InitInterface()
         MISC_HILOGE("InitVibratorServiceImpl failed");
         return false;
     }
-    (void)GetLocalVibratorInfo();
+    GetOnlineVibratorInfo();
     return true;
 }
 
@@ -1031,9 +1031,38 @@ void MiscdeviceService::MergeVibratorParmeters(const VibrateParameter &parameter
     }
 }
 
-void MiscdeviceService::SendMsgToClient(HdfVibratorPlugInfo info)
+void MiscdeviceService::SendMsgToClient(const HdfVibratorPlugInfo &info)
 {
-    MISC_HILOGI("Device:%{public}d state change,state:%{public}d", info.deviceId, info.status);
+    MISC_HILOGI("Device:%{public}d state change, state:%{public}d, deviceName:%{public}s", info.deviceId, info.status,
+        info.deviceName.c_str());
+    std::lock_guard<std::mutex> lockManage(devicesManageMutex_);
+    if (info.status == 0) {
+        auto it = devicesManageMap_.find(info.deviceId);
+        if (it == devicesManageMap_.end()) {
+            MISC_HILOGE("Device %{public}d is not in the map, so no action taken.", info.deviceId);
+            return;
+        }
+        VibratorIdentifierIPC identifier;
+        for (auto &value : it->second.baseInfo) {
+            identifier.deviceId = info.deviceId;
+            identifier.vibratorId = value.vibratorId;
+            StopVibratorService(identifier);
+        }
+        devicesManageMap_.erase(it);
+        MISC_HILOGI("Device %{public}d is offline and removed from the map.", info.deviceId);
+    } else {
+        std::vector<HdfVibratorInfo> vibratorInfo;
+        auto ret = vibratorHdiConnection_.GetVibratorInfo(vibratorInfo);
+        if (ret != NO_ERROR || vibratorInfo.empty()) {
+            MISC_HILOGE("Device not contain the local vibrator");
+            return;
+        }
+        if (InsertVibratorInfo(info.deviceId, info.deviceName, vibratorInfo) != NO_ERROR) {
+            MISC_HILOGE("Insert vibrator of device %{public}d fail", info.deviceId);
+            return;
+        }
+    }
+
     std::lock_guard<std::mutex> lock(clientPidMapMutex_);
     MISC_HILOGI("Device:%{public}d state change,state:%{public}d, clientPidMap_.size::%{public}zu",
         info.deviceId, info.status, clientPidMap_.size());
@@ -1045,28 +1074,6 @@ void MiscdeviceService::SendMsgToClient(HdfVibratorPlugInfo info)
             MISC_HILOGI("Device:%{public}d state change,state:%{public}d, ProcessPlugEvent",
                         info.deviceId, info.status);
             clientProxy->ProcessPlugEvent(info.status, info.deviceId, info.vibratorCnt);
-        }
-    }
-    std::lock_guard<std::mutex> lockManage(devicesManageMutex_);
-    if (info.status == 0) {
-        auto it = devicesManageMap_.find(info.deviceId);
-        if (it != devicesManageMap_.end()) {
-            VibratorIdentifierIPC identifier;
-            identifier.deviceId = info.deviceId;
-            identifier.vibratorId = -1;
-            StopVibratorService(identifier);
-            devicesManageMap_.erase(it);
-            MISC_HILOGI("Device %{public}d is offline and removed from the map.", info.deviceId);
-        } else {
-            MISC_HILOGI("Device %{public}d is not in the map, so no action taken.", info.deviceId);
-        }
-    } else {
-        VibratorIdentifierIPC identifier;
-        identifier.deviceId = info.deviceId;
-        VibratorAllInfos newAllInfo({});
-        if (!UpdateVibratorAllInfo(identifier, info, newAllInfo)) {
-            MISC_HILOGE("Update new vibrator info failed");
-            return;
         }
     }
 }
@@ -1133,20 +1140,6 @@ void  MiscdeviceService::RegisterClientDeathRecipient(sptr<IRemoteObject> vibrat
     }
     vibratorServiceClient->AddDeathRecipient(clientDeathObserver_);
     SaveClientPid(vibratorServiceClient, pid);
-    std::thread([this, vibratorServiceClient]() {
-        std::this_thread::sleep_for(std::chrono::milliseconds(THREADSLEEPTIME));
-        std::lock_guard<std::mutex> lockManage(devicesManageMutex_);
-        if (devicesManageMap_.empty()) {
-            MISC_HILOGI("No vibrator device online");
-            return;
-        }
-        for (auto &value : devicesManageMap_) {
-            sptr<IVibratorClient> clientProxy = iface_cast<IVibratorClient>(vibratorServiceClient);
-            if (clientProxy != nullptr) {
-                clientProxy->ProcessPlugEvent(1, value.first, value.second.baseInfo.size());
-            }
-        }
-    }).detach();
 }
 
 void MiscdeviceService::UnregisterClientDeathRecipient(sptr<IRemoteObject> vibratorServiceClient)
@@ -1274,52 +1267,81 @@ int32_t MiscdeviceService::PlayPrimitiveEffectCheckAuthAndParam(int32_t intensit
     return ERR_OK;
 }
 
+int32_t MiscdeviceService::GetLocalDeviceId(int32_t &deviceId)
+{
+    for (const auto& device : devicesManageMap_) {
+        for (const auto& info : device.second.baseInfo) {
+            if (info.isLocalVibrator) {
+                deviceId = info.deviceId;
+                return NO_ERROR;
+            }
+        }
+    }
+
+    return ERROR;
+}
+
+int32_t MiscdeviceService::GetOneVibrator(const VibratorIdentifierIPC& actIdentifier,
+    std::vector<VibratorInfoIPC>& vibratorInfoIPC)
+{
+    if (devicesManageMap_.empty()) {
+        MISC_HILOGE("No vibrator device online");
+        return ERROR;
+    }
+
+    auto it = devicesManageMap_.find(actIdentifier.deviceId);
+    if (it == devicesManageMap_.end()) {
+        MISC_HILOGE("Device manager map has no vibrator info");
+        return ERROR;
+    }
+    for (auto &value : it->second.baseInfo) {
+        if (actIdentifier.vibratorId == value.vibratorId) {
+            vibratorInfoIPC.emplace_back(value);
+            break;
+        }
+    }
+    return NO_ERROR;
+}
+
 int32_t MiscdeviceService::GetVibratorList(const VibratorIdentifierIPC& identifier,
     std::vector<VibratorInfoIPC>& vibratorInfoIPC)
 {
     CALL_LOG_ENTER;
-    PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
-    int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
-    if (ret != PERMISSION_GRANTED) {
-#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
-        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
-            HiSysEvent::EventType::SECURITY, "PKG_NAME", "GetVibratorList", "ERROR_CODE", ret);
-#endif // HIVIEWDFX_HISYSEVENT_ENABLE
-        MISC_HILOGE("CheckVibratePermission failed, ret:%{public}d", ret);
-        return PERMISSION_DENIED;
-    }
     identifier.Dump();
     if (devicesManageMap_.empty()) {
-        MISC_HILOGI("No vibrator device online");
-        return NO_ERROR;
+        GetOnlineVibratorInfo();
     }
-    if ((identifier.deviceId == -1 && identifier.vibratorId == -1) ||
-        (identifier.deviceId == -1 && identifier.vibratorId != -1)) {
+    std::lock_guard<std::mutex> lockManage(devicesManageMutex_);
+    int32_t ret;
+    if ((identifier.deviceId == -1) && (identifier.vibratorId == -1)) {
         for (auto &value : devicesManageMap_) {
             vibratorInfoIPC.insert(vibratorInfoIPC.end(), value.second.baseInfo.begin(),
                 value.second.baseInfo.end());
         }
-        return NO_ERROR;
-    } else if (identifier.deviceId != -1 && identifier.vibratorId == -1) {
+    } else if ((identifier.deviceId == -1) && (identifier.vibratorId != -1)) {
+        VibratorIdentifierIPC actIdentifier;
+        actIdentifier.vibratorId = identifier.vibratorId;
+        ret = GetLocalDeviceId(actIdentifier.deviceId);
+        if (ret == NO_ERROR) {
+            ret = GetOneVibrator(actIdentifier, vibratorInfoIPC);
+            if (ret != NO_ERROR) {
+                MISC_HILOGI("Local deviceId %{public}d has no vibratorId %{public}d info",
+                    actIdentifier.deviceId, actIdentifier.vibratorId);
+            }
+        }
+    } else if ((identifier.deviceId != -1) && (identifier.vibratorId == -1)) {
         auto it = devicesManageMap_.find(identifier.deviceId);
         if (it == devicesManageMap_.end()) {
             MISC_HILOGD("Device manager map has no vibrator info");
             return NO_ERROR;
         }
         vibratorInfoIPC = it->second.baseInfo;
-        return NO_ERROR;
-    } else {
-        auto it = devicesManageMap_.find(identifier.deviceId);
-        if (it == devicesManageMap_.end()) {
-            MISC_HILOGD("Device manager map has no vibrator info");
-            return NO_ERROR;
+    } else { // ((identifier.deviceId != -1) && (identifier.vibratorId != -1))
+        ret = GetOneVibrator(identifier, vibratorInfoIPC);
+        if (ret != NO_ERROR) {
+            MISC_HILOGI("DeviceId %{public}d has no vibratorId %{public}d info",
+                identifier.deviceId, identifier.vibratorId);
         }
-        for (auto &value : it->second.baseInfo) {
-            if (identifier.vibratorId == value.vibratorId) {
-                vibratorInfoIPC.emplace_back(value);
-            }
-        }
-        return NO_ERROR;
     }
     return NO_ERROR;
 }
@@ -1328,16 +1350,6 @@ int32_t MiscdeviceService::GetEffectInfo(const VibratorIdentifierIPC& identifier
     EffectInfoIPC& effectInfoIPC)
 {
     CALL_LOG_ENTER;
-    PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
-    int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
-    if (ret != PERMISSION_GRANTED) {
-#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
-        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
-            HiSysEvent::EventType::SECURITY, "PKG_NAME", "GetEffectInfo", "ERROR_CODE", ret);
-#endif // HIVIEWDFX_HISYSEVENT_ENABLE
-        MISC_HILOGE("CheckVibratePermission failed, ret:%{public}d", ret);
-        return PERMISSION_DENIED;
-    }
     identifier.Dump();
     if (devicesManageMap_.empty()) {
         MISC_HILOGI("No vibrator device online");
@@ -1352,7 +1364,7 @@ int32_t MiscdeviceService::GetEffectInfo(const VibratorIdentifierIPC& identifier
         }
     }
     HdfEffectInfo hdfEffectInfo;
-    ret = vibratorHdiConnection_.GetEffectInfo((identifier.deviceId == -1) ? localIdentifier : identifier,
+    int32_t ret = vibratorHdiConnection_.GetEffectInfo((identifier.deviceId == -1) ? localIdentifier : identifier,
         effectType, hdfEffectInfo);
     if (ret != NO_ERROR) {
         MISC_HILOGE("HDI::GetEffectInfo return error");
@@ -1375,23 +1387,6 @@ int32_t MiscdeviceService::SubscribeVibratorPlugInfo(const sptr<IRemoteObject> &
         MISC_HILOGD("VibratorServiceClient is nullptr");
         return ERROR;
     }
-
-    std::thread([this, vibratorServiceClient]() {
-        std::this_thread::sleep_for(std::chrono::milliseconds(THREADSLEEPTIME));
-        std::lock_guard<std::mutex> lockManage(devicesManageMutex_);
-        if (devicesManageMap_.empty()) {
-            MISC_HILOGI("No vibrator device online");
-            return ERR_OK;
-        }
-
-        for (auto &value : devicesManageMap_) {
-            sptr<IVibratorClient> clientProxy = iface_cast<IVibratorClient>(vibratorServiceClient);
-            if (clientProxy != nullptr) {
-                clientProxy->ProcessPlugEvent(1, value.first, value.second.baseInfo.size());
-            }
-        }
-        return ERR_OK;
-    }).detach();
     return ERR_OK;
 }
 
@@ -1500,49 +1495,6 @@ int32_t MiscdeviceService::GetHapticStartUpTime(const VibratorIdentifierIPC& ide
     return NO_ERROR;
 }
 
-bool MiscdeviceService::UpdateVibratorAllInfo(const VibratorIdentifierIPC &identifier,
-    const HdfVibratorPlugInfo &info, VibratorAllInfos &vibratorAllInfos)
-{
-    CALL_LOG_ENTER;
-    std::vector<HdfVibratorInfo> baseInfo;
-    std::vector<int> vibratorIdList;
-    int32_t ret = -1;
-    const auto ite = devicesManageMap_.find(identifier.deviceId);
-    if (ite != devicesManageMap_.end()) {
-        for (auto& value : ite->second.baseInfo) {
-            (value.deviceName == "") ? (value.deviceName = info.deviceName) : 0;
-        }
-        return true;
-    }
-    if (identifier.deviceId < 0 || (identifier.deviceId < 0 && identifier.vibratorId < 0)) {
-        ret = vibratorHdiConnection_.GetVibratorInfo(baseInfo);
-    } else {
-        ret = vibratorHdiConnection_.GetVibratorList(identifier, baseInfo);
-    }
-    if (ret != NO_ERROR || baseInfo.empty()) {
-        MISC_HILOGE("HDI::GetVibratorInfoList return error");
-        return false;
-    }
-    for (auto& value: baseInfo) {
-        vibratorIdList.push_back(value.vibratorId);
-    }
-    VibratorAllInfos tVibratorInfo(vibratorIdList);
-    vibratorAllInfos = tVibratorInfo;
-    VibratorCapacity capacity;
-    ret = vibratorHdiConnection_.GetVibratorCapacity(identifier, capacity);
-    if (ret != NO_ERROR) {
-        MISC_HILOGW("HDI::GetHapticCapacity return error, then fill the default capacity");
-    }
-    std::vector<HdfWaveInformation> waveInfo;
-    ret = vibratorHdiConnection_.GetAllWaveInfo(identifier, waveInfo);
-    if (ret != NO_ERROR) {
-        MISC_HILOGW("HDI::GetAllWaveInfo return error");
-    }
-    (void)ConvertToServerInfos(baseInfo, capacity, waveInfo, info, vibratorAllInfos);
-    devicesManageMap_.insert(std::make_pair(identifier.deviceId, vibratorAllInfos));
-    return true;
-}
-
 void MiscdeviceService::ConvertToServerInfos(const std::vector<HdfVibratorInfo> &baseVibratorInfo,
     const VibratorCapacity &vibratorCapacity, const std::vector<HdfWaveInformation> &waveInfomation,
     const HdfVibratorPlugInfo &info, VibratorAllInfos& vibratorAllInfos)
@@ -1556,55 +1508,78 @@ void MiscdeviceService::ConvertToServerInfos(const std::vector<HdfVibratorInfo> 
         vibratorInfo.isSupportHdHaptic = vibratorCapacity.isSupportHdHaptic;
         vibratorInfo.isLocalVibrator = infos.isLocal;
         vibratorAllInfos.baseInfo.emplace_back(vibratorInfo);
-        MISC_HILOGI("HDI::HdfVibratorInfo deviceId:%{public}d, vibratorId:%{public}d, isLocalVibrator:%{public}d",
-            vibratorInfo.deviceId, vibratorInfo.vibratorId, vibratorInfo.isLocalVibrator);
+        MISC_HILOGI("HDI::HdfVibratorInfo deviceName:%{public}s, deviceId:%{public}d, vibratorId:%{public}d,"
+            " isLocalVibrator:%{public}d", info.deviceName.c_str(), vibratorInfo.deviceId, vibratorInfo.vibratorId,
+            vibratorInfo.isLocalVibrator);
     }
     vibratorAllInfos.capacityInfo = vibratorCapacity;
     vibratorAllInfos.waveInfo = waveInfomation;
 }
 
-void MiscdeviceService::GetLocalVibratorInfo()
+void MiscdeviceService::GetOnlineVibratorInfo()
 {
     CALL_LOG_ENTER;
     std::vector<HdfVibratorInfo> vibratorInfo;
     auto ret = vibratorHdiConnection_.GetVibratorInfo(vibratorInfo);
     if (ret != NO_ERROR || vibratorInfo.empty()) {
-        MISC_HILOGW("Device not contain the local vibrator");
+        MISC_HILOGW("Device does not contain any vibrators");
         return;
     }
-    std::vector<HdfVibratorInfo> localInfo;
-    HdfVibratorPlugInfo mockInfo;
-    mockInfo.deviceName = "";
+
+    std::lock_guard<std::mutex> lockManage(devicesManageMutex_);
+    const std::string deviceName = "";
     for (auto &info : vibratorInfo) {
-        if (info.isLocal == 1) {
-            localInfo.emplace_back(info);
+        const auto it = devicesManageMap_.find(info.deviceId);
+        if (it != devicesManageMap_.end()) {
+            continue;
+        }
+        if (InsertVibratorInfo(info.deviceId, deviceName, vibratorInfo) != NO_ERROR) {
+            MISC_HILOGW("Insert vibrator of device %{public}d fail", info.deviceId);
         }
     }
+}
+
+int32_t MiscdeviceService::InsertVibratorInfo(int deviceId, const std::string &deviceName,
+    const std::vector<HdfVibratorInfo> &vibratorInfo)
+{
+    CALL_LOG_ENTER;
+    std::vector<HdfVibratorInfo> infos;
+    std::vector<int> vibratorIdList;
+    for (auto &info : vibratorInfo) {
+        const auto it = devicesManageMap_.find(info.deviceId);
+        if (it != devicesManageMap_.end()) {
+            continue;
+        }
+        if (info.deviceId == deviceId) {
+            infos.emplace_back(info);
+            vibratorIdList.push_back(info.vibratorId);
+        }
+    }
+    if (infos.empty()) {
+        MISC_HILOGE("Device %{public}d does not contain any vibrators", deviceId);
+        return ERROR;
+    }
+
     VibratorIdentifierIPC param;
-    for (auto &info : vibratorInfo) {
-        if (info.isLocal == 1) {
-            param.deviceId = info.deviceId;
-            param.vibratorId = info.vibratorId;
-            break;
-        }
-    }
+    param.deviceId = infos[0].deviceId;
+    param.vibratorId = infos[0].vibratorId;
     VibratorCapacity capacity;
-    ret = vibratorHdiConnection_.GetVibratorCapacity(param, capacity);
+    int32_t ret = vibratorHdiConnection_.GetVibratorCapacity(param, capacity);
     if (ret != NO_ERROR) {
-        MISC_HILOGW("HDI::Get local hapticCapacity fail, then fill the default capacity");
+        MISC_HILOGW("Get capacity fail from HDI, then use the default capacity, deviceId: %{public}d", param.deviceId);
     }
     std::vector<HdfWaveInformation> waveInfo;
     ret = vibratorHdiConnection_.GetAllWaveInfo(param, waveInfo);
     if (ret != NO_ERROR) {
-        MISC_HILOGW("Get local waveInfo fail");
+        MISC_HILOGW("Get waveInfo fail from HDI, deviceId: %{public}d", param.deviceId);
     }
-    std::vector<int> vibratorIdList;
-    for (auto &value : localInfo) {
-        vibratorIdList.push_back(value.vibratorId);
-    }
+
+    HdfVibratorPlugInfo mockInfo;
+    mockInfo.deviceName = deviceName;
     VibratorAllInfos localVibratorInfo(vibratorIdList);
-    (void)ConvertToServerInfos(localInfo, capacity, waveInfo, mockInfo, localVibratorInfo);
+    (void)ConvertToServerInfos(infos, capacity, waveInfo, mockInfo, localVibratorInfo);
     devicesManageMap_.insert(std::make_pair(param.deviceId, localVibratorInfo));
+    return NO_ERROR;
 }
 
 int32_t MiscdeviceService::StartVibrateThreadControl(const VibratorIdentifierIPC& identifier, VibrateInfo& info)
@@ -1661,7 +1636,7 @@ std::vector<VibratorIdentifierIPC> MiscdeviceService::CheckDeviceIdIsValid(const
 
     auto addToResult = [&](const auto& info) {
         VibratorIdentifierIPC newIdentifier;
-        newIdentifier.deviceId = identifier.deviceId == -1 ? info.deviceId : identifier.deviceId;
+        newIdentifier.deviceId = info.deviceId;
         newIdentifier.vibratorId = info.vibratorId;
         newIdentifier.position = info.position;
         newIdentifier.isLocalVibrator = info.isLocalVibrator;
@@ -1671,13 +1646,15 @@ std::vector<VibratorIdentifierIPC> MiscdeviceService::CheckDeviceIdIsValid(const
 
     auto processDevice = [&](const auto& device) {
         for (const auto& info : device.second.baseInfo) {
-            bool shouldAdd = true;
+            bool shouldAdd = false;
             if (identifier.deviceId == -1 && identifier.vibratorId != -1) {
                 shouldAdd = info.isLocalVibrator && info.vibratorId == identifier.vibratorId;
             } else if (identifier.deviceId != -1 && identifier.vibratorId != -1) {
                 shouldAdd = info.vibratorId == identifier.vibratorId;
             } else if (identifier.deviceId == -1 && identifier.vibratorId == -1) {
                 shouldAdd = info.isLocalVibrator;
+            } else { // (identifier.deviceId != -1 && identifier.vibratorId == -1)
+                shouldAdd = true;
             }
 
             if (shouldAdd) {

@@ -116,7 +116,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_PRESET_INFO
     void StartVibrateThread(VibrateInfo info, const VibratorIdentifierIPC& identifier);
     int32_t StopVibratorService(const VibratorIdentifierIPC& identifier);
-    void SendMsgToClient(HdfVibratorPlugInfo info);
+    void SendMsgToClient(const HdfVibratorPlugInfo &info);
     int32_t RegisterVibratorPlugCb();
     std::shared_ptr<VibratorThread> GetVibratorThread(const VibratorIdentifierIPC& identifier);
     void StopVibrateThread(std::shared_ptr<VibratorThread> vibratorThread);
@@ -143,11 +143,14 @@ private:
     int32_t GetHapticCapacityInfo(const VibratorIdentifierIPC& identifier, VibratorCapacity& capacityInfo);
     int32_t GetAllWaveInfo(const VibratorIdentifierIPC& identifier, std::vector<HdfWaveInformation>& waveInfo);
     int32_t GetHapticStartUpTime(const VibratorIdentifierIPC& identifier, int32_t mode, int32_t &startUpTime);
-    void GetLocalVibratorInfo();
+    void GetOnlineVibratorInfo();
     std::vector<VibratorIdentifierIPC> CheckDeviceIdIsValid(const VibratorIdentifierIPC& identifier);
     int32_t StartVibrateThreadControl(const VibratorIdentifierIPC& identifier, VibrateInfo& info);
-    bool UpdateVibratorAllInfo(const VibratorIdentifierIPC &identifier, const HdfVibratorPlugInfo &info,
-        VibratorAllInfos &vibratorAllInfos);
+    int32_t InsertVibratorInfo(int deviceId, const std::string &deviceName,
+        const std::vector<HdfVibratorInfo> &vibratorInfo);
+    int32_t GetLocalDeviceId(int32_t &deviceId);
+    int32_t GetOneVibrator(const VibratorIdentifierIPC& actIdentifier,
+        std::vector<VibratorInfoIPC>& vibratorInfoIPC);
     void ConvertToServerInfos(const std::vector<HdfVibratorInfo> &baseVibratorInfo,
         const VibratorCapacity &vibratorCapacity, const std::vector<HdfWaveInformation> &waveInfomation,
         const HdfVibratorPlugInfo &info, VibratorAllInfos &vibratorAllInfos);
