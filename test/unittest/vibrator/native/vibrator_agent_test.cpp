@@ -2813,5 +2813,13 @@ HWTEST_F(VibratorAgentTest, UnSubscribeVibrator_001, TestSize.Level1)
     ret = UnSubscribeVibratorPlug(testUser);
     ASSERT_NE(ret, OHOS::Sensors::SUCCESS);
 }
+
+HWTEST_F(VibratorAgentTest, operator_001, TestSize.Level1)
+{
+    MISC_HILOGI("operator_001 in");
+    VibratorIdentifier id1{1, 1};
+    VibratorIdentifier id2{2, 1};
+    ASSERT_TRUE(id1 < id2);
+}
 } // namespace Sensors
 } // namespace OHOS
