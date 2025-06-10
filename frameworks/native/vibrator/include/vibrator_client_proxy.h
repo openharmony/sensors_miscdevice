@@ -52,13 +52,16 @@ public:
             MISC_HILOGE("Failed to write vibratorCnt to parcelable");
             return PARAMETER_ERROR;
         }
+        if (Remote() == nullptr) {
+            MISC_HILOGE("Remote is nullptr");
+            return ERROR;
+        }
         int error = Remote()->SendRequest(TRANS_ID_PLUG_ABILITY, dataParcel, replyParcel, option);
         if (error != ERR_NONE) {
             MISC_HILOGE("failed, error code is: %{public}d", error);
             return PARAMETER_ERROR;
         }
-        int result = (error == ERR_NONE) ? replyParcel.ReadInt32() : -1;
-        return result;
+        return replyParcel.ReadInt32();
     }
 
 private:

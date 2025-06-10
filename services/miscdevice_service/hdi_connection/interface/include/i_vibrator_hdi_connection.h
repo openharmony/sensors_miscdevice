@@ -49,7 +49,7 @@ using OHOS::HDI::Vibrator::V2_0::CompositeEffect;
 using OHOS::HDI::Vibrator::V2_0::HdfCompositeEffect;
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
 
-using DevicePlugCallback = std::function<void(const HdfVibratorPlugInfo PlugCallback)>;
+using DevicePlugCallback = std::function<void(const HdfVibratorPlugInfo &PlugCallback)>;
 class IVibratorHdiConnection {
 public:
     IVibratorHdiConnection() = default;

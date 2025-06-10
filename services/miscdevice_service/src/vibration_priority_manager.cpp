@@ -673,7 +673,7 @@ bool VibrationPriorityManager::ShouldIgnoreInputMethod(const VibrateInfo &vibrat
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 
 VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo,
-    std::shared_ptr<VibratorThread> vibratorThread, const VibratorIdentifierIPC& identifier)
+    const std::shared_ptr<VibratorThread> &vibratorThread, const VibratorIdentifierIPC& identifier)
 {
     UpdateStatus();
     if (!IsSystemCalling() || vibrateInfo.systemUsage == false) {
@@ -722,7 +722,7 @@ VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &v
     return ShouldIgnoreVibrate(vibrateInfo, vibratorThread->GetCurrentVibrateInfo());
 }
 
-bool VibrationPriorityManager::IsCurrentVibrate(std::shared_ptr<VibratorThread> vibratorThread,
+bool VibrationPriorityManager::IsCurrentVibrate(const std::shared_ptr<VibratorThread> &vibratorThread,
     const VibratorIdentifierIPC& identifier) const
 {
 #if defined(OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM) && defined(HDF_DRIVERS_INTERFACE_VIBRATOR)

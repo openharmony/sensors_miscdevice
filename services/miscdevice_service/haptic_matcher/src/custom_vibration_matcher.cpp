@@ -72,13 +72,13 @@ CustomVibrationMatcher::CustomVibrationMatcher()
 }
 
 CustomVibrationMatcher::CustomVibrationMatcher(const VibratorIdentifierIPC& identifier,
-    std::vector<HdfWaveInformation> waveInfo)
+    const std::vector<HdfWaveInformation> &waveInfo)
 {
     hdfWaveInfos_ = waveInfo;
     if (!hdfWaveInfos_.empty()) {
-        for (auto it = hdfWaveInfos_.begin(); it != hdfWaveInfos_.end(); ++it) {
+        for (const auto &info : hdfWaveInfos_) {
             MISC_HILOGI("waveId:%{public}d, intensity:%{public}f, frequency:%{public}f, duration:%{public}d",
-                it->waveId, it->intensity, it->frequency, it->duration);
+                info.waveId, info.intensity, info.frequency, info.duration);
         }
         NormalizedWaveInfo();
     }

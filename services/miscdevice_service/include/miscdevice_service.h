@@ -43,7 +43,10 @@ struct VibratorControlInfo {
     VibratorControlInfo(const std::vector<int>& vibratorIds) : motorCount(static_cast<int>(vibratorIds.size()))
     {
         for (int motorId : vibratorIds) {
-            vibratorThreads[motorId] = std::make_shared<VibratorThread>();
+            auto it = vibratorThreads.find(motorId);
+            if (it == vibratorThreads.end()) {
+                vibratorThreads[motorId] = std::make_shared<VibratorThread>();
+            }
         }
     }
 

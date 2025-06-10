@@ -199,7 +199,7 @@ VibrateInfo VibratorThread::copyInfoWithIndexEvents(const VibrateInfo& originalI
 
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
 int32_t VibratorThread::PlayCustomByCompositeEffect(const VibrateInfo &info, const VibratorIdentifierIPC& identifier,
-    std::vector<HdfWaveInformation> waveInfo)
+    const std::vector<HdfWaveInformation> &waveInfo)
 {
     CustomVibrationMatcher matcher(identifier, waveInfo);
     HdfCompositeEffect hdfCompositeEffect;
