@@ -97,6 +97,15 @@ struct VibratePackage {
     void Dump() const;
 };
 
+struct VibratePackageIPC : public Parcelable {
+    int32_t patternNum = 0;
+    int32_t packageDuration = 0;
+    std::vector<VibratePattern> patterns;
+    void Dump() const;
+    bool Marshalling(Parcel &parcel) const;
+    static VibratePackageIPC* Unmarshalling(Parcel &data);
+};
+
 struct VibratorCapacity : public Parcelable {
     bool isSupportHdHaptic = false;
     bool isSupportPresetMapping = false;
@@ -125,13 +134,16 @@ struct VibrateInfo {
     std::string effect;
     int32_t count = 0;
     int32_t intensity = 0;
+    uint32_t sessionId = 0;
     VibratePackage package;
+    VibratePackageIPC packageIPC;
 };
 
 struct VibrateParameter : public Parcelable {
     int32_t intensity = 100;  // from 0 to 100
     int32_t frequency = 0;    // from -100 to 100
     int32_t reserved = 0;
+    uint32_t sessionId = 0;
     void Dump() const;
     bool Marshalling(Parcel &parcel) const;
     static VibrateParameter* Unmarshalling(Parcel &data);

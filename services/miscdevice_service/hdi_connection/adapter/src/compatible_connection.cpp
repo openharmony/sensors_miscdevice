@@ -178,6 +178,23 @@ int32_t CompatibleConnection::PlayPattern(const VibratorIdentifierIPC &identifie
     return ERR_OK;
 }
 
+int32_t CompatibleConnection::PlayPatternBySessionId(const VibratorIdentifierIPC &identifier, uint32_t sessionId,
+    const VibratePattern &pattern)
+{
+    return ERR_OK;
+}
+
+int32_t CompatibleConnection::PlayPackageBySessionId(const VibratorIdentifierIPC &identifier, uint32_t sessionId,
+    const VibratePackageIPC &package)
+{
+    return ERR_OK;
+}
+
+int32_t CompatibleConnection::StopVibrateBySessionId(const VibratorIdentifierIPC &identifier, uint32_t sessionId)
+{
+    return ERR_OK;
+}
+
 int32_t CompatibleConnection::DestroyHdiConnection()
 {
     CALL_LOG_ENTER;

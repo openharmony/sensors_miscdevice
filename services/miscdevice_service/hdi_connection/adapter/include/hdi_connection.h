@@ -25,6 +25,7 @@
 
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
 using OHOS::HDI::Vibrator::V2_0::IVibratorInterface;
+using OHOS::HDI::Vibrator::V2_0::VibratorPackage;
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
 namespace OHOS {
 namespace Sensors {
@@ -48,6 +49,12 @@ public:
     int32_t GetDelayTime(const VibratorIdentifierIPC &identifier, int32_t mode, int32_t &delayTime) override;
     int32_t GetVibratorCapacity(const VibratorIdentifierIPC &identifier, VibratorCapacity &capacity) override;
     int32_t PlayPattern(const VibratorIdentifierIPC &identifier, const VibratePattern &pattern) override;
+    int32_t PlayPatternBySessionId(const VibratorIdentifierIPC &identifier, uint32_t sessionId,
+        const VibratePattern &pattern) override;
+    void GetVibratorPackage(const VibratePackageIPC &packageIPC, VibratorPackage &package);
+    int32_t PlayPackageBySessionId(const VibratorIdentifierIPC &identifier, uint32_t sessionId,
+        const VibratePackageIPC &package) override;
+    int32_t StopVibrateBySessionId(const VibratorIdentifierIPC &identifier, uint32_t sessionId) override;
     int32_t DestroyHdiConnection() override;
     void ProcessDeathObserver(const wptr<IRemoteObject> &object);
     int32_t StartByIntensity(const VibratorIdentifierIPC &identifier, const std::string &effect,
@@ -74,6 +81,7 @@ private:
     void RegisterHdiDeathRecipient();
     void UnregisterHdiDeathRecipient();
     void Reconnect();
+    void GetHapticPaket(const VibratePattern &pattern, HapticPaket &packet);
 };
 }  // namespace Sensors
 }  // namespace OHOS

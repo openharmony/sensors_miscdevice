@@ -84,6 +84,10 @@ public:
         bool systemUsage, const VibratorParameter &parameter);
     int32_t PlayPattern(const VibratorIdentifier &identifier, const VibratorPattern &pattern, int32_t usage,
         bool systemUsage, const VibratorParameter &parameter);
+    int32_t ConvertVibratorPackage(const VibratorPackage& inPkg, VibratePackageIPC &outPkg);
+    int32_t PlayPackageBySessionId(const VibratorIdentifier &identifier,
+        const VibratorEffectParameter &vibratorEffectParameter, const VibratorPackage &package);
+    int32_t StopVibrateBySessionId(const VibratorIdentifier &identifier, uint32_t sessionId);
     static int32_t FreeVibratorPackage(VibratorPackage &package);
     int32_t PlayPrimitiveEffect(const VibratorIdentifier &identifier, const std::string &effect,
         const PrimitiveEffect &primitiveEffect);

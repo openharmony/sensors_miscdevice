@@ -95,6 +95,10 @@ public:
     virtual int32_t TurnOff(int32_t lightId) override;
     virtual int32_t PlayPattern(const VibratorIdentifierIPC& identifier, const VibratePattern &pattern,
         const CustomHapticInfoIPC& customHapticInfoIPC) override;
+
+    virtual int32_t PlayPackageBySessionId(const VibratorIdentifierIPC &identifier, const VibratePackageIPC &package,
+        const CustomHapticInfoIPC &customHapticInfoIPC) override;
+    virtual int32_t StopVibrateBySessionId(const VibratorIdentifierIPC &identifier, uint32_t sessionId) override;
     virtual int32_t GetDelayTime(const VibratorIdentifierIPC& identifier, int32_t &delayTime) override;
     virtual int32_t TransferClientRemoteObject(const sptr<IRemoteObject> &vibratorServiceClient) override;
     virtual int32_t PlayPrimitiveEffect(const VibratorIdentifierIPC& identifier, const std::string &effect,
@@ -154,8 +158,7 @@ private:
     void ConvertToServerInfos(const std::vector<HdfVibratorInfo> &baseVibratorInfo,
         const VibratorCapacity &vibratorCapacity, const std::vector<HdfWaveInformation> &waveInfomation,
         const HdfVibratorPlugInfo &info, VibratorAllInfos &vibratorAllInfos);
-    int32_t PerformVibrationControl(const VibratorIdentifierIPC& identifier, const VibratePattern& pattern,
-        VibrateInfo& info);
+    int32_t PerformVibrationControl(const VibratorIdentifierIPC& identifier, int32_t duration, VibrateInfo& info);
     std::mutex isVibrationPriorityReadyMutex_;
     static bool isVibrationPriorityReady_;
     VibratorHdiConnection &vibratorHdiConnection_ = VibratorHdiConnection::GetInstance();

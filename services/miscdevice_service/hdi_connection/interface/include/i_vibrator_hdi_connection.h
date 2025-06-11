@@ -71,6 +71,8 @@ public:
     virtual int32_t GetDelayTime(const VibratorIdentifierIPC &identifier, int32_t mode, int32_t &delayTime) = 0;
     virtual int32_t GetVibratorCapacity(const VibratorIdentifierIPC &identifier, VibratorCapacity &capacity) = 0;
     virtual int32_t PlayPattern(const VibratorIdentifierIPC &identifier, const VibratePattern &pattern) = 0;
+    virtual int32_t PlayPatternBySessionId(const VibratorIdentifierIPC &identifier,
+        uint32_t sessionId, const VibratePattern &pattern) = 0;
     virtual int32_t StartByIntensity(const VibratorIdentifierIPC &identifier, const std::string &effect,
         int32_t intensity) = 0;
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
@@ -81,6 +83,9 @@ public:
         std::vector<HdfVibratorInfo> &hdfVibratorInfo) = 0;
     virtual int32_t GetEffectInfo(const VibratorIdentifierIPC &identifier, const std::string &effectType,
         HdfEffectInfo &effectInfo) = 0;
+    virtual int32_t PlayPackageBySessionId(const VibratorIdentifierIPC &identifier, uint32_t sessionId,
+        const VibratePackageIPC &package) = 0;
+    virtual int32_t StopVibrateBySessionId(const VibratorIdentifierIPC &identifier, uint32_t sessionId) = 0;
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
     virtual int32_t RegisterVibratorPlugCallback(DevicePlugCallback cb) = 0;
     virtual DevicePlugCallback GetVibratorPlugCb() = 0;
