@@ -1353,6 +1353,13 @@ HWTEST_F(VibratorAgentTest, StartVibratorUseNotifactionTest, TestSize.Level1)
     MISC_HILOGI("StartVibratorUseNotifactionTest in");
     bool flag = SetUsage(USAGE_UNKNOWN);
     ASSERT_TRUE(flag);
+    bool isSupport = false;
+    ASSERT_EQ(IsSupportEffect(VIBRATOR_TYPE_FAIL, &isSupport), 0);
+    if (!isSupport) {
+        MISC_HILOGW("effect %{public}s is not supported, skip test case StartVibratorUseNotifactionTest",
+            VIBRATOR_TYPE_FAIL);
+        return;
+    }
     int32_t ret = StartVibrator(VIBRATOR_TYPE_FAIL);
     ASSERT_EQ(ret, SUCCESS);
     flag = SetUsage(USAGE_NOTIFICATION);
@@ -1367,6 +1374,13 @@ HWTEST_F(VibratorAgentTest, StartVibratorUseRingTest, TestSize.Level1)
     MISC_HILOGI("StartVibratorUseRingTest in");
     bool flag = SetUsage(USAGE_UNKNOWN);
     ASSERT_TRUE(flag);
+    bool isSupport = false;
+    ASSERT_EQ(IsSupportEffect(VIBRATOR_TYPE_FAIL, &isSupport), 0);
+    if (!isSupport) {
+        MISC_HILOGW("effect %{public}s is not supported, skip test case StartVibratorUseRingTest",
+            VIBRATOR_TYPE_FAIL);
+        return;
+    }
     int32_t ret = StartVibrator(VIBRATOR_TYPE_FAIL);
     ASSERT_EQ(ret, SUCCESS);
     flag = SetUsage(USAGE_RING);
