@@ -14,6 +14,9 @@
  */
 
 @!namespace("@ohos.vibrator", "vibrator")
+@!sts_inject("""
+static { loadLibrary("vibrator_taihe_native.z") }
+""")
 
 /**
  * Preset vibration type vibration effect.
@@ -50,20 +53,20 @@ struct VibratePreset {
     /**
      * The number of vibration repetitions.
      *
-     * @type { Optional<i32> }
+     * @type { Optional<f64> }
      * @syscap SystemCapability.Sensors.MiscDevice
      * @since 12
      */
-    count: Optional<i32>;
+    count: Optional<f64>;
 
     /**
      * The intensity of vibration effect.
      *
-     * @type { Optional<i32> }
+     * @type { Optional<f64> }
      * @syscap SystemCapability.Sensors.MiscDevice
      * @since 12
      */
-    intensity: Optional<i32>;
+    intensity: Optional<f64>;
 }
 
 /**
@@ -107,12 +110,12 @@ struct VibrateTime {
     /**
      * The duration of the vibration, in ms.
      *
-     * @type { i32 }
+     * @type { f64 }
      * @syscap SystemCapability.Sensors.MiscDevice
      * @atomicservice
      * @since 11
      */
-    duration: i32; /** The duration of the vibration, in ms */
+    duration: f64; /** The duration of the vibration, in ms */
 }
 
 /**
@@ -162,12 +165,12 @@ struct VibrateAttribute {
     /**
      * Vibrator id, default is 0.
      *
-     * @type { Optional<i32> }
+     * @type { Optional<f64> }
      * @syscap SystemCapability.Sensors.MiscDevice
      * @atomicservice
      * @since 11
      */
-    id: Optional<i32>;
+    id: Optional<f64>;
 
     /**
      * The use of vibration.
