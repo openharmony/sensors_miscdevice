@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2029 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,6 +40,9 @@ constexpr int32_t CONT_TYPE_CURVE_EVENT_IDX_10 = 10;
 constexpr int32_t CURVE_FREQUENCY_NO_MODIFICATION = 0;
 constexpr int32_t CURVE_INTENSITY_NO_MODIFICATION = 100;
 constexpr int32_t CURVE_TIME_NO_MODIFICATION = 0;
+constexpr int32_t FADE_IN_END_MODIFY = 1;
+constexpr int32_t FADE_OUT_BEGIN_MODIFY = 10;
+constexpr int32_t FADE_IN_FADE_OUT_DURATION = 1200;
 }
 
 class VibratorAgentModulationTest : public testing::Test {
@@ -213,6 +216,7 @@ bool ConvertFileToVibratorPackage(const char* functionName, const char* filePath
     struct stat64 statbuf = { 0 };
     if (fstat64(fd, &statbuf) != 0) {
         MISC_HILOGE("failed to call fstat64 with param: %{public}s", filePath);
+        close(fd);
         return false;
     }
     vfd.fd = fd;
@@ -220,6 +224,7 @@ bool ConvertFileToVibratorPackage(const char* functionName, const char* filePath
     vfd.length = statbuf.st_size;
     if (PreProcess(vfd, vibratorPackage) != 0) {
         MISC_HILOGE("failed to call PreProcess with param: %{public}s", filePath);
+        close(fd);
         return false;
     }
     PrintVibratorPackageInfo(vibratorPackage, std::string(functionName));
@@ -484,6 +489,89 @@ HWTEST_F(VibratorAgentModulationTest, InvalidModulationEvent, TestSize.Level1)
     MISC_HILOGI("InvalidModulationEvent end");
 }
 
+bool generateFadeInFadeOutCurve(VibratorCurvePoint*& modulationCurve, int32_t& curvePointNum, int32_t& duration)
+{
+    std::vector<VibratorCurvePoint> curveVec {
+        VibratorCurvePoint{.time = 0, .intensity = 0, .frequency = 0},
+        VibratorCurvePoint{.time = 20, .intensity = 30, .frequency = 0},
+        VibratorCurvePoint{.time = 40, .intensity = 50, .frequency = 0},
+        VibratorCurvePoint{.time = 70, .intensity = 70, .frequency = 0},
+        VibratorCurvePoint{.time = 90, .intensity = 100, .frequency = 0},
+        VibratorCurvePoint{.time = 1100, .intensity = 90, .frequency = 0},
+        VibratorCurvePoint{.time = 1120, .intensity = 70, .frequency = 0},
+        VibratorCurvePoint{.time = 1150, .intensity = 50, .frequency = 0},
+        VibratorCurvePoint{.time = 1170, .intensity = 30, .frequency = 0},
+        VibratorCurvePoint{.time = 1200, .intensity = 0, .frequency = 0}
+    };
+    VibratorCurvePoint* curve = (VibratorCurvePoint*)malloc(curveVec.size() * sizeof(VibratorCurvePoint));
+    if (curve == nullptr) {
+        MISC_HILOGI("generateFadeInFadeOutCurve: failed to allocate memory for curve");
+        return false;
+    }
+    std::copy(curveVec.begin(), curveVec.end(), curve);
+    modulationCurve = curve;
+    curvePointNum = (int32_t)curveVec.size();
+    duration = FADE_IN_FADE_OUT_DURATION;
+    return true;
+}
+
+bool getExpectedOutputEventsForFadeInFadeOut(int32_t idx, std::vector<VibratorCurvePoint>& outputCurve)
+{
+    outputCurve.clear();
+    switch (idx) {
+        case FADE_IN_END_MODIFY:
+            outputCurve.emplace_back(VibratorCurvePoint{.time = 0, .intensity = 0, .frequency = 0});
+            outputCurve.emplace_back(VibratorCurvePoint{.time = 1, .intensity = 50, .frequency = 0});
+            outputCurve.emplace_back(VibratorCurvePoint{.time = 30, .intensity = 70, .frequency = 0});
+            outputCurve.emplace_back(VibratorCurvePoint{.time = 40, .intensity = 70, .frequency = 0});
+            outputCurve.emplace_back(VibratorCurvePoint{.time = 50, .intensity = 100, .frequency = 0});
+            break;
+        case FADE_OUT_BEGIN_MODIFY:
+            outputCurve.emplace_back(VibratorCurvePoint{.time = 0, .intensity = 90, .frequency = 0});
+            outputCurve.emplace_back(VibratorCurvePoint{.time = 20, .intensity = 70, .frequency = 0});
+            outputCurve.emplace_back(VibratorCurvePoint{.time = 50, .intensity = 50, .frequency = 0});
+            outputCurve.emplace_back(VibratorCurvePoint{.time = 70, .intensity = 30, .frequency = 0});
+            break;
+        default:
+            return false;
+            break;
+    }
+    return true;
+}
+
+HWTEST_F(VibratorAgentModulationTest, FadeInFadeOut, TestSize.Level1)
+{
+    MISC_HILOGI("FadeInFadeOut in");
+    VibratorCurvePoint* modulationCurve;
+    int32_t curvePointNum;
+    int32_t duration;
+    ASSERT_TRUE(generateFadeInFadeOutCurve(modulationCurve, curvePointNum, duration));
+    VibratorPackage package, packageAfterModulation;
+    ASSERT_TRUE(ConvertFileToVibratorPackage("FadeInFadeOut",
+        "/data/test/vibrator/package_before_modulation.json", package));
+    ASSERT_EQ(ModulatePackage(modulationCurve, curvePointNum, duration, package, packageAfterModulation), 0);
+    const VibratorPattern& originalPattern = package.patterns[0];
+    const VibratorPattern& afterModPattern = packageAfterModulation.patterns[0];
+    std::vector<VibratorCurvePoint> expectedOuput;
+    for (int32_t eventIdx = 0; eventIdx < originalPattern.eventNum; eventIdx++) {
+        if (originalPattern.events[eventIdx].type != EVENT_TYPE_CONTINUOUS ||
+            (eventIdx > FADE_IN_END_MODIFY && eventIdx < FADE_OUT_BEGIN_MODIFY)) {
+            ASSERT_TRUE(IsEventIdentical(originalPattern.events[eventIdx], afterModPattern.events[eventIdx]));
+        } else {
+            const VibratorEvent& originalEvent = originalPattern.events[eventIdx];
+            const VibratorEvent& afterModEvent = afterModPattern.events[eventIdx];
+            ASSERT_EQ(originalEvent.type, afterModEvent.type);
+            ASSERT_EQ(originalEvent.time, afterModEvent.time);
+            ASSERT_TRUE(getExpectedOutputEventsForFadeInFadeOut(eventIdx, expectedOuput));
+            for (int32_t pointIdx = 0; pointIdx < afterModEvent.pointNum; pointIdx++) {
+                ASSERT_TRUE(IsVibratorCurvePointIdentical(afterModEvent.points[pointIdx], expectedOuput[pointIdx]));
+            }
+        }
+    }
+    ASSERT_EQ(FreeVibratorPackage(package), 0);
+    ASSERT_EQ(FreeVibratorPackage(packageAfterModulation), 0);
+    MISC_HILOGI("FadeInFadeOut end");
+}
 
 } // namespace Sensors
 } // namespace OHOS
