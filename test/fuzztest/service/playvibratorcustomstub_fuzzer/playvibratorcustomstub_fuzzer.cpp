@@ -33,8 +33,22 @@ using Security::AccessToken::AccessTokenID;
 namespace {
 constexpr size_t U32_AT_SIZE = 4;
 auto g_service = MiscdeviceDelayedSpSingleton<MiscdeviceService>::GetInstance();
-const std::u16string VIBRATOR_INTERFACE_TOKEN = u"IMiscdeviceService";
+const std::u16string VIBRATOR_INTERFACE_TOKEN = u"OHOS.Sensors.IMiscdeviceService";
 } // namespace
+
+template<class T>
+size_t GetObject(const uint8_t *data, size_t size, T &object)
+{
+    size_t objectSize = sizeof(object);
+    if (objectSize > size) {
+        return 0;
+    }
+    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
+    if (ret != EOK) {
+        return 0;
+    }
+    return objectSize;
+}
 
 void SetUpTestCase()
 {
@@ -62,9 +76,26 @@ void SetUpTestCase()
 bool OnRemoteRequestFuzzTest(const uint8_t *data, size_t size)
 {
     SetUpTestCase();
+    if (g_service == nullptr) {
+        return false;
+    }
     MessageParcel datas;
     datas.WriteInterfaceToken(VIBRATOR_INTERFACE_TOKEN);
-    datas.WriteBuffer(data, size);
+    VibratorIdentifierIPC identifier;
+    size_t startPos = 0;
+    startPos += GetObject<int32_t>(data + startPos, size - startPos, identifier.deviceId);
+    startPos += GetObject<int32_t>(data + startPos, size - startPos, identifier.vibratorId);
+    datas.WriteParcelable(&identifier);
+    int fd = -1;
+    datas.WriteFileDescriptor(fd);
+    int64_t offset = 0;
+    startPos += GetObject<int64_t>(data + startPos, size - startPos, offset);
+    datas.WriteInt64(offset);
+    int64_t length = 0;
+    GetObject<int64_t>(data + startPos, size - startPos, length);
+    datas.WriteInt64(length);
+    CustomHapticInfoIPC customHapticInfoIPC;
+    datas.WriteParcelable(&customHapticInfoIPC);
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;

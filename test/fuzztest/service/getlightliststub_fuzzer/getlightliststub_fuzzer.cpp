@@ -33,7 +33,7 @@ using Security::AccessToken::AccessTokenID;
 namespace {
 constexpr size_t U32_AT_SIZE = 4;
 auto g_service = MiscdeviceDelayedSpSingleton<MiscdeviceService>::GetInstance();
-const std::u16string VIBRATOR_INTERFACE_TOKEN = u"IMiscdeviceService";
+const std::u16string VIBRATOR_INTERFACE_TOKEN = u"OHOS.Sensors.IMiscdeviceService";
 } // namespace
 
 template<class T>
@@ -76,11 +76,20 @@ void SetUpTestCase()
 bool OnRemoteRequestFuzzTest(const uint8_t *data, size_t size)
 {
     SetUpTestCase();
+    if (g_service == nullptr) {
+        return false;
+    }
+    MessageParcel datas;
+    datas.WriteInterfaceToken(VIBRATOR_INTERFACE_TOKEN);
+    int32_t usage = 0;
+    GetObject<int32_t>(data, size, usage);
+    datas.WriteInt32(usage);
+    datas.RewindRead(0);
+    MessageParcel reply;
+    MessageOption option;
     g_service->OnStartFuzz();
-    size_t startPos = 0;
-    std::vector<LightInfoIPC> lightInfoIpcList;
-    GetObject<LightInfoIPC>(data + startPos, size - startPos, lightInfoIpcList[0]);
-    g_service->GetLightList(lightInfoIpcList);
+    g_service->OnRemoteRequest(static_cast<uint32_t>(IMiscdeviceServiceIpcCode::COMMAND_GET_LIGHT_LIST),
+        datas, reply, option);
     return true;
 }
 } // namespace Sensors
