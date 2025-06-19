@@ -570,6 +570,8 @@ HWTEST_F(VibratorAgentModulationTest, FadeInFadeOut, TestSize.Level1)
     }
     ASSERT_EQ(FreeVibratorPackage(package), 0);
     ASSERT_EQ(FreeVibratorPackage(packageAfterModulation), 0);
+    free(modulationCurve);
+    modulationCurve = nullptr;
     MISC_HILOGI("FadeInFadeOut end");
 }
 
