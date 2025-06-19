@@ -26,7 +26,7 @@ class CustomVibrationMatcher {
 public:
     ~CustomVibrationMatcher() = default;
     static CustomVibrationMatcher &GetInstance();
-    CustomVibrationMatcher(const VibratorIdentifierIPC& identifier, std::vector<HdfWaveInformation> wareInfo);
+    CustomVibrationMatcher(const VibratorIdentifierIPC& identifier, const std::vector<HdfWaveInformation> &wareInfo);
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
     int32_t TransformTime(const VibratePackage &package, std::vector<CompositeEffect> &compositeEffects);
     int32_t TransformEffect(const VibratePackage &package, std::vector<CompositeEffect> &compositeEffects);

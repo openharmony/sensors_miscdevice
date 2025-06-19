@@ -279,7 +279,7 @@ bool VibratorInfoIPC::Marshalling(Parcel &parcel) const
         return false;
     }
     if (!parcel.WriteString(deviceName)) {
-        MISC_HILOGE("Write vibratorId failed");
+        MISC_HILOGE("Write deviceName failed");
         return false;
     }
     if (!parcel.WriteBool(isSupportHdHaptic)) {
@@ -366,10 +366,12 @@ VibratorIdentifierIPC* VibratorIdentifierIPC::Unmarshalling(Parcel &data)
     if (!(data.ReadInt32(identifier->deviceId))) {
         MISC_HILOGE("Read parameter's deviceId or vibratorId failed");
         identifier = nullptr;
+        return identifier;
     }
     if (!(data.ReadInt32(identifier->vibratorId))) {
         MISC_HILOGE("Read parameter's deviceId or vibratorId failed");
         identifier = nullptr;
+        return identifier;
     }
     return identifier;
 }
@@ -481,8 +483,8 @@ void CustomHapticInfoIPC::Dump() const
     retStr = "usage: "+ std::to_string(usage) + " ";
     retStr += "systemUsage: " + std::to_string(systemUsage)  + " ";
     retStr += "parameter.intensity: " + std::to_string(parameter.intensity)  + " ";
-    retStr += "parameter.intensity: " + std::to_string(parameter.frequency)  + " ";
-    retStr += "parameter.intensity: " + std::to_string(parameter.reserved)  + " ";
+    retStr += "parameter.frequency: " + std::to_string(parameter.frequency)  + " ";
+    retStr += "parameter.reserved: " + std::to_string(parameter.reserved)  + " ";
     MISC_HILOGI("CustomHapticInfoIPC: [%{public}s]", retStr.c_str());
 }
 

@@ -410,7 +410,7 @@ int32_t MiscdeviceService::Vibrate(const VibratorIdentifierIPC& identifier, int3
     }
     MISC_HILOGI("Start vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, usage:%{public}d,"
         "deviceId:%{public}d, vibratorId:%{public}d, duration:%{public}d", curVibrateTime.c_str(),
-        info.packageName.c_str(), info.pid, info.usage, identifier.vibratorId, identifier.deviceId, info.duration);
+        info.packageName.c_str(), info.pid, info.usage, identifier.deviceId, identifier.vibratorId, info.duration);
     return NO_ERROR;
 }
 
@@ -434,7 +434,7 @@ int32_t MiscdeviceService::StopVibratorService(const VibratorIdentifierIPC& iden
 {
     std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
     std::vector<VibratorIdentifierIPC> result = CheckDeviceIdIsValid(identifier);
-    int ignoreVibrateNum = 0;
+    size_t ignoreVibrateNum = 0;
     if (result.empty()) {
         MISC_HILOGD("No vibration, no need to stop");
         return ERROR;
@@ -602,7 +602,7 @@ int32_t MiscdeviceService::StopVibratorByMode(const VibratorIdentifierIPC& ident
         return PERMISSION_DENIED;
     }
     std::vector<VibratorIdentifierIPC> result = CheckDeviceIdIsValid(identifier);
-    int ignoreVibrateNum = 0;
+    size_t ignoreVibrateNum = 0;
     if (result.empty()) {
         MISC_HILOGD("No vibration, no need to stop");
         return ERROR;
@@ -1038,28 +1038,24 @@ void MiscdeviceService::SendMsgToClient(const HdfVibratorPlugInfo &info)
     std::lock_guard<std::mutex> lockManage(devicesManageMutex_);
     if (info.status == 0) {
         auto it = devicesManageMap_.find(info.deviceId);
-        if (it == devicesManageMap_.end()) {
-            MISC_HILOGE("Device %{public}d is not in the map, so no action taken.", info.deviceId);
-            return;
+        if (it != devicesManageMap_.end()) {
+            VibratorIdentifierIPC identifier;
+            for (auto &value : it->second.baseInfo) {
+                identifier.deviceId = info.deviceId;
+                identifier.vibratorId = value.vibratorId;
+                StopVibratorService(identifier);
+            }
+            devicesManageMap_.erase(it);
+            MISC_HILOGI("Device %{public}d is offline and removed from the map.", info.deviceId);
         }
-        VibratorIdentifierIPC identifier;
-        for (auto &value : it->second.baseInfo) {
-            identifier.deviceId = info.deviceId;
-            identifier.vibratorId = value.vibratorId;
-            StopVibratorService(identifier);
-        }
-        devicesManageMap_.erase(it);
-        MISC_HILOGI("Device %{public}d is offline and removed from the map.", info.deviceId);
     } else {
         std::vector<HdfVibratorInfo> vibratorInfo;
         auto ret = vibratorHdiConnection_.GetVibratorInfo(vibratorInfo);
         if (ret != NO_ERROR || vibratorInfo.empty()) {
             MISC_HILOGE("Device not contain the local vibrator");
-            return;
         }
         if (InsertVibratorInfo(info.deviceId, info.deviceName, vibratorInfo) != NO_ERROR) {
             MISC_HILOGE("Insert vibrator of device %{public}d fail", info.deviceId);
-            return;
         }
     }
 
@@ -1548,6 +1544,7 @@ int32_t MiscdeviceService::InsertVibratorInfo(int deviceId, const std::string &d
     for (auto &info : vibratorInfo) {
         const auto it = devicesManageMap_.find(info.deviceId);
         if (it != devicesManageMap_.end()) {
+            MISC_HILOGW("The deviceId already exists in devicesManageMap_, deviceId: %{public}d", info.deviceId);
             continue;
         }
         if (info.deviceId == deviceId) {
@@ -1556,8 +1553,8 @@ int32_t MiscdeviceService::InsertVibratorInfo(int deviceId, const std::string &d
         }
     }
     if (infos.empty()) {
-        MISC_HILOGE("Device %{public}d does not contain any vibrators", deviceId);
-        return ERROR;
+        MISC_HILOGW("Device %{public}d does not contain any vibrators", deviceId);
+        return NO_ERROR;
     }
 
     VibratorIdentifierIPC param;
@@ -1591,7 +1588,7 @@ int32_t MiscdeviceService::StartVibrateThreadControl(const VibratorIdentifierIPC
         return ERROR;
     }
 
-    int32_t ignoreVibrateNum = 0;
+    size_t ignoreVibrateNum = 0;
 
     const std::vector<std::string> specialModes = {
         VIBRATE_CUSTOM_HD, VIBRATE_CUSTOM_COMPOSITE_EFFECT,

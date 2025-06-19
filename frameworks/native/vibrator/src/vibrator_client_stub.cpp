@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
+#include <sys/time.h>
 #include "vibrator_client_stub.h"
-
 #include "message_parcel.h"
 
 #include "miscdevice_log.h"
@@ -60,19 +60,22 @@ int32_t VibratorClientStub::OnRemoteRequest(uint32_t code, MessageParcel &data, 
             reply.WriteInt32(result);
             return NO_ERROR;
         }
-        default: break;
+        default:
+            MISC_HILOGE("Unsupported command, cmd:%{public}u", code);
+            return PARAMETER_ERROR;
     }
     return NO_ERROR;
 }
 
 int64_t VibratorClientStub::GetSystemTime()
 {
-    struct timespec ts = { 0, 0 };
-    if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
-        MISC_HILOGE("clock_gettime failed:%{public}d", errno);
-        return 0;
-    }
-    return (ts.tv_sec * TIME_CONVERSION_UNIT * TIME_CONVERSION_UNIT) + (ts.tv_nsec / TIME_CONVERSION_UNIT);
+    struct timeval curTime;
+    curTime.tv_sec = 0;
+    curTime.tv_usec = 0;
+    gettimeofday(&curTime, NULL);
+    int64_t timestamp = static_cast<int64_t>(
+        curTime.tv_sec * TIME_CONVERSION_UNIT + curTime.tv_usec / TIME_CONVERSION_UNIT);
+    return timestamp;
 }
 
 int VibratorClientStub::ProcessPlugEvent(int32_t eventCode, int32_t deviceId, int32_t vibratorCnt)
@@ -88,7 +91,7 @@ int VibratorClientStub::ProcessPlugEvent(int32_t eventCode, int32_t deviceId, in
     auto &client = VibratorServiceClient::GetInstance();
     bool ret = client.HandleVibratorData(statusEvent);
     if (!ret) {
-        MISC_HILOGE("Handle bibrator data failed, ret:%{public}d", ret);
+        MISC_HILOGE("Handle vibrator data failed, ret:%{public}d", ret);
         return DEVICE_OPERATION_FAILED;
     }
     MISC_HILOGD("Success to process plug event");
