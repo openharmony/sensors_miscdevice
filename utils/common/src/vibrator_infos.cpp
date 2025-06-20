@@ -302,26 +302,31 @@ VibratorInfoIPC* VibratorInfoIPC::Unmarshalling(Parcel &data)
     }
     if (!data.ReadInt32(vibratorInfoIPC->deviceId)) {
         MISC_HILOGE("Read deviceId failed");
+        delete vibratorInfoIPC;
         vibratorInfoIPC = nullptr;
         return vibratorInfoIPC;
     }
     if (!data.ReadInt32(vibratorInfoIPC->vibratorId)) {
         MISC_HILOGE("Read vibratorId failed");
+        delete vibratorInfoIPC;
         vibratorInfoIPC = nullptr;
         return vibratorInfoIPC;
     }
     if (!data.ReadString(vibratorInfoIPC->deviceName)) {
         MISC_HILOGE("Read deviceName failed");
+        delete vibratorInfoIPC;
         vibratorInfoIPC = nullptr;
         return vibratorInfoIPC;
     }
     if (!data.ReadBool(vibratorInfoIPC->isSupportHdHaptic)) {
         MISC_HILOGE("Read isSupportHdHaptic failed");
+        delete vibratorInfoIPC;
         vibratorInfoIPC = nullptr;
         return vibratorInfoIPC;
     }
     if (!data.ReadBool(vibratorInfoIPC->isLocalVibrator)) {
         MISC_HILOGE("Read isLocalVibrator failed");
+        delete vibratorInfoIPC;
         vibratorInfoIPC = nullptr;
         return vibratorInfoIPC;
     }
@@ -365,11 +370,13 @@ VibratorIdentifierIPC* VibratorIdentifierIPC::Unmarshalling(Parcel &data)
     }
     if (!(data.ReadInt32(identifier->deviceId))) {
         MISC_HILOGE("Read parameter's deviceId or vibratorId failed");
+        delete identifier;
         identifier = nullptr;
         return identifier;
     }
     if (!(data.ReadInt32(identifier->vibratorId))) {
         MISC_HILOGE("Read parameter's deviceId or vibratorId failed");
+        delete identifier;
         identifier = nullptr;
         return identifier;
     }
@@ -398,11 +405,13 @@ EffectInfoIPC* EffectInfoIPC::Unmarshalling(Parcel &data)
     }
     if (!data.ReadInt32(effectInfoIPC->duration)) {
         MISC_HILOGE("Read duration failed");
+        delete effectInfoIPC;
         effectInfoIPC = nullptr;
         return effectInfoIPC;
     }
     if (!data.ReadBool(effectInfoIPC->isSupportEffect)) {
         MISC_HILOGE("Read isSupportEffect failed");
+        delete effectInfoIPC;
         effectInfoIPC = nullptr;
         return effectInfoIPC;
     }
@@ -451,26 +460,31 @@ CustomHapticInfoIPC* CustomHapticInfoIPC::Unmarshalling(Parcel &data)
     }
     if (!data.ReadInt32(customHapticInfoIPC->usage)) {
         MISC_HILOGE("Read usage failed");
+        delete customHapticInfoIPC;
         customHapticInfoIPC = nullptr;
         return customHapticInfoIPC;
     }
     if (!data.ReadBool(customHapticInfoIPC->systemUsage)) {
         MISC_HILOGE("Read systemUsage failed");
+        delete customHapticInfoIPC;
         customHapticInfoIPC = nullptr;
         return customHapticInfoIPC;
     }
     if (!data.ReadInt32(customHapticInfoIPC->parameter.intensity)) {
         MISC_HILOGE("Read intensity failed");
+        delete customHapticInfoIPC;
         customHapticInfoIPC = nullptr;
         return customHapticInfoIPC;
     }
     if (!data.ReadInt32(customHapticInfoIPC->parameter.frequency)) {
         MISC_HILOGE("Read frequency failed");
+        delete customHapticInfoIPC;
         customHapticInfoIPC = nullptr;
         return customHapticInfoIPC;
     }
     if (!data.ReadInt32(customHapticInfoIPC->parameter.reserved)) {
         MISC_HILOGE("Read reserved failed");
+        delete customHapticInfoIPC;
         customHapticInfoIPC = nullptr;
         return customHapticInfoIPC;
     }
@@ -518,23 +532,27 @@ PrimitiveEffectIPC* PrimitiveEffectIPC::Unmarshalling(Parcel &data)
     }
     if (!data.ReadInt32(primitiveEffectIPC->intensity)) {
         MISC_HILOGE("Read intensity failed");
+        delete primitiveEffectIPC;
         primitiveEffectIPC = nullptr;
         return primitiveEffectIPC;
     }
     if (!data.ReadInt32(primitiveEffectIPC->usage)) {
         MISC_HILOGE("Read usage failed");
+        delete primitiveEffectIPC;
         primitiveEffectIPC = nullptr;
         return primitiveEffectIPC;
     }
 
     if (!data.ReadBool(primitiveEffectIPC->systemUsage)) {
         MISC_HILOGE("Read systemUsage failed");
+        delete primitiveEffectIPC;
         primitiveEffectIPC = nullptr;
         return primitiveEffectIPC;
     }
 
     if (!data.ReadInt32(primitiveEffectIPC->count)) {
         MISC_HILOGE("Read count failed");
+        delete primitiveEffectIPC;
         primitiveEffectIPC = nullptr;
         return primitiveEffectIPC;
     }

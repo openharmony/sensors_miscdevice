@@ -30,6 +30,7 @@ const std::string VIBRATE_CONTROL_THREAD_NAME = "OS_VibControl";
 constexpr int32_t DELAY_TIME1 = 5;    /** ms */
 constexpr int32_t DELAY_TIME2 = 10;   /** ms */
 constexpr size_t RETRY_NUMBER = 6;
+constexpr int32_t MAX_VIBRATE_COUNT = 1000;
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
 constexpr size_t COMPOSITE_EFFECT_PART = 128;
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
@@ -112,6 +113,10 @@ void VibratorThread::HandleMultipleVibrations(const VibratorIdentifierIPC& ident
 int32_t VibratorThread::PlayEffect(const VibrateInfo &info, const VibratorIdentifierIPC& identifier)
 {
     std::unique_lock<std::mutex> vibrateLck(vibrateMutex_);
+    if (info.count < 0 || info.count > MAX_VIBRATE_COUNT) {
+        MISC_HILOGE("Vibratorinfo's count is invalid, count:%{public}d", info.count);
+        return ERROR;
+    }
     for (int32_t i = 0; i < info.count; ++i) {
         std::string effect = info.effect;
         int32_t duration = info.duration;

@@ -273,7 +273,7 @@ typedef struct VibratorIdentifier {
  * @since 19
  */
 typedef struct EffectInfo {
-    bool isSupportEffect;
+    bool isSupportEffect = false;
 } EffectInfo;
 
 /**

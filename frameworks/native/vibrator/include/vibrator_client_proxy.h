@@ -61,7 +61,7 @@ public:
             MISC_HILOGE("failed, error code is: %{public}d", error);
             return PARAMETER_ERROR;
         }
-        return replyParcel.ReadInt32();
+        return SUCCESS;
     }
 
 private:
