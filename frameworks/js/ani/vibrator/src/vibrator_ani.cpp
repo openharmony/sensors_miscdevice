@@ -305,19 +305,19 @@ static bool GetPropertyAsDouble(ani_env* env, ani_object obj, const char* proper
     ani_boolean isUndefined = false;
 
     if (env->Object_GetPropertyByName_Ref(obj, propertyName, &propRef) != ANI_OK) {
-        MISC_HILOGE("GetPropertyAsDouble: Failed to get property '%{punlic}s'", propertyName);
+        MISC_HILOGE("GetPropertyAsDouble, failed to get property:%{public}s", propertyName);
         return false;
     }
 
     env->Reference_IsUndefined(propRef, &isUndefined);
     if (isUndefined) {
-        MISC_HILOGE("GetPropertyAsDouble: Property '%{punlic}s' is undefined", propertyName);
+        MISC_HILOGE("GetPropertyAsDouble, property:%{public}s is undefined", propertyName);
         return false;
     }
 
     if (env->Object_CallMethodByName_Double(static_cast<ani_object>(propRef), "doubleValue", nullptr, outValue) !=
         ANI_OK) {
-        MISC_HILOGE("GetPropertyAsDouble: Failed to call 'doubleValue' on property '%{punlic}s'", propertyName);
+        MISC_HILOGE("GetPropertyAsDouble, failed to call doubleValue on property:%{public}s'", propertyName);
         return false;
     }
 
@@ -401,7 +401,7 @@ static bool ParsePointsArray(ani_env *env, ani_object parentObject, VibratorEven
         return false;
     }
 
-    event.pointNum = static_cast<uint32_t>(sizePoints);
+    event.pointNum = static_cast<int32_t>(sizePoints);
 
     if (static_cast<uint32_t>(sizePoints) > 0) {
         if (!ParseVibratorCurvePointArray(env, static_cast<ani_object>(points),
@@ -749,6 +749,38 @@ static bool ParseEffectTypeAndParameters(ani_env *env, ani_object effect, Vibrat
     return true;
 }
 
+static void FreeVibrateInfo(VibrateInfo &vibrateInfo)
+{
+    int32_t patternSize = vibrateInfo.count;
+    if (patternSize <= 0) {
+        MISC_HILOGW("Patterns is not need to free, pattern size:%{public}d", patternSize);
+        return;
+    }
+    auto patterns = &vibrateInfo.vibratorPattern;
+    if (patterns == nullptr) {
+        MISC_HILOGW("Patterns is not need to free, patterns is null");
+        return;
+    }
+    for (int32_t i = 0; i < patternSize; ++i) {
+        int32_t eventNum = patterns[i].eventNum;
+        if ((eventNum <= 0) || (patterns[i].events == nullptr)) {
+            MISC_HILOGW("Events is not need to free, event size:%{public}d", eventNum);
+            continue;
+        }
+        auto events = patterns[i].events;
+        for (int32_t j = 0; j < eventNum; ++j) {
+            if (events[j].points != nullptr) {
+                free(events[j].points);
+                events[j].points = nullptr;
+            }
+        }
+        free(events);
+        events = nullptr;
+    }
+    free(patterns);
+    patterns = nullptr;
+}
+
 static void StartVibrationSync([[maybe_unused]] ani_env *env, ani_object effect, ani_object attribute)
 {
     ani_namespace ns;
@@ -768,6 +800,7 @@ static void StartVibrationSync([[maybe_unused]] ani_env *env, ani_object effect,
         return;
     }
     if (!ParserParamFromVibrateAttribute(env, attribute, vibrateInfo)) {
+        FreeVibrateInfo(vibrateInfo);
         ThrowBusinessError(env, PARAMETER_ERROR, "ParserParamFromVibrateAttribute failed!");
         return;
     }
