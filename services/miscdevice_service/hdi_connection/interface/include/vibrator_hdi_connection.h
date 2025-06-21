@@ -53,6 +53,11 @@ public:
         std::vector<HdfVibratorInfo> &hdfVibratorInfo) override;
     int32_t GetEffectInfo(const VibratorIdentifierIPC &identifier, const std::string &effectType,
         HdfEffectInfo &effectInfo) override;
+    int32_t PlayPatternBySessionId(const VibratorIdentifierIPC &identifier,
+        uint32_t sessionId, const VibratePattern &pattern) override;
+    int32_t PlayPackageBySessionId(const VibratorIdentifierIPC &identifier, uint32_t sessionId,
+        const VibratePackageIPC &package) override;
+    int32_t StopVibrateBySessionId(const VibratorIdentifierIPC &identifier, uint32_t sessionId) override;
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
     int32_t RegisterVibratorPlugCallback(DevicePlugCallback cb) override;
     DevicePlugCallback GetVibratorPlugCb() override;

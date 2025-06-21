@@ -235,6 +235,166 @@ VibratePattern* VibratePattern::Unmarshalling(Parcel &data)
     return pattern;
 }
 
+bool VibratePackageIPC::Marshalling(Parcel &parcel) const
+{
+    if (!parcel.WriteInt32(packageDuration)) {
+        MISC_HILOGE("Write packageDuration failed");
+        return false;
+    }
+    if (!parcel.WriteInt32(patternNum)) {
+        MISC_HILOGE("Write pattern's patternNum failed");
+        return false;
+    }
+    if (patternNum != static_cast<int32_t>(patterns.size())) {
+        MISC_HILOGE("patternNum does not match patterns size");
+        return false;
+    }
+    for (int32_t i = 0; i < patternNum; ++i) {
+        if (!parcel.WriteInt32(patterns[i].startTime)) {
+            MISC_HILOGE("Write pattern's startTime failed");
+            return false;
+        }
+        if (!parcel.WriteInt32(patterns[i].patternDuration)) {
+            MISC_HILOGE("Write patternDuration failed");
+            return false;
+        }
+        if (!parcel.WriteInt32(static_cast<int32_t>(patterns[i].events.size()))) {
+            MISC_HILOGE("Write events's size failed");
+            return false;
+        }
+        for (size_t j = 0; j < patterns[i].events.size(); ++j) {
+            if (!parcel.WriteInt32(static_cast<int32_t>(patterns[i].events[j].tag))) {
+                MISC_HILOGE("Write tag failed");
+                return false;
+            }
+            if (!parcel.WriteInt32(patterns[i].events[j].time)) {
+                MISC_HILOGE("Write events's time failed");
+                return false;
+            }
+            if (!parcel.WriteInt32(patterns[i].events[j].duration)) {
+                MISC_HILOGE("Write duration failed");
+                return false;
+            }
+            if (!parcel.WriteInt32(patterns[i].events[j].intensity)) {
+                MISC_HILOGE("Write intensity failed");
+                return false;
+            }
+            if (!parcel.WriteInt32(patterns[i].events[j].frequency)) {
+                MISC_HILOGE("Write frequency failed");
+                return false;
+            }
+            if (!parcel.WriteInt32(patterns[i].events[j].index)) {
+                MISC_HILOGE("Write index failed");
+                return false;
+            }
+            if (!parcel.WriteInt32(static_cast<int32_t>(patterns[i].events[j].points.size()))) {
+                MISC_HILOGE("Write points's size failed");
+                return false;
+            }
+            for (size_t k = 0; k < patterns[i].events[j].points.size(); ++k) {
+                if (!parcel.WriteInt32(patterns[i].events[j].points[k].time)) {
+                    MISC_HILOGE("Write points's time failed");
+                    return false;
+                }
+                if (!parcel.WriteInt32(patterns[i].events[j].points[k].intensity)) {
+                    MISC_HILOGE("Write points's intensity failed");
+                    return false;
+                }
+                if (!parcel.WriteInt32(patterns[i].events[j].points[k].frequency)) {
+                    MISC_HILOGE("Write points's frequency failed");
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+
+VibratePackageIPC* VibratePackageIPC::Unmarshalling(Parcel &data)
+{
+    auto package = new (std::nothrow) VibratePackageIPC();
+    if (package == nullptr || !(data.ReadInt32(package->packageDuration))) {
+        MISC_HILOGE("Read pattern basic info failed");
+        if (package != nullptr) {
+            delete package;
+            package = nullptr;
+        }
+        return package;
+    }
+    int32_t patternNum{ 0 };
+    if (!(data.ReadInt32(patternNum)) || patternNum > MAX_EVENT_SIZE) {
+        MISC_HILOGE("Read patternNum failed or patternNum exceed the maximum");
+        delete package;
+        package = nullptr;
+        return package;
+    }
+    package->patternNum = patternNum;
+    for (int32_t i = 0; i < patternNum; ++i) {
+        VibratePattern pattern;
+        if (!(data.ReadInt32(pattern.startTime)) || !(data.ReadInt32(pattern.patternDuration))) {
+            MISC_HILOGE("Read pattern basic info failed");
+            delete package;
+            package = nullptr;
+            return package;
+        }
+        int32_t eventSize{ 0 };
+        if (!(data.ReadInt32(eventSize)) || eventSize > MAX_EVENT_SIZE || eventSize < 0) {
+            MISC_HILOGE("Read eventSize failed or eventSize exceed the maximum");
+            delete package;
+            package = nullptr;
+            return package;
+        }
+        for (int32_t j = 0; j < eventSize; ++j) {
+            VibrateEvent event;
+            int32_t tag{ -1 };
+            if (!data.ReadInt32(tag)) {
+                MISC_HILOGE("Read type failed");
+                delete package;
+                package = nullptr;
+                return package;
+            }
+            event.tag = static_cast<VibrateTag>(tag);
+            if (!data.ReadInt32(event.time) || !data.ReadInt32(event.duration) || !data.ReadInt32(event.intensity) ||
+                !data.ReadInt32(event.frequency) || !data.ReadInt32(event.index)) {
+                MISC_HILOGE("Read events info failed");
+                delete package;
+                package = nullptr;
+                return package;
+            }
+            int32_t pointSize{ 0 };
+            if (!data.ReadInt32(pointSize) || pointSize > MAX_POINT_SIZE || pointSize < 0) {
+                MISC_HILOGE("Read pointSize failed or pointSize exceed the maximum");
+                delete package;
+                package = nullptr;
+                return package;
+            }
+            for (int32_t k = 0; k < pointSize; ++k) {
+                VibrateCurvePoint point;
+                if (!data.ReadInt32(point.time) || !data.ReadInt32(point.intensity) ||
+                    !data.ReadInt32(point.frequency)) {
+                    MISC_HILOGE("Read points info time failed");
+                    delete package;
+                    package = nullptr;
+                    return package;
+                }
+                event.points.emplace_back(point);
+            }
+            pattern.events.emplace_back(event);
+        }
+        package->patterns.emplace_back(pattern);
+    }
+    return package;
+}
+
+void VibratePackageIPC::Dump() const
+{
+    int32_t size = static_cast<int32_t>(patterns.size());
+    MISC_HILOGD("Vibrate package pattern size:%{public}d", size);
+    for (int32_t i = 0; i < size; ++i) {
+        patterns[i].Dump();
+    }
+}
+
 void VibrateParameter::Dump() const
 {
     MISC_HILOGI("intensity:%{public}d, frequency:%{public}d", intensity, frequency);
@@ -427,6 +587,10 @@ bool CustomHapticInfoIPC::Marshalling(Parcel &parcel) const
         MISC_HILOGE("Write systemUsage failed");
         return false;
     }
+    if (!parcel.WriteUint32(parameter.sessionId)) {
+        MISC_HILOGE("Write sessionId failed");
+        return false;
+    }
     if (!parcel.WriteInt32(parameter.intensity)) {
         MISC_HILOGE("Write intensity failed");
         return false;
@@ -456,6 +620,11 @@ CustomHapticInfoIPC* CustomHapticInfoIPC::Unmarshalling(Parcel &data)
     }
     if (!data.ReadBool(customHapticInfoIPC->systemUsage)) {
         MISC_HILOGE("Read systemUsage failed");
+        customHapticInfoIPC = nullptr;
+        return customHapticInfoIPC;
+    }
+    if (!data.ReadUint32(customHapticInfoIPC->parameter.sessionId)) {
+        MISC_HILOGE("Read sessionId failed");
         customHapticInfoIPC = nullptr;
         return customHapticInfoIPC;
     }

@@ -2835,5 +2835,109 @@ HWTEST_F(VibratorAgentTest, operator_001, TestSize.Level1)
     VibratorIdentifier id2{2, 1};
     ASSERT_TRUE(id1 < id2);
 }
+
+HWTEST_F(VibratorAgentTest, PlayPatternBySessionId_001, TestSize.Level1)
+{
+    MISC_HILOGI("PlayPatternBySessionId_001 in");
+    VibratorPattern pattern;
+    int32_t ret = PlayPatternBySessionId(0, pattern);
+    ASSERT_NE(ret, PARAMETER_ERROR);
+}
+
+HWTEST_F(VibratorAgentTest, PlayPatternBySessionId_002, TestSize.Level1)
+{
+    MISC_HILOGI("PlayPatternBySessionId_002 in");
+    bool isSupport = IsSupportVibratorCustom();
+    if (isSupport) {
+        int32_t delayTime { -1 };
+        int32_t ret = GetDelayTime(delayTime);
+        ASSERT_EQ(ret, 0);
+        MISC_HILOGD("delayTime:%{public}d", delayTime);
+        FileDescriptor fileDescriptor("/data/test/vibrator/coin_drop.json");
+        MISC_HILOGD("fd:%{public}d", fileDescriptor.fd);
+        VibratorFileDescription vfd;
+        VibratorPackage package;
+        struct stat64 statbuf = { 0 };
+        if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
+            vfd.fd = fileDescriptor.fd;
+            vfd.offset = 0;
+            vfd.length = statbuf.st_size;
+            ret = PreProcess(vfd, package);
+            ASSERT_EQ(ret, 0);
+            for (int32_t i = 0; i < package.patternNum; ++i) {
+                if (i == 0) {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(package.patterns[i].time));
+                } else {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(package.patterns[i].time) -
+                        std::chrono::milliseconds(package.patterns[i - 1].time));
+                }
+                ASSERT_EQ(SetUsage(USAGE_UNKNOWN), true);
+                MISC_HILOGD("pointNum:%{public}d", package.patterns[i].events[i].pointNum);
+                ret = PlayPatternBySessionId(1, package.patterns[i]);
+                ASSERT_EQ(ret, 0);
+            }
+        }
+        ret = FreeVibratorPackage(package);
+        ASSERT_EQ(ret, 0);
+        StopVibrateBySessionId(1);
+    } else {
+        ASSERT_EQ(isSupport, false);
+    }
+}
+
+HWTEST_F(VibratorAgentTest, PlayPackageBySessionId_001, TestSize.Level1)
+{
+    MISC_HILOGI("PlayPatternBySessionId_001 in");
+    VibratorPackage package;
+    int32_t ret = PlayPackageBySessionId(0, package);
+    ASSERT_NE(ret, PARAMETER_ERROR);
+}
+
+HWTEST_F(VibratorAgentTest, PlayPackageBySessionId_002, TestSize.Level1)
+{
+    MISC_HILOGI("PlayPatternBySessionId_002 in");
+    bool isSupport = IsSupportVibratorCustom();
+    if (isSupport) {
+        int32_t delayTime { -1 };
+        int32_t ret = GetDelayTime(delayTime);
+        ASSERT_EQ(ret, 0);
+        MISC_HILOGD("delayTime:%{public}d", delayTime);
+        FileDescriptor fileDescriptor("/data/test/vibrator/coin_drop.json");
+        MISC_HILOGD("fd:%{public}d", fileDescriptor.fd);
+        VibratorFileDescription vfd;
+        VibratorPackage package;
+        struct stat64 statbuf = { 0 };
+        if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
+            vfd.fd = fileDescriptor.fd;
+            vfd.offset = 0;
+            vfd.length = statbuf.st_size;
+            ret = PreProcess(vfd, package);
+            ASSERT_EQ(ret, 0);
+            ASSERT_EQ(SetUsage(USAGE_UNKNOWN), true);
+            MISC_HILOGD("patternNum:%{public}d", package.patternNum);
+            ret = PlayPackageBySessionId(1, package);
+            ASSERT_EQ(ret, 0);
+        }
+        ret = FreeVibratorPackage(package);
+        ASSERT_EQ(ret, 0);
+        StopVibrateBySessionId(1);
+    } else {
+        ASSERT_EQ(isSupport, false);
+    }
+}
+
+HWTEST_F(VibratorAgentTest, StopVibrateBySessionId_001, TestSize.Level1)
+{
+    MISC_HILOGI("StopVibrateBySessionId_001 in");
+    int32_t ret = StopVibrateBySessionId(0);
+    ASSERT_NE(ret, PARAMETER_ERROR);
+}
+
+HWTEST_F(VibratorAgentTest, StopVibrateBySessionId_002, TestSize.Level1)
+{
+    MISC_HILOGI("StopVibrateBySessionId_002 in");
+    int32_t ret = StopVibrateBySessionId(1);
+    ASSERT_NE(ret, OHOS::Sensors::SUCCESS);
+}
 } // namespace Sensors
 } // namespace OHOS

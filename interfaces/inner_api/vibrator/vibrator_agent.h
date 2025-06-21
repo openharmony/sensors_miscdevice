@@ -455,6 +455,30 @@ int32_t SubscribeVibratorPlug(const VibratorUser& user);
  * @since 19
  */
 int32_t UnSubscribeVibratorPlug(const VibratorUser& user);
+
+/**
+ * @brief Play the vibration sequence.
+ * @param pattern: Vibration sequences with sessionId, such as {@link VibratorPattern}.
+ * @return 0 indicates success, otherwise indicates failure.
+ * @since 20
+ */
+int32_t PlayPatternBySessionId(uint32_t sessionId, const VibratorPattern &pattern);
+
+/**
+ * @brief Play the vibration sequence.
+ * @param package: Vibration sequence packages, such as {@link VibratorPackage}.
+ * @return 0 indicates success, otherwise indicates failure.
+ * @since 20
+ */
+int32_t PlayPackageBySessionId(uint32_t sessionId, const VibratorPackage &package);
+
+/**
+ * @brief Stop the motor vibration according to sessionId.
+ * @param sessionId Indicates the sessionId of the vibration to stop.
+ * @return Returns <b>0</b> if the vibration is stopped as expected; returns <b>-1</b> otherwise.
+ * @since 20
+ */
+int32_t StopVibrateBySessionId(uint32_t sessionId);
 } // namespace Sensors
 } // namespace OHOS
 #ifdef __cplusplus

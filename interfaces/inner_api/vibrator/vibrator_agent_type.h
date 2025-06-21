@@ -233,6 +233,7 @@ typedef struct VibratorParameter {
     int32_t intensity = 100;  // from 0 to 100
     int32_t frequency = 0;    // from -100 to 100
     int32_t reserved = 0;
+    uint32_t sessionId = 0;
 } VibratorParameter;
 
 /**

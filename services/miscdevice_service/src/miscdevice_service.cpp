@@ -898,7 +898,7 @@ int32_t MiscdeviceService::Dump(int32_t fd, const std::vector<std::u16string> &a
 }
 
 int32_t MiscdeviceService::PerformVibrationControl(const VibratorIdentifierIPC& identifier,
-    const VibratePattern& pattern, VibrateInfo& info)
+    int32_t duration, VibrateInfo& info)
 {
     std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
     std::string curVibrateTime = GetCurrentTime();
@@ -911,8 +911,7 @@ int32_t MiscdeviceService::PerformVibrationControl(const VibratorIdentifierIPC& 
         }
     }
     MISC_HILOGI("Start vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, usage:%{public}d,"
-        "duration:%{public}d", curVibrateTime.c_str(), info.packageName.c_str(), info.pid, info.usage,
-        pattern.patternDuration);
+        "duration:%{public}d", curVibrateTime.c_str(), info.packageName.c_str(), info.pid, info.usage, duration);
     return ERR_OK;
 }
 
@@ -933,12 +932,14 @@ int32_t MiscdeviceService::PlayPattern(const VibratorIdentifierIPC& identifier, 
     };
     MergeVibratorParmeters(customHapticInfoIPC.parameter, package);
     package.Dump();
+    uint32_t sessionId = customHapticInfoIPC.parameter.sessionId;
     VibrateInfo info = {
         .mode = VIBRATE_BUTT,
         .packageName = GetPackageName(GetCallingTokenID()),
         .pid = GetCallingPid(),
         .uid = GetCallingUid(),
         .usage = customHapticInfoIPC.usage,
+        .sessionId = sessionId,
         .systemUsage = customHapticInfoIPC.systemUsage
     };
     VibratorCapacity capacity;
@@ -947,10 +948,13 @@ int32_t MiscdeviceService::PlayPattern(const VibratorIdentifierIPC& identifier, 
         return ERROR;
     }
     if (capacity.isSupportHdHaptic) {
-        int32_t result = PerformVibrationControl(identifier, pattern, info);
+        int32_t result = PerformVibrationControl(identifier, pattern.patternDuration, info);
         if (result != ERR_OK) {
             MISC_HILOGE("PerformVibrationControl failed");
             return result;
+        }
+        if (sessionId > 0) {
+            return vibratorHdiConnection_.PlayPatternBySessionId(identifier, sessionId, package.patterns.front());
         }
         return vibratorHdiConnection_.PlayPattern(identifier, package.patterns.front());
     } else if (capacity.isSupportPresetMapping) {
@@ -959,7 +963,98 @@ int32_t MiscdeviceService::PlayPattern(const VibratorIdentifierIPC& identifier, 
         info.mode = VIBRATE_CUSTOM_COMPOSITE_TIME;
     }
     info.package = package;
-    return PerformVibrationControl(identifier, pattern, info);
+    return PerformVibrationControl(identifier, pattern.patternDuration, info);
+}
+
+int32_t MiscdeviceService::PlayPackageBySessionId(const VibratorIdentifierIPC &identifier,
+    const VibratePackageIPC &package, const CustomHapticInfoIPC &customHapticInfoIPC)
+{
+    CALL_LOG_ENTER;
+    int32_t checkResult = PlayPatternCheckAuthAndParam(customHapticInfoIPC.usage, customHapticInfoIPC.parameter);
+    if (checkResult != ERR_OK) {
+        MISC_HILOGE("CheckAuthAndParam failed, ret:%{public}d", checkResult);
+        return checkResult;
+    }
+    package.Dump();
+    VibrateInfo info = {
+        .mode = VIBRATE_BUTT,
+        .packageName = GetPackageName(GetCallingTokenID()),
+        .pid = GetCallingPid(),
+        .uid = GetCallingUid(),
+        .usage = customHapticInfoIPC.usage,
+        .systemUsage = customHapticInfoIPC.systemUsage,
+        .sessionId = customHapticInfoIPC.parameter.sessionId
+    };
+    VibratorCapacity capacity;
+    if (GetHapticCapacityInfo(identifier, capacity) != ERR_OK) {
+        MISC_HILOGE("GetVibratorCapacity failed");
+        return ERROR;
+    }
+    if (capacity.isSupportHdHaptic) {
+        int32_t result = PerformVibrationControl(identifier, package.packageDuration, info);
+        if (result != ERR_OK) {
+            MISC_HILOGE("PerformVibrationControl failed");
+            return result;
+        }
+        uint32_t sessionId = customHapticInfoIPC.parameter.sessionId;
+        return vibratorHdiConnection_.PlayPackageBySessionId(identifier, sessionId, package);
+    } else if (capacity.isSupportPresetMapping) {
+        info.mode = VIBRATE_CUSTOM_COMPOSITE_EFFECT;
+    } else if (capacity.isSupportTimeDelay) {
+        info.mode = VIBRATE_CUSTOM_COMPOSITE_TIME;
+    }
+    info.packageIPC = package;
+    return PerformVibrationControl(identifier, package.packageDuration, info);
+}
+
+int32_t MiscdeviceService::StopVibrateBySessionId(const VibratorIdentifierIPC &identifier, uint32_t sessionId)
+{
+    CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
+    PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
+    int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
+    if (ret != PERMISSION_GRANTED) {
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
+            HiSysEvent::EventType::SECURITY, "PKG_NAME", "StopVibrateBySessionId", "ERROR_CODE", ret);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
+        MISC_HILOGE("CheckVibratePermission failed, ret:%{public}d", ret);
+        return PERMISSION_DENIED;
+    }
+    std::vector<VibratorIdentifierIPC> result = CheckDeviceIdIsValid(identifier);
+    int32_t ignoreVibrateNum = 0;
+    if (result.empty()) {
+        MISC_HILOGD("No vibration, no need to stop");
+        return ERROR;
+    }
+    for (const auto& paramIt : result) {
+        auto vibratorThread_ = GetVibratorThread(paramIt);
+        if ((vibratorThread_ == nullptr) || (!vibratorThread_->IsRunning() &&
+            !vibratorHdiConnection_.IsVibratorRunning(paramIt))) {
+            MISC_HILOGD("No vibration, no need to stop");
+            ignoreVibrateNum++;
+            continue;
+        }
+        const VibrateInfo info = vibratorThread_->GetCurrentVibrateInfo();
+        if (info.sessionId != sessionId) {
+            MISC_HILOGD("Stop vibration information mismatch");
+            continue;
+        }
+        StopVibrateThread(vibratorThread_);
+        if (vibratorHdiConnection_.IsVibratorRunning(paramIt)) {
+            vibratorHdiConnection_.Stop(paramIt, HDF_VIBRATOR_MODE_PRESET);
+        }
+    }
+    if (ignoreVibrateNum == result.size()) {
+        MISC_HILOGD("No vibration, no need to stop");
+        return ERROR;
+    }
+    std::string packageName = GetPackageName(GetCallingTokenID());
+    std::string curVibrateTime = GetCurrentTime();
+    MISC_HILOGI("Stop vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, deviceId:%{public}d,"
+        "vibratorId:%{public}d, sessionId:%{public}d", curVibrateTime.c_str(), packageName.c_str(), GetCallingPid(),
+        identifier.deviceId, identifier.vibratorId, sessionId);
+    return NO_ERROR;
 }
 
 int32_t MiscdeviceService::PlayPatternCheckAuthAndParam(int32_t usage, const VibrateParameter &parameter)

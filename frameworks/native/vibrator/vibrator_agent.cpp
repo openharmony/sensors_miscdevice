@@ -483,5 +483,77 @@ int32_t UnSubscribeVibratorPlug(const VibratorUser& user)
     }
     return SUCCESS;
 }
+
+int32_t PlayPatternBySessionId(uint32_t sessionId, const VibratorPattern &pattern)
+{
+    CALL_LOG_ENTER;
+    if (sessionId == 0) {
+        MISC_HILOGE("sessionId invalid, ret:%{public}d", sessionId);
+        return PARAMETER_ERROR;
+    }
+    VibratorIdentifier identifier = {
+        .deviceId = -1,
+        .vibratorId = -1
+    };
+    auto &client = VibratorServiceClient::GetInstance();
+    VibratorEffectParameter vibratorEffectParameter = client.GetVibratorEffectParameter(identifier);
+    vibratorEffectParameter.vibratorParameter.sessionId = sessionId;
+    int32_t ret = client.PlayPattern(identifier, pattern, vibratorEffectParameter.usage,
+        vibratorEffectParameter.systemUsage, vibratorEffectParameter.vibratorParameter);
+    vibratorEffectParameter.vibratorParameter.intensity = INTENSITY_ADJUST_MAX;
+    vibratorEffectParameter.vibratorParameter.frequency = 0;
+    client.SetUsage(identifier, USAGE_UNKNOWN, false);
+    client.SetParameters(identifier, vibratorEffectParameter.vibratorParameter);
+    if (ret != ERR_OK) {
+        MISC_HILOGE("PlayPatternBySessionId failed, ret:%{public}d", ret);
+        return NormalizeErrCode(ret);
+    }
+    return SUCCESS;
+}
+
+int32_t PlayPackageBySessionId(uint32_t sessionId, const VibratorPackage &package)
+{
+    CALL_LOG_ENTER;
+    if (sessionId == 0) {
+        MISC_HILOGE("sessionId invalid, ret:%{public}d", sessionId);
+        return PARAMETER_ERROR;
+    }
+    VibratorIdentifier identifier = {
+        .deviceId = -1,
+        .vibratorId = -1
+    };
+    auto &client = VibratorServiceClient::GetInstance();
+    VibratorEffectParameter vibratorEffectParameter = client.GetVibratorEffectParameter(identifier);
+    vibratorEffectParameter.sessionId = sessionId;
+    int32_t ret = client.PlayPackageBySessionId(identifier, vibratorEffectParameter, package);
+    if (ret != ERR_OK) {
+        MISC_HILOGE("PlayPackageBySessionId failed, ret:%{public}d", ret);
+        return NormalizeErrCode(ret);
+    }
+    vibratorEffectParameter.vibratorParameter.intensity = INTENSITY_ADJUST_MAX;
+    vibratorEffectParameter.vibratorParameter.frequency = 0;
+    client.SetUsage(identifier, USAGE_UNKNOWN, false);
+    client.SetParameters(identifier, vibratorEffectParameter.vibratorParameter);
+    return SUCCESS;
+}
+
+int32_t StopVibrateBySessionId(uint32_t sessionId)
+{
+    CALL_LOG_ENTER;
+    if (sessionId == 0) {
+        MISC_HILOGE("sessionId invalid, ret:%{public}d", sessionId);
+        return PARAMETER_ERROR;
+    }
+    VibratorIdentifier identifier = {
+        .deviceId = -1,
+        .vibratorId = -1
+    };
+    int32_t ret = VibratorServiceClient::GetInstance().StopVibrateBySessionId(identifier, sessionId);
+    if (ret != ERR_OK) {
+        MISC_HILOGE("StopVibrateBySessionId failed, ret:%{public}d", ret);
+        return NormalizeErrCode(ret);
+    }
+    return SUCCESS;
+}
 } // namespace Sensors
 } // namespace OHOS

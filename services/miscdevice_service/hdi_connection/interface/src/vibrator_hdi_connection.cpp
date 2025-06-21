@@ -164,6 +164,26 @@ int32_t VibratorHdiConnection::PlayPattern(const VibratorIdentifierIPC &identifi
     return iVibratorHdiConnection_->PlayPattern(identifier, pattern);
 }
 
+int32_t VibratorHdiConnection::PlayPatternBySessionId(const VibratorIdentifierIPC &identifier, uint32_t sessionId,
+    const VibratePattern &pattern)
+{
+    CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
+    return iVibratorHdiConnection_->PlayPatternBySessionId(identifier, sessionId, pattern);
+}
+
+int32_t VibratorHdiConnection::PlayPackageBySessionId(const VibratorIdentifierIPC &identifier, uint32_t sessionId,
+    const VibratePackageIPC &package)
+{
+    CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
+    return iVibratorHdiConnection_->PlayPackageBySessionId(identifier, sessionId, package);
+}
+
+int32_t VibratorHdiConnection::StopVibrateBySessionId(const VibratorIdentifierIPC &identifier, uint32_t sessionId)
+{
+    CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
+    return iVibratorHdiConnection_->StopVibrateBySessionId(identifier, sessionId);
+}
+
 int32_t VibratorHdiConnection::DestroyHdiConnection()
 {
     CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);

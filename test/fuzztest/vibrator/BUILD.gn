@@ -48,5 +48,8 @@ group("fuzztest") {
     "playpatternenhanced_fuzzer:fuzztest",
     "getdelaytimeenhanced_fuzzer:fuzztest",
     "cancelenhanced_fuzzer:fuzztest",
+    "playpackagebysessionid_fuzzer:fuzztest",
+    "playpatternbysessionid_fuzzer:fuzztest",
+    "stopvibratebysessionid_fuzzer:fuzztest",
   ]
 }

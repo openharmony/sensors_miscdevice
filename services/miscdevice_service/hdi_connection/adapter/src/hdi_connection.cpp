@@ -233,10 +233,8 @@ int32_t HdiConnection::GetVibratorCapacity(const VibratorIdentifierIPC &identifi
     return ERR_OK;
 }
 
-int32_t HdiConnection::PlayPattern(const VibratorIdentifierIPC &identifier, const VibratePattern &pattern)
+void HdiConnection::GetHapticPaket(const VibratePattern &pattern, HapticPaket &packet)
 {
-    CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
-    HapticPaket packet = {};
     packet.time = pattern.startTime;
     int32_t eventNum = static_cast<int32_t>(pattern.events.size());
     packet.eventNum = eventNum;
@@ -259,6 +257,13 @@ int32_t HdiConnection::PlayPattern(const VibratorIdentifierIPC &identifier, cons
         }
         packet.events.emplace_back(hapticEvent);
     }
+}
+
+int32_t HdiConnection::PlayPattern(const VibratorIdentifierIPC &identifier, const VibratePattern &pattern)
+{
+    CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
+    HapticPaket packet = {};
+    GetHapticPaket(pattern, packet);
     DeviceVibratorInfo deviceVibratorInfo = {
         .deviceId = identifier.deviceId,
         .vibratorId = identifier.vibratorId
@@ -270,6 +275,101 @@ int32_t HdiConnection::PlayPattern(const VibratorIdentifierIPC &identifier, cons
             HiSysEvent::EventType::FAULT, "PKG_NAME", "PlayHapticPattern", "ERROR_CODE", ret);
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
         MISC_HILOGE("PlayHapticPattern failed");
+        return ret;
+    }
+    return ERR_OK;
+}
+
+int32_t HdiConnection::PlayPatternBySessionId(const VibratorIdentifierIPC &identifier,
+    uint32_t sessionId, const VibratePattern &pattern)
+{
+    CALL_LOG_ENTER;
+    CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
+    HapticPaket packet = {};
+    GetHapticPaket(pattern, packet);
+    DeviceVibratorInfo deviceVibratorInfo = {
+        .deviceId = identifier.deviceId,
+        .vibratorId = identifier.vibratorId
+    };
+    int32_t ret = vibratorInterface_->PlayPatternBySessionId(deviceVibratorInfo, sessionId, packet);
+    if (ret != ERR_OK) {
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "PlayPatternBySessionId", "ERROR_CODE", ret);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
+        MISC_HILOGE("PlayPatternBySessionId failed");
+        return ret;
+    }
+    return ERR_OK;
+}
+
+void HdiConnection::GetVibratorPackage(const VibratePackageIPC &packageIPC, VibratorPackage &package)
+{
+    package.packageduration = packageIPC.packageDuration;
+    for (int32_t i = 0; i < packageIPC.patternNum; ++i) {
+        int32_t patternNum = static_cast<int32_t>(packageIPC.patterns[i].events.size());
+        package.patternNum = patternNum;
+        HapticPaket paket;
+        for (int32_t j = 0; j < patternNum; ++j) {
+            HapticEvent hapticEvent = {};
+            hapticEvent.type = static_cast<EVENT_TYPE>(packageIPC.patterns[i].events[j].tag);
+            hapticEvent.time = packageIPC.patterns[i].events[j].time;
+            hapticEvent.duration = packageIPC.patterns[i].events[j].duration;
+            hapticEvent.intensity = packageIPC.patterns[i].events[j].intensity;
+            hapticEvent.frequency = packageIPC.patterns[i].events[j].frequency;
+            hapticEvent.index = packageIPC.patterns[i].events[j].index;
+            int32_t pointNum = static_cast<int32_t>(packageIPC.patterns[i].events[j].points.size());
+            hapticEvent.pointNum = pointNum;
+            for (int32_t k = 0; k < pointNum; ++k) {
+                CurvePoint hapticPoint = {};
+                hapticPoint.time = packageIPC.patterns[i].events[j].points[k].time;
+                hapticPoint.intensity = packageIPC.patterns[i].events[j].points[k].intensity;
+                hapticPoint.frequency = packageIPC.patterns[i].events[j].points[k].frequency;
+                hapticEvent.points.emplace_back(hapticPoint);
+            }
+            paket.events.emplace_back(hapticEvent);
+        }
+        package.patterns.emplace_back(paket);
+    }
+}
+
+int32_t HdiConnection::PlayPackageBySessionId(const VibratorIdentifierIPC &identifier, uint32_t sessionId,
+    const VibratePackageIPC &package)
+{
+    CALL_LOG_ENTER;
+    DeviceVibratorInfo deviceVibratorInfo = {
+        .deviceId = identifier.deviceId,
+        .vibratorId = identifier.vibratorId
+    };
+    VibratorPackage hdiPackage;
+    GetVibratorPackage(package, hdiPackage);
+    int32_t ret = vibratorInterface_->PlayPackageBySession(deviceVibratorInfo, sessionId, hdiPackage);
+    if (ret != ERR_OK) {
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "PlayPackageBySessionId", "ERROR_CODE", ret);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
+        MISC_HILOGE("PlayPackageBySessionId failed");
+        return ret;
+    }
+    return ERR_OK;
+}
+
+int32_t HdiConnection::StopVibrateBySessionId(const VibratorIdentifierIPC &identifier, uint32_t sessionId)
+{
+    CALL_LOG_ENTER;
+    CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
+    DeviceVibratorInfo deviceVibratorInfo = {
+        .deviceId = identifier.deviceId,
+        .vibratorId = identifier.vibratorId
+    };
+    int32_t ret = vibratorInterface_->StopVibrateBySessionId(deviceVibratorInfo, sessionId);
+    if (ret != ERR_OK) {
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
+            HiSysEvent::EventType::FAULT, "PKG_NAME", "StopVibrateBySessionId", "ERROR_CODE", ret);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
+        MISC_HILOGE("StopVibrateBySessionId failed");
         return ret;
     }
     return ERR_OK;

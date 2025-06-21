@@ -471,6 +471,7 @@ int32_t VibratorServiceClient::InitPlayPattern(const VibratorIdentifier &identif
     customHapticInfoIPC.systemUsage = systemUsage;
     customHapticInfoIPC.parameter.intensity = parameter.intensity;
     customHapticInfoIPC.parameter.frequency = parameter.frequency;
+    customHapticInfoIPC.parameter.sessionId = parameter.sessionId;
     VibratorIdentifierIPC vibrateIdentifier;
     vibrateIdentifier.deviceId = identifier.deviceId;
     vibrateIdentifier.vibratorId = identifier.vibratorId;
@@ -499,6 +500,115 @@ int32_t VibratorServiceClient::PlayPattern(const VibratorIdentifier &identifier,
 #endif // HIVIEWDFX_HITRACE_ENABLE
     if (ret != ERR_OK) {
         MISC_HILOGE("PlayPattern failed, ret:%{public}d, usage:%{public}d", ret, usage);
+    }
+    return ret;
+}
+
+int32_t VibratorServiceClient::ConvertVibratorPackage(const VibratorPackage& inPkg, VibratePackageIPC &outPkg)
+{
+    outPkg.patternNum = inPkg.patternNum;
+    outPkg.packageDuration = inPkg.packageDuration;
+    for (int32_t i = 0; i < inPkg.patternNum; ++i) {
+        if (inPkg.patterns == nullptr) {
+            MISC_HILOGE("VibratorPackage's patterns is null");
+            return ERROR;
+        }
+        VibratePattern vibratePattern = {};
+        vibratePattern.startTime = inPkg.patterns[i].time;
+        vibratePattern.patternDuration = inPkg.patterns[i].patternDuration;
+        for (int32_t j = 0; j < inPkg.patterns[i].eventNum; ++j) {
+            if (inPkg.patterns[i].events == nullptr) {
+                MISC_HILOGE("vibratePattern's events is null");
+                return ERROR;
+            }
+            VibrateEvent event;
+            event.tag = static_cast<VibrateTag>(inPkg.patterns[i].events[j].type);
+            event.time = inPkg.patterns[i].events[j].time;
+            event.duration = inPkg.patterns[i].events[j].duration;
+            event.intensity = inPkg.patterns[i].events[j].intensity;
+            event.frequency = inPkg.patterns[i].events[j].frequency;
+            event.index = inPkg.patterns[i].events[j].index;
+            for (int32_t k = 0; k < inPkg.patterns[i].events[j].pointNum; ++k) {
+                if (inPkg.patterns[i].events[j].points == nullptr) {
+                    MISC_HILOGE("VibratorEvent's points is null");
+                    continue;
+                }
+                VibrateCurvePoint point;
+                point.time = inPkg.patterns[i].events[j].points[k].time;
+                point.intensity = inPkg.patterns[i].events[j].points[k].intensity;
+                point.frequency = inPkg.patterns[i].events[j].points[k].frequency;
+                event.points.emplace_back(point);
+            }
+            vibratePattern.events.emplace_back(event);
+            vibratePattern.patternDuration = inPkg.patterns[i].patternDuration;
+        }
+        outPkg.patterns.emplace_back(vibratePattern);
+    }
+    return ERR_OK;
+}
+
+int32_t VibratorServiceClient::PlayPackageBySessionId(const VibratorIdentifier &identifier,
+    const VibratorEffectParameter &parameter, const VibratorPackage &package)
+{
+    MISC_HILOGD("PlayPackageBySessionId begin, sessionId:%{public}d", parameter.sessionId);
+    int32_t ret = InitServiceClient();
+    if (ret != ERR_OK) {
+        MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
+        return MISC_NATIVE_GET_SERVICE_ERR;
+    }
+    VibratePackageIPC packageIPC;
+    if (ConvertVibratorPackage(package, packageIPC) != ERR_OK) {
+        MISC_HILOGE("VibratorPackage parameter invalid");
+        return PARAMETER_ERROR;
+    }
+    CustomHapticInfoIPC customHapticInfoIPC;
+    customHapticInfoIPC.usage = parameter.usage;
+    customHapticInfoIPC.systemUsage = parameter.systemUsage;
+    customHapticInfoIPC.parameter.intensity = parameter.vibratorParameter.intensity;
+    customHapticInfoIPC.parameter.frequency = parameter.vibratorParameter.frequency;
+    customHapticInfoIPC.parameter.sessionId = parameter.sessionId;
+    VibratorIdentifierIPC vibrateIdentifier;
+    vibrateIdentifier.deviceId = identifier.deviceId;
+    vibrateIdentifier.vibratorId = identifier.vibratorId;
+    std::lock_guard<std::mutex> clientLock(clientMutex_);
+#ifdef HIVIEWDFX_HITRACE_ENABLE
+    StartTrace(HITRACE_TAG_SENSORS, "PlayPackageBySessionId");
+#endif // HIVIEWDFX_HITRACE_ENABLE
+    CHKPR(miscdeviceProxy_, ERROR);
+    ret = miscdeviceProxy_->PlayPackageBySessionId(vibrateIdentifier, packageIPC, customHapticInfoIPC);
+    WriteVibratorHiSysIPCEvent(IMiscdeviceServiceIpcCode::COMMAND_PLAY_PACKAGE_BY_SESSION_ID, ret);
+#ifdef HIVIEWDFX_HITRACE_ENABLE
+    FinishTrace(HITRACE_TAG_SENSORS);
+#endif // HIVIEWDFX_HITRACE_ENABLE
+    if (ret != ERR_OK) {
+        MISC_HILOGD("PlayPackageBySessionId failed, ret:%{public}d, sessionId:%{public}d", ret, parameter.sessionId);
+    }
+    return ret;
+}
+
+int32_t VibratorServiceClient::StopVibrateBySessionId(const VibratorIdentifier &identifier, uint32_t sessionId)
+{
+    MISC_HILOGD("StopVibrateBySessionId begin, sessionId:%{public}d", sessionId);
+    int32_t ret = InitServiceClient();
+    if (ret != ERR_OK) {
+        MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
+        return MISC_NATIVE_GET_SERVICE_ERR;
+    }
+    std::lock_guard<std::mutex> clientLock(clientMutex_);
+#ifdef HIVIEWDFX_HITRACE_ENABLE
+    StartTrace(HITRACE_TAG_SENSORS, "StopVibrateBySessionId");
+#endif // HIVIEWDFX_HITRACE_ENABLE
+    VibratorIdentifierIPC vibrateIdentifier;
+    vibrateIdentifier.deviceId = identifier.deviceId;
+    vibrateIdentifier.vibratorId = identifier.vibratorId;
+    CHKPR(miscdeviceProxy_, ERROR);
+    ret = miscdeviceProxy_->StopVibrateBySessionId(vibrateIdentifier, sessionId);
+    WriteVibratorHiSysIPCEvent(IMiscdeviceServiceIpcCode::COMMAND_STOP_VIBRATE_BY_SESSION_ID, ret);
+#ifdef HIVIEWDFX_HITRACE_ENABLE
+    FinishTrace(HITRACE_TAG_SENSORS);
+#endif // HIVIEWDFX_HITRACE_ENABLE
+    if (ret != ERR_OK) {
+        MISC_HILOGD("StopVibrateBySessionId failed, ret:%{public}d, sessionId:%{public}d", ret, sessionId);
     }
     return ret;
 }
@@ -1330,6 +1440,14 @@ void VibratorServiceClient::WriteVibratorHiSysIPCEvent(IMiscdeviceServiceIpcCode
             case IMiscdeviceServiceIpcCode::COMMAND_GET_EFFECT_INFO:
                 HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
                     HiSysEvent::EventType::FAULT, "PKG_NAME", "GetEffectInfo", "ERROR_CODE", ret);
+                break;
+            case IMiscdeviceServiceIpcCode::COMMAND_PLAY_PACKAGE_BY_SESSION_ID:
+                HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+                    HiSysEvent::EventType::FAULT, "PKG_NAME", "PlayPackageBySessionId", "ERROR_CODE", ret);
+                break;
+            case IMiscdeviceServiceIpcCode::COMMAND_STOP_VIBRATE_BY_SESSION_ID:
+                HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
+                    HiSysEvent::EventType::FAULT, "PKG_NAME", "StopVibrateBySessionId", "ERROR_CODE", ret);
                 break;
             default:
                 MISC_HILOGW("Code does not exist, code:%{public}d", static_cast<int32_t>(code));

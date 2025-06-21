@@ -39,6 +39,7 @@ typedef struct VibratorEffectParameter {
     int32_t loopCount = 1;
     int32_t usage = USAGE_UNKNOWN;
     bool systemUsage = false;
+    uint32_t sessionId = 0;
     VibratorParameter vibratorParameter;
 }VibratorEffectParameter;
 
