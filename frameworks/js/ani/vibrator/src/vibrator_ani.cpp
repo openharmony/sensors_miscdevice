@@ -145,9 +145,9 @@ static bool SetVibrateProperty(ani_env* env, ani_object effect, const char* prop
     }
 
     ani_double result;
-    if (ANI_OK != env->Object_CallMethodByName_Double(static_cast<ani_object>(propertyRef), "doubleValue", nullptr,
+    if (ANI_OK != env->Object_CallMethodByName_Double(static_cast<ani_object>(propertyRef), "unboxed", nullptr,
         &result)) {
-        MISC_HILOGE("Failed to call Method named doubleValue on property \"%{public}s\"", propertyName);
+        MISC_HILOGE("Failed to call Method named unboxed on property \"%{public}s\"", propertyName);
         return false;
     }
 
@@ -205,9 +205,9 @@ bool SetVibratePropertyInt64(ani_env* env, ani_object effect, const char* proper
     }
 
     ani_double result;
-    if (ANI_OK != env->Object_CallMethodByName_Double(static_cast<ani_object>(propertyRef), "doubleValue", nullptr,
+    if (ANI_OK != env->Object_CallMethodByName_Double(static_cast<ani_object>(propertyRef), "unboxed", nullptr,
         &result)) {
-        MISC_HILOGE("Failed to call Method named doubleValue on property \"%{public}s\"", propertyName);
+        MISC_HILOGE("Failed to call Method named unboxed on property \"%{public}s\"", propertyName);
         return false;
     }
 
@@ -315,9 +315,9 @@ static bool GetPropertyAsDouble(ani_env* env, ani_object obj, const char* proper
         return false;
     }
 
-    if (env->Object_CallMethodByName_Double(static_cast<ani_object>(propRef), "doubleValue", nullptr, outValue) !=
+    if (env->Object_CallMethodByName_Double(static_cast<ani_object>(propRef), "unboxed", nullptr, outValue) !=
         ANI_OK) {
-        MISC_HILOGE("GetPropertyAsDouble: Failed to call 'doubleValue' on property '%{punlic}s'", propertyName);
+        MISC_HILOGE("GetPropertyAsDouble: Failed to call 'unboxed' on property '%{punlic}s'", propertyName);
         return false;
     }
 
