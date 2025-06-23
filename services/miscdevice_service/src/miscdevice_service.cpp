@@ -1010,7 +1010,6 @@ int32_t MiscdeviceService::PlayPackageBySessionId(const VibratorIdentifierIPC &i
 int32_t MiscdeviceService::StopVibrateBySessionId(const VibratorIdentifierIPC &identifier, uint32_t sessionId)
 {
     CALL_LOG_ENTER;
-    std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
     int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
     if (ret != PERMISSION_GRANTED) {
@@ -1021,32 +1020,26 @@ int32_t MiscdeviceService::StopVibrateBySessionId(const VibratorIdentifierIPC &i
         MISC_HILOGE("CheckVibratePermission failed, ret:%{public}d", ret);
         return PERMISSION_DENIED;
     }
+    std::lock_guard<std::mutex> lock(devicesManageMutex_);
     std::vector<VibratorIdentifierIPC> result = CheckDeviceIdIsValid(identifier);
-    int32_t ignoreVibrateNum = 0;
+    size_t ignoreVibrateNum = 0;
     if (result.empty()) {
-        MISC_HILOGD("No vibration, no need to stop");
+        MISC_HILOGE("result is empty, no need to stop");
         return ERROR;
     }
     for (const auto& paramIt : result) {
         auto vibratorThread_ = GetVibratorThread(paramIt);
-        if ((vibratorThread_ == nullptr) || (!vibratorThread_->IsRunning() &&
-            !vibratorHdiConnection_.IsVibratorRunning(paramIt))) {
+        if (!vibratorHdiConnection_.IsVibratorRunning(paramIt)) {
             MISC_HILOGD("No vibration, no need to stop");
             ignoreVibrateNum++;
             continue;
         }
-        const VibrateInfo info = vibratorThread_->GetCurrentVibrateInfo();
-        if (info.sessionId != sessionId) {
-            MISC_HILOGD("Stop vibration information mismatch");
-            continue;
-        }
-        StopVibrateThread(vibratorThread_);
         if (vibratorHdiConnection_.IsVibratorRunning(paramIt)) {
-            vibratorHdiConnection_.Stop(paramIt, HDF_VIBRATOR_MODE_PRESET);
+            vibratorHdiConnection_.StopVibrateBySessionId(identifier, sessionId);
         }
     }
     if (ignoreVibrateNum == result.size()) {
-        MISC_HILOGD("No vibration, no need to stop");
+        MISC_HILOGE("No need to stop, ignoreVibrateNum:%{public}zu", ignoreVibrateNum);
         return ERROR;
     }
     std::string packageName = GetPackageName(GetCallingTokenID());
