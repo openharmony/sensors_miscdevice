@@ -83,7 +83,7 @@ public:
     CallbackType callbackType = COMMON_CALLBACK;
     bool isSupportEffect {false};
     std::vector<VibratorInfos> vibratorInfos;
-    int32_t arrayLength;
+    int32_t arrayLength = -1;
     EffectInfo effectInfo;
     VibratorStatusEvent statusEvent;
     std::string flag;

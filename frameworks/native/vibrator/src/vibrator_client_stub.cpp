@@ -57,7 +57,9 @@ int32_t VibratorClientStub::OnRemoteRequest(uint32_t code, MessageParcel &data, 
                 return PARAMETER_ERROR;
             }
             int result = ProcessPlugEvent(eventCode, deviceId, vibratorCnt);
-            reply.WriteInt32(result);
+            if (result != NO_ERROR) {
+                MISC_HILOGE("Process plug event failed");
+            }
             return NO_ERROR;
         }
         default:

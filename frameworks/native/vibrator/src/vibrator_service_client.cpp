@@ -46,6 +46,8 @@ static constexpr int32_t FREQUENCY_UPPER_BOUND = 100;
 static constexpr int32_t FREQUENCY_LOWER_BOUND = -100;
 static constexpr int32_t INTENSITY_UPPERBOUND = 100;
 static constexpr int32_t INTENSITY_LOWERBOUND = 0;
+static constexpr int32_t MAX_PATTERN_EVENT_NUM = 1000;
+static constexpr int32_t MAX_PATTERN_NUM = 1000;
 constexpr int32_t CURVE_FREQUENCY_NO_MODIFICATION = 0;
 constexpr int32_t CURVE_INTENSITY_NO_MODIFICATION = 100;
 constexpr int32_t CURVE_TIME_NO_MODIFICATION = 0;
@@ -440,6 +442,10 @@ int32_t VibratorServiceClient::InitPlayPattern(const VibratorIdentifier &identif
 {
     VibratePattern vibratePattern = {};
     vibratePattern.startTime = pattern.time;
+    if (pattern.eventNum < 0 || pattern.eventNum > MAX_PATTERN_EVENT_NUM) {
+        MISC_HILOGE("VibratorPattern's eventNum is invalid, eventNum:%{public}d", pattern.eventNum);
+        return ERROR;
+    }
     for (int32_t i = 0; i < pattern.eventNum; ++i) {
         if (pattern.events == nullptr) {
             MISC_HILOGE("VibratorPattern's events is null");
@@ -930,6 +936,10 @@ void VibratorServiceClient::ConvertSeekVibratorPackage(const VibratorPackage &co
     VibratePackage &convertPackage, int32_t seekTime)
 {
     convertPackage.packageDuration = completePackage.packageDuration;
+    if (completePackage.patternNum < 0 || completePackage.patternNum > MAX_PATTERN_NUM) {
+        MISC_HILOGE("completePackage.patternNum is invalid, patternNum:%{public}d", completePackage.patternNum);
+        return;
+    }
     for (int32_t i = 0; i < completePackage.patternNum; ++i) {
         VibratePattern vibratePattern = {};
         int32_t patternStartTime = completePackage.patterns[i].time;
@@ -977,6 +987,10 @@ void VibratorServiceClient::ConvertVibratorPattern(const VibratorPattern &vibrat
 {
     vibratePattern.startTime = vibratorPattern.time;
     vibratePattern.patternDuration = vibratorPattern.patternDuration;
+    if (vibratorPattern.eventNum < 0 || vibratorPattern.eventNum > MAX_PATTERN_EVENT_NUM) {
+        MISC_HILOGE("VibratorPattern's eventNum is invalid, eventNum:%{public}d", vibratorPattern.eventNum);
+        return;
+    }
     for (int32_t j = 0; j < vibratorPattern.eventNum; ++j) {
         VibrateEvent vibrateEvent = {};
         vibrateEvent.tag = static_cast<VibrateTag>(vibratorPattern.events[j].type);
