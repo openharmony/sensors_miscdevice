@@ -326,10 +326,10 @@ static bool GetPropertyAsDouble(ani_env* env, ani_object obj, const char* proper
 
 static bool ParseVibratorCurvePoint(ani_env *env, ani_object pointsArray, uint32_t index, VibratorCurvePoint &point)
 {
-    auto array = static_cast<ani_array_ref>(pointsArray);
+    auto array = static_cast<ani_array>(pointsArray);
     ani_ref arrayRef;
-    if (env->Array_Get_Ref(array, index, &arrayRef) != ANI_OK) {
-        MISC_HILOGE("Array_Get_Ref Fail");
+    if (env->Array_Get(array, index, &arrayRef) != ANI_OK) {
+        MISC_HILOGE("Array_Get Fail");
         return false;
     }
     ani_double time = 0;
@@ -416,10 +416,10 @@ static bool ParsePointsArray(ani_env *env, ani_object parentObject, VibratorEven
 
 static bool ParseVibrateEvent(ani_env *env, ani_object eventArray, int32_t index, VibratorEvent &event)
 {
-    auto array = static_cast<ani_array_ref>(eventArray);
+    auto array = static_cast<ani_array>(eventArray);
     ani_ref arrayRef;
-    if (env->Array_Get_Ref(array, index, &arrayRef) != ANI_OK) {
-        MISC_HILOGE("Array_Get_Ref Fail");
+    if (env->Array_Get(array, index, &arrayRef) != ANI_OK) {
+        MISC_HILOGE("Array_Get Fail");
         return false;
     }
     ani_ref aniEventType;
