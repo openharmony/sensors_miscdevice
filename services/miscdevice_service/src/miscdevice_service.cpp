@@ -398,15 +398,11 @@ int32_t MiscdeviceService::Vibrate(const VibratorIdentifierIPC& identifier, int3
         .systemUsage = systemUsage,
         .duration = timeOut
     };
-    std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
     std::string curVibrateTime = GetCurrentTime();
-    {
-        std::lock_guard<std::mutex> lock(devicesManageMutex_);
-        if (StartVibrateThreadControl(identifier, info) != ERR_OK) {
-            MISC_HILOGE("%{public}s:vibration is ignored and high priority is vibrating or no vibration found",
-                curVibrateTime.c_str());
-            return ERROR;
-        }
+    if (StartVibrateThreadControl(identifier, info) != ERR_OK) {
+        MISC_HILOGE("%{public}s:vibration is ignored and high priority is vibrating or no vibration found",
+            curVibrateTime.c_str());
+        return ERROR;
     }
     MISC_HILOGI("Start vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, usage:%{public}d,"
         "deviceId:%{public}d, vibratorId:%{public}d, duration:%{public}d", curVibrateTime.c_str(),
@@ -506,15 +502,11 @@ int32_t MiscdeviceService::PlayVibratorEffect(const VibratorIdentifierIPC& ident
         .count = count,
         .intensity = INTENSITY_ADJUST_MAX
     };
-    std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
     std::string curVibrateTime = GetCurrentTime();
-    {
-        std::lock_guard<std::mutex> lock(devicesManageMutex_);
-        if (StartVibrateThreadControl(identifier, info) != ERR_OK) {
-            MISC_HILOGE("%{public}s:vibration is ignored and high priority is vibrating or no vibration found",
-                curVibrateTime.c_str());
-            return ERROR;
-        }
+    if (StartVibrateThreadControl(identifier, info) != ERR_OK) {
+        MISC_HILOGE("%{public}s:vibration is ignored and high priority is vibrating or no vibration found",
+            curVibrateTime.c_str());
+        return ERROR;
     }
     MISC_HILOGI("Start vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, usage:%{public}d,"
         "deviceId:%{public}d, vibratorId:%{public}d, duration:%{public}d, effect:%{public}s, count:%{public}d",
@@ -719,15 +711,11 @@ int32_t MiscdeviceService::PlayVibratorCustom(const VibratorIdentifierIPC& ident
     } else if (capacity.isSupportTimeDelay) {
         info.mode = VIBRATE_CUSTOM_COMPOSITE_TIME;
     }
-    std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
     std::string curVibrateTime = GetCurrentTime();
-    {
-        std::lock_guard<std::mutex> lock(devicesManageMutex_);
-        if (StartVibrateThreadControl(identifier, info) != ERR_OK) {
-            MISC_HILOGE("%{public}s:vibration is ignored and high priority is vibrating or no vibration found",
-                curVibrateTime.c_str());
-            return ERROR;
-        }
+    if (StartVibrateThreadControl(identifier, info) != ERR_OK) {
+        MISC_HILOGE("%{public}s:vibration is ignored and high priority is vibrating or no vibration found",
+            curVibrateTime.c_str());
+        return ERROR;
     }
     MISC_HILOGI("Start vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, usage:%{public}d,"
         "vibratorId:%{public}d, duration:%{public}d", curVibrateTime.c_str(), info.packageName.c_str(), info.pid,
@@ -900,15 +888,11 @@ int32_t MiscdeviceService::Dump(int32_t fd, const std::vector<std::u16string> &a
 int32_t MiscdeviceService::PerformVibrationControl(const VibratorIdentifierIPC& identifier,
     int32_t duration, VibrateInfo& info)
 {
-    std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
     std::string curVibrateTime = GetCurrentTime();
-    {
-        std::lock_guard<std::mutex> lock(devicesManageMutex_);
-        if (StartVibrateThreadControl(identifier, info) != ERR_OK) {
-            MISC_HILOGE("%{public}s:vibration is ignored and high priority is vibrating or no vibration found",
-                curVibrateTime.c_str());
-            return ERROR;
-        }
+    if (StartVibrateThreadControl(identifier, info) != ERR_OK) {
+        MISC_HILOGE("%{public}s:vibration is ignored and high priority is vibrating or no vibration found",
+            curVibrateTime.c_str());
+        return ERROR;
     }
     MISC_HILOGI("Start vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, usage:%{public}d,"
         "duration:%{public}d", curVibrateTime.c_str(), info.packageName.c_str(), info.pid, info.usage, duration);
@@ -1315,15 +1299,11 @@ int32_t MiscdeviceService::PlayPrimitiveEffect(const VibratorIdentifierIPC& iden
         .count = primitiveEffectIPC.count,
         .intensity = primitiveEffectIPC.intensity
     };
-    std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
     std::string curVibrateTime = GetCurrentTime();
-    {
-        std::lock_guard<std::mutex> lock(devicesManageMutex_);
-        if (StartVibrateThreadControl(identifier, info) != ERR_OK) {
-            MISC_HILOGE("%{public}s:vibration is ignored and high priority is vibrating or no vibration found",
-                curVibrateTime.c_str());
-            return ERROR;
-        }
+    if (StartVibrateThreadControl(identifier, info) != ERR_OK) {
+        MISC_HILOGE("%{public}s:vibration is ignored and high priority is vibrating or no vibration found",
+            curVibrateTime.c_str());
+        return ERROR;
     }
     MISC_HILOGI("Start vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, usage:%{public}d,"
         "deviceId:%{public}d, vibratorId:%{public}d, duration:%{public}d, effect:%{public}s, intensity:%{public}d",
@@ -1669,6 +1649,7 @@ int32_t MiscdeviceService::InsertVibratorInfo(int deviceId, const std::string &d
 
 int32_t MiscdeviceService::StartVibrateThreadControl(const VibratorIdentifierIPC& identifier, VibrateInfo& info)
 {
+    std::lock_guard<std::mutex> lockManage(devicesManageMutex_);
     std::string curVibrateTime = GetCurrentTime();
     std::vector<VibratorIdentifierIPC> result = CheckDeviceIdIsValid(identifier);
     if (result.empty()) {
@@ -1694,7 +1675,7 @@ int32_t MiscdeviceService::StartVibrateThreadControl(const VibratorIdentifierIPC
             MISC_HILOGD("Info mode:%{public}s, vibratorIndex:%{public}d", info.mode.c_str(), index);
         }
     }
-
+    std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
     for (const auto& paramIt : result) {
         bool shouldProcess = uniqueIndices.empty() ||
         uniqueIndices.find(0) != uniqueIndices.end() ||
