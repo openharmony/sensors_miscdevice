@@ -18,7 +18,7 @@ import {BusinessError} from "@ohos.base";
 
 loadLibrary("vibrator_taihe_native.z");
 
-function testStopVibrator() {
+function testStopVibrator(){
     console.log("testStopVibrator begin");
     try {
         vibrator.stopVibrationSync();
@@ -29,7 +29,7 @@ function testStopVibrator() {
     console.log("testStopVibrator end");
 }
 
-function testStartPresetVibrator() {
+function testStartPresetVibrator(){
     console.log("testStartPresetVibrator begin");
     try {
         let preset: vibrator.VibratePreset = {
@@ -52,7 +52,7 @@ function testStartPresetVibrator() {
     console.log("testStartPresetVibrator end");
 }
 
-function testStartTimeVibrator() {
+function testStartTimeVibrator(){
     console.log("testStartTimeVibrator begin");
     try {
         let effect: vibrator.VibrateTime = {
@@ -73,7 +73,7 @@ function testStartTimeVibrator() {
     console.log("testStartTimeVibrator end");
 }
 
-function testIsSupportEffect() {
+function testIsSupportEffect(){
     console.log("testIsSupportEffect begin");
     vibrator.isSupportEffect('haptic.effect.soft', (error: BusinessError, state: boolean) => {
         console.info(`isSupportEffect. Code: ${error.code}, message: ${error.message}, state: ${state}`);
@@ -81,13 +81,13 @@ function testIsSupportEffect() {
     console.log("testIsSupportEffect end");
 }
 
-function testIsHdHapticSupported() {
+function testIsHdHapticSupported(){
     console.log("testIsHdHapticSupported begin");
     let ret = vibrator.isHdHapticSupported();
     console.log("testIsHdHapticSupported end " + ret);
 }
 
-function main() {
+function main(){
     testIsHdHapticSupported();
     testIsSupportEffect();
     testStartTimeVibrator();
