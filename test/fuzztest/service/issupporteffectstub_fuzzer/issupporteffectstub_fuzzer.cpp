@@ -33,7 +33,7 @@ using Security::AccessToken::AccessTokenID;
 namespace {
 constexpr size_t U32_AT_SIZE = 12;
 auto g_service = MiscdeviceDelayedSpSingleton<MiscdeviceService>::GetInstance();
-const std::u16string VIBRATOR_INTERFACE_TOKEN = u"IMiscdeviceService";
+const std::u16string VIBRATOR_INTERFACE_TOKEN = u"OHOS.Sensors.IMiscdeviceService";
 } // namespace
 
 template<class T>
@@ -76,15 +76,23 @@ void SetUpTestCase()
 bool OnRemoteRequestFuzzTest(const uint8_t *data, size_t size)
 {
     SetUpTestCase();
-    g_service->OnStartFuzz();
-    size_t startPos = 0;
-    std::string effect = "";
-    bool state = false;
+    if (g_service == nullptr) {
+        return false;
+    }
+    MessageParcel datas;
+    datas.WriteInterfaceToken(VIBRATOR_INTERFACE_TOKEN);
     VibratorIdentifierIPC identifier;
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, identifier.deviceId);
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, identifier.vibratorId);
-    GetObject<bool>(data + startPos, size - startPos, state);
-    g_service->IsSupportEffect(identifier, effect, state);
+    size_t startPos = 0;
+    startPos += GetObject<int32_t>(data + startPos, size - startPos, identifier.position);
+    datas.WriteParcelable(&identifier);
+    std::string effect = "haptic.effect.soft";
+    datas.WriteString16(Str8ToStr16(effect));
+    datas.RewindRead(0);
+    MessageParcel reply;
+    MessageOption option;
+    g_service->OnStartFuzz();
+    g_service->OnRemoteRequest(static_cast<uint32_t>(IMiscdeviceServiceIpcCode::COMMAND_IS_SUPPORT_EFFECT),
+        datas, reply, option);
     return true;
 }
 } // namespace Sensors

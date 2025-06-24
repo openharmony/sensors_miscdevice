@@ -38,7 +38,7 @@ constexpr uint32_t IPC_CODE_COUNT = 9;
 constexpr uint32_t IPC_CODE_COUNT = 8;
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 auto g_service = MiscdeviceDelayedSpSingleton<MiscdeviceService>::GetInstance();
-const std::u16string VIBRATOR_INTERFACE_TOKEN = u"IMiscdeviceService";
+const std::u16string VIBRATOR_INTERFACE_TOKEN = u"OHOS.Sensors.IMiscdeviceService";
 } // namespace
 
 void SetUpTestCase()

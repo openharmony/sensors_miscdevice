@@ -33,8 +33,22 @@ using Security::AccessToken::AccessTokenID;
 namespace {
 constexpr size_t U32_AT_SIZE = 4;
 auto g_service = MiscdeviceDelayedSpSingleton<MiscdeviceService>::GetInstance();
-const std::u16string VIBRATOR_INTERFACE_TOKEN = u"IMiscdeviceService";
+const std::u16string VIBRATOR_INTERFACE_TOKEN = u"OHOS.Sensors.IMiscdeviceService";
 } // namespace
+
+template<class T>
+size_t GetObject(const uint8_t *data, size_t size, T &object)
+{
+    size_t objectSize = sizeof(object);
+    if (objectSize > size) {
+        return 0;
+    }
+    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
+    if (ret != EOK) {
+        return 0;
+    }
+    return objectSize;
+}
 
 void SetUpTestCase()
 {
@@ -62,9 +76,25 @@ void SetUpTestCase()
 bool OnRemoteRequestFuzzTest(const uint8_t *data, size_t size)
 {
     SetUpTestCase();
+    if (g_service == nullptr) {
+        return false;
+    }
     MessageParcel datas;
     datas.WriteInterfaceToken(VIBRATOR_INTERFACE_TOKEN);
-    datas.WriteBuffer(data, size);
+    VibratorIdentifierIPC identifier;
+    size_t startPos = 0;
+    startPos += GetObject<int32_t>(data + startPos, size - startPos, identifier.deviceId);
+    startPos += GetObject<int32_t>(data + startPos, size - startPos, identifier.vibratorId);
+    datas.WriteParcelable(&identifier);
+    int32_t timeOut = 0;
+    startPos += GetObject<int32_t>(data + startPos, size - startPos, timeOut);
+    datas.WriteInt32(timeOut);
+    int32_t usage = 0;
+    startPos += GetObject<int32_t>(data + startPos, size - startPos, usage);
+    datas.WriteInt32(usage);
+    int32_t systemUsage = 0;
+    GetObject<int32_t>(data + startPos, size - startPos, systemUsage);
+    datas.WriteInt32(systemUsage);
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
