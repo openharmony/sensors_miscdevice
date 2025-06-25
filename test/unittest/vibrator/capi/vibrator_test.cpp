@@ -150,7 +150,7 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_CancelTest_002, TestSize.Level1)
     ASSERT_NE(ret, RET_SUCCESS);
 }
 
-HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_001, TestSize.Level1)
+HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_001, TestSize.Level0)
 {
     CALL_LOG_ENTER;
     FileDescriptor fileDescriptor("/data/test/vibrator/coin_drop.json");
