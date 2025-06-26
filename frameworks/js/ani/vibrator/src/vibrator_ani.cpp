@@ -751,34 +751,20 @@ static bool ParseEffectTypeAndParameters(ani_env *env, ani_object effect, Vibrat
 
 static void FreeVibrateInfo(VibrateInfo &vibrateInfo)
 {
-    int32_t patternSize = vibrateInfo.count;
-    if (patternSize <= 0) {
-        MISC_HILOGW("Patterns is not need to free, pattern size:%{public}d", patternSize);
+    int32_t eventNum = vibrateInfo.vibratorPattern.eventNum;
+    auto events = vibrateInfo.vibratorPattern.events;
+    if (eventNum <= 0 || events == nullptr) {
+        MISC_HILOGW("Events is not need to free, event size:%{public}d", eventNum);
         return;
     }
-    auto patterns = &vibrateInfo.vibratorPattern;
-    if (patterns == nullptr) {
-        MISC_HILOGW("Patterns is not need to free, patterns is null");
-        return;
-    }
-    for (int32_t i = 0; i < patternSize; ++i) {
-        int32_t eventNum = patterns[i].eventNum;
-        if ((eventNum <= 0) || (patterns[i].events == nullptr)) {
-            MISC_HILOGW("Events is not need to free, event size:%{public}d", eventNum);
-            continue;
+    for (int32_t j = 0; j < eventNum; ++j) {
+        if (events[j].points != nullptr) {
+            free(events[j].points);
+            events[j].points = nullptr;
         }
-        auto events = patterns[i].events;
-        for (int32_t j = 0; j < eventNum; ++j) {
-            if (events[j].points != nullptr) {
-                free(events[j].points);
-                events[j].points = nullptr;
-            }
-        }
-        free(events);
-        events = nullptr;
     }
-    free(patterns);
-    patterns = nullptr;
+    free(events);
+    events = nullptr;
 }
 
 static void StartVibrationSync([[maybe_unused]] ani_env *env, ani_object effect, ani_object attribute)
@@ -797,6 +783,7 @@ static void StartVibrationSync([[maybe_unused]] ani_env *env, ani_object effect,
 
     VibrateInfo vibrateInfo;
     if (!ParseEffectTypeAndParameters(env, effect, vibrateInfo)) {
+        FreeVibrateInfo(vibrateInfo);
         return;
     }
     if (!ParserParamFromVibrateAttribute(env, attribute, vibrateInfo)) {
