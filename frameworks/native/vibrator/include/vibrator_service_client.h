@@ -117,20 +117,19 @@ private:
     void ConvertVibratorPattern(const VibratorPattern &vibratorPattern, VibratePattern &vibratePattern);
     bool SkipEventAndConvertVibratorEvent(const VibratorEvent &vibratorEvent, VibratePattern &vibratePattern,
         int32_t patternStartTime, VibrateEvent &vibrateEvent);
-    static int32_t GetCurveListAfterModulation(
-        const std::set<int32_t>& intervalEdges, const std::vector<VibratorCurveInterval>& currentInterval,
-        const std::vector<VibratorCurveInterval>& modInterval, const int offset, VibratorCurvePoint*& curve,
-        int32_t& curveNum);
-    static int32_t CopyNonContinuousVibratorEvent(const VibratorEvent &event, VibratorEvent &eventCopy);
-    static void FreePartiallyAllocatedVibratorPatterns(VibratorPattern*& patterns, const int32_t partialIdx);
+    static VibratorCurvePoint* GetCurveListAfterModulation(const std::vector<VibratorCurveInterval>& modInterval,
+        const VibratorEvent &beforeModEvent, const int32_t patternOffset);
+    static int32_t ModulateEventWithoutCurvePoints(std::vector<VibratorCurveInterval>& modInterval,
+        const int32_t patternStartTime, const VibratorEvent &beforeModEvent, VibratorEvent &afterModEvent);
+    static void FreePartiallyAllocatedVibratorPatterns(VibratorPattern** patterns, const int32_t partialIdx);
     static int32_t ModulateVibratorPattern(const VibratorEvent &modulationCurve,
         const VibratorPattern &beforeModulationPattern, VibratorPattern &afterModulationPattern);
-    static void FreePartiallyAllocatedVibratorEvents(VibratorEvent*& events, const int32_t partialIdx);
-    static int32_t ModulateVibratorEvent(const VibratorEvent &modulationCurve, const int patternStartTime,
+    static void FreePartiallyAllocatedVibratorEvents(VibratorEvent** events, const int32_t partialIdx);
+    static int32_t ModulateVibratorEvent(const VibratorEvent &modulationCurve, const int32_t patternStartTime,
         const VibratorEvent &beforeModulationEvent, VibratorEvent &afterModulationEvent);
-    static int32_t ModulateContinuousVibratorEvent(const VibratorEvent &modulationCurve, const int patternStartTime,
-        const VibratorEvent &beforeModulationEvent, VibratorEvent &afterModulationEvent);
-    static bool BinarySearchInterval(const std::vector<VibratorCurveInterval>& interval,
+    static int32_t ModulateEventWithCurvePoints(std::vector<VibratorCurveInterval>& modInterval,
+        const int patternStartTime, const VibratorEvent &beforeModulationEvent, VibratorEvent &afterModulationEvent);
+    static void BinarySearchInterval(const std::vector<VibratorCurveInterval>& interval,
         const int32_t val, int32_t& idx);
     static void ConvertVibratorEventsToCurveIntervals(const VibratorEvent &vibratorEvent, const int patternTimeOffset,
         std::vector<VibratorCurveInterval>& curveInterval);
