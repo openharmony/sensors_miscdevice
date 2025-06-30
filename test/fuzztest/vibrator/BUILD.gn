@@ -51,5 +51,7 @@ group("fuzztest") {
     "playpackagebysessionid_fuzzer:fuzztest",
     "playpatternbysessionid_fuzzer:fuzztest",
     "stopvibratebysessionid_fuzzer:fuzztest",
+    "handlevibratordata_fuzzer:fuzztest",
+    "issupportvibratorcustom_fuzzer:fuzztest",
   ]
 }
