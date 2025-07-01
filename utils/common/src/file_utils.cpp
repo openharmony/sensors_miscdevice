@@ -187,16 +187,23 @@ std::string ReadFd(const RawFileDescriptor &rawFd)
     int64_t fdSize = GetFileSize(rawFd.fd);
     if ((rawFd.offset < 0) || (rawFd.offset > fdSize)) {
         MISC_HILOGE("offset is invalid, offset:%{public}" PRId64, rawFd.offset);
-        close(rawFd.fd);
         return {};
     }
     if ((rawFd.length <= 0) || (rawFd.length > fdSize - rawFd.offset)) {
         MISC_HILOGE("length is invalid, length:%{public}" PRId64, rawFd.length);
-        close(rawFd.fd);
         return {};
     }
-    FILE *fp = fdopen(rawFd.fd, "r");
-    CHKPS(fp);
+    int dupFd = dup(rawFd.fd);
+    if (dupFd < 0) {
+        MISC_HILOGE("dup fd failed, fd:%{public}d, errno:%{public}d", rawFd.fd, errno);
+        return {};
+    }
+    FILE *fp = fdopen(dupFd, "r");
+    if (fp == nullptr) {
+        MISC_HILOGE("fdopen failed, fd:%{public}d, errno:%{public}d", dupFd, errno);
+        close(dupFd);
+        return {};
+    }
     if (fseek(fp, rawFd.offset, SEEK_SET) != 0) {
         MISC_HILOGE("fseek failed, errno:%{public}d", errno);
         if (fclose(fp) != 0) {
