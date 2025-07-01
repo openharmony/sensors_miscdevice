@@ -2841,7 +2841,7 @@ HWTEST_F(VibratorAgentTest, PlayPatternBySessionId_001, TestSize.Level1)
     MISC_HILOGI("PlayPatternBySessionId_001 in");
     VibratorPattern pattern;
     int32_t ret = PlayPatternBySessionId(0, pattern);
-    ASSERT_NE(ret, PARAMETER_ERROR);
+    ASSERT_EQ(ret, PARAMETER_ERROR);
 }
 
 HWTEST_F(VibratorAgentTest, PlayPatternBySessionId_002, TestSize.Level1)
@@ -2890,7 +2890,7 @@ HWTEST_F(VibratorAgentTest, PlayPackageBySessionId_001, TestSize.Level1)
     MISC_HILOGI("PlayPatternBySessionId_001 in");
     VibratorPackage package;
     int32_t ret = PlayPackageBySessionId(0, package);
-    ASSERT_NE(ret, PARAMETER_ERROR);
+    ASSERT_EQ(ret, PARAMETER_ERROR);
 }
 
 HWTEST_F(VibratorAgentTest, PlayPackageBySessionId_002, TestSize.Level1)
@@ -2930,7 +2930,7 @@ HWTEST_F(VibratorAgentTest, StopVibrateBySessionId_001, TestSize.Level1)
 {
     MISC_HILOGI("StopVibrateBySessionId_001 in");
     int32_t ret = StopVibrateBySessionId(0);
-    ASSERT_NE(ret, PARAMETER_ERROR);
+    ASSERT_EQ(ret, PARAMETER_ERROR);
 }
 
 HWTEST_F(VibratorAgentTest, StopVibrateBySessionId_002, TestSize.Level1)
