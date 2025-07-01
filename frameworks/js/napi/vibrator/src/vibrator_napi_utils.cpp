@@ -531,17 +531,10 @@ void ExecuteCallBack(napi_env env, void *data)
 void EmitUvEventLoop(sptr<AsyncCallbackInfo> asyncCallbackInfo)
 {
     CHKPV(asyncCallbackInfo);
-    uv_loop_s *loop(nullptr);
-    CHKCV((napi_get_uv_event_loop(asyncCallbackInfo->env, &loop) == napi_ok), "napi_get_uv_event_loop fail");
-    CHKPV(loop);
-    uv_work_t *work = new(std::nothrow) uv_work_t;
-    CHKPV(work);
     asyncCallbackInfo->IncStrongRef(nullptr);
-    work->data = asyncCallbackInfo.GetRefPtr();
-    int32_t ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) { }, [] (uv_work_t *work, int status) {
-        CHKPV(work);
-        sptr<AsyncCallbackInfo> asyncCallbackInfo(static_cast<AsyncCallbackInfo *>(work->data));
-        DeleteWork(work);
+    auto event = asyncCallbackInfo.GetRefPtr();
+    auto task = [event]() {
+        sptr<AsyncCallbackInfo> asyncCallbackInfo(static_cast<AsyncCallbackInfo *>(event));
         /**
          * After the asynchronous task is created, the asyncCallbackInfo reference count is reduced
          * to 0 destruction, so you need to add 1 to the asyncCallbackInfo reference count when the
@@ -572,11 +565,11 @@ void EmitUvEventLoop(sptr<AsyncCallbackInfo> asyncCallbackInfo)
             napi_throw_error(env, nullptr, "napi_call_function callback fail");
             return;
         }
-    }, uv_qos_default);
-    if (ret != 0) {
-        MISC_HILOGE("uv_queue_work_with_qos fail");
+    };
+    auto ret = napi_send_event(asyncCallbackInfo->env, task, napi_eprio_immediate);
+    if (ret != napi_ok) {
+        MISC_HILOGE("Failed to SendEvent, ret:%{public}d", ret);
         asyncCallbackInfo->DecStrongRef(nullptr);
-        DeleteWork(work);
     }
 }
 
