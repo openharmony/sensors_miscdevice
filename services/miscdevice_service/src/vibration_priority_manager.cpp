@@ -151,6 +151,7 @@ void VibrationPriorityManager::InitDoNotDisturbData()
         doNotDisturbSwitch_ = switchTemp;
         MISC_HILOGI("doNotDisturbSwitch:%{public}d", switchTemp);
     }
+    std::lock_guard<std::mutex> whiteListLock(whiteListMutex_);
     if (doNotDisturbSwitch_ == DONOTDISTURB_SWITCH_ON) {
         std::vector<WhiteListAppInfo> whiteListTemp;
         int32_t whiteListRet = GetWhiteListValue(DO_NOT_DISTURB_WHITE_LIST, whiteListTemp);
@@ -443,6 +444,7 @@ bool VibrationPriorityManager::IgnoreAppVibrations(const VibrateInfo &vibrateInf
         MISC_HILOGD("DoNotDisturbSwitch is off");
         return false;
     }
+    std::lock_guard<std::mutex> whiteListLock(whiteListMutex_);
     for (const WhiteListAppInfo &whiteListAppInfo : doNotDisturbWhiteList_) {
         if (vibrateInfo.packageName == whiteListAppInfo.bundle) {
             MISC_HILOGD("Not ignore app vibration, the app is on the whitelist, bundleName::%{public}s",
