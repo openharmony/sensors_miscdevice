@@ -14,13 +14,38 @@
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
+import("./../../../../miscdevice.gni")
+
+ohos_fuzztest("IsHdHapticSupportedFuzzTest") {
+  module_out_path = FUZZ_MODULE_OUT_PATH
+
+  fuzz_config_file = "$SUBSYSTEM_DIR/test/fuzztest/vibrator/ishdhapticsupported_fuzzer"
+
+  include_dirs = [
+    "$SUBSYSTEM_DIR/frameworks/native/vibrator",
+    "$SUBSYSTEM_DIR/test/fuzztest/vibrator/ishdhapticsupported_fuzzer",
+  ]
+
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+
+  sources = [ "ishdhapticsupported_fuzzer.cpp" ]
+
+  deps =
+      [ "$SUBSYSTEM_DIR/frameworks/native/vibrator:vibrator_interface_native" ]
+  
+  external_deps = [ "c_utils:utils" ]
+}
 
 group("fuzztest") {
   testonly = true
   deps = []
   deps += [
-    "getlightlist_fuzzer:fuzztest",
-    "startlight_fuzzer:fuzztest",
-    "stoplight_fuzzer:fuzztest",
+    # deps file
+    ":IsHdHapticSupportedFuzzTest",
   ]
 }
