@@ -685,11 +685,12 @@ static int32_t StartVibrate(const VibrateInfo &info)
     return StartVibratorOnce(info.duration);
 }
 
-ani_class FindClassInNamespace(ani_env *env, ani_namespace &ns, const char *className)
+ani_class FindClassInNamespace(ani_env *env, const char *nsName, const char *className)
 {
     ani_class cls;
-    if (ANI_OK != env->Namespace_FindClass(ns, className, &cls)) {
-        MISC_HILOGE("Not found '%{public}s'", className);
+    const std::string fullClassName = std::string(nsName) + "." + className;
+    if (ANI_OK != env->FindClass(fullClassName.c_str(), &cls)) {
+        MISC_HILOGE("Not found '%{public}s'", className.c_str());
         return nullptr;
     }
     return cls;
@@ -697,17 +698,11 @@ ani_class FindClassInNamespace(ani_env *env, ani_namespace &ns, const char *clas
 
 static bool ParseEffectTypeAndParameters(ani_env *env, ani_object effect, VibrateInfo &vibrateInfo)
 {
-    ani_namespace ns;
-    static const char *namespaceName = "C{@ohos.vibrator.vibrator}";
-    if (ANI_OK != env->FindNamespace(namespaceName, &ns)) {
-        MISC_HILOGE("Not found '%{public}s'", namespaceName);
-        return false;
-    }
-
-    ani_class vibrateTimeClass = FindClassInNamespace(env, ns, "C{VibrateTime}");
-    ani_class vibratePresetClass = FindClassInNamespace(env, ns, "C{VibratePreset}");
-    ani_class vibrateFromFileClass = FindClassInNamespace(env, ns, "C{VibrateFromFile}");
-    ani_class vibratePatternClass = FindClassInNamespace(env, ns, "C{VibrateFromPattern}");
+    static const char *namespaceName = "@ohos.vibrator.vibrator";
+    ani_class vibrateTimeClass = FindClassInNamespace(env, namespaceName, "VibrateTime");
+    ani_class vibratePresetClass = FindClassInNamespace(env, namespaceName, "VibratePreset");
+    ani_class vibrateFromFileClass = FindClassInNamespace(env, namespaceName, "VibrateFromFile");
+    ani_class vibratePatternClass = FindClassInNamespace(env, namespaceName, "VibrateFromPattern");
     if (!vibrateTimeClass || !vibratePresetClass || !vibrateFromFileClass || !vibratePatternClass) {
         return false;
     }
@@ -751,14 +746,7 @@ static bool ParseEffectTypeAndParameters(ani_env *env, ani_object effect, Vibrat
 
 static void StartVibrationSync([[maybe_unused]] ani_env *env, ani_object effect, ani_object attribute)
 {
-    ani_namespace ns;
-    static const char *namespaceName = "C{@ohos.vibrator.vibrator}";
-    if (ANI_OK != env->FindNamespace(namespaceName, &ns)) {
-        MISC_HILOGE("Not found '%{public}s'", namespaceName);
-        return;
-    }
-
-    ani_class vibrateAttributeClass = FindClassInNamespace(env, ns, "C{VibrateAttribute}");
+    ani_class vibrateAttributeClass = FindClassInNamespace(env, "@ohos.vibrator.vibrator", "VibrateAttribute");
     if (!vibrateAttributeClass) {
         return;
     }
