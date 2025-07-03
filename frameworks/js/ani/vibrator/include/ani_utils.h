@@ -88,25 +88,25 @@ private:
 template<>
 bool UnionAccessor::IsInstanceOfType<bool>()
 {
-    return IsInstanceOf("Lstd/core/Boolean;");
+    return IsInstanceOf("C{std.core.Boolean}");
 }
 
 template<>
 bool UnionAccessor::IsInstanceOfType<int>()
 {
-    return IsInstanceOf("Lstd/core/Int;");
+    return IsInstanceOf("C{std.core.Int}");
 }
 
 template<>
 bool UnionAccessor::IsInstanceOfType<double>()
 {
-    return IsInstanceOf("Lstd/core/Double;");
+    return IsInstanceOf("C{std.core.Double}");
 }
 
 template<>
 bool UnionAccessor::IsInstanceOfType<std::string>()
 {
-    return IsInstanceOf("Lstd/core/String;");
+    return IsInstanceOf("C{std.core.String}");
 }
 
 template<>
@@ -178,7 +178,7 @@ bool UnionAccessor::TryConvertArray<bool>(std::vector<bool> &value)
     }
     for (int i = 0; i < int(length); i++) {
         ani_ref ref;
-        if (ANI_OK != env_->Object_CallMethodByName_Ref(obj_, "$_get", "I:Lstd/core/Object;", &ref, (ani_int)i)) {
+        if (ANI_OK != env_->Object_CallMethodByName_Ref(obj_, "$_get", "i:C{std.core.Object}", &ref, (ani_int)i)) {
             std::cerr << "Object_GetPropertyByName_Ref failed" << std::endl;
             return false;
         }
@@ -202,7 +202,7 @@ bool UnionAccessor::TryConvertArray<int>(std::vector<int> &value)
     }
     for (int i = 0; i < int(length); i++) {
         ani_ref ref;
-        if (ANI_OK != env_->Object_CallMethodByName_Ref(obj_, "$_get", "I:Lstd/core/Object;", &ref, (ani_int)i)) {
+        if (ANI_OK != env_->Object_CallMethodByName_Ref(obj_, "$_get", "i:C{std.core.Object}", &ref, (ani_int)i)) {
             std::cerr << "Object_GetPropertyByName_Ref failed" << std::endl;
             return false;
         }
@@ -226,7 +226,7 @@ bool UnionAccessor::TryConvertArray<double>(std::vector<double> &value)
     }
     for (int i = 0; i < int(length); i++) {
         ani_ref ref;
-        if (ANI_OK != env_->Object_CallMethodByName_Ref(obj_, "$_get", "I:Lstd/core/Object;", &ref, (ani_int)i)) {
+        if (ANI_OK != env_->Object_CallMethodByName_Ref(obj_, "$_get", "i:C{std.core.Object}", &ref, (ani_int)i)) {
             std::cerr << "Object_GetPropertyByName_Ref failed" << std::endl;
             return false;
         }
@@ -273,7 +273,7 @@ bool UnionAccessor::TryConvertArray<std::string>(std::vector<std::string> &value
 
     for (int i = 0; i < int(length); i++) {
         ani_ref ref;
-        if (ANI_OK != env_->Object_CallMethodByName_Ref(obj_, "$_get", "I:Lstd/core/Object;", &ref, (ani_int)i)) {
+        if (ANI_OK != env_->Object_CallMethodByName_Ref(obj_, "$_get", "i:C{std.core.Object}", &ref, (ani_int)i)) {
             std::cerr << "Object_GetPropertyByName_Double length failed" << std::endl;
             return false;
         }
