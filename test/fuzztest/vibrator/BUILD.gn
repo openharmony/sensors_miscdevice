@@ -53,5 +53,6 @@ group("fuzztest") {
     "stopvibratebysessionid_fuzzer:fuzztest",
     "handlevibratordata_fuzzer:fuzztest",
     "issupportvibratorcustom_fuzzer:fuzztest",
+    "ishdhapticsupported_fuzzer:fuzztest",
   ]
 }
