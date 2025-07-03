@@ -51,9 +51,6 @@ static constexpr int32_t MAX_PATTERN_NUM = 1000;
 constexpr int32_t CURVE_FREQUENCY_NO_MODIFICATION = 0;
 constexpr int32_t CURVE_INTENSITY_NO_MODIFICATION = 100;
 constexpr int32_t CURVE_TIME_NO_MODIFICATION = 0;
-constexpr int32_t CURVE_POINT_NUM_MIN = 4;
-constexpr int32_t CURVE_POINT_NUM_MAX = 16;
-constexpr int32_t EVENT_NUM_MAX = 16;
 using namespace OHOS::HiviewDFX;
 
 namespace {
@@ -952,10 +949,6 @@ void VibratorServiceClient::ConvertSeekVibratorPackage(const VibratorPackage &co
             continue;
         }
         vibratePattern.startTime = seekTime;
-        if (completePackage.patterns[i].eventNum <= 0 || completePackage.patterns[i].eventNum > EVENT_NUM_MAX) {
-            MISC_HILOGE("The size of pattern is out of bounds, size:%{public}d", completePackage.patterns[i].eventNum);
-            return;
-        }
         for (int32_t j = 0; j < completePackage.patterns[i].eventNum; ++j) {
             VibrateEvent vibrateEvent = {};
             if (SkipEventAndConvertVibratorEvent(completePackage.patterns[i].events[j], vibratePattern,
@@ -972,12 +965,7 @@ void VibratorServiceClient::ConvertSeekVibratorPackage(const VibratorPackage &co
             vibrateEvent.intensity = completePackage.patterns[i].events[j].intensity;
             vibrateEvent.frequency = completePackage.patterns[i].events[j].frequency;
             vibrateEvent.index = completePackage.patterns[i].events[j].index;
-            int32_t pointNum = completePackage.patterns[i].events[j].pointNum;
-            if ((pointNum < CURVE_POINT_NUM_MIN) || (pointNum > CURVE_POINT_NUM_MAX)) {
-                MISC_HILOGE("The size of curve point is out of bounds, size:%{public}d", pointNum);
-                return;
-            }
-            for (size_t k = 0; k < static_cast<uint32_t>(pointNum); ++k) {
+            for (size_t k = 0; k < static_cast<uint32_t>(completePackage.patterns[i].events[j].pointNum); ++k) {
                 VibrateCurvePoint vibrateCurvePoint = {};
                 vibrateCurvePoint.time = completePackage.patterns[i].events[j].points[k].time;
                 vibrateCurvePoint.intensity = completePackage.patterns[i].events[j].points[k].intensity;
