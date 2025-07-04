@@ -135,6 +135,7 @@ private:
     std::vector<WhiteListAppInfo> doNotDisturbWhiteList_;
     sptr<MiscDeviceObserver> currentUserObserver_;
     std::mutex currentUserObserverMutex_;
+    std::mutex whiteListMutex_;
 #endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
     std::atomic_int32_t miscCrownFeedback_ = FEEDBACK_MODE_INVALID;
