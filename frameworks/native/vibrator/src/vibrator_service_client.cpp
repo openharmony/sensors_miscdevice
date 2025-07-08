@@ -1083,7 +1083,7 @@ int32_t VibratorServiceClient::ModulateVibratorPattern(const VibratorEvent &modu
     return ERR_OK;
 }
 
-void VibratorServiceClient::FreePartiallyAllocatedVibratorPatterns(VibratorPattern** patterns, const int32_t partialIdx)
+void VibratorServiceClient::FreePartiallyAllocatedVibratorPatterns(VibratorPattern** patterns, int32_t partialIdx)
 {
     if (patterns == nullptr || *patterns == nullptr) {
         MISC_HILOGW("FreePartiallyAllocatedVibratorPatterns failed because patterns is null");
@@ -1097,7 +1097,7 @@ void VibratorServiceClient::FreePartiallyAllocatedVibratorPatterns(VibratorPatte
     *patterns = nullptr;
 }
 
-void VibratorServiceClient::FreePartiallyAllocatedVibratorEvents(VibratorEvent** events, const int32_t partialIdx)
+void VibratorServiceClient::FreePartiallyAllocatedVibratorEvents(VibratorEvent** events, int32_t partialIdx)
 {
     if (events == nullptr || *events == nullptr) {
         MISC_HILOGW("FreePartiallyAllocatedVibratorEvents failed because events is null");
@@ -1112,7 +1112,7 @@ void VibratorServiceClient::FreePartiallyAllocatedVibratorEvents(VibratorEvent**
 }
 
 int32_t VibratorServiceClient::ModulateVibratorEvent(const VibratorEvent &modulationCurve,
-    const int32_t patternStartTime, const VibratorEvent &beforeModulationEvent, VibratorEvent &afterModulationEvent)
+    int32_t patternStartTime, const VibratorEvent &beforeModulationEvent, VibratorEvent &afterModulationEvent)
 {
     std::vector<VibratorCurveInterval> modInterval;
     ConvertVibratorEventsToCurveIntervals(modulationCurve, 0, modInterval);
@@ -1127,7 +1127,7 @@ int32_t VibratorServiceClient::ModulateVibratorEvent(const VibratorEvent &modula
 }
 
 int32_t VibratorServiceClient::ModulateEventWithoutCurvePoints(std::vector<VibratorCurveInterval>& modInterval,
-    const int32_t patternStartTime, const VibratorEvent &beforeModEvent, VibratorEvent &afterModEvent)
+    int32_t patternStartTime, const VibratorEvent &beforeModEvent, VibratorEvent &afterModEvent)
 {
     afterModEvent = beforeModEvent;
     afterModEvent.pointNum = 0;
@@ -1145,7 +1145,7 @@ int32_t VibratorServiceClient::ModulateEventWithoutCurvePoints(std::vector<Vibra
 
 // absoluteTime = VibratorPattern::time + VibratorEvent::time + VibratorCurvePoint::time
 int32_t VibratorServiceClient::ModulateEventWithCurvePoints(std::vector<VibratorCurveInterval>& modInterval,
-    const int patternStartTime, const VibratorEvent &beforeModulationEvent, VibratorEvent &afterModulationEvent)
+    int32_t patternStartTime, const VibratorEvent &beforeModulationEvent, VibratorEvent &afterModulationEvent)
 {
     if (beforeModulationEvent.pointNum == 0 || beforeModulationEvent.points == nullptr) {
         MISC_HILOGE("ModulateContinuousVibratorEvent: invalid event, event should hava curve points");
@@ -1168,7 +1168,7 @@ int32_t VibratorServiceClient::ModulateEventWithCurvePoints(std::vector<Vibrator
 
 VibratorCurvePoint* VibratorServiceClient::GetCurveListAfterModulation(
     const std::vector<VibratorCurveInterval>& modInterval, const VibratorEvent &beforeModEvent,
-    const int32_t patternOffset)
+    int32_t patternOffset)
 {
     // There are atmost (modulationCurve.pointNum + beforeModulationEvent.pointNum + 1)
     // VibratorCurvePoints after modulation
@@ -1196,7 +1196,7 @@ VibratorCurvePoint* VibratorServiceClient::GetCurveListAfterModulation(
 }
 
 void VibratorServiceClient::BinarySearchInterval(
-    const std::vector<VibratorCurveInterval>& interval, const int32_t val, int32_t& idx)
+    const std::vector<VibratorCurveInterval>& interval, int32_t val, int32_t& idx)
 {
     if (val < interval.begin()->beginTime || val > interval.rbegin()->endTime) {
         idx = -1;
@@ -1221,7 +1221,7 @@ void VibratorServiceClient::BinarySearchInterval(
 }
 
 void VibratorServiceClient::ConvertVibratorEventsToCurveIntervals(
-    const VibratorEvent &vibratorEvent, const int patternTimeOffset, std::vector<VibratorCurveInterval>& curveInterval)
+    const VibratorEvent &vibratorEvent, int32_t patternTimeOffset, std::vector<VibratorCurveInterval>& curveInterval)
 {
     int32_t fullOffset = patternTimeOffset + vibratorEvent.time;
     const VibratorCurvePoint* curvePoints = vibratorEvent.points;
