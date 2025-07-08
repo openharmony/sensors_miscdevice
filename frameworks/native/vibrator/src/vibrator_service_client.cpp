@@ -1120,10 +1120,8 @@ int32_t VibratorServiceClient::ModulateVibratorEvent(const VibratorEvent &modula
         beforeModulationEvent.points == nullptr) {
         return ModulateEventWithoutCurvePoints(modInterval, patternStartTime,
             beforeModulationEvent, afterModulationEvent);
-    } else {
-        return ModulateEventWithCurvePoints(modInterval, patternStartTime,
-            beforeModulationEvent, afterModulationEvent);
     }
+    return ModulateEventWithCurvePoints(modInterval, patternStartTime, beforeModulationEvent, afterModulationEvent);
 }
 
 int32_t VibratorServiceClient::ModulateEventWithoutCurvePoints(std::vector<VibratorCurveInterval>& modInterval,
@@ -1179,15 +1177,15 @@ VibratorCurvePoint* VibratorServiceClient::GetCurveListAfterModulation(
         return nullptr;
     }
     int32_t modIdx = 0;
-    const int32_t startTimeOffset = patternOffset + beforeModEvent.time;
-    const int32_t intensityRangeLen = INTENSITY_UPPER_BOUND - INTENSITY_LOWER_BOUND;
+    int32_t startTimeOffset = patternOffset + beforeModEvent.time;
     for (int32_t curveIdx = 0; curveIdx < beforeModEvent.pointNum; curveIdx++) {
         const VibratorCurvePoint& beforeModCurvePoint = beforeModEvent.points[curveIdx];
         curvePoints[curveIdx] = beforeModCurvePoint;
         BinarySearchInterval(modInterval, startTimeOffset + beforeModCurvePoint.time, modIdx);
         if (modIdx >= 0) {
             curvePoints[curveIdx].intensity = RestrictIntensityRange(
-                beforeModCurvePoint.intensity * modInterval[modIdx].intensity / intensityRangeLen);
+                beforeModCurvePoint.intensity * modInterval[modIdx].intensity /
+                (INTENSITY_UPPER_BOUND - INTENSITY_LOWER_BOUND));
             curvePoints[curveIdx].frequency = RestrictFrequencyRange(
                 beforeModCurvePoint.frequency + modInterval[modIdx].frequency);
         }
