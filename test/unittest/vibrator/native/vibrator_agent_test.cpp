@@ -44,6 +44,12 @@ constexpr int32_t INTENSITY_HIGH = 100;
 constexpr int32_t INTENSITY_MEDIUM = 50;
 constexpr int32_t INTENSITY_LOW = 20;
 constexpr int32_t INTENSITY_INVALID = -1;
+constexpr int32_t SESSION_ID_ONE = 1;
+constexpr int32_t SESSION_ID_TWO = 2;
+constexpr int32_t SESSION_ID_THREE = 3;
+constexpr int32_t SESSION_ID_FOUR = 4;
+constexpr int32_t SESSION_ID_FIVE = 5;
+constexpr int32_t LOOP_TIMES = 5;
 
 PermissionStateFull g_infoManagerTestState = {
     .grantFlags = {1},
@@ -2873,13 +2879,51 @@ HWTEST_F(VibratorAgentTest, PlayPatternBySessionId_002, TestSize.Level1)
                 }
                 ASSERT_EQ(SetUsage(USAGE_UNKNOWN), true);
                 MISC_HILOGD("pointNum:%{public}d", package.patterns[i].events[i].pointNum);
-                ret = PlayPatternBySessionId(1, package.patterns[i]);
+                ret = PlayPatternBySessionId(SESSION_ID_ONE, package.patterns[i]);
                 ASSERT_EQ(ret, 0);
             }
         }
         ret = FreeVibratorPackage(package);
         ASSERT_EQ(ret, 0);
-        StopVibrateBySessionId(1);
+        StopVibrateBySessionId(SESSION_ID_ONE);
+    } else {
+        ASSERT_EQ(isSupport, false);
+    }
+}
+
+HWTEST_F(VibratorAgentTest, PlayPatternBySessionId_003, TestSize.Level1)
+{
+    MISC_HILOGI("PlayPatternBySessionId_003 in");
+    bool isSupport = IsSupportVibratorCustom();
+    if (isSupport) {
+        VibratorCurvePoint point = {
+            .time = 10,
+            .intensity = 5,
+            .frequency = 5,
+        };
+        VibratorEvent event = {
+            .type = EVENT_TYPE_CONTINUOUS,
+            .time = 10,
+            .duration = 5,
+            .pointNum = 1,
+            .points = &point,
+        };
+        VibratorPattern pattern = {
+            .time = 10,
+            .eventNum = 1,
+            .patternDuration = 2,
+            .events = &event,
+        };
+        int32_t ret = PlayPatternBySessionId(SESSION_ID_ONE, pattern);
+        ASSERT_EQ(ret, 0);
+        ret = PlayPatternBySessionId(SESSION_ID_TWO, pattern);
+        ASSERT_EQ(ret, 0);
+        ret = PlayPatternBySessionId(SESSION_ID_THREE, pattern);
+        ASSERT_EQ(ret, 0);
+        ret = PlayPatternBySessionId(SESSION_ID_FOUR, pattern);
+        ASSERT_EQ(ret, 0);
+        ret = PlayPatternBySessionId(SESSION_ID_FIVE, pattern);
+        ASSERT_EQ(ret, 0);
     } else {
         ASSERT_EQ(isSupport, false);
     }
@@ -2887,7 +2931,7 @@ HWTEST_F(VibratorAgentTest, PlayPatternBySessionId_002, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, PlayPackageBySessionId_001, TestSize.Level1)
 {
-    MISC_HILOGI("PlayPatternBySessionId_001 in");
+    MISC_HILOGI("PlayPackageBySessionId_001 in");
     VibratorPackage package;
     int32_t ret = PlayPackageBySessionId(0, package);
     ASSERT_EQ(ret, PARAMETER_ERROR);
@@ -2895,7 +2939,7 @@ HWTEST_F(VibratorAgentTest, PlayPackageBySessionId_001, TestSize.Level1)
 
 HWTEST_F(VibratorAgentTest, PlayPackageBySessionId_002, TestSize.Level1)
 {
-    MISC_HILOGI("PlayPatternBySessionId_002 in");
+    MISC_HILOGI("PlayPackageBySessionId_002 in");
     bool isSupport = IsSupportVibratorCustom();
     if (isSupport) {
         int32_t delayTime { -1 };
@@ -2915,12 +2959,47 @@ HWTEST_F(VibratorAgentTest, PlayPackageBySessionId_002, TestSize.Level1)
             ASSERT_EQ(ret, 0);
             ASSERT_EQ(SetUsage(USAGE_UNKNOWN), true);
             MISC_HILOGD("patternNum:%{public}d", package.patternNum);
-            ret = PlayPackageBySessionId(1, package);
+            ret = PlayPackageBySessionId(SESSION_ID_ONE, package);
             ASSERT_EQ(ret, 0);
         }
         ret = FreeVibratorPackage(package);
         ASSERT_EQ(ret, 0);
-        StopVibrateBySessionId(1);
+        StopVibrateBySessionId(SESSION_ID_ONE);
+    } else {
+        ASSERT_EQ(isSupport, false);
+    }
+}
+
+HWTEST_F(VibratorAgentTest, PlayPackageBySessionId_003, TestSize.Level1)
+{
+    MISC_HILOGI("PlayPackageBySessionId_003 in");
+    bool isSupport = IsSupportVibratorCustom();
+    if (isSupport) {
+        int32_t delayTime { -1 };
+        int32_t ret = GetDelayTime(delayTime);
+        ASSERT_EQ(ret, 0);
+        MISC_HILOGD("delayTime:%{public}d", delayTime);
+        FileDescriptor fileDescriptor("/data/test/vibrator/coin_drop.json");
+        MISC_HILOGD("fd:%{public}d", fileDescriptor.fd);
+        VibratorFileDescription vfd;
+        VibratorPackage package;
+        struct stat64 statbuf = { 0 };
+        if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
+            vfd.fd = fileDescriptor.fd;
+            vfd.offset = 0;
+            vfd.length = statbuf.st_size;
+            ret = PreProcess(vfd, package);
+            ASSERT_EQ(ret, 0);
+            ASSERT_EQ(SetUsage(USAGE_UNKNOWN), true);
+            MISC_HILOGD("patternNum:%{public}d", package.patternNum);
+            for (int32_t i = 0; i < LOOP_TIMES; ++i) {
+                ret = PlayPackageBySessionId((i + 1), package);
+                ASSERT_EQ(ret, 0);
+            }
+        }
+        ret = FreeVibratorPackage(package);
+        ASSERT_EQ(ret, 0);
+        StopVibrateBySessionId(SESSION_ID_ONE);
     } else {
         ASSERT_EQ(isSupport, false);
     }
@@ -2936,7 +3015,37 @@ HWTEST_F(VibratorAgentTest, StopVibrateBySessionId_001, TestSize.Level1)
 HWTEST_F(VibratorAgentTest, StopVibrateBySessionId_002, TestSize.Level1)
 {
     MISC_HILOGI("StopVibrateBySessionId_002 in");
-    int32_t ret = StopVibrateBySessionId(1);
+    int32_t ret = StopVibrateBySessionId(SESSION_ID_ONE);
+    ASSERT_NE(ret, OHOS::Sensors::SUCCESS);
+}
+
+HWTEST_F(VibratorAgentTest, StopVibrateBySessionId_003, TestSize.Level1)
+{
+    MISC_HILOGI("StopVibrateBySessionId_003 in");
+    int32_t ret = StopVibrateBySessionId(SESSION_ID_ONE);
+    ASSERT_NE(ret, OHOS::Sensors::SUCCESS);
+    ret = StopVibrateBySessionId(SESSION_ID_ONE);
+    ASSERT_NE(ret, OHOS::Sensors::SUCCESS);
+    ret = StopVibrateBySessionId(SESSION_ID_ONE);
+    ASSERT_NE(ret, OHOS::Sensors::SUCCESS);
+    ret = StopVibrateBySessionId(SESSION_ID_ONE);
+    ASSERT_NE(ret, OHOS::Sensors::SUCCESS);
+    ret = StopVibrateBySessionId(SESSION_ID_ONE);
+    ASSERT_NE(ret, OHOS::Sensors::SUCCESS);
+}
+
+HWTEST_F(VibratorAgentTest, StopVibrateBySessionId_004, TestSize.Level1)
+{
+    MISC_HILOGI("StopVibrateBySessionId_004 in");
+    int32_t ret = StopVibrateBySessionId(SESSION_ID_ONE);
+    ASSERT_NE(ret, OHOS::Sensors::SUCCESS);
+    ret = StopVibrateBySessionId(SESSION_ID_TWO);
+    ASSERT_NE(ret, OHOS::Sensors::SUCCESS);
+    ret = StopVibrateBySessionId(SESSION_ID_THREE);
+    ASSERT_NE(ret, OHOS::Sensors::SUCCESS);
+    ret = StopVibrateBySessionId(SESSION_ID_FOUR);
+    ASSERT_NE(ret, OHOS::Sensors::SUCCESS);
+    ret = StopVibrateBySessionId(SESSION_ID_FIVE);
     ASSERT_NE(ret, OHOS::Sensors::SUCCESS);
 }
 } // namespace Sensors
