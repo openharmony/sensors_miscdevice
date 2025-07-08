@@ -60,8 +60,7 @@
           "//base/sensors/miscdevice/frameworks/native/vibrator:vibrator_target",
           "//base/sensors/miscdevice/frameworks/native/light:light_target",
           "//base/sensors/miscdevice/utils:miscdevice_utils_target",
-          "//base/sensors/miscdevice/frameworks/capi:ohvibrator",
-          "//base/sensors/miscdevice/frameworks/ets/taihe:vibrator_taihe"
+          "//base/sensors/miscdevice/frameworks/capi:ohvibrator"
         ],
         "service_group": [
           "//base/sensors/miscdevice/services/miscdevice_service:miscdevice_service_target",
@@ -69,9 +68,6 @@
         ]
       },
       "inner_kits": [
-        {
-          "name": "//base/sensors/miscdevice/frameworks/ets/taihe:copy_taihe"
-        },
         {
           "name": "//base/sensors/miscdevice/frameworks/native/vibrator:vibrator_interface_native",
           "header": {
