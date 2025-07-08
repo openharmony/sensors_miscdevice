@@ -908,7 +908,8 @@ int32_t MiscdeviceService::PlayPattern(const VibratorIdentifierIPC& identifier, 
         return checkResult;
     }
     VibratePattern vibratePattern;
-    vibratePattern.startTime = 0;
+    uint32_t sessionId = customHapticInfoIPC.parameter.sessionId;
+    vibratePattern.startTime = ((sessionId > 0) ? pattern.startTime : 0);
     vibratePattern.events = pattern.events;
     std::vector<VibratePattern> patterns = {vibratePattern};
     VibratePackage package = {
@@ -916,7 +917,6 @@ int32_t MiscdeviceService::PlayPattern(const VibratorIdentifierIPC& identifier, 
     };
     MergeVibratorParmeters(customHapticInfoIPC.parameter, package);
     package.Dump();
-    uint32_t sessionId = customHapticInfoIPC.parameter.sessionId;
     VibrateInfo info = {
         .mode = VIBRATE_BUTT,
         .packageName = GetPackageName(GetCallingTokenID()),
