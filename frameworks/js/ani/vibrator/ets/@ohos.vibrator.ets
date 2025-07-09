@@ -29,8 +29,8 @@ export default namespace vibrator {
     let p1 = taskpool.execute(startVibrationIntSync, effect, attribute);
     p1.then((e: NullishType)=>{
         console.log("in callback startVibration then.")
-        let err1 : BusinessError<void>
-        callback(err1, undefined);
+        let err = new BusinessError<void>;
+        callback(err, undefined);
     });
     p1.catch((err: NullishType) => {
       console.log("startVibration catch in callback thread.");
@@ -61,7 +61,7 @@ export default namespace vibrator {
     p1.then((e: NullishType)=>{
         let r = e as boolean;
         console.log("in callback isSupportEffectInterally then. e is ", e)
-        let err : BusinessError<void>
+        let err = new BusinessError<void>;
         callback(err, r);
     });
     p1.catch((error: NullishType) => {
