@@ -15,13 +15,20 @@
 
 #include <fcntl.h>
 #include <gtest/gtest.h>
+#include <set>
 #include <string>
 #include <thread>
 
+#include "accesstoken_kit.h"
+#include "nativetoken_kit.h"
 #include "parameters.h"
+#include "parcel.h"
+#include "securec.h"
 #include "sensors_errors.h"
+#include "token_setproc.h"
 #include "vibrator_agent.h"
 #include "vibrator_agent_type.h"
+#include "vibrator_infos.h"
 
 #undef LOG_TAG
 #define LOG_TAG "VibratorAgentSeekTest"
@@ -31,19 +38,48 @@ namespace Sensors {
 using namespace testing::ext;
 
 namespace {
-constexpr int32_t TIME_WAIT_FOR_OP_TWO_HUNDRED = 200;
 constexpr int32_t CONT_TYPE_NO_CURVE_EVENT_IDX_9 = 9;
 constexpr int32_t CONT_TYPE_NO_CURVE_EVENT_IDX_10 = 10;
 constexpr int32_t CONT_TYPE_CURVE_EVENT_IDX_8 = 8;
 constexpr int32_t CONT_TYPE_CURVE_EVENT_IDX_9 = 9;
 constexpr int32_t CONT_TYPE_CURVE_EVENT_IDX_10 = 10;
-constexpr int32_t CURVE_FREQUENCY_NO_MODIFICATION = 0;
-constexpr int32_t CURVE_INTENSITY_NO_MODIFICATION = 100;
-constexpr int32_t CURVE_TIME_NO_MODIFICATION = 0;
-constexpr int32_t FADE_IN_END_MODIFY = 1;
-constexpr int32_t FADE_OUT_BEGIN_MODIFY = 10;
+constexpr int32_t FADE_IN_IDX_0 = 0;
+constexpr int32_t FADE_IN_IDX_1 = 1;
+constexpr int32_t FADE_OUT_IDX_10 = 10;
 constexpr int32_t FADE_IN_FADE_OUT_DURATION = 1200;
+constexpr int32_t MOD_NON_CONT_TYPE_EVENT_IDX = 0;
+constexpr int32_t INVALID_FD = -1;
+constexpr int32_t TRANSIENT_VIBRATION_DURATION = 48;
+constexpr int32_t TIME_WAIT_FOR_OP = 2000;
+constexpr int32_t TIME_WAIT_FOR_EACH_CASE = 200;
+constexpr int32_t TEST_SUCCESS = 0;
+constexpr int32_t TEST_FAILED = -1;
 }
+
+using namespace Security::AccessToken;
+using Security::AccessToken::AccessTokenID;
+
+PermissionStateFull g_infoManagerTestState = {
+    .grantFlags = {1},
+    .grantStatus = {PermissionState::PERMISSION_GRANTED},
+    .isGeneral = true,
+    .permissionName = "ohos.permission.VIBRATE",
+    .resDeviceID = {"local"}
+};
+
+HapPolicyParams g_infoManagerTestPolicyPrams = {
+    .apl = APL_NORMAL,
+    .domain = "test.domain",
+    .permList = {},
+    .permStateList = {g_infoManagerTestState}
+};
+
+HapInfoParams g_infoManagerTestInfoParms = {
+    .bundleName = "vibratoragent_test",
+    .userID = 1,
+    .instIndex = 0,
+    .appIDDesc = "vibratorAgentTest"
+};
 
 class VibratorAgentModulationTest : public testing::Test {
 public:
@@ -51,26 +87,27 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
+private:
+    static AccessTokenID tokenID_;
 };
 
-struct FileDescriptor {
-    explicit FileDescriptor(const std::string &path)
-    {
-        fd = open(path.c_str(), O_RDONLY);
-    }
-    ~FileDescriptor()
-    {
-        close(fd);
-    }
-    int32_t fd;
-};
+AccessTokenID VibratorAgentModulationTest::tokenID_ = 0;
 
 void VibratorAgentModulationTest::SetUpTestCase()
 {
+    AccessTokenIDEx tokenIdEx = {0};
+    tokenIdEx = AccessTokenKit::AllocHapToken(g_infoManagerTestInfoParms, g_infoManagerTestPolicyPrams);
+    tokenID_ = tokenIdEx.tokenIdExStruct.tokenID;
+    ASSERT_NE(0, tokenID_);
+    ASSERT_EQ(0, SetSelfTokenID(tokenID_));
 }
 
 void VibratorAgentModulationTest::TearDownTestCase()
 {
+    int32_t ret = AccessTokenKit::DeleteToken(tokenID_);
+    if (tokenID_ != 0) {
+        ASSERT_EQ(RET_SUCCESS, ret);
+    }
 }
 
 void VibratorAgentModulationTest::SetUp()
@@ -79,7 +116,34 @@ void VibratorAgentModulationTest::SetUp()
 
 void VibratorAgentModulationTest::TearDown()
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_TWO_HUNDRED));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_EACH_CASE));
+}
+
+int32_t PlayModulatedPattern(const VibratorPackage& package)
+{
+    VibratorIdentifier identifier = {
+        .deviceId = -1,
+        .vibratorId = -1,
+    };
+    bool isSupport = IsSupportVibratorCustomEnhanced(identifier);
+    if (!isSupport) {
+        MISC_HILOGI("PlayModulatedPattern: enhanced not supported");
+        return TEST_SUCCESS;
+    } else {
+        MISC_HILOGI("PlayModulatedPattern: enhanced is supported");
+    }
+    if (!SetUsageEnhanced(identifier, USAGE_UNKNOWN)) {
+        return TEST_FAILED;
+    }
+    for (int32_t idx = 0; idx < package.patternNum; idx++) {
+        int32_t res = PlayPatternEnhanced(identifier, package.patterns[0]);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+        CancelEnhanced(identifier);
+        if (res != TEST_SUCCESS) {
+            return TEST_FAILED;
+        }
+    }
+    return TEST_SUCCESS;
 }
 
 void PrintVibratorPackageInfo(const VibratorPackage& package, std::string functionName)
@@ -122,54 +186,39 @@ void PrintVibratorPackageInfo(const VibratorPackage& package, std::string functi
     }
 }
 
+void FreeEvent(VibratorEvent& event)
+{
+    if (event.pointNum != 0 && event.points != nullptr) {
+        free(event.points);
+        event.points = nullptr;
+    }
+}
+
 bool IsVibratorCurvePointIdentical(const VibratorCurvePoint& first, const VibratorCurvePoint& second)
 {
     return first.frequency == second.frequency && first.intensity == second.intensity && first.time == second.time;
 }
 
-bool IsEquivalentEvent(const VibratorEvent& first, const VibratorEvent& second)
-{
-    if (first.time != second.time || first.duration != second.duration || first.intensity != second.intensity ||
-        first.frequency != second.frequency || first.index != second.index || first.type != second.type) {
-        return false;
-    }
-    if ((first.pointNum == 0 && second.pointNum == 1) || (first.pointNum == 1 && second.pointNum == 0)) {
-        const VibratorCurvePoint& onlyPoint = first.pointNum == 1 ? first.points[0] : second.points[0];
-        return onlyPoint.frequency == CURVE_FREQUENCY_NO_MODIFICATION &&
-            onlyPoint.intensity == CURVE_INTENSITY_NO_MODIFICATION &&
-            onlyPoint.time == CURVE_TIME_NO_MODIFICATION;
-    }
-    return false;
-}
-
 bool IsEventIdentical(const VibratorEvent& first, const VibratorEvent& second)
 {
-    if (first.time != second.time || first.duration != second.duration || first.intensity != second.intensity ||
-        first.frequency != second.frequency || first.index != second.index || first.type != second.type) {
+    if (first.type != second.type || first.time != second.time || first.duration != second.duration ||
+        first.intensity != second.intensity || first.frequency != second.frequency || first.index != second.index ||
+        first.pointNum != second.pointNum) {
         return false;
     }
     if (first.type != EVENT_TYPE_CONTINUOUS) {
-        if (first.pointNum != 0 || second.pointNum != 0) {
-            return false;
-        }
+        return first.pointNum == 0;
+    }
+    if (first.pointNum == 0) {
         return true;
     }
-    if (IsEquivalentEvent(first, second)) {
-        return true;
+    const VibratorCurvePoint* firstCurve = first.points;
+    const VibratorCurvePoint* secondCurve = second.points;
+    if (firstCurve == nullptr || secondCurve == nullptr) {
+        return false;
     }
-    for (int32_t idx = 0; idx < std::min(first.pointNum, second.pointNum); idx++) {
-        if (!IsVibratorCurvePointIdentical(first.points[idx], second.points[idx])) {
-            return false;
-        }
-    }
-    if (first.pointNum == second.pointNum) {
-        return true;
-    }
-    const VibratorCurvePoint* points = first.pointNum > second.pointNum ? first.points : second.points;
-    const int32_t duration = first.pointNum > second.pointNum ? first.duration : second.duration;
-    for (int32_t idx = std::min(first.pointNum, second.pointNum);
-        idx < std::max(first.pointNum, second.pointNum); idx++) {
-        if (points[idx].time < duration) {
+    for (int32_t idx = 0; idx < first.pointNum; idx++) {
+        if (!IsVibratorCurvePointIdentical(firstCurve[idx], secondCurve[idx])) {
             return false;
         }
     }
@@ -203,10 +252,26 @@ bool IsPackageIdentical(const VibratorPackage& first, const VibratorPackage& sec
     return true;
 }
 
+int GetFdWithRealpath(const char* path)
+{
+    char filePath[PATH_MAX];
+    char *resolvedPath = realpath(path, filePath);
+    if (resolvedPath == nullptr) {
+        MISC_HILOGE("GetFdWithRealpath: invalid path %{public}s", path);
+        return INVALID_FD;
+    }
+    int fd = open(filePath, O_RDONLY);
+    if (fd < 0) {
+        MISC_HILOGE("GetFdWithRealpath: failed to open %{public}s", filePath);
+        return INVALID_FD;
+    }
+    return fd;
+}
+
 bool ConvertFileToVibratorPackage(const char* functionName, const char* filePath, VibratorPackage& vibratorPackage)
 {
     MISC_HILOGI("ConvertFileToVibratorPackage in: %{public}s", functionName);
-    int fd = open(filePath, O_RDONLY);
+    int fd = GetFdWithRealpath(filePath);
     if (fd < 0) {
         MISC_HILOGI("ConvertFileToVibratorPackage: failed to open %{public}s in: %{public}s", filePath, functionName);
         return false;
@@ -231,59 +296,110 @@ bool ConvertFileToVibratorPackage(const char* functionName, const char* filePath
     return true;
 }
 
-void ConvertEventToParams(VibratorEvent& event, VibratorCurvePoint*& curvePoint,
+void ConvertEventToParams(VibratorEvent& event, VibratorCurvePoint** curvePointArg,
     int32_t& curvePointNum, int32_t& duration)
 {
-    curvePoint = event.points;
+    if (curvePointArg == nullptr) {
+        MISC_HILOGE("failed to ConvertEventToParams due to nullptr");
+    }
+    *curvePointArg = event.points;
     curvePointNum = event.pointNum;
     duration = event.duration + event.time;
     for (int32_t idx = 0; idx < curvePointNum; idx++) {
-        curvePoint[idx].time += event.time;
+        (*curvePointArg)[idx].time += event.time;
     }
 }
 
-HWTEST_F(VibratorAgentModulationTest, NonContinuousTypeIsIntact, TestSize.Level1)
+VibratorEvent GetExpectedEventInModulateNonContinuousType()
 {
-    MISC_HILOGI("NonContinuousTypeIsIntact in");
-    VibratorPackage package, modulationPackage, packageAfterModulation;
+    return VibratorEvent{.type = EVENT_TYPE_TRANSIENT, .time = 0, .duration = TRANSIENT_VIBRATION_DURATION,
+        .intensity = 0, .frequency = 31, .index = 0, .pointNum = 0, .points = nullptr};
+}
+
+HWTEST_F(VibratorAgentModulationTest, ModulateNonContinuousType, TestSize.Level1)
+{
+    MISC_HILOGI("ModulateNonContinuousType in");
+    VibratorPackage package;
+    VibratorPackage modulationPackage;
+    VibratorPackage packageAfterModulation;
     ASSERT_TRUE(ConvertFileToVibratorPackage(
-        "NonContinuousTypeIsIntact", "/data/test/vibrator/package_before_modulation.json", package));
+        "ModulateNonContinuousType", "/data/test/vibrator/package_before_modulation.json", package));
     ASSERT_TRUE(ConvertFileToVibratorPackage(
-        "NonContinuousTypeIsIntact", "/data/test/vibrator/modulation_curve.json", modulationPackage));
+        "ModulateNonContinuousType", "/data/test/vibrator/modulation_curve.json", modulationPackage));
     ASSERT_TRUE(modulationPackage.patternNum >= 1);
     ASSERT_TRUE(modulationPackage.patterns[0].eventNum >= 1);
     ASSERT_NE(modulationPackage.patterns[0].events, nullptr);
     VibratorCurvePoint* modulationCurve = nullptr;
     int32_t curvePointNum = 0;
     int32_t duration = 0;
-    ConvertEventToParams(modulationPackage.patterns[0].events[0], modulationCurve, curvePointNum, duration);
-    int32_t ret = ModulatePackage(modulationCurve, curvePointNum, duration, package, packageAfterModulation);
-    ASSERT_EQ(ret, 0);
-    ASSERT_TRUE(IsPackageIdentical(package, packageAfterModulation));
-    ret = FreeVibratorPackage(package);
-    ASSERT_EQ(ret, 0);
-    ret = FreeVibratorPackage(packageAfterModulation);
-    ASSERT_EQ(ret, 0);
-    ret = FreeVibratorPackage(modulationPackage);
-    ASSERT_EQ(ret, 0);
-    MISC_HILOGI("NonContinuousTypeIsIntact end");
+    ConvertEventToParams(modulationPackage.patterns[0].events[0], &modulationCurve, curvePointNum, duration);
+    ASSERT_EQ(ModulatePackage(modulationCurve, curvePointNum, duration, package, packageAfterModulation), 0);
+    ASSERT_EQ(package.patternNum, packageAfterModulation.patternNum);
+    ASSERT_EQ(package.packageDuration, packageAfterModulation.packageDuration);
+    const VibratorPattern& pattern = package.patterns[0];
+    const VibratorPattern& patternAfterMod = packageAfterModulation.patterns[0];
+    ASSERT_EQ(pattern.eventNum, patternAfterMod.eventNum);
+    for (int32_t eventIdx = 0; eventIdx < pattern.eventNum; eventIdx++) {
+        if (eventIdx == MOD_NON_CONT_TYPE_EVENT_IDX) {
+            VibratorEvent expectedEvent = GetExpectedEventInModulateNonContinuousType();
+            ASSERT_NE(expectedEvent.type, EVENT_TYPE_UNKNOWN);
+            ASSERT_TRUE(IsEventIdentical(expectedEvent, patternAfterMod.events[eventIdx]));
+            FreeEvent(expectedEvent);
+        } else {
+            ASSERT_TRUE(IsEventIdentical(pattern.events[eventIdx], patternAfterMod.events[eventIdx]));
+        }
+    }
+    ASSERT_EQ(PlayModulatedPattern(packageAfterModulation), TEST_SUCCESS);
+    ASSERT_EQ(FreeVibratorPackage(package), 0);
+    ASSERT_EQ(FreeVibratorPackage(packageAfterModulation), 0);
+    ASSERT_EQ(FreeVibratorPackage(modulationPackage), 0);
+    MISC_HILOGI("ModulateNonContinuousType end");
 }
 
-void getContinuousTypeWithCurvePointsExpectation(std::vector<VibratorCurvePoint>& ans)
+VibratorEvent GetContinuousTypeWithCurvePointsExpectation()
 {
-    ans.clear();
-    ans.emplace_back(VibratorCurvePoint{.time = 0, .intensity = 0, .frequency = -10});
-    ans.emplace_back(VibratorCurvePoint{.time = 100, .intensity = 100, .frequency = 10});
-    ans.emplace_back(VibratorCurvePoint{.time = 150, .intensity = 50, .frequency = 10});
-    ans.emplace_back(VibratorCurvePoint{.time = 200, .intensity = 50, .frequency = 10});
-    ans.emplace_back(VibratorCurvePoint{.time = 210, .intensity = 89, .frequency = -20});
-    ans.emplace_back(VibratorCurvePoint{.time = 234, .intensity = 77, .frequency = 20});
+    std::vector<VibratorCurvePoint> curveVec;
+    curveVec.emplace_back(VibratorCurvePoint{.time = 0, .intensity = 0, .frequency = -10});
+    curveVec.emplace_back(VibratorCurvePoint{.time = 100, .intensity = 17, .frequency = -10});
+    curveVec.emplace_back(VibratorCurvePoint{.time = 200, .intensity = 50, .frequency = 10});
+    curveVec.emplace_back(VibratorCurvePoint{.time = 254, .intensity = 0, .frequency = 20});
+    VibratorCurvePoint *curvePoints = (VibratorCurvePoint *)calloc(curveVec.size(), sizeof(VibratorCurvePoint));
+    if (curvePoints == nullptr) {
+        MISC_HILOGE("failed to allocate memory for VibratorCurvePoint");
+        curveVec.clear();
+    } else {
+        uint32_t copyBytesCount = curveVec.size() * sizeof(VibratorCurvePoint);
+        memcpy_s(curvePoints, copyBytesCount, curveVec.data(), copyBytesCount);
+    }
+    return VibratorEvent{.type = curvePoints == nullptr ? EVENT_TYPE_UNKNOWN : EVENT_TYPE_CONTINUOUS,
+        .time = 410, .duration = 254, .intensity = 38, .frequency = 30, .index = 0,
+        .pointNum = (int32_t)curveVec.size(), .points = curvePoints};
+}
+
+VibratorEvent GetContinuousTypeWithoutCurvePointsExpectationForEvent(int32_t idx)
+{
+    switch (idx) {
+        case CONT_TYPE_NO_CURVE_EVENT_IDX_9:
+            return VibratorEvent{.type =  EVENT_TYPE_CONTINUOUS, .time = 940, .duration = 160,
+                .intensity = 7, .frequency = 57, .index = 0, .pointNum = 0, .points = nullptr};
+            break;
+        case CONT_TYPE_NO_CURVE_EVENT_IDX_10:
+            return VibratorEvent{.type =  EVENT_TYPE_CONTINUOUS, .time = 1100, .duration = 100,
+                .intensity = 14, .frequency = 64, .index = 0, .pointNum = 0, .points = nullptr};
+            break;
+        default:
+            return VibratorEvent{.type =  EVENT_TYPE_UNKNOWN, .time = -1, .duration = -1,
+                .intensity = -1, .frequency = -1, .index = 0, .pointNum = 0, .points = nullptr};
+            break;
+    }
 }
 
 HWTEST_F(VibratorAgentModulationTest, ContinuousTypeWithCurvePoint, TestSize.Level1)
 {
     MISC_HILOGI("ContinuousTypeWithCurvePoint in");
-    VibratorPackage package, modulationPackage, packageAfterModulation;
+    VibratorPackage package;
+    VibratorPackage modulationPackage;
+    VibratorPackage packageAfterModulation;
     ASSERT_TRUE(ConvertFileToVibratorPackage(
         "ContinuousTypeWithCurvePoint", "/data/test/vibrator/package_before_modulation.json", package));
     ASSERT_TRUE(ConvertFileToVibratorPackage(
@@ -294,9 +410,8 @@ HWTEST_F(VibratorAgentModulationTest, ContinuousTypeWithCurvePoint, TestSize.Lev
     VibratorCurvePoint* modulationCurve = nullptr;
     int32_t curvePointNum = 0;
     int32_t duration = 0;
-    ConvertEventToParams(modulationPackage.patterns[0].events[1], modulationCurve, curvePointNum, duration);
-    int32_t ret = ModulatePackage(modulationCurve, curvePointNum, duration, package, packageAfterModulation);
-    ASSERT_EQ(ret, 0);
+    ConvertEventToParams(modulationPackage.patterns[0].events[1], &modulationCurve, curvePointNum, duration);
+    ASSERT_EQ(ModulatePackage(modulationCurve, curvePointNum, duration, package, packageAfterModulation), 0);
     ASSERT_FALSE(IsPackageIdentical(package, packageAfterModulation));
     ASSERT_EQ(packageAfterModulation.patternNum, package.patternNum);
     ASSERT_EQ(packageAfterModulation.patterns[0].eventNum, package.patterns[0].eventNum);
@@ -306,51 +421,19 @@ HWTEST_F(VibratorAgentModulationTest, ContinuousTypeWithCurvePoint, TestSize.Lev
         if (idx != 7) {
             ASSERT_TRUE(IsEventIdentical(originalPattern.events[idx], pattern.events[idx]));
         } else {
-            const VibratorEvent& event = pattern.events[idx];
-            const VibratorEvent& originalEvent = originalPattern.events[idx];
-            ASSERT_EQ(event.type, originalEvent.type);
-            ASSERT_EQ(event.time, originalEvent.time);
-            ASSERT_EQ(event.intensity, originalEvent.intensity);
-            ASSERT_EQ(event.frequency, originalEvent.frequency);
-            ASSERT_EQ(event.index, originalEvent.index);
-            ASSERT_EQ(event.pointNum, 6);
-            std::vector<VibratorCurvePoint> expectedAns;
-            getContinuousTypeWithCurvePointsExpectation(expectedAns);
-            for (int32_t pointIdx = 0; pointIdx < 6; pointIdx++) {
-                ASSERT_TRUE(IsVibratorCurvePointIdentical(event.points[pointIdx], expectedAns[pointIdx]));
-            }
+            const VibratorEvent& afterModEvent = pattern.events[idx];
+            VibratorEvent expectedEvent = GetContinuousTypeWithCurvePointsExpectation();
+            ASSERT_NE(expectedEvent.type, EVENT_TYPE_UNKNOWN);
+            ASSERT_TRUE(IsEventIdentical(afterModEvent, expectedEvent));
+            FreeEvent(expectedEvent);
         }
     }
-    ret = FreeVibratorPackage(package);
-    ASSERT_EQ(ret, 0);
-    ret = FreeVibratorPackage(packageAfterModulation);
-    ASSERT_EQ(ret, 0);
-    ret = FreeVibratorPackage(modulationPackage);
-    ASSERT_EQ(ret, 0);
+    ASSERT_EQ(PlayModulatedPattern(packageAfterModulation), TEST_SUCCESS);
+    ASSERT_EQ(FreeVibratorPackage(package), 0);
+    ASSERT_EQ(FreeVibratorPackage(packageAfterModulation), 0);
+    ASSERT_EQ(FreeVibratorPackage(modulationPackage), 0);
     MISC_HILOGI("ContinuousTypeWithCurvePoint end");
 }
-
-void getContinuousTypeWithoutCurvePointsExpectationForEvent(int32_t idx, std::vector<VibratorCurvePoint>& ans)
-{
-    ans.clear();
-    switch (idx) {
-        case CONT_TYPE_NO_CURVE_EVENT_IDX_9:
-            ans.emplace_back(VibratorCurvePoint{.time = 0, .intensity = 10, .frequency = 20});
-            ans.emplace_back(VibratorCurvePoint{.time = 20, .intensity = 20, .frequency = -30});
-            ans.emplace_back(VibratorCurvePoint{.time = 80, .intensity = 30, .frequency = 40});
-            ans.emplace_back(VibratorCurvePoint{.time = 100, .intensity = 40, .frequency = -50});
-            ans.emplace_back(VibratorCurvePoint{.time = 150, .intensity = 60, .frequency = 20});
-            break;
-        case CONT_TYPE_NO_CURVE_EVENT_IDX_10:
-            ans.emplace_back(VibratorCurvePoint{.time = 0, .intensity = 60, .frequency = 20});
-            ans.emplace_back(VibratorCurvePoint{.time = 40, .intensity = 70, .frequency = -30});
-            ans.emplace_back(VibratorCurvePoint{.time = 80, .intensity = 80, .frequency = 40});
-            break;
-        default:
-            break;
-    }
-}
-
 
 HWTEST_F(VibratorAgentModulationTest, ContinuousTypeWithoutCurvePoint, TestSize.Level1)
 {
@@ -366,62 +449,62 @@ HWTEST_F(VibratorAgentModulationTest, ContinuousTypeWithoutCurvePoint, TestSize.
     VibratorCurvePoint* modulationCurve = nullptr;
     int32_t curvePointNum = 0;
     int32_t duration = 0;
-    ConvertEventToParams(modulationPackage.patterns[0].events[2], modulationCurve, curvePointNum, duration);
-    int32_t ret = ModulatePackage(modulationCurve, curvePointNum, duration, package, packageAfterModulation);
-    ASSERT_EQ(ret, 0);
+    ConvertEventToParams(modulationPackage.patterns[0].events[2], &modulationCurve, curvePointNum, duration);
+    ASSERT_EQ(ModulatePackage(modulationCurve, curvePointNum, duration, package, packageAfterModulation), 0);
     ASSERT_FALSE(IsPackageIdentical(package, packageAfterModulation));
     ASSERT_EQ(packageAfterModulation.patternNum, package.patternNum);
     ASSERT_EQ(packageAfterModulation.patterns[0].eventNum, package.patterns[0].eventNum);
     const VibratorPattern& pattern = packageAfterModulation.patterns[0];
     const VibratorPattern& originalPattern = package.patterns[0];
     for (int32_t idx = 0; idx < pattern.eventNum; idx++) {
-        if (idx != 9 && idx != 10) {
+        if (idx != CONT_TYPE_NO_CURVE_EVENT_IDX_9 && idx != CONT_TYPE_NO_CURVE_EVENT_IDX_10) {
             ASSERT_TRUE(IsEventIdentical(originalPattern.events[idx], pattern.events[idx]));
-            continue;
-        }
-        const VibratorEvent& event = pattern.events[idx];
-        const VibratorEvent& originalEvent = originalPattern.events[idx];
-        ASSERT_EQ(event.type, originalEvent.type);
-        ASSERT_EQ(event.time, originalEvent.time);
-        ASSERT_EQ(event.intensity, originalEvent.intensity);
-        ASSERT_EQ(event.frequency, originalEvent.frequency);
-        ASSERT_EQ(event.index, originalEvent.index);
-        std::vector<VibratorCurvePoint> expectedAns;
-        getContinuousTypeWithoutCurvePointsExpectationForEvent(idx, expectedAns);
-        for (int32_t pointIdx = 0; pointIdx < (int32_t)expectedAns.size(); pointIdx++) {
-            ASSERT_TRUE(IsVibratorCurvePointIdentical(event.points[pointIdx], expectedAns[pointIdx]));
+        } else {
+            const VibratorEvent& event = pattern.events[idx];
+            VibratorEvent expectedEvent = GetContinuousTypeWithoutCurvePointsExpectationForEvent(idx);
+            ASSERT_TRUE(IsEventIdentical(event, expectedEvent));
+            FreeEvent(expectedEvent);
         }
     }
-    ret = FreeVibratorPackage(package);
-    ASSERT_EQ(ret, 0);
-    ret = FreeVibratorPackage(packageAfterModulation);
-    ASSERT_EQ(ret, 0);
-    ret = FreeVibratorPackage(modulationPackage);
-    ASSERT_EQ(ret, 0);
+    ASSERT_EQ(PlayModulatedPattern(packageAfterModulation), TEST_SUCCESS);
+    ASSERT_EQ(FreeVibratorPackage(package), 0);
+    ASSERT_EQ(FreeVibratorPackage(packageAfterModulation), 0);
+    ASSERT_EQ(FreeVibratorPackage(modulationPackage), 0);
     MISC_HILOGI("ContinuousTypeWithoutCurvePoint end");
 }
 
-void getExpectedCruvePoints(int idx, std::vector<VibratorCurvePoint>& ans)
+VibratorEvent GetExpectedEventForContinuousTypeWithCurvePointAndEventStartTime(int idx)
 {
-    ans.clear();
+    VibratorCurvePoint* curvePoints = nullptr;
+    std::vector<VibratorCurvePoint> pointsVec;
     switch (idx) {
         case CONT_TYPE_CURVE_EVENT_IDX_8:
-            ans.emplace_back(VibratorCurvePoint{.time = 0, .intensity = 0, .frequency = 0});
-            ans.emplace_back(VibratorCurvePoint{.time = 100, .intensity = 100, .frequency = 0});
-            ans.emplace_back(VibratorCurvePoint{.time = 200, .intensity = 100, .frequency = 0});
-            ans.emplace_back(VibratorCurvePoint{.time = 230, .intensity = 17, .frequency = -10});
+            pointsVec.emplace_back(VibratorCurvePoint{.time = 0, .intensity = 0, .frequency = 0});
+            pointsVec.emplace_back(VibratorCurvePoint{.time = 100, .intensity = 100, .frequency = 0});
+            pointsVec.emplace_back(VibratorCurvePoint{.time = 200, .intensity = 17, .frequency = -10});
+            pointsVec.emplace_back(VibratorCurvePoint{.time = 254, .intensity = 0, .frequency = -10});
+            curvePoints = (VibratorCurvePoint *)calloc(pointsVec.size(), sizeof(VibratorCurvePoint));
+            if (curvePoints == nullptr) {
+                MISC_HILOGE("failed to allocate memory for VibratorCurvePoint");
+            } else {
+                uint32_t copyBytesCount = pointsVec.size() * sizeof(VibratorCurvePoint);
+                memcpy_s(curvePoints, copyBytesCount, pointsVec.data(), copyBytesCount);
+            }
+            return VibratorEvent{.type =  EVENT_TYPE_CONTINUOUS, .time = 670, .duration = 254,
+                .intensity = 38, .frequency = 30, .index = 0,
+                .pointNum = curvePoints == nullptr ? 0 : (int32_t)pointsVec.size(), .points = curvePoints};
             break;
         case CONT_TYPE_CURVE_EVENT_IDX_9:
-            ans.emplace_back(VibratorCurvePoint{.time = 0, .intensity = 17, .frequency = -10});
-            ans.emplace_back(VibratorCurvePoint{.time = 60, .intensity = 100, .frequency = 10});
-            ans.emplace_back(VibratorCurvePoint{.time = 110, .intensity = 50, .frequency = 10});
+            return VibratorEvent{.type =  EVENT_TYPE_CONTINUOUS, .time = 940, .duration = 160,
+                .intensity = 12, .frequency = 27, .index = 0, .pointNum = 0, .points = nullptr};
             break;
         case CONT_TYPE_CURVE_EVENT_IDX_10:
-            ans.emplace_back(VibratorCurvePoint{.time = 0, .intensity = 50, .frequency = 10});
-            ans.emplace_back(VibratorCurvePoint{.time = 10, .intensity = 89, .frequency = -20});
-            ans.emplace_back(VibratorCurvePoint{.time = 20, .intensity = 100, .frequency = 0});
+            return VibratorEvent{.type =  EVENT_TYPE_CONTINUOUS, .time = 1100, .duration = 100,
+                .intensity = 18, .frequency = 64, .index = 0, .pointNum = 0, .points = nullptr};
             break;
         default:
+            return VibratorEvent{.type = EVENT_TYPE_UNKNOWN, .time = -1, .duration = -1, .intensity = -1,
+                .frequency = -1, .index = 0, .pointNum = 0, .points = nullptr};
             break;
     }
 }
@@ -429,7 +512,9 @@ void getExpectedCruvePoints(int idx, std::vector<VibratorCurvePoint>& ans)
 HWTEST_F(VibratorAgentModulationTest, ContinuousTypeWithCurvePointAndEventStartTime, TestSize.Level1)
 {
     MISC_HILOGI("ContinuousTypeWithCurvePointAndEventStartTime in");
-    VibratorPackage package, modulationPackage, packageAfterModulation;
+    VibratorPackage package;
+    VibratorPackage modulationPackage;
+    VibratorPackage packageAfterModulation;
     ASSERT_TRUE(ConvertFileToVibratorPackage("ContinuousTypeWithCurvePointAndEventStartTime",
         "/data/test/vibrator/package_before_modulation.json", package));
     ASSERT_TRUE(ConvertFileToVibratorPackage("ContinuousTypeWithCurvePointAndEventStartTime",
@@ -438,14 +523,13 @@ HWTEST_F(VibratorAgentModulationTest, ContinuousTypeWithCurvePointAndEventStartT
     ASSERT_TRUE(modulationPackage.patterns[0].eventNum >= 1);
     ASSERT_NE(modulationPackage.patterns[0].events, nullptr);
     VibratorEvent& modulationEvent = modulationPackage.patterns[0].events[1];
-    modulationEvent.duration = 220;
-    modulationEvent.time = 900;
+    modulationEvent.duration = 270;
+    modulationEvent.time = 850;
     VibratorCurvePoint* modulationCurve = nullptr;
     int32_t curvePointNum = 0;
     int32_t duration = 0;
-    ConvertEventToParams(modulationEvent, modulationCurve, curvePointNum, duration);
-    int32_t ret = ModulatePackage(modulationCurve, curvePointNum, duration, package, packageAfterModulation);
-    ASSERT_EQ(ret, 0);
+    ConvertEventToParams(modulationEvent, &modulationCurve, curvePointNum, duration);
+    ASSERT_EQ(ModulatePackage(modulationCurve, curvePointNum, duration, package, packageAfterModulation), 0);
     ASSERT_FALSE(IsPackageIdentical(package, packageAfterModulation));
     ASSERT_EQ(packageAfterModulation.patternNum, package.patternNum);
     ASSERT_EQ(packageAfterModulation.patterns[0].eventNum, package.patterns[0].eventNum);
@@ -456,48 +540,66 @@ HWTEST_F(VibratorAgentModulationTest, ContinuousTypeWithCurvePointAndEventStartT
             ASSERT_TRUE(IsEventIdentical(originalPattern.events[idx], pattern.events[idx]));
         } else {
             const VibratorEvent& event = pattern.events[idx];
-            const VibratorEvent& originalEvent = originalPattern.events[idx];
-            ASSERT_EQ(event.type, originalEvent.type);
-            ASSERT_EQ(event.time, originalEvent.time);
-            std::vector<VibratorCurvePoint> expectedAns;
-            getExpectedCruvePoints(idx, expectedAns);
-            ASSERT_EQ(event.pointNum, (int32_t)expectedAns.size());
-            for (int32_t pointIdx = 0; pointIdx < event.pointNum; pointIdx++) {
-                ASSERT_TRUE(IsVibratorCurvePointIdentical(event.points[pointIdx], expectedAns[pointIdx]));
-            }
+            VibratorEvent expectedEvent = GetExpectedEventForContinuousTypeWithCurvePointAndEventStartTime(idx);
+            ASSERT_NE(expectedEvent.type, EVENT_TYPE_UNKNOWN);
+            ASSERT_TRUE(IsEventIdentical(event, expectedEvent));
+            FreeEvent(expectedEvent);
         }
     }
-    ret = FreeVibratorPackage(package);
-    ASSERT_EQ(ret, 0);
-    ret = FreeVibratorPackage(packageAfterModulation);
-    ASSERT_EQ(ret, 0);
-    ret = FreeVibratorPackage(modulationPackage);
-    ASSERT_EQ(ret, 0);
+    ASSERT_EQ(PlayModulatedPattern(packageAfterModulation), TEST_SUCCESS);
+    ASSERT_EQ(FreeVibratorPackage(package), 0);
+    ASSERT_EQ(FreeVibratorPackage(packageAfterModulation), 0);
+    ASSERT_EQ(FreeVibratorPackage(modulationPackage), 0);
     MISC_HILOGI("ContinuousTypeWithCurvePointAndEventStartTime end");
 }
 
 HWTEST_F(VibratorAgentModulationTest, InvalidModulationEvent, TestSize.Level1)
 {
     MISC_HILOGI("InvalidModulationEvent in");
-    VibratorPackage package, packageAfterModulation;
+    VibratorPackage package;
+    VibratorPackage packageAfterModulation;
     ASSERT_TRUE(ConvertFileToVibratorPackage("InvalidModulationEvent",
         "/data/test/vibrator/package_before_modulation.json", package));
-    int32_t ret = ModulatePackage(nullptr, -1, 220, package, packageAfterModulation);
-    ASSERT_NE(ret, 0);
-    ret = FreeVibratorPackage(package);
-    ASSERT_EQ(ret, 0);
+    ASSERT_NE(ModulatePackage(nullptr, -1, 220, package, packageAfterModulation), 0);
+    ASSERT_EQ(FreeVibratorPackage(package), 0);
     MISC_HILOGI("InvalidModulationEvent end");
 }
 
-bool generateFadeInFadeOutCurve(VibratorCurvePoint*& modulationCurve, int32_t& curvePointNum, int32_t& duration)
+HWTEST_F(VibratorAgentModulationTest, EventWithInvalidAmountOfPoints, TestSize.Level1)
 {
+    MISC_HILOGI("EventWithInvalidAmountOfPoints in");
+    VibratorPackage package;
+    VibratorPackage modulationPackage;
+    VibratorPackage packageAfterModulation;
+    ASSERT_TRUE(ConvertFileToVibratorPackage("ContinuousTypeWithCurvePointAndEventStartTime",
+        "/data/test/vibrator/package_before_modulation.json", package));
+    ASSERT_TRUE(ConvertFileToVibratorPackage("ContinuousTypeWithCurvePointAndEventStartTime",
+        "/data/test/vibrator/modulation_curve.json", modulationPackage));
+    VibratorEvent& modulationEvent = modulationPackage.patterns[0].events[1];
+    VibratorCurvePoint* modulationCurve = nullptr;
+    int32_t curvePointNum = 0;
+    int32_t duration = 0;
+    package.patterns[0].events[8].pointNum = 2;
+    ConvertEventToParams(modulationEvent, &modulationCurve, curvePointNum, duration);
+    ASSERT_NE(ModulatePackage(modulationCurve, curvePointNum, duration, package, packageAfterModulation), 0);
+    ASSERT_EQ(FreeVibratorPackage(package), 0);
+    ASSERT_EQ(FreeVibratorPackage(modulationPackage), 0);
+    MISC_HILOGI("EventWithInvalidAmountOfPoints end");
+}
+
+bool GenerateFadeInFadeOutCurve(VibratorCurvePoint** modulationCurve, int32_t& curvePointNum, int32_t& duration)
+{
+    if (modulationCurve == nullptr) {
+        MISC_HILOGI("Invalid pointer for modulationCurve");
+        return false;
+    }
     std::vector<VibratorCurvePoint> curveVec {
         VibratorCurvePoint{.time = 0, .intensity = 0, .frequency = 0},
         VibratorCurvePoint{.time = 20, .intensity = 30, .frequency = 0},
         VibratorCurvePoint{.time = 40, .intensity = 50, .frequency = 0},
         VibratorCurvePoint{.time = 70, .intensity = 70, .frequency = 0},
         VibratorCurvePoint{.time = 90, .intensity = 100, .frequency = 0},
-        VibratorCurvePoint{.time = 1100, .intensity = 90, .frequency = 0},
+        VibratorCurvePoint{.time = 1000, .intensity = 90, .frequency = 0},
         VibratorCurvePoint{.time = 1120, .intensity = 70, .frequency = 0},
         VibratorCurvePoint{.time = 1150, .intensity = 50, .frequency = 0},
         VibratorCurvePoint{.time = 1170, .intensity = 30, .frequency = 0},
@@ -509,34 +611,47 @@ bool generateFadeInFadeOutCurve(VibratorCurvePoint*& modulationCurve, int32_t& c
         return false;
     }
     std::copy(curveVec.begin(), curveVec.end(), curve);
-    modulationCurve = curve;
+    *modulationCurve = curve;
     curvePointNum = (int32_t)curveVec.size();
     duration = FADE_IN_FADE_OUT_DURATION;
     return true;
 }
 
-bool getExpectedOutputEventsForFadeInFadeOut(int32_t idx, std::vector<VibratorCurvePoint>& outputCurve)
+VibratorEvent GetExpectedOutputEventsForFadeInFadeOut(int32_t idx)
 {
-    outputCurve.clear();
+    VibratorCurvePoint* curvePoints = nullptr;
+    std::vector<VibratorCurvePoint> curveVec;
     switch (idx) {
-        case FADE_IN_END_MODIFY:
-            outputCurve.emplace_back(VibratorCurvePoint{.time = 0, .intensity = 0, .frequency = 0});
-            outputCurve.emplace_back(VibratorCurvePoint{.time = 1, .intensity = 50, .frequency = 0});
-            outputCurve.emplace_back(VibratorCurvePoint{.time = 30, .intensity = 70, .frequency = 0});
-            outputCurve.emplace_back(VibratorCurvePoint{.time = 40, .intensity = 70, .frequency = 0});
-            outputCurve.emplace_back(VibratorCurvePoint{.time = 50, .intensity = 100, .frequency = 0});
+        case FADE_IN_IDX_0:
+            return VibratorEvent{.type =  EVENT_TYPE_TRANSIENT, .time = 0, .duration = TRANSIENT_VIBRATION_DURATION,
+                .intensity = 0, .frequency = 31, .index = 0, .pointNum = 0, .points = nullptr};
             break;
-        case FADE_OUT_BEGIN_MODIFY:
-            outputCurve.emplace_back(VibratorCurvePoint{.time = 0, .intensity = 90, .frequency = 0});
-            outputCurve.emplace_back(VibratorCurvePoint{.time = 20, .intensity = 70, .frequency = 0});
-            outputCurve.emplace_back(VibratorCurvePoint{.time = 50, .intensity = 50, .frequency = 0});
-            outputCurve.emplace_back(VibratorCurvePoint{.time = 70, .intensity = 30, .frequency = 0});
+        case FADE_IN_IDX_1:
+            curveVec.emplace_back(VibratorCurvePoint{.time = 0, .intensity = 0, .frequency = 0});
+            curveVec.emplace_back(VibratorCurvePoint{.time = 1, .intensity = 50, .frequency = 0});
+            curveVec.emplace_back(VibratorCurvePoint{.time = 40, .intensity = 70, .frequency = 0});
+            curveVec.emplace_back(VibratorCurvePoint{.time = 54, .intensity = 0, .frequency = 0});
+            curvePoints = (VibratorCurvePoint *)calloc(curveVec.size(), sizeof(VibratorCurvePoint));
+            if (curvePoints == nullptr) {
+                MISC_HILOGE("failed to allocate memory for VibratorCurvePoint");
+                curveVec.clear();
+            } else {
+                uint32_t copyBytesCount = curveVec.size() * sizeof(VibratorCurvePoint);
+                memcpy_s(curvePoints, copyBytesCount, curveVec.data(), copyBytesCount);
+            }
+            return VibratorEvent{.type =  EVENT_TYPE_CONTINUOUS, .time = 40, .duration = 54,
+                .intensity = 38, .frequency = 30, .index = 0, .pointNum = (int32_t)curveVec.size(),
+                .points = curvePoints};
+            break;
+        case FADE_OUT_IDX_10:
+            return VibratorEvent{.type =  EVENT_TYPE_CONTINUOUS, .time = 1100, .duration = 100,
+                .intensity = 21, .frequency = 44, .index = 0, .pointNum = 0, .points = nullptr};
             break;
         default:
-            return false;
+            return VibratorEvent{.type = EVENT_TYPE_UNKNOWN, .time = -1, .duration = -1, .intensity = -1,
+                .frequency = -1, .index = 0, .pointNum = 0, .points = nullptr};
             break;
     }
-    return true;
 }
 
 HWTEST_F(VibratorAgentModulationTest, FadeInFadeOut, TestSize.Level1)
@@ -545,29 +660,28 @@ HWTEST_F(VibratorAgentModulationTest, FadeInFadeOut, TestSize.Level1)
     VibratorCurvePoint* modulationCurve;
     int32_t curvePointNum;
     int32_t duration;
-    ASSERT_TRUE(generateFadeInFadeOutCurve(modulationCurve, curvePointNum, duration));
-    VibratorPackage package, packageAfterModulation;
+    ASSERT_TRUE(GenerateFadeInFadeOutCurve(&modulationCurve, curvePointNum, duration));
+    VibratorPackage package;
+    VibratorPackage packageAfterModulation;
     ASSERT_TRUE(ConvertFileToVibratorPackage("FadeInFadeOut",
         "/data/test/vibrator/package_before_modulation.json", package));
     ASSERT_EQ(ModulatePackage(modulationCurve, curvePointNum, duration, package, packageAfterModulation), 0);
     const VibratorPattern& originalPattern = package.patterns[0];
     const VibratorPattern& afterModPattern = packageAfterModulation.patterns[0];
-    std::vector<VibratorCurvePoint> expectedOuput;
+    std::set<int32_t> modifiedEventIdx = {FADE_IN_IDX_0, FADE_IN_IDX_1, FADE_OUT_IDX_10};
+    std::set<VibratorCurvePoint> expectedOuput;
     for (int32_t eventIdx = 0; eventIdx < originalPattern.eventNum; eventIdx++) {
-        if (originalPattern.events[eventIdx].type != EVENT_TYPE_CONTINUOUS ||
-            (eventIdx > FADE_IN_END_MODIFY && eventIdx < FADE_OUT_BEGIN_MODIFY)) {
+        if (modifiedEventIdx.find(eventIdx) == modifiedEventIdx.end()) {
             ASSERT_TRUE(IsEventIdentical(originalPattern.events[eventIdx], afterModPattern.events[eventIdx]));
         } else {
-            const VibratorEvent& originalEvent = originalPattern.events[eventIdx];
             const VibratorEvent& afterModEvent = afterModPattern.events[eventIdx];
-            ASSERT_EQ(originalEvent.type, afterModEvent.type);
-            ASSERT_EQ(originalEvent.time, afterModEvent.time);
-            ASSERT_TRUE(getExpectedOutputEventsForFadeInFadeOut(eventIdx, expectedOuput));
-            for (int32_t pointIdx = 0; pointIdx < afterModEvent.pointNum; pointIdx++) {
-                ASSERT_TRUE(IsVibratorCurvePointIdentical(afterModEvent.points[pointIdx], expectedOuput[pointIdx]));
-            }
+            VibratorEvent expectedEvent = GetExpectedOutputEventsForFadeInFadeOut(eventIdx);
+            ASSERT_NE(expectedEvent.type, EVENT_TYPE_UNKNOWN);
+            ASSERT_TRUE(IsEventIdentical(afterModEvent, expectedEvent));
+            FreeEvent(expectedEvent);
         }
     }
+    ASSERT_EQ(PlayModulatedPattern(packageAfterModulation), TEST_SUCCESS);
     ASSERT_EQ(FreeVibratorPackage(package), 0);
     ASSERT_EQ(FreeVibratorPackage(packageAfterModulation), 0);
     free(modulationCurve);
