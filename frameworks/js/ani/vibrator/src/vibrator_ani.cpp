@@ -22,6 +22,7 @@
 #include <map>
 #include "miscdevice_log.h"
 #include "vibrator_agent.h"
+#include <cinttypes>
 
 #undef LOG_TAG
 #define LOG_TAG "VibratorAni"
@@ -212,7 +213,7 @@ static bool SetVibratePropertyInt64(ani_env* env, ani_object effect, const char*
     }
 
     propertyValue = static_cast<double>(result);
-    MISC_HILOGD("\"%{public}s\": %{public}lld", propertyName, propertyValue);
+    MISC_HILOGD("\"%{public}s\": %{public}" PRId64, propertyName, propertyValue);
 
     return true;
 }
@@ -242,7 +243,7 @@ static bool ParserParamFromVibrateFromFile(ani_env *env, ani_object effect, Vibr
     MISC_HILOGD("vibrateInfo.type: %{public}s, vibrateInfo.fd: %{public}d", typeStr.c_str(), vibrateInfo.fd);
 
     SetVibratePropertyInt64(env, static_cast<ani_object>(hapticFd), "offset", vibrateInfo.offset);
-    MISC_HILOGD("vibrateInfo.offset: %{public}lld", vibrateInfo.offset);
+    MISC_HILOGD("vibrateInfo.offset: %{public}" PRId64, vibrateInfo.offset);
     int64_t fdSize = GetFileSize(vibrateInfo.fd);
     if (!(vibrateInfo.offset >= 0) && (vibrateInfo.offset <= fdSize)) {
         MISC_HILOGE("The parameter of offset is invalid");
@@ -250,7 +251,7 @@ static bool ParserParamFromVibrateFromFile(ani_env *env, ani_object effect, Vibr
     }
     vibrateInfo.length = fdSize - vibrateInfo.offset;
     SetVibratePropertyInt64(env, static_cast<ani_object>(hapticFd), "length", vibrateInfo.length);
-    MISC_HILOGD("vibrateInfo.length: %{public}lld", vibrateInfo.length);
+    MISC_HILOGD("vibrateInfo.length: %{public}" PRId64, vibrateInfo.length);
     return true;
 }
 
