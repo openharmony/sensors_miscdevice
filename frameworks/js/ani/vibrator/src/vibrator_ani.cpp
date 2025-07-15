@@ -765,13 +765,25 @@ static void StartVibrationSync([[maybe_unused]] ani_env *env, ani_object effect,
 
     VibrateInfo vibrateInfo;
     if (!ParseEffectTypeAndParameters(env, effect, vibrateInfo)) {
+        if (vibrateInfo.vibratorPattern.events != nullptr) {
+            free(vibrateInfo.vibratorPattern.events);
+            vibrateInfo.vibratorPattern.events = nullptr;
+        }
         return;
     }
     if (!ParserParamFromVibrateAttribute(env, attribute, vibrateInfo)) {
+        if (vibrateInfo.vibratorPattern.events != nullptr) {
+            free(vibrateInfo.vibratorPattern.events);
+            vibrateInfo.vibratorPattern.events = nullptr;
+        }
         ThrowBusinessError(env, PARAMETER_ERROR, "ParserParamFromVibrateAttribute failed!");
         return;
     }
     StartVibrate(vibrateInfo);
+    if (vibrateInfo.vibratorPattern.events != nullptr) {
+        free(vibrateInfo.vibratorPattern.events);
+        vibrateInfo.vibratorPattern.events = nullptr;
+    }
 }
 
 static bool IsSupportEffectInterally([[maybe_unused]] ani_env *env, ani_string effectId)
