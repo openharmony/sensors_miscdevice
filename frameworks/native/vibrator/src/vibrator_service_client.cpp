@@ -398,6 +398,7 @@ int32_t VibratorServiceClient::PreProcess(const VibratorFileDescription &fd, Vib
         .length = fd.length
     };
     JsonParser parser(rawFd);
+    std::lock_guard<std::mutex> decodeLock(decodeMutex_);
     decodeHandle_.decoder = decodeHandle_.create(parser);
     CHKPR(decodeHandle_.decoder, ERROR);
     VibratePackage pkg = {};

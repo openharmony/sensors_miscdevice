@@ -94,7 +94,7 @@ int32_t DefaultVibratorDecoder::CheckMetadata(const JsonParser &parser)
 }
 
 int32_t DefaultVibratorDecoder::ParseChannel(const JsonParser &parser, VibratePattern &originPattern,
-    VibratePackage &patternPackage)
+    VibratePackage &patternPackage) __attribute__((no_sanitize("cfi")))
 {
     cJSON *channelsItem = parser.GetObjectItem("Channels");
     CHKPR(channelsItem, ERROR);
@@ -126,7 +126,8 @@ int32_t DefaultVibratorDecoder::ParseChannel(const JsonParser &parser, VibratePa
     return SUCCESS;
 }
 
-int32_t DefaultVibratorDecoder::ParseChannelParameters(const JsonParser &parser, cJSON *channelParametersItem)
+int32_t DefaultVibratorDecoder::ParseChannelParameters(const JsonParser &parser,
+    cJSON *channelParametersItem) __attribute__((no_sanitize("cfi")))
 {
     cJSON *indexItem = parser.GetObjectItem(channelParametersItem, "Index");
     CHKPR(indexItem, ERROR);
