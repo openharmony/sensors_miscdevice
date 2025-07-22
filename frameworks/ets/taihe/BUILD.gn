@@ -78,7 +78,6 @@ taihe_shared_library("vibrator_taihe_native") {
 generate_static_abc("vibrator_abc") {
   base_url = "$taihe_generated_file_path"
   files = [
-    "$taihe_generated_file_path/@ohos.base.ets",
     "$taihe_generated_file_path/@ohos.vibrator.ets",
   ]
   is_boot_abc = "True"
