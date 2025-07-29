@@ -53,20 +53,20 @@ struct VibratePreset {
     /**
      * The number of vibration repetitions.
      *
-     * @type { Optional<f64> }
+     * @type { Optional<i32> }
      * @syscap SystemCapability.Sensors.MiscDevice
      * @since 12
      */
-    count: Optional<f64>;
+    count: Optional<i32>;
 
     /**
      * The intensity of vibration effect.
      *
-     * @type { Optional<f64> }
+     * @type { Optional<i32> }
      * @syscap SystemCapability.Sensors.MiscDevice
      * @since 12
      */
-    intensity: Optional<f64>;
+    intensity: Optional<i32>;
 }
 
 /**
@@ -110,12 +110,12 @@ struct VibrateTime {
     /**
      * The duration of the vibration, in ms.
      *
-     * @type { f64 }
+     * @type { i32 }
      * @syscap SystemCapability.Sensors.MiscDevice
      * @atomicservice
      * @since 11
      */
-    duration: f64; /** The duration of the vibration, in ms */
+    duration: i32; /** The duration of the vibration, in ms */
 }
 
 /**
@@ -165,12 +165,12 @@ struct VibrateAttribute {
     /**
      * Vibrator id, default is 0.
      *
-     * @type { Optional<f64> }
+     * @type { Optional<i32> }
      * @syscap SystemCapability.Sensors.MiscDevice
      * @atomicservice
      * @since 11
      */
-    id: Optional<f64>;
+    id: Optional<i32>;
 
     /**
      * The use of vibration.
