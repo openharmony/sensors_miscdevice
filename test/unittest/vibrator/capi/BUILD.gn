@@ -24,10 +24,14 @@ ohos_unittest("NativeVibratorTest") {
   include_dirs = [
     "$SUBSYSTEM_DIR/interfaces/inner_api/vibrator",
     "$SUBSYSTEM_DIR/interfaces/kits/c",
+    "$SUBSYSTEM_DIR/test/unittest/common/include",
     "$SUBSYSTEM_DIR/utils/common/include",
   ]
 
-  sources = [ "vibrator_test.cpp" ]
+  sources = [
+    "vibrator_test.cpp",
+    "$SUBSYSTEM_DIR/test/unittest/common/src/common_utils.cpp",
+  ]
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
