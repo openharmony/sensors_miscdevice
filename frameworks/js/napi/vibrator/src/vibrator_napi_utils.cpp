@@ -212,7 +212,7 @@ bool GetStringValue(const napi_env &env, const napi_value &value, string &result
         return false;
     }
     bufLength = bufLength > STRING_LENGTH_MAX ? STRING_LENGTH_MAX : bufLength;
-    char str[STRING_LENGTH_MAX] = {0};
+    char str[STRING_LENGTH_MAX + 1] = {0};
     size_t strLen = 0;
     ret = napi_get_value_string_utf8(env, value, str, bufLength + 1, &strLen);
     if (ret != napi_ok) {
