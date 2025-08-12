@@ -64,10 +64,13 @@ namespace {
 
 VibratorServiceClient::~VibratorServiceClient()
 {
-    if (miscdeviceProxy_ != nullptr && serviceDeathObserver_ != nullptr) {
-        auto remoteObject = miscdeviceProxy_->AsObject();
-        if (remoteObject != nullptr) {
-            remoteObject->RemoveDeathRecipient(serviceDeathObserver_);
+    {
+        std::lock_guard<std::mutex> clientLock(clientMutex_);
+        if (miscdeviceProxy_ != nullptr && serviceDeathObserver_ != nullptr) {
+            auto remoteObject = miscdeviceProxy_->AsObject();
+            if (remoteObject != nullptr) {
+                remoteObject->RemoveDeathRecipient(serviceDeathObserver_);
+            }
         }
     }
     std::lock_guard<std::mutex> decodeLock(decodeMutex_);
