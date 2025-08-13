@@ -79,6 +79,7 @@ ohos_shared_library("libmiscdevice_service") {
     "data_share:datashare_consumer",
     "hilog:libhilog",
     "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
   ]
 
   if (miscdevice_feature_vibrator_input_method_enable) {
@@ -192,6 +193,7 @@ ohos_static_library("libmiscdevice_service_static") {
     "data_share:datashare_consumer",
     "hilog:libhilog",
     "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
   ]
 
   if (miscdevice_feature_vibrator_input_method_enable) {
