@@ -432,7 +432,7 @@ int32_t MiscdeviceService::StopVibratorService(const VibratorIdentifierIPC& iden
     std::vector<VibratorIdentifierIPC> result = CheckDeviceIdIsValid(identifier);
     size_t ignoreVibrateNum = 0;
     if (result.empty()) {
-        MISC_HILOGD("No vibration, no need to stop");
+        MISC_HILOGD("result is empty, no need to stop");
         return ERROR;
     }
     for (const auto& paramIt : result) {
@@ -440,7 +440,7 @@ int32_t MiscdeviceService::StopVibratorService(const VibratorIdentifierIPC& iden
         #if defined (OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM)
             if ((vibratorThread_ == nullptr) || (!vibratorThread_->IsRunning() &&
                 !vibratorHdiConnection_.IsVibratorRunning(paramIt))) {
-                MISC_HILOGD("No vibration, no need to stop");
+                MISC_HILOGD("Thread is not running, no need to stop");
                 ignoreVibrateNum ++;
                 continue;
             }
@@ -450,7 +450,7 @@ int32_t MiscdeviceService::StopVibratorService(const VibratorIdentifierIPC& iden
             }
         #else
             if ((vibratorThread_ == nullptr) || (!vibratorThread_->IsRunning())) {
-                MISC_HILOGD("No vibration, no need to stop");
+                MISC_HILOGD("Thread is not running, no need to stop");
                 ignoreVibrateNum ++;
                 continue;
             }
@@ -459,7 +459,7 @@ int32_t MiscdeviceService::StopVibratorService(const VibratorIdentifierIPC& iden
     }
     if (ignoreVibrateNum == result.size()) {
         MISC_HILOGD("No vibration, no need to stop");
-        return ERROR;
+        return NO_ERROR;
     }
     std::string packageName = GetPackageName(GetCallingTokenID());
     std::string curVibrateTime = GetCurrentTime();
@@ -596,14 +596,14 @@ int32_t MiscdeviceService::StopVibratorByMode(const VibratorIdentifierIPC& ident
     std::vector<VibratorIdentifierIPC> result = CheckDeviceIdIsValid(identifier);
     size_t ignoreVibrateNum = 0;
     if (result.empty()) {
-        MISC_HILOGD("No vibration, no need to stop");
+        MISC_HILOGD("result is empty, no need to stop");
         return ERROR;
     }
     for (const auto& paramIt : result) {
         auto vibratorThread_ = GetVibratorThread(paramIt);
         if ((vibratorThread_ == nullptr) || (!vibratorThread_->IsRunning() &&
             !vibratorHdiConnection_.IsVibratorRunning(paramIt))) {
-            MISC_HILOGD("No vibration, no need to stop");
+            MISC_HILOGD("Thread is not running, no need to stop");
             ignoreVibrateNum ++;
             continue;
         }
@@ -619,7 +619,7 @@ int32_t MiscdeviceService::StopVibratorByMode(const VibratorIdentifierIPC& ident
     }
     if (ignoreVibrateNum == result.size()) {
         MISC_HILOGD("No vibration, no need to stop");
-        return ERROR;
+        return NO_ERROR;
     }
     std::string packageName = GetPackageName(GetCallingTokenID());
     std::string curVibrateTime = GetCurrentTime();
@@ -1014,7 +1014,7 @@ int32_t MiscdeviceService::StopVibrateBySessionId(const VibratorIdentifierIPC &i
     for (const auto& paramIt : result) {
         auto vibratorThread_ = GetVibratorThread(paramIt);
         if (!vibratorHdiConnection_.IsVibratorRunning(paramIt)) {
-            MISC_HILOGD("No vibration, no need to stop");
+            MISC_HILOGD("Thread is not running, no need to stop");
             ignoreVibrateNum++;
             continue;
         }
@@ -1024,7 +1024,7 @@ int32_t MiscdeviceService::StopVibrateBySessionId(const VibratorIdentifierIPC &i
     }
     if (ignoreVibrateNum == result.size()) {
         MISC_HILOGE("No need to stop, ignoreVibrateNum:%{public}zu", ignoreVibrateNum);
-        return ERROR;
+        return NO_ERROR;
     }
     std::string packageName = GetPackageName(GetCallingTokenID());
     std::string curVibrateTime = GetCurrentTime();
