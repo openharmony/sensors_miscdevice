@@ -412,11 +412,11 @@ struct VibratorCurvePoint {
     /**
      * Gain in relative event vibration intensity
      *
-     * @type { Optional<i32> }
+     * @type { Optional<f64> }
      * @syscap SystemCapability.Sensors.MiscDevice
      * @since 18
      */
-    intensity: Optional<i32>;
+    intensity: Optional<f64>;
     /**
      * Changes in relative event vibration frequency
      *
@@ -595,21 +595,21 @@ struct HapticFileDescriptor {
      * The offset into the file where the data to be read, in bytes. By default,
      * the offset is zero.
      *
-     * @type { Optional<i32> }
+     * @type { Optional<i64> }
      * @syscap SystemCapability.Sensors.MiscDevice
      * @since 10
      */
-    offset: Optional<i32>;
+    offset: Optional<i64>;
 
     /**
      * The length in bytes of the data to be read. By default, the length is the
      * rest of bytes in the file from the offset.
      *
-     * @type { Optional<i32> }
+     * @type { Optional<i64> }
      * @syscap SystemCapability.Sensors.MiscDevice
      * @since 10
      */
-    length: Optional<i32>;
+    length: Optional<i64>;
 }
 
 /**
