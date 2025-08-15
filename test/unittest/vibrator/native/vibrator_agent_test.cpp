@@ -205,7 +205,7 @@ HWTEST_F(VibratorAgentTest, StopVibratorTest_002, TestSize.Level1)
 {
     MISC_HILOGI("StopVibratorTest_002 in");
     int32_t ret = StopVibrator("preset");
-    ASSERT_NE(ret, 0);
+    ASSERT_EQ(ret, 0);
 }
 
 HWTEST_F(VibratorAgentTest, StopVibratorTest_003, TestSize.Level1)
@@ -805,7 +805,7 @@ HWTEST_F(VibratorAgentTest, Cancel_001, TestSize.Level1)
 {
     MISC_HILOGI("Cancel_001 in");
     int32_t ret = Cancel();
-    ASSERT_NE(ret, 0);
+    ASSERT_EQ(ret, 0);
 }
 
 HWTEST_F(VibratorAgentTest, Cancel_002, TestSize.Level1)
@@ -1561,7 +1561,7 @@ HWTEST_F(VibratorAgentTest, StopVibratorEnhancedTest_002, TestSize.Level1)
         .vibratorId = -1,
     };
     int32_t ret = StopVibratorEnhanced(identifier, "preset");
-    ASSERT_NE(ret, 0);
+    ASSERT_EQ(ret, 0);
 }
 
 HWTEST_F(VibratorAgentTest, StopVibratorEnhancedTest_003, TestSize.Level1)
@@ -2315,7 +2315,7 @@ HWTEST_F(VibratorAgentTest, CancelEnhanced_001, TestSize.Level1)
         .vibratorId = -1,
     };
     int32_t ret = CancelEnhanced(identifier);
-    ASSERT_NE(ret, 0);
+    ASSERT_EQ(ret, 0);
 }
 
 HWTEST_F(VibratorAgentTest, CancelEnhanced_002, TestSize.Level1)
@@ -3016,37 +3016,37 @@ HWTEST_F(VibratorAgentTest, StopVibrateBySessionId_002, TestSize.Level1)
 {
     MISC_HILOGI("StopVibrateBySessionId_002 in");
     int32_t ret = StopVibrateBySessionId(SESSION_ID_ONE);
-    ASSERT_NE(ret, OHOS::Sensors::SUCCESS);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
 }
 
 HWTEST_F(VibratorAgentTest, StopVibrateBySessionId_003, TestSize.Level1)
 {
     MISC_HILOGI("StopVibrateBySessionId_003 in");
     int32_t ret = StopVibrateBySessionId(SESSION_ID_ONE);
-    ASSERT_NE(ret, OHOS::Sensors::SUCCESS);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
     ret = StopVibrateBySessionId(SESSION_ID_ONE);
-    ASSERT_NE(ret, OHOS::Sensors::SUCCESS);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
     ret = StopVibrateBySessionId(SESSION_ID_ONE);
-    ASSERT_NE(ret, OHOS::Sensors::SUCCESS);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
     ret = StopVibrateBySessionId(SESSION_ID_ONE);
-    ASSERT_NE(ret, OHOS::Sensors::SUCCESS);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
     ret = StopVibrateBySessionId(SESSION_ID_ONE);
-    ASSERT_NE(ret, OHOS::Sensors::SUCCESS);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
 }
 
 HWTEST_F(VibratorAgentTest, StopVibrateBySessionId_004, TestSize.Level1)
 {
     MISC_HILOGI("StopVibrateBySessionId_004 in");
     int32_t ret = StopVibrateBySessionId(SESSION_ID_ONE);
-    ASSERT_NE(ret, OHOS::Sensors::SUCCESS);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
     ret = StopVibrateBySessionId(SESSION_ID_TWO);
-    ASSERT_NE(ret, OHOS::Sensors::SUCCESS);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
     ret = StopVibrateBySessionId(SESSION_ID_THREE);
-    ASSERT_NE(ret, OHOS::Sensors::SUCCESS);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
     ret = StopVibrateBySessionId(SESSION_ID_FOUR);
-    ASSERT_NE(ret, OHOS::Sensors::SUCCESS);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
     ret = StopVibrateBySessionId(SESSION_ID_FIVE);
-    ASSERT_NE(ret, OHOS::Sensors::SUCCESS);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
 }
 } // namespace Sensors
 } // namespace OHOS

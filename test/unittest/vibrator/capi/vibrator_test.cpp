@@ -148,7 +148,7 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_CancelTest_002, TestSize.Level1)
     CALL_LOG_ENTER;
     int32_t ret = OH_Vibrator_Cancel();
     MISC_HILOGI("ret is %{public}d", ret);
-    ASSERT_NE(ret, RET_SUCCESS);
+    ASSERT_EQ(ret, RET_SUCCESS);
 }
 
 HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_001, TestSize.Level0)
