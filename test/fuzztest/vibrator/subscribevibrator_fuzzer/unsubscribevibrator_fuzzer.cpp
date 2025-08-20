@@ -20,9 +20,24 @@
 #include <cstring>
 #include <string>
 
+#include "securec.h"
 #include "vibrator_agent.h"
 
 namespace OHOS {
+template<class T>
+size_t GetObject(const uint8_t *data, size_t size, T &object)
+{
+    size_t objectSize = sizeof(object);
+    if (objectSize > size) {
+        return 0;
+    }
+    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
+    if (ret != EOK) {
+        return 0;
+    }
+    return objectSize;
+}
+
 void CallbackTest(VibratorStatusEvent *statusEvent)
 {
     return;
@@ -30,9 +45,11 @@ void CallbackTest(VibratorStatusEvent *statusEvent)
 
 bool UnSubscribeVibratorFuzzTest(const uint8_t *data, size_t size)
 {
+    UserData userData;
+    GetObject<UserData>(data, size, userData);
     VibratorUser user = {
         .callback = CallbackTest,
-        .userData = nullptr,
+        .userData = &userData,
     };
     int32_t ret = OHOS::Sensors::UnSubscribeVibratorPlug(user);
     if (ret == 0) {

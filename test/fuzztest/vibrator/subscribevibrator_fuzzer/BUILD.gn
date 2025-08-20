@@ -37,6 +37,7 @@ ohos_fuzztest("UnSubscribeVibratorFuzzTest") {
 
   deps =
       [ "$SUBSYSTEM_DIR/frameworks/native/vibrator:vibrator_interface_native" ]
+  external_deps = [ "c_utils:utils" ]
 }
 
 group("fuzztest") {

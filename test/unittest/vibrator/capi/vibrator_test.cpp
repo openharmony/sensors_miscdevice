@@ -22,6 +22,7 @@
 #include "parameters.h"
 #include "token_setproc.h"
 
+#include "common_utils.h"
 #include "sensors_errors.h"
 #include "vibrator.h"
 #include "vibrator_agent.h"
@@ -147,13 +148,15 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_CancelTest_002, TestSize.Level1)
     CALL_LOG_ENTER;
     int32_t ret = OH_Vibrator_Cancel();
     MISC_HILOGI("ret is %{public}d", ret);
-    ASSERT_NE(ret, RET_SUCCESS);
+    ASSERT_EQ(ret, RET_SUCCESS);
 }
 
 HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_001, TestSize.Level0)
 {
     CALL_LOG_ENTER;
-    FileDescriptor fileDescriptor("/data/test/vibrator/coin_drop.json");
+    const string coinDropPath = "/data/test/vibrator/coin_drop.json";
+    ASSERT_EQ(CheckFilePath(coinDropPath), true);
+    FileDescriptor fileDescriptor(coinDropPath);
     MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
     struct stat64 statbuf = { 0 };
     if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
@@ -176,7 +179,9 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_001, TestSize.Level
 HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_002, TestSize.Level1)
 {
     CALL_LOG_ENTER;
-    FileDescriptor fileDescriptor("/data/test/vibrator/test_invalid_type.json");
+    const string testInvalidPath = "/data/test/vibrator/test_invalid_type.json";
+    ASSERT_EQ(CheckFilePath(testInvalidPath), true);
+    FileDescriptor fileDescriptor(testInvalidPath);
     MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
     struct stat64 statbuf = { 0 };
     if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
@@ -196,7 +201,9 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_002, TestSize.Level
 HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_003, TestSize.Level1)
 {
     CALL_LOG_ENTER;
-    FileDescriptor fileDescriptor("/data/test/vibrator/test_invalid_startTime.json");
+    const string testInvalidStartTime = "/data/test/vibrator/test_invalid_startTime.json";
+    ASSERT_EQ(CheckFilePath(testInvalidStartTime), true);
+    FileDescriptor fileDescriptor(testInvalidStartTime);
     MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
     struct stat64 statbuf = { 0 };
     if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
@@ -216,7 +223,9 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_003, TestSize.Level
 HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_004, TestSize.Level1)
 {
     CALL_LOG_ENTER;
-    FileDescriptor fileDescriptor("/data/test/vibrator/test_invalid_duration.json");
+    const string testInvalidDuration = "/data/test/vibrator/test_invalid_duration.json";
+    ASSERT_EQ(CheckFilePath(testInvalidDuration), true);
+    FileDescriptor fileDescriptor(testInvalidDuration);
     MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
     struct stat64 statbuf = { 0 };
     if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
@@ -236,7 +245,9 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_004, TestSize.Level
 HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_005, TestSize.Level1)
 {
     CALL_LOG_ENTER;
-    FileDescriptor fileDescriptor("/data/test/vibrator/test_invalid_intensity.json");
+    const string testInvalidIntensity = "/data/test/vibrator/test_invalid_intensity.json";
+    ASSERT_EQ(CheckFilePath(testInvalidIntensity), true);
+    FileDescriptor fileDescriptor(testInvalidIntensity);
     MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
     struct stat64 statbuf = { 0 };
     if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
@@ -256,7 +267,9 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_005, TestSize.Level
 HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_006, TestSize.Level1)
 {
     CALL_LOG_ENTER;
-    FileDescriptor fileDescriptor("/data/test/vibrator/test_invalid_frequency.json");
+    const string testInvalidFrequency = "/data/test/vibrator/test_invalid_frequency.json";
+    ASSERT_EQ(CheckFilePath(testInvalidFrequency), true);
+    FileDescriptor fileDescriptor(testInvalidFrequency);
     MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
     struct stat64 statbuf = { 0 };
     if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
@@ -276,7 +289,9 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_006, TestSize.Level
 HWTEST_F(NativeVibratorTest, PlayVibratorCustom_018, TestSize.Level1)
 {
     CALL_LOG_ENTER;
-    FileDescriptor fileDescriptor("/data/test/vibrator/test_129_event.json");
+    const string testEvent = "/data/test/vibrator/test_129_event.json";
+    ASSERT_EQ(CheckFilePath(testEvent), true);
+    FileDescriptor fileDescriptor(testEvent);
     MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
     struct stat64 statbuf = { 0 };
     if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
@@ -296,7 +311,9 @@ HWTEST_F(NativeVibratorTest, PlayVibratorCustom_018, TestSize.Level1)
 HWTEST_F(NativeVibratorTest, PlayVibratorCustom_019, TestSize.Level1)
 {
     CALL_LOG_ENTER;
-    FileDescriptor fileDescriptor("/data/test/vibrator/test_big_file_size.json");
+    const string testBigFileSize = "/data/test/vibrator/test_129_event.json";
+    ASSERT_EQ(CheckFilePath(testBigFileSize), true);
+    FileDescriptor fileDescriptor(testBigFileSize);
     MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
     struct stat64 statbuf = { 0 };
     if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
@@ -316,7 +333,9 @@ HWTEST_F(NativeVibratorTest, PlayVibratorCustom_019, TestSize.Level1)
 HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_020, TestSize.Level1)
 {
     CALL_LOG_ENTER;
-    FileDescriptor fileDescriptor("/data/test/vibrator/coin_drop.json");
+    const string coinDrop = "/data/test/vibrator/coin_drop.json";
+    ASSERT_EQ(CheckFilePath(coinDrop), true);
+    FileDescriptor fileDescriptor(coinDrop);
     MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
     struct stat64 statbuf = { 0 };
     if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
@@ -339,7 +358,9 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_020, TestSize.Level
 HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_021, TestSize.Level1)
 {
     CALL_LOG_ENTER;
-    FileDescriptor fileDescriptor("/data/test/vibrator/coin_drop.json");
+    const string coinDrop = "/data/test/vibrator/coin_drop.json";
+    ASSERT_EQ(CheckFilePath(coinDrop), true);
+    FileDescriptor fileDescriptor(coinDrop);
     MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
     struct stat64 statbuf = { 0 };
     if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
@@ -362,7 +383,9 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_021, TestSize.Level
 HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_022, TestSize.Level1)
 {
     CALL_LOG_ENTER;
-    FileDescriptor fileDescriptor("/data/test/vibrator/coin_drop.json");
+    const string coinDrop = "/data/test/vibrator/coin_drop.json";
+    ASSERT_EQ(CheckFilePath(coinDrop), true);
+    FileDescriptor fileDescriptor(coinDrop);
     MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
     struct stat64 statbuf = { 0 };
     if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
@@ -384,7 +407,9 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_022, TestSize.Level
 HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_023, TestSize.Level1)
 {
     CALL_LOG_ENTER;
-    FileDescriptor fileDescriptor("/data/test/vibrator/coin_drop.json");
+    const string coinDrop = "/data/test/vibrator/coin_drop.json";
+    ASSERT_EQ(CheckFilePath(coinDrop), true);
+    FileDescriptor fileDescriptor(coinDrop);
     MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
     struct stat64 statbuf = { 0 };
     if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
@@ -407,7 +432,9 @@ HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_023, TestSize.Level
 HWTEST_F(NativeVibratorTest, OH_Vibrator_PlayVibrationCustom_024, TestSize.Level1)
 {
     CALL_LOG_ENTER;
-    FileDescriptor fileDescriptor("/data/test/vibrator/coin_drop.json");
+    const string coinDrop = "/data/test/vibrator/coin_drop.json";
+    ASSERT_EQ(CheckFilePath(coinDrop), true);
+    FileDescriptor fileDescriptor(coinDrop);
     MISC_HILOGD("Test fd:%{public}d", fileDescriptor.fd);
     struct stat64 statbuf = { 0 };
     if (fstat64(fileDescriptor.fd, &statbuf) == 0) {
