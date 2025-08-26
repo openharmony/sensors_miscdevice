@@ -86,7 +86,8 @@ static bool ParseVibratorCurvePoint(::taihe::array<::ohos::vibrator::VibratorCur
 {
     CALL_LOG_ENTER;
     point.time = pointsArray[index].time;
-    point.intensity = pointsArray[index].intensity.has_value() ? pointsArray[index].intensity.value() : 0;
+    point.intensity =
+        pointsArray[index].intensity.has_value() ? static_cast<int32_t>(pointsArray[index].intensity.value()) : 0;
     point.frequency = pointsArray[index].frequency.has_value() ? pointsArray[index].frequency.value() : 0;
     return true;
 }
@@ -197,7 +198,7 @@ static void PrintVibratorPattern(::ohos::vibrator::VibratorPattern &vibratorPatt
         ::taihe::array<::ohos::vibrator::VibratorCurvePoint> point = vibratorPattern.events[i].points.value();
         for (int32_t j = 0; j < static_cast<int32_t>(vibratorPattern.events[i].points.value().size()); ++j) {
             MISC_HILOGD("PrintVibratorPattern, time:%{public}d, intensity:%{public}d, frequency:%{public}d",
-                point[j].time, point[j].intensity.value(), point[j].frequency.value());
+                point[j].time, static_cast<int32_t>(point[j].intensity.value()), point[j].frequency.value());
         }
     }
 }
@@ -218,7 +219,7 @@ static bool CheckVibratorCurvePoint(const ::ohos::vibrator::VibratorEvent &event
         if ((event.points.value()[j].intensity.value() < 0) ||
             (event.points.value()[j].intensity.value() > CURVE_POINT_INTENSITY_MAX)) {
             MISC_HILOGE("intensity in points is out of range, intensity:%{public}d",
-                event.points.value()[j].intensity.value());
+                static_cast<int32_t>(event.points.value()[j].intensity.value()));
             return false;
         }
         if ((event.points.value()[j].frequency.value() < CURVE_FREQUENCY_MIN) ||
