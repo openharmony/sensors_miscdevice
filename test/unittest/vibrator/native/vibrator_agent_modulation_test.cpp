@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2029 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,11 +13,14 @@
  * limitations under the License.
  */
 
+#include <climits>
+#include <cstdlib>
 #include <fcntl.h>
 #include <gtest/gtest.h>
 #include <set>
 #include <string>
 #include <thread>
+
 
 #include "accesstoken_kit.h"
 #include "nativetoken_kit.h"
@@ -36,6 +39,8 @@
 namespace OHOS {
 namespace Sensors {
 using namespace testing::ext;
+using namespace Security::AccessToken;
+using Security::AccessToken::AccessTokenID;
 
 namespace {
 constexpr int32_t CONT_TYPE_NO_CURVE_EVENT_IDX_9 = 9;
@@ -54,10 +59,8 @@ constexpr int32_t TIME_WAIT_FOR_OP = 2000;
 constexpr int32_t TIME_WAIT_FOR_EACH_CASE = 200;
 constexpr int32_t TEST_SUCCESS = 0;
 constexpr int32_t TEST_FAILED = -1;
+constexpr AccessTokenID INVALID_TOKEN_ID = 0;
 }
-
-using namespace Security::AccessToken;
-using Security::AccessToken::AccessTokenID;
 
 PermissionStateFull g_infoManagerTestState = {
     .grantFlags = {1},
@@ -75,10 +78,10 @@ HapPolicyParams g_infoManagerTestPolicyPrams = {
 };
 
 HapInfoParams g_infoManagerTestInfoParms = {
-    .bundleName = "vibratoragent_test",
+    .bundleName = "vibratoragentmodulation_test",
     .userID = 1,
     .instIndex = 0,
-    .appIDDesc = "vibratorAgentTest"
+    .appIDDesc = "vibratorAgentModulationTest"
 };
 
 class VibratorAgentModulationTest : public testing::Test {
@@ -87,7 +90,6 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
-private:
     static AccessTokenID tokenID_;
 };
 
@@ -98,8 +100,11 @@ void VibratorAgentModulationTest::SetUpTestCase()
     AccessTokenIDEx tokenIdEx = {0};
     tokenIdEx = AccessTokenKit::AllocHapToken(g_infoManagerTestInfoParms, g_infoManagerTestPolicyPrams);
     tokenID_ = tokenIdEx.tokenIdExStruct.tokenID;
-    ASSERT_NE(0, tokenID_);
-    ASSERT_EQ(0, SetSelfTokenID(tokenID_));
+    if (tokenID_ != 0) {
+        MISC_HILOGI("acquire token successfully");
+        ASSERT_EQ(0, SetSelfTokenID(tokenID_));
+    }
+    MISC_HILOGE("failed to acquire token");
 }
 
 void VibratorAgentModulationTest::TearDownTestCase()
@@ -145,41 +150,28 @@ int32_t PlayModulatedPattern(const VibratorPackage& package)
     }
     return TEST_SUCCESS;
 }
-
-void PrintVibratorPackageInfo(const VibratorPackage& package, std::string functionName)
+// this print function required when debugging failure of testcase
+void PrintVibratorPackageInfo(const VibratorPackage& package, const std::string& functionName)
 {
-    MISC_HILOGI("FunctionName:%{public}s data, package patternNum:%{public}d", functionName.c_str(),
-        package.patternNum);
-    MISC_HILOGI("FunctionName:%{public}s data, package packageDuration:%{public}d", functionName.c_str(),
-        package.packageDuration);
+    MISC_HILOGI("FunctionName:%{public}s data, package patternNum:%{public}d, package packageDuration:%{public}d",
+        functionName.c_str(), package.patternNum, package.packageDuration);
     for (int32_t i = 0; i < package.patternNum; i++) {
-        MISC_HILOGI("FunctionName:%{public}s data, pattern time:%{public}d", functionName.c_str(),
-            package.patterns[i].time);
-        MISC_HILOGI("FunctionName:%{public}s data, pattern patternDuration:%{public}d", functionName.c_str(),
-            package.patterns[i].patternDuration);
-        MISC_HILOGI("FunctionName:%{public}s data, pattern eventNum:%{public}d", functionName.c_str(),
-            package.patterns[i].eventNum);
+        MISC_HILOGI("FunctionName:%{public}s data, pattern time:%{public}d, pattern patternDuration:%{public}d,"
+            "pattern eventNum:%{public}d", functionName.c_str(), package.patterns[i].time,
+            package.patterns[i].patternDuration, package.patterns[i].eventNum);
         for (int32_t j = 0; j < package.patterns[i].eventNum; j++) {
-            MISC_HILOGI("FunctionName:%{public}s data, event type:%{public}d", functionName.c_str(),
-                static_cast<int32_t>(package.patterns[i].events[j].type));
-            MISC_HILOGI("FunctionName:%{public}s data, event time:%{public}d", functionName.c_str(),
-                package.patterns[i].events[j].time);
-            MISC_HILOGI("FunctionName:%{public}s data, event duration:%{public}d", functionName.c_str(),
-                package.patterns[i].events[j].duration);
-            MISC_HILOGI("FunctionName:%{public}s data, event intensity:%{public}d", functionName.c_str(),
-                package.patterns[i].events[j].intensity);
-            MISC_HILOGI("FunctionName:%{public}s data, event frequency:%{public}d", functionName.c_str(),
-                package.patterns[i].events[j].frequency);
-            MISC_HILOGI("FunctionName:%{public}s data, event index:%{public}d", functionName.c_str(),
-                package.patterns[i].events[j].index);
-            MISC_HILOGI("FunctionName:%{public}s data, event pointNum:%{public}d", functionName.c_str(),
-                package.patterns[i].events[j].pointNum);
+            MISC_HILOGI("FunctionName:%{public}s data, event type:%{public}d, event time:%{public}d, "
+                "event duration:%{public}d, intensity:%{public}d, frequency:%{public}d, index:%{public}d, "
+                "pointNum:%{public}d", functionName.c_str(),
+                static_cast<int32_t>(package.patterns[i].events[j].type),
+                package.patterns[i].events[j].time, package.patterns[i].events[j].duration,
+                package.patterns[i].events[j].intensity, package.patterns[i].events[j].frequency,
+                package.patterns[i].events[j].index, package.patterns[i].events[j].pointNum);
             for (int32_t k = 0; k < package.patterns[i].events[j].pointNum; k++) {
-                MISC_HILOGI("FunctionName:%{public}s data, points time:%{public}d", functionName.c_str(),
-                    package.patterns[i].events[j].points[k].time);
-                MISC_HILOGI("FunctionName:%{public}s data, points intensity:%{public}d", functionName.c_str(),
-                    package.patterns[i].events[j].points[k].intensity);
-                MISC_HILOGI("FunctionName:%{public}s data, points frequency:%{public}d", functionName.c_str(),
+                MISC_HILOGI("FunctionName:%{public}s data, points time:%{public}d, points intensity:%{public}d, "
+                    "points frequency:%{public}d", functionName.c_str(),
+                    package.patterns[i].events[j].points[k].time,
+                    package.patterns[i].events[j].points[k].intensity,
                     package.patterns[i].events[j].points[k].frequency);
             }
         }
@@ -349,7 +341,12 @@ HWTEST_F(VibratorAgentModulationTest, ModulateNonContinuousType, TestSize.Level1
             ASSERT_TRUE(IsEventIdentical(pattern.events[eventIdx], patternAfterMod.events[eventIdx]));
         }
     }
-    ASSERT_EQ(PlayModulatedPattern(packageAfterModulation), TEST_SUCCESS);
+    if (tokenID_ != INVALID_TOKEN_ID) {
+        MISC_HILOGI("start to play modulated pattern");
+        ASSERT_EQ(PlayModulatedPattern(packageAfterModulation), TEST_SUCCESS);
+    } else {
+        MISC_HILOGW("unable to play modulated pattern due to privilege issue, skip");
+    }
     ASSERT_EQ(FreeVibratorPackage(package), 0);
     ASSERT_EQ(FreeVibratorPackage(packageAfterModulation), 0);
     ASSERT_EQ(FreeVibratorPackage(modulationPackage), 0);
@@ -428,7 +425,12 @@ HWTEST_F(VibratorAgentModulationTest, ContinuousTypeWithCurvePoint, TestSize.Lev
             FreeEvent(expectedEvent);
         }
     }
-    ASSERT_EQ(PlayModulatedPattern(packageAfterModulation), TEST_SUCCESS);
+    if (tokenID_ != INVALID_TOKEN_ID) {
+        MISC_HILOGI("start to play modulated pattern");
+        ASSERT_EQ(PlayModulatedPattern(packageAfterModulation), TEST_SUCCESS);
+    } else {
+        MISC_HILOGW("unable to play modulated pattern due to privilege issue, skip");
+    }
     ASSERT_EQ(FreeVibratorPackage(package), 0);
     ASSERT_EQ(FreeVibratorPackage(packageAfterModulation), 0);
     ASSERT_EQ(FreeVibratorPackage(modulationPackage), 0);
@@ -466,7 +468,12 @@ HWTEST_F(VibratorAgentModulationTest, ContinuousTypeWithoutCurvePoint, TestSize.
             FreeEvent(expectedEvent);
         }
     }
-    ASSERT_EQ(PlayModulatedPattern(packageAfterModulation), TEST_SUCCESS);
+    if (tokenID_ != INVALID_TOKEN_ID) {
+        MISC_HILOGI("start to play modulated pattern");
+        ASSERT_EQ(PlayModulatedPattern(packageAfterModulation), TEST_SUCCESS);
+    } else {
+        MISC_HILOGW("unable to play modulated pattern due to privilege issue, skip");
+    }
     ASSERT_EQ(FreeVibratorPackage(package), 0);
     ASSERT_EQ(FreeVibratorPackage(packageAfterModulation), 0);
     ASSERT_EQ(FreeVibratorPackage(modulationPackage), 0);
@@ -546,7 +553,12 @@ HWTEST_F(VibratorAgentModulationTest, ContinuousTypeWithCurvePointAndEventStartT
             FreeEvent(expectedEvent);
         }
     }
-    ASSERT_EQ(PlayModulatedPattern(packageAfterModulation), TEST_SUCCESS);
+    if (tokenID_ != INVALID_TOKEN_ID) {
+        MISC_HILOGI("start to play modulated pattern");
+        ASSERT_EQ(PlayModulatedPattern(packageAfterModulation), TEST_SUCCESS);
+    } else {
+        MISC_HILOGW("unable to play modulated pattern due to privilege issue, skip");
+    }
     ASSERT_EQ(FreeVibratorPackage(package), 0);
     ASSERT_EQ(FreeVibratorPackage(packageAfterModulation), 0);
     ASSERT_EQ(FreeVibratorPackage(modulationPackage), 0);
@@ -681,7 +693,12 @@ HWTEST_F(VibratorAgentModulationTest, FadeInFadeOut, TestSize.Level1)
             FreeEvent(expectedEvent);
         }
     }
-    ASSERT_EQ(PlayModulatedPattern(packageAfterModulation), TEST_SUCCESS);
+    if (tokenID_ != INVALID_TOKEN_ID) {
+        MISC_HILOGI("start to play modulated pattern");
+        ASSERT_EQ(PlayModulatedPattern(packageAfterModulation), TEST_SUCCESS);
+    } else {
+        MISC_HILOGW("unable to play modulated pattern due to privilege issue, skip");
+    }
     ASSERT_EQ(FreeVibratorPackage(package), 0);
     ASSERT_EQ(FreeVibratorPackage(packageAfterModulation), 0);
     free(modulationCurve);

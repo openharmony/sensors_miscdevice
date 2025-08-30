@@ -27,7 +27,6 @@
 
 #include "sensors_errors.h"
 #include "vibrator_agent.h"
-#include "vibrator_agent_type.h"
 
 namespace OHOS {
 namespace Sensors {
@@ -104,8 +103,8 @@ bool IsMatchType(const napi_env &env, const napi_value &value, const napi_valuet
 bool IsSameValue(const napi_env &env, const napi_value &lhs, const napi_value &rhs);
 bool GetNapiInt32(const napi_env &env, const int32_t value, napi_value &result);
 bool GetInt32Value(const napi_env &env, const napi_value &value, int32_t &result);
-bool GetDoubleValue(const napi_env &env, const napi_value &value, double &result);
 bool GetInt64Value(const napi_env &env, const napi_value &value, int64_t &result);
+bool GetDoubleValue(const napi_env &env, const napi_value &value, double &result);
 bool GetStringValue(const napi_env &env, const napi_value &value, string &result);
 bool GetPropertyBool(const napi_env &env, const napi_value &value, const std::string &type, bool &result);
 bool GetPropertyItem(const napi_env &env, const napi_value &value, const std::string &type, napi_value &item);

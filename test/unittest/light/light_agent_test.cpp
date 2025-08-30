@@ -17,10 +17,10 @@
 #include <thread>
 
 #include "accesstoken_kit.h"
-#include "nativetoken_kit.h"
-#include "token_setproc.h"
 #include "light_agent.h"
+#include "nativetoken_kit.h"
 #include "sensors_errors.h"
+#include "token_setproc.h"
 
 #undef LOG_TAG
 #define LOG_TAG "LightAgentTest"
@@ -85,10 +85,9 @@ void LightAgentTest::SetUpTestCase()
 
 void LightAgentTest::TearDownTestCase()
 {
+    ASSERT_NE(0, tokenID_);
     int32_t ret = AccessTokenKit::DeleteToken(tokenID_);
-    if (tokenID_ != 0) {
-        ASSERT_EQ(RET_SUCCESS, ret);
-    }
+    ASSERT_EQ(RET_SUCCESS, ret);
 }
 
 /**

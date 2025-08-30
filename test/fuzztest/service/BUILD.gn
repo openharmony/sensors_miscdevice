@@ -36,9 +36,9 @@ group("fuzztest") {
     "turnonstub_fuzzer:fuzztest",
     "vibratestub_fuzzer:fuzztest",
     "vibratoronremoterequest_fuzzer:fuzztest",
+    "subscribevibratorpluginfostub_fuzzer:fuzztest",
     "playpackagebysessionidstub_fuzzer:fuzztest",
     "stopvibratebysessionidstub_fuzzer:fuzztest",
-    "subscribevibratorpluginfostub_fuzzer:fuzztest",
   ]
 
   if (miscdevice_feature_vibrator_custom) {

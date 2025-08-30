@@ -351,12 +351,12 @@ int32_t SeekTimeOnPackage(int32_t seekTime, const VibratorPackage &completePacka
     return SUCCESS;
 }
 
-int32_t ModulatePackage(const VibratorCurvePoint* modulationCurve, const int32_t curvePointNum, const int32_t duration,
+int32_t ModulatePackage(VibratorCurvePoint* modulationCurve, const int32_t curvePointNum, const int32_t duration,
     const VibratorPackage &beforeModulationPackage, VibratorPackage &afterModulationPackage)
 {
     VibratorEvent modulationEvent{.type = EVENT_TYPE_CONTINUOUS, .time = 0, .duration = duration,
         .intensity = -1, .frequency = -1, .index = 0, .pointNum = curvePointNum,
-        .points = const_cast<VibratorCurvePoint*>(modulationCurve)};
+        .points = modulationCurve};
     int32_t ret = VibratorServiceClient::ModulatePackage(
         modulationEvent, beforeModulationPackage, afterModulationPackage);
     if (ret != ERR_OK) {

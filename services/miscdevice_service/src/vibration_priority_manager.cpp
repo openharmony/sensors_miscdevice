@@ -106,11 +106,11 @@ bool VibrationPriorityManager::Init()
             MISC_HILOGE("Get feedback failed");
         }
         miscFeedback_ = feedback;
-        MISC_HILOGI("feedback:%{public}d", feedback);
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "SWITCHES_TOGGLE",
             HiSysEvent::EventType::BEHAVIOR, "SWITCH_TYPE", "feedback", "STATUS", feedback);
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
+        MISC_HILOGI("feedback:%{public}d", feedback);
         int32_t ringerMode = miscAudioRingerMode_;
         if (GetIntValue(SETTING_RINGER_MODE_KEY, ringerMode) != ERR_OK) {
             MISC_HILOGE("Get ringerMode failed");

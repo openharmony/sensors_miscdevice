@@ -22,7 +22,6 @@
 #include <map>
 #include "miscdevice_log.h"
 #include "vibrator_agent.h"
-#include <cinttypes>
 
 #undef LOG_TAG
 #define LOG_TAG "VibratorAni"
@@ -106,7 +105,6 @@ static void ThrowBusinessError(ani_env *env, int errCode, std::string&& errMsg)
         return;
     }
     env->ThrowError(static_cast<ani_error>(errorObject));
-    return;
 }
 
 static bool ParserParamFromVibrateTime(ani_env *env, ani_object effect, VibrateInfo &vibrateInfo)
@@ -125,7 +123,7 @@ static bool ParserParamFromVibrateTime(ani_env *env, ani_object effect, VibrateI
         MISC_HILOGE("Failed to get property named duration");
         return false;
     }
-    vibrateInfo.duration = static_cast<double>(duration);
+    vibrateInfo.duration = static_cast<int32_t>(duration);
     MISC_HILOGD("vibrateInfo.duration: %{public}d", vibrateInfo.duration);
     return true;
 }
@@ -153,8 +151,6 @@ static bool SetVibrateProperty(ani_env* env, ani_object effect, const char* prop
     }
 
     propertyValue = static_cast<double>(result);
-    MISC_HILOGD("\"%{public}s\": %{public}d", propertyName, propertyValue);
-
     return true;
 }
 
@@ -213,7 +209,7 @@ static bool SetVibratePropertyInt64(ani_env* env, ani_object effect, const char*
     }
 
     propertyValue = static_cast<double>(result);
-    MISC_HILOGD("\"%{public}s\": %{public}" PRId64, propertyName, propertyValue);
+    MISC_HILOGD("\"%{public}s\": %{public}lld", propertyName, propertyValue);
 
     return true;
 }
@@ -239,19 +235,19 @@ static bool ParserParamFromVibrateFromFile(ani_env *env, ani_object effect, Vibr
         MISC_HILOGE("Failed to get property named fd");
         return false;
     }
-    vibrateInfo.fd = static_cast<double>(fd);
+    vibrateInfo.fd = static_cast<int32_t>(fd);
     MISC_HILOGD("vibrateInfo.type: %{public}s, vibrateInfo.fd: %{public}d", typeStr.c_str(), vibrateInfo.fd);
 
     SetVibratePropertyInt64(env, static_cast<ani_object>(hapticFd), "offset", vibrateInfo.offset);
-    MISC_HILOGD("vibrateInfo.offset: %{public}" PRId64, vibrateInfo.offset);
+    MISC_HILOGD("vibrateInfo.offset: %{public}lld", vibrateInfo.offset);
     int64_t fdSize = GetFileSize(vibrateInfo.fd);
-    if (!(vibrateInfo.offset >= 0) && (vibrateInfo.offset <= fdSize)) {
+    if ((vibrateInfo.offset < 0) || (vibrateInfo.offset > fdSize)) {
         MISC_HILOGE("The parameter of offset is invalid");
         return false;
     }
     vibrateInfo.length = fdSize - vibrateInfo.offset;
     SetVibratePropertyInt64(env, static_cast<ani_object>(hapticFd), "length", vibrateInfo.length);
-    MISC_HILOGD("vibrateInfo.length: %{public}" PRId64, vibrateInfo.length);
+    MISC_HILOGD("vibrateInfo.length: %{public}lld", vibrateInfo.length);
     return true;
 }
 
@@ -306,19 +302,19 @@ static bool GetPropertyAsDouble(ani_env* env, ani_object obj, const char* proper
     ani_boolean isUndefined = false;
 
     if (env->Object_GetPropertyByName_Ref(obj, propertyName, &propRef) != ANI_OK) {
-        MISC_HILOGE("GetPropertyAsDouble: Failed to get property '%{punlic}s'", propertyName);
+        MISC_HILOGE("GetPropertyAsDouble: Failed to get property:%{public}s", propertyName);
         return false;
     }
 
     env->Reference_IsUndefined(propRef, &isUndefined);
     if (isUndefined) {
-        MISC_HILOGE("GetPropertyAsDouble: Property '%{punlic}s' is undefined", propertyName);
+        MISC_HILOGE("GetPropertyAsDouble: Property:%{public}s is undefined", propertyName);
         return false;
     }
 
     if (env->Object_CallMethodByName_Double(static_cast<ani_object>(propRef), "doubleValue", nullptr, outValue) !=
         ANI_OK) {
-        MISC_HILOGE("GetPropertyAsDouble: Failed to call 'doubleValue' on property '%{punlic}s'", propertyName);
+        MISC_HILOGE("GetPropertyAsDouble: Failed to call 'doubleValue' on property:%{public}s", propertyName);
         return false;
     }
 
@@ -402,7 +398,7 @@ static bool ParsePointsArray(ani_env *env, ani_object parentObject, VibratorEven
         return false;
     }
 
-    event.pointNum = static_cast<uint32_t>(sizePoints);
+    event.pointNum = static_cast<int32_t>(sizePoints);
 
     if (static_cast<uint32_t>(sizePoints) > 0) {
         if (!ParseVibratorCurvePointArray(env, static_cast<ani_object>(points),

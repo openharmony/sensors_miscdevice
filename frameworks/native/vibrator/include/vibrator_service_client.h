@@ -119,7 +119,7 @@ private:
         int32_t patternStartTime, VibrateEvent &vibrateEvent);
     static VibratorCurvePoint* GetCurveListAfterModulation(const std::vector<VibratorCurveInterval>& modInterval,
         const VibratorEvent &beforeModEvent, int32_t patternOffset);
-    static int32_t ModulateEventWithoutCurvePoints(std::vector<VibratorCurveInterval>& modInterval,
+    static int32_t ModulateEventWithoutCurvePoints(const std::vector<VibratorCurveInterval>& modInterval,
         int32_t patternStartTime, const VibratorEvent &beforeModEvent, VibratorEvent &afterModEvent);
     static void FreePartiallyAllocatedVibratorPatterns(VibratorPattern** patterns, int32_t partialIdx);
     static int32_t ModulateVibratorPattern(const VibratorEvent &modulationCurve,
@@ -133,8 +133,6 @@ private:
         int32_t val, int32_t& idx);
     static void ConvertVibratorEventsToCurveIntervals(const VibratorEvent &vibratorEvent, int32_t patternTimeOffset,
         std::vector<VibratorCurveInterval>& curveInterval);
-    static void ModulateSingleCurvePoint(const VibratorCurveInterval &modulationInterval,
-        const VibratorCurveInterval &originalInterval, VibratorCurvePoint& point);
     static int32_t RestrictIntensityRange(int32_t intensity);
     static int32_t RestrictFrequencyRange(int32_t frequency);
     void WriteVibratorHiSysIPCEvent(IMiscdeviceServiceIpcCode code, int32_t ret);

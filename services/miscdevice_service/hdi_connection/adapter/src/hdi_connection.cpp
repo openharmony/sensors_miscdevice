@@ -306,11 +306,14 @@ int32_t HdiConnection::PlayPatternBySessionId(const VibratorIdentifierIPC &ident
 void HdiConnection::GetVibratorPackage(const VibratePackageIPC &packageIPC, VibratorPackage &package)
 {
     package.packageduration = packageIPC.packageDuration;
-    for (int32_t i = 0; i < packageIPC.patternNum; ++i) {
-        int32_t patternNum = static_cast<int32_t>(packageIPC.patterns[i].events.size());
-        package.patternNum = patternNum;
+    int32_t patternNum = static_cast<int32_t>(packageIPC.patterns.size());
+    package.patternNum = patternNum;
+    for (int32_t i = 0; i < patternNum; ++i) {
         HapticPaket paket;
-        for (int32_t j = 0; j < patternNum; ++j) {
+        paket.time = packageIPC.patterns[i].startTime;
+        int32_t eventNum = static_cast<int32_t>(packageIPC.patterns[i].events.size());
+        paket.eventNum = eventNum;
+        for (int32_t j = 0; j < eventNum; ++j) {
             HapticEvent hapticEvent = {};
             hapticEvent.type = static_cast<EVENT_TYPE>(packageIPC.patterns[i].events[j].tag);
             hapticEvent.time = packageIPC.patterns[i].events[j].time;

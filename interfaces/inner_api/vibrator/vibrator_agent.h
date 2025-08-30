@@ -195,7 +195,7 @@ int32_t SeekTimeOnPackage(int32_t seekTime, const VibratorPackage &completePacka
  * @return 0 indicates success, otherwise indicates failure.
  * @since 20
  */
-int32_t ModulatePackage(const VibratorCurvePoint* modulationCurve, const int32_t curvePointNum, const int32_t duration,
+int32_t ModulatePackage(VibratorCurvePoint* modulationCurve, const int32_t curvePointNum, const int32_t duration,
     const VibratorPackage &beforeModulationPackage, VibratorPackage &afterModulationPackage);
 
 /**

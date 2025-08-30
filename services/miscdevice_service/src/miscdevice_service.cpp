@@ -923,8 +923,8 @@ int32_t MiscdeviceService::PlayPattern(const VibratorIdentifierIPC& identifier, 
         .pid = GetCallingPid(),
         .uid = GetCallingUid(),
         .usage = customHapticInfoIPC.usage,
-        .sessionId = sessionId,
-        .systemUsage = customHapticInfoIPC.systemUsage
+        .systemUsage = customHapticInfoIPC.systemUsage,
+        .sessionId = sessionId
     };
     VibratorCapacity capacity;
     if (GetHapticCapacityInfo(identifier, capacity) != ERR_OK) {
@@ -1004,7 +1004,6 @@ int32_t MiscdeviceService::StopVibrateBySessionId(const VibratorIdentifierIPC &i
         MISC_HILOGE("CheckVibratePermission failed, ret:%{public}d", ret);
         return PERMISSION_DENIED;
     }
-    std::lock_guard<std::mutex> lock(devicesManageMutex_);
     std::vector<VibratorIdentifierIPC> result = CheckDeviceIdIsValid(identifier);
     size_t ignoreVibrateNum = 0;
     if (result.empty()) {
@@ -1019,7 +1018,7 @@ int32_t MiscdeviceService::StopVibrateBySessionId(const VibratorIdentifierIPC &i
             continue;
         }
         if (vibratorHdiConnection_.IsVibratorRunning(paramIt)) {
-            vibratorHdiConnection_.StopVibrateBySessionId(identifier, sessionId);
+            vibratorHdiConnection_.StopVibrateBySessionId(paramIt, sessionId);
         }
     }
     if (ignoreVibrateNum == result.size()) {
@@ -1376,7 +1375,6 @@ int32_t MiscdeviceService::GetVibratorList(const VibratorIdentifierIPC& identifi
         GetOnlineVibratorInfo();
     }
     std::lock_guard<std::mutex> lockManage(devicesManageMutex_);
-    int32_t ret;
     if ((identifier.deviceId == -1) && (identifier.vibratorId == -1)) {
         for (auto &value : devicesManageMap_) {
             vibratorInfoIPC.insert(vibratorInfoIPC.end(), value.second.baseInfo.begin(),
@@ -1385,7 +1383,7 @@ int32_t MiscdeviceService::GetVibratorList(const VibratorIdentifierIPC& identifi
     } else if ((identifier.deviceId == -1) && (identifier.vibratorId != -1)) {
         VibratorIdentifierIPC actIdentifier;
         actIdentifier.vibratorId = identifier.vibratorId;
-        ret = GetLocalDeviceId(actIdentifier.deviceId);
+        int32_t ret = GetLocalDeviceId(actIdentifier.deviceId);
         if (ret == NO_ERROR) {
             ret = GetOneVibrator(actIdentifier, vibratorInfoIPC);
             if (ret != NO_ERROR) {
@@ -1401,8 +1399,7 @@ int32_t MiscdeviceService::GetVibratorList(const VibratorIdentifierIPC& identifi
         }
         vibratorInfoIPC = it->second.baseInfo;
     } else { // ((identifier.deviceId != -1) && (identifier.vibratorId != -1))
-        ret = GetOneVibrator(identifier, vibratorInfoIPC);
-        if (ret != NO_ERROR) {
+        if (GetOneVibrator(identifier, vibratorInfoIPC) != NO_ERROR) {
             MISC_HILOGI("DeviceId %{public}d has no vibratorId %{public}d info",
                 identifier.deviceId, identifier.vibratorId);
         }

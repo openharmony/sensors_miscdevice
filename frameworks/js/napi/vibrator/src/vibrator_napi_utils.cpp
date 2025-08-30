@@ -135,6 +135,7 @@ bool IsMatchArrayType(const napi_env &env, const napi_value &value)
 
 bool IsMatchType(const napi_env &env, const napi_value &value, const napi_valuetype &type)
 {
+    CALL_LOG_ENTER;
     napi_valuetype paramType = napi_undefined;
     napi_status ret = napi_typeof(env, value, &paramType);
     if ((ret != napi_ok) || (paramType != type)) {
@@ -165,16 +166,6 @@ bool GetInt32Value(const napi_env &env, const napi_value &value, int32_t &result
     return true;
 }
 
-bool GetDoubleValue(const napi_env &env, const napi_value &value, double &result)
-{
-    CALL_LOG_ENTER;
-    napi_valuetype valuetype = napi_undefined;
-    CHKCF(napi_typeof(env, value, &valuetype) == napi_ok, "napi_typeof failed");
-    CHKCF((valuetype == napi_number), "Wrong argument type. Number expected");
-    CHKCF(napi_get_value_double(env, value, &result) == napi_ok, "napi_get_value_double failed");
-    return true;
-}
-
 bool GetInt64Value(const napi_env &env, const napi_value &value, int64_t &result)
 {
     CALL_LOG_ENTER;
@@ -182,6 +173,16 @@ bool GetInt64Value(const napi_env &env, const napi_value &value, int64_t &result
     CHKCF(napi_typeof(env, value, &valuetype) == napi_ok, "napi_typeof failed");
     CHKCF((valuetype == napi_number), "Wrong argument type. Number expected");
     CHKCF(napi_get_value_int64(env, value, &result) == napi_ok, "napi_get_value_int64 failed");
+    return true;
+}
+
+bool GetDoubleValue(const napi_env &env, const napi_value &value, double &result)
+{
+    CALL_LOG_ENTER;
+    napi_valuetype valuetype = napi_undefined;
+    CHKCF(napi_typeof(env, value, &valuetype) == napi_ok, "napi_typeof failed");
+    CHKCF((valuetype == napi_number), "Wrong argument type. Number expected");
+    CHKCF(napi_get_value_double(env, value, &result) == napi_ok, "napi_get_value_double failed");
     return true;
 }
 
@@ -258,7 +259,7 @@ bool GetPropertyInt32(const napi_env &env, const napi_value &value, const std::s
     bool exist = false;
     napi_status status = napi_has_named_property(env, value, type.c_str(), &exist);
     if (status != napi_ok || !exist) {
-        MISC_HILOGD("Can not find %{public}s property", type.c_str());
+        MISC_HILOGE("Can not find %{public}s property", type.c_str());
         return false;
     }
     CHKCF((napi_get_named_property(env, value, type.c_str(), &item) == napi_ok), "napi get property fail");

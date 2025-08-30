@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,6 +24,7 @@
 #include "miscdevice_log.h"
 #include "vibrator_napi_error.h"
 #include "vibrator_napi_utils.h"
+#include "vibrator_agent_type.h"
 
 #undef LOG_TAG
 #define LOG_TAG "VibratorPatternJs"
@@ -119,6 +120,7 @@ bool VibratorPatternBuilder::ParsePoints(const napi_env &env, const napi_value &
         }
         event.points.push_back(point);
     }
+    MISC_HILOGE("ParsePoints out");
     return true;
 }
 
@@ -163,6 +165,7 @@ bool VibratorPatternBuilder::ParseOptions(const napi_env &env, const napi_value 
     } else {
         event.index = 0;
     }
+    MISC_HILOGI("ParseOptions out");
     return true;
 }
 

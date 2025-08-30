@@ -110,11 +110,59 @@ ohos_unittest("VibratorAgentModulationTest") {
   }
 }
 
+ohos_unittest("VibratorServiceTest") {
+  module_out_path = "miscdevice/miscdevice/native"
+
+  sources = [ "vibrator_service_test.cpp" ]
+
+  include_dirs = [
+    "$SUBSYSTEM_DIR/interfaces/inner_api/light",
+    "$SUBSYSTEM_DIR/interfaces/inner_api/vibrator",
+    "$SUBSYSTEM_DIR/services/miscdevice_service/include",
+    "$SUBSYSTEM_DIR/services/miscdevice_service/hdi_connection/adapter/include",
+    "$SUBSYSTEM_DIR/services/miscdevice_service/hdi_connection/interface/include",
+    "$SUBSYSTEM_DIR/utils/common/include",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  deps = [
+    "$SUBSYSTEM_DIR/frameworks/native/vibrator:miscdevice_service_stub",
+    "$SUBSYSTEM_DIR/services/miscdevice_service:libmiscdevice_service_static",
+    "$SUBSYSTEM_DIR/utils/common:libmiscdevice_utils",
+  ]
+
+  external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "c_utils:utils",
+    "drivers_interface_vibrator:libvibrator_proxy_2.0",
+    "googletest:gmock",
+    "googletest:gtest_main",
+    "hilog:libhilog",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+  ]
+
+  if (miscdevice_feature_vibrator_input_method_enable) {
+    external_deps += [
+      "bundle_framework:appexecfwk_core",
+    ]
+  }
+
+  defines = miscdevice_default_defines
+}
+
 group("unittest") {
   testonly = true
   deps = [
     ":VibratorAgentSeekTest",
     ":VibratorAgentTest",
     ":VibratorAgentModulationTest",
+    ":VibratorServiceTest",
   ]
 }

@@ -25,7 +25,7 @@ constexpr size_t DATA_MIN_SIZE = 8;
 } // namespace
 
 template<class T>
-size_t GetObject(const uint8_t *data, size_t size, T &object)
+static size_t GetObject(const uint8_t *data, size_t size, T &object)
 {
     size_t objectSize = sizeof(object);
     if (objectSize > size) {
@@ -43,9 +43,8 @@ void HandleVibratorDataFuzzTest(const uint8_t *data, size_t size)
     if (data == nullptr || size < DATA_MIN_SIZE) {
         return;
     }
-    size_t startPos = 0;
     VibratorStatusEvent statusEvent;
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, statusEvent.deviceId);
+    size_t startPos = GetObject<int32_t>(data, size, statusEvent.deviceId);
     GetObject<int32_t>(data + startPos, size - startPos, statusEvent.vibratorCnt);
     VibratorServiceClient::GetInstance().HandleVibratorData(statusEvent);
 }

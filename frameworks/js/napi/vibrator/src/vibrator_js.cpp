@@ -675,7 +675,12 @@ static napi_value IsSupportEffect(napi_env env, napi_callback_info info)
     sptr<AsyncCallbackInfo> asyncCallbackInfo = new (std::nothrow) AsyncCallbackInfo(env);
     CHKPP(asyncCallbackInfo);
     asyncCallbackInfo->callbackType = IS_SUPPORT_EFFECT_CALLBACK;
-    asyncCallbackInfo->error.code = IsSupportEffect(effectId.c_str(), &asyncCallbackInfo->isSupportEffect);
+    bool isSupportEffect = false;
+    int32_t ret = IsSupportEffect(effectId.c_str(), &isSupportEffect);
+    if (ret == PERMISSION_DENIED || ret == PARAMETER_ERROR) {
+        asyncCallbackInfo->error.code = ret;
+    }
+    asyncCallbackInfo->isSupportEffect = isSupportEffect;
     if ((argc > 1) && (IsMatchType(env, args[1], napi_function))) {
         return EmitAsyncWork(args[1], asyncCallbackInfo);
     }
