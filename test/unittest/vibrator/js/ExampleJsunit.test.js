@@ -1279,12 +1279,12 @@ describe("VibratorJsTest", function () {
     */
     it("VibratorJsTest042", 0, async function (done) {
         try {
-            const vibrators = vibrator.getVibratorInfoSync();
-            if (vibrators.length  === 0) {
-                console.warn('vibrators is null, ending test case.');
+            const vibratorsList = vibrator.getVibratorInfoSync();
+            if (vibratorsList.length  === 0) {
+                console.warn('vibratorsList is null, ending test case.');
                 done();
             }
-            expect(Array.isArray(vibrators)).assertEqual(true);
+            expect(Array.isArray(vibratorsList)).assertEqual(true);
             done();
         } catch (error) {
             console.error('VibratorJsTest042 failed with error:', error);
@@ -1303,12 +1303,12 @@ describe("VibratorJsTest", function () {
                 deviceId: -1,
                 vibratorId: -1
             };
-            const vibrators = vibrator.getVibratorInfoSync(vibratorInfoParam);
-            if (vibrators.length  === 0) {
-                console.warn('vibrators is null, ending test case.');
+            const vibratorsList = vibrator.getVibratorInfoSync(vibratorInfoParam);
+            if (vibratorsList.length  === 0) {
+                console.warn('vibratorsList is null, ending test case.');
                 done();
             }
-            expect(Array.isArray(vibrators)).assertEqual(true);
+            expect(Array.isArray(vibratorsList)).assertEqual(true);
             done();
         } catch (error) {
             console.error('VibratorJsTest043 failed with error:', error);
@@ -1323,9 +1323,9 @@ describe("VibratorJsTest", function () {
     */
     it("VibratorJsTest044", 0, function (done) {
         try {
-            const vibrators = vibrator.getVibratorInfoSync();
-            if (vibrators.length  === 0) {
-                console.warn('vibrators is null, ending test case.');
+            const vibratorsList = vibrator.getVibratorInfoSync();
+            if (vibratorsList.length  === 0) {
+                console.warn('vibratorsList is null, ending test case.');
                 done();
             }
             const validCallback = function (statusEvent) {
@@ -1354,17 +1354,17 @@ describe("VibratorJsTest", function () {
     */
     it("VibratorJsTest045", 0, async function (done) {
         try {
-            const vibrators = vibrator.getVibratorInfoSync();
-            if (vibrators.length  === 0) {
-                console.warn('vibrators is null, ending test case.');
+            const vibratorsList = vibrator.getVibratorInfoSync();
+            if (vibratorsList.length  === 0) {
+                console.warn('vibratorsList is null, ending test case.');
                 done();
             }
             await vibrator.startVibration({
                 type: "time",
                 duration: 500
             }, {
-                id: vibrators[0].vibratorId,
-                deviceId: vibrators[0].deviceId,
+                id: vibratorsList[0].vibratorId,
+                deviceId: vibratorsList[0].deviceId,
                 usage: "alarm"
             }, (error) => {
                 if (error) {
@@ -1391,17 +1391,17 @@ describe("VibratorJsTest", function () {
     */
     it("VibratorJsTest046", 0, async function (done) {
         try {
-            const vibrators = vibrator.getVibratorInfoSync();
-            if (vibrators.length  === 0) {
-                console.warn('vibrators is null, ending test case.');
+            const vibratorsList = vibrator.getVibratorInfoSync();
+            if (vibratorsList.length  === 0) {
+                console.warn('vibratorsList is null, ending test case.');
                 done();
             }
             await vibrator.startVibration({
                 type: "time",
                 duration: 500
             }, {
-                id: vibrators[0].vibratorId,
-                deviceId: vibrators[0].deviceId,
+                id: vibratorsList[0].vibratorId,
+                deviceId: vibratorsList[0].deviceId,
                 usage: "alarm"
             }, (error) => {
                 if (error) {
@@ -1413,8 +1413,8 @@ describe("VibratorJsTest", function () {
                 done();
             });
             const vibratorInfoParam = {
-                deviceId: vibrators[0].deviceId,
-                vibratorId: vibrators[0].vibratorId
+                deviceId: vibratorsList[0].deviceId,
+                vibratorId: vibratorsList[0].vibratorId
             };
             await vibrator.stopVibration(vibratorInfoParam);
             console.info("stopVibration success");
@@ -1433,14 +1433,14 @@ describe("VibratorJsTest", function () {
     it("VibratorJsTest047", 0, async function (done) {
         try {
             const effectId = "haptic.clock.timer";
-            const vibrators = vibrator.getVibratorInfoSync();
-            if (vibrators.length  === 0) {
-                console.warn('vibrators is null, ending test case.');
+            const vibratorsList = vibrator.getVibratorInfoSync();
+            if (vibratorsList.length  === 0) {
+                console.warn('vibratorsList is null, ending test case.');
                 done();
             }
             const vibratorInfoParam = {
-                deviceId: vibrators[0].deviceId,
-                vibratorId: vibrators[0].vibratorId
+                deviceId: vibratorsList[0].deviceId,
+                vibratorId: vibratorsList[0].vibratorId
             };
             const jsEffectInfo = vibrator.getEffectInfoSync(effectId, vibratorInfoParam);
             if (!jsEffectInfo.isEffectSupported) {
@@ -1463,9 +1463,9 @@ describe("VibratorJsTest", function () {
     */
     it("VibratorJsTest048", 0, async function (done) {
         try {
-            const vibrators = vibrator.getVibratorInfoSync();
-            if (vibrators.length  === 0) {
-                console.warn('vibrators is null, ending test case.');
+            const vibratorsList = vibrator.getVibratorInfoSync();
+            if (vibratorsList.length  === 0) {
+                console.warn('vibratorsList is null, ending test case.');
                 done();
             }
             const effectId = "haptic.clock.timer";
@@ -1490,14 +1490,14 @@ describe("VibratorJsTest", function () {
     */
     it("VibratorJsTest049", 0, async function (done) {
         try {
-            const vibrators = vibrator.getVibratorInfoSync();
-            if (vibrators.length  === 0) {
-                console.warn('vibrators is null, ending test case.');
+            const vibratorsList = vibrator.getVibratorInfoSync();
+            if (vibratorsList.length  === 0) {
+                console.warn('vibratorsList is null, ending test case.');
                 done();
             }
             const effectId = "haptic.clock.timer";
             const vibratorInfoParam = {
-                deviceId: vibrators[0].deviceId,
+                deviceId: vibratorsList[0].deviceId,
             };
             const jsEffectInfo = vibrator.getEffectInfoSync(effectId, vibratorInfoParam);
             if (!jsEffectInfo.isEffectSupported) {
@@ -3582,6 +3582,7 @@ describe("VibratorJsTest", function () {
         } else {
             console.info('This device is not supportEffect');
             expect(true).assertTrue();
+            done();
         }
     })
 
@@ -3617,6 +3618,7 @@ describe("VibratorJsTest", function () {
         } else {
             console.info('This device is not supportEffect');
             expect(true).assertTrue();
+            done();
         }
     })
 
@@ -3652,6 +3654,7 @@ describe("VibratorJsTest", function () {
         } else {
             console.info('This device is not supportEffect');
             expect(true).assertTrue();
+            done();
         }
     })
 })

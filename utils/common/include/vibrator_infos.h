@@ -98,7 +98,6 @@ struct VibratePackage {
 };
 
 struct VibratePackageIPC : public Parcelable {
-    int32_t patternNum = 0;
     int32_t packageDuration = 0;
     std::vector<VibratePattern> patterns;
     void Dump() const;

@@ -41,7 +41,7 @@ constexpr int32_t EFFECT_ID_BOUNDARY = 1000;
 constexpr int32_t DURATION_MAX = 1600;
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
 constexpr float CURVE_INTENSITY_SCALE = 100.00;
-constexpr float EPSILON = 0.00001;
+const float EPSILON = 0.00001;
 #ifdef HDF_DRIVERS_INTERFACE_VIBRATOR
 constexpr int32_t SLICE_STEP = 50;
 constexpr int32_t CONTINUOUS_VIBRATION_DURATION_MIN = 15;
@@ -63,9 +63,9 @@ CustomVibrationMatcher::CustomVibrationMatcher()
         return;
     }
     if (!hdfWaveInfos_.empty()) {
-        for (auto it = hdfWaveInfos_.begin(); it != hdfWaveInfos_.end(); ++it) {
+        for (const auto &info : hdfWaveInfos_) {
             MISC_HILOGI("waveId:%{public}d, intensity:%{public}f, frequency:%{public}f, duration:%{public}d",
-                it->waveId, it->intensity, it->frequency, it->duration);
+                info.waveId, info.intensity, info.frequency, info.duration);
         }
         NormalizedWaveInfo();
     }
@@ -91,10 +91,10 @@ void CustomVibrationMatcher::NormalizedWaveInfo()
     float maxIntensity = firstIt->intensity;
     float minFrequency = firstIt->frequency;
     float maxFrequency = firstIt->frequency;
-    for (auto it = hdfWaveInfos_.begin(); it != hdfWaveInfos_.end(); ++it) {
-        maxIntensity = (maxIntensity > it->intensity) ? maxIntensity : it->intensity;
-        minFrequency = (minFrequency < it->frequency) ? minFrequency : it->frequency;
-        maxFrequency = (maxFrequency > it->frequency) ? maxFrequency : it->frequency;
+    for (const auto &info : hdfWaveInfos_) {
+        maxIntensity = (maxIntensity > info.intensity) ? maxIntensity : info.intensity;
+        minFrequency = (minFrequency < info.frequency) ? minFrequency : info.frequency;
+        maxFrequency = (maxFrequency > info.frequency) ? maxFrequency : info.frequency;
     }
 
     float intensityEqualValue = maxIntensity / INTENSITY_MAX;
@@ -103,16 +103,16 @@ void CustomVibrationMatcher::NormalizedWaveInfo()
         MISC_HILOGE("The equal value of intensity or frequency is zero");
         return;
     }
-    for (auto it = hdfWaveInfos_.begin(); it != hdfWaveInfos_.end(); ++it) {
+    for (const auto &info : hdfWaveInfos_) {
         std::vector<int32_t> normalizedValue;
-        normalizedValue.push_back(static_cast<int32_t>(it->intensity / intensityEqualValue));
-        normalizedValue.push_back(static_cast<int32_t>((it->frequency - minFrequency) / frequencyEqualValue));
-        normalizedValue.push_back(it->duration);
-        waveInfos_[it->waveId] = normalizedValue;
+        normalizedValue.push_back(static_cast<int32_t>(info.intensity / intensityEqualValue));
+        normalizedValue.push_back(static_cast<int32_t>((info.frequency - minFrequency) / frequencyEqualValue));
+        normalizedValue.push_back(info.duration);
+        waveInfos_[info.waveId] = normalizedValue;
     }
-    for (auto it = waveInfos_.begin(); it != waveInfos_.end(); ++it) {
+    for (const auto &info : waveInfos_) {
         MISC_HILOGI("waveId:%{public}d, intensity:%{public}d, frequency:%{public}d, duration:%{public}d",
-            it->first, it->second[0], it->second[1], it->second[WAVE_INFO_DIMENSION - 1]);
+            info.first, info.second[0], info.second[1], info.second[WAVE_INFO_DIMENSION - 1]);
     }
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
 }

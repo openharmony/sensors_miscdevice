@@ -176,7 +176,12 @@ bool UnionAccessor::TryConvertArray<bool>(std::vector<bool> &value)
         std::cerr << "Object_GetPropertyByName_Double length failed" << std::endl;
         return false;
     }
-    for (int i = 0; i < int(length); i++) {
+    int64_t lengthValue = static_cast<int64_t>(length);
+    if (lengthValue < 0 || lengthValue > INT64_MAX) {
+        std::cerr << "Invalid length" << std::endl;
+        return false;
+    }
+    for (int64_t i = 0; i < lengthValue; i++) {
         ani_ref ref;
         if (ANI_OK != env_->Object_CallMethodByName_Ref(obj_, "$_get", "I:Lstd/core/Object;", &ref, (ani_int)i)) {
             std::cerr << "Object_GetPropertyByName_Ref failed" << std::endl;
@@ -200,7 +205,12 @@ bool UnionAccessor::TryConvertArray<int>(std::vector<int> &value)
         std::cerr << "Object_GetPropertyByName_Double length failed" << std::endl;
         return false;
     }
-    for (int i = 0; i < int(length); i++) {
+    int64_t lengthValue = static_cast<int64_t>(length);
+    if (lengthValue < 0 || lengthValue > INT64_MAX) {
+        std::cerr << "Invalid length" << std::endl;
+        return false;
+    }
+    for (int64_t i = 0; i < lengthValue; i++) {
         ani_ref ref;
         if (ANI_OK != env_->Object_CallMethodByName_Ref(obj_, "$_get", "I:Lstd/core/Object;", &ref, (ani_int)i)) {
             std::cerr << "Object_GetPropertyByName_Ref failed" << std::endl;
@@ -224,7 +234,12 @@ bool UnionAccessor::TryConvertArray<double>(std::vector<double> &value)
         std::cerr << "Object_GetPropertyByName_Double length failed" << std::endl;
         return false;
     }
-    for (int i = 0; i < int(length); i++) {
+    int64_t lengthValue = static_cast<int64_t>(length);
+    if (lengthValue < 0 || lengthValue > INT64_MAX) {
+        std::cerr << "Invalid length" << std::endl;
+        return false;
+    }
+    for (int64_t i = 0; i < lengthValue; i++) {
         ani_ref ref;
         if (ANI_OK != env_->Object_CallMethodByName_Ref(obj_, "$_get", "I:Lstd/core/Object;", &ref, (ani_int)i)) {
             std::cerr << "Object_GetPropertyByName_Ref failed" << std::endl;
@@ -270,8 +285,12 @@ bool UnionAccessor::TryConvertArray<std::string>(std::vector<std::string> &value
         std::cerr << "Object_GetPropertyByName_Double length failed" << std::endl;
         return false;
     }
-
-    for (int i = 0; i < int(length); i++) {
+    int64_t lengthValue = static_cast<int64_t>(length);
+    if (lengthValue < 0 || lengthValue > INT64_MAX) {
+        std::cerr << "Invalid length" << std::endl;
+        return false;
+    }
+    for (int64_t i = 0; i < lengthValue; i++) {
         ani_ref ref;
         if (ANI_OK != env_->Object_CallMethodByName_Ref(obj_, "$_get", "I:Lstd/core/Object;", &ref, (ani_int)i)) {
             std::cerr << "Object_GetPropertyByName_Double length failed" << std::endl;
@@ -327,7 +346,10 @@ std::optional<std::string> OptionalAccessor::Convert<std::string>()
     }
 
     ani_size strSize;
-    env_->String_GetUTF8Size(static_cast<ani_string>(obj_), &strSize);
+    auto status = env_->String_GetUTF8Size(static_cast<ani_string>(obj_), &strSize);
+    if (status != ANI_OK) {
+        return std::nullopt;
+    }
 
     std::vector<char> buffer(strSize + 1);
     char* utf8_buffer = buffer.data();
