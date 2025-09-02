@@ -160,6 +160,10 @@ void MiscdeviceService::OnAddSystemAbility(int32_t systemAbilityId, const std::s
         case DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID: {
             MISC_HILOGI("Distributed kv data service start");
             std::lock_guard<std::mutex> lock(isVibrationPriorityReadyMutex_);
+            if (isVibrationPriorityReady_) { /** Datashare will reconnect to the client and register data after alive */
+                MISC_HILOGI("PriorityManager already init");
+                break;
+            }
             if (PriorityManager->Init()) {
                 MISC_HILOGI("PriorityManager init");
                 isVibrationPriorityReady_ = true;
