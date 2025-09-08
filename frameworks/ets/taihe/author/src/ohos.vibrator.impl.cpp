@@ -78,7 +78,11 @@ struct VibrateInfo {
 void stopVibrationByModeSync(::ohos::vibrator::VibratorStopMode stopMode)
 {
     CALL_LOG_ENTER;
-    StopVibrator(stopMode.get_value());
+    int32_t ret = StopVibrator(stopMode.get_value());
+    if (ret != SUCCESS) {
+        taihe::set_business_error(ret, "stop vibrator by mode failed");
+        return;
+    }
 }
 
 static bool ParseVibratorCurvePoint(::taihe::array<::ohos::vibrator::VibratorCurvePoint> pointsArray, uint32_t index,
@@ -404,7 +408,7 @@ void startVibrationSync(::ohos::vibrator::VibrateEffect const& effect,
         }
         int32_t ret = PlayPrimitiveEffect(vibrateInfo.effectId.c_str(), vibrateInfo.intensity);
         if (ret != SUCCESS) {
-            taihe::set_business_error(PARAMETER_ERROR, "start vibrator failed");
+            taihe::set_business_error(ret, "start vibrator failed");
             return;
         }
     } else {
@@ -412,8 +416,8 @@ void startVibrationSync(::ohos::vibrator::VibrateEffect const& effect,
         if (vibrateInfo.vibratorPattern.events != nullptr) {
             CHKCV(ClearVibratorPattern(vibrateInfo.vibratorPattern), "ClearVibratorPattern fail");
         }
-        if (ret == PARAMETER_ERROR) {
-            taihe::set_business_error(PARAMETER_ERROR, "Parameters invalid");
+        if (ret != SUCCESS) {
+            taihe::set_business_error(ret, "start vibrator failed");
             return;
         }
     }
