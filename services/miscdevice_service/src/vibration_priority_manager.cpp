@@ -702,13 +702,13 @@ VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &v
         MISC_HILOGD("Vibration is ignored for feedback:%{public}d", static_cast<int32_t>(miscFeedback_));
         return IGNORE_FEEDBACK;
         }
-    }
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
     if (ShouldIgnoreByIntensity(vibrateInfo)) {
         MISC_HILOGI("ShouldIgnoreByIntensity: vibrateInfo.effect:%{public}s", vibrateInfo.effect.c_str());
         return IGNORE_FEEDBACK;
     }
 #endif
+    }
     if (vibratorThread == nullptr) {
         MISC_HILOGD("There is no vibration, it can vibrate");
         return VIBRATION;
