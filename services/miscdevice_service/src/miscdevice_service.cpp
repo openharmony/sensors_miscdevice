@@ -1699,6 +1699,16 @@ int32_t MiscdeviceService::StartVibrateThreadControl(const VibratorIdentifierIPC
     return (ignoreVibrateNum == result.size()) ? ERROR : ERR_OK;
 }
 
+bool IsVibratorIdValid(const std::vector<VibratorInfoIPC> baseInfo, int32_t target)
+{
+    for (const auto& item : baseInfo) {
+        if (item.vibratorId == target) {
+            return true;
+        }
+    }
+    return false;
+}
+
 std::vector<VibratorIdentifierIPC> MiscdeviceService::CheckDeviceIdIsValid(const VibratorIdentifierIPC& identifier)
 {
     CALL_LOG_ENTER;
@@ -1740,7 +1750,13 @@ std::vector<VibratorIdentifierIPC> MiscdeviceService::CheckDeviceIdIsValid(const
         }
     } else {
         for (const auto& pair : devicesManageMap_) {
-            processDevice(pair);
+            if (!IsVibratorIdValid(pair.second.baseInfo, identifier.vibratorId)) {
+                for (const auto& info : pair.second.baseInfo) {
+                    addToResult(info);
+                }
+            } else {
+                processDevice(pair);
+            }
         }
     }
     return result;
