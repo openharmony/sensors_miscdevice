@@ -3654,4 +3654,89 @@ describe("VibratorJsTest", function () {
             expect(true).assertTrue();
         }
     })
+
+
+    /*
+     * @tc.name:VibrateJsTest055
+     * @tc.desc:vibratorId is invalid, it should vibrate
+     * @tc.type: FUNC
+     * @tc.require: I53SGE
+     * @tc.number: VibrateJsTest055
+     */
+    it("VibrateJsTest055", 0, async function () {
+        await vibrator.startVibration({
+            type: "time",
+            duration: 1000
+        }, {
+            id: 2,
+            usage: "unknown"
+        }, (error) => {
+            if (error) {
+                console.info('VibrateJsTest055 vibrator error');
+                expect(false).assertTrue();
+            } else {
+                console.info('VibrateJsTest055 vibrator success');
+                expect(true).assertTrue();
+            }
+            setTimeout(() => {
+                done();
+            }, 1000);
+        });
+    })
+
+    /*
+     * @tc.name:VibrateJsTest056
+     * @tc.desc:vibratorId is invalid, it should vibrate
+     * @tc.type: FUNC
+     * @tc.require: I53SGE
+     * @tc.number: VibrateJsTest056
+     */
+    it("VibrateJsTest056", 0, async function () {
+        await vibrator.startVibration({
+            type: "time",
+            duration: 1000
+        }, {
+            id: 3,
+            usage: "unknown"
+        }, (error) => {
+            if (error) {
+                console.info('VibrateJsTest056 vibrator error');
+                expect(false).assertTrue();
+            } else {
+                console.info('VibrateJsTest056 vibrator success');
+                expect(true).assertTrue();
+            }
+            setTimeout(() => {
+                done();
+            }, 1000);
+        });
+    })
+
+    /*
+     * @tc.name:VibrateJsTest057
+     * @tc.desc:vibratorId is valid, it should vibrate
+     * @tc.type: FUNC
+     * @tc.require: I53SGE
+     * @tc.number: VibrateJsTest057
+     */
+    it("VibrateJsTest057", 0, async function () {
+        await vibrator.startVibration({
+            type: "time",
+            duration: 1000
+        }, {
+            id: 1,
+            usage: "unknown"
+        }, (error) => {
+            if (error) {
+                console.info('VibrateJsTest057 vibrator error');
+                expect(false).assertTrue();
+            } else {
+                console.info('VibrateJsTest057 vibrator success');
+                expect(true).assertTrue();
+            }
+            setTimeout(() => {
+                done();
+            }, 1000);
+        });
+    })
 })
