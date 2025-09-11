@@ -17,7 +17,7 @@ import type { AsyncCallback } from '@ohos.base';
 import { BusinessError } from '@ohos.base';
 
 export default namespace vibrator {
-  loadLibrary("vibrator_ani");
+  loadLibraryWithPermissionCheck("vibrator_ani", "@ohos.vibrator");
 
   native function startVibrationSync(effect: VibrateEffect, attribute: VibrateAttribute): void;
   export function startVibrationIntSync(effect: VibrateEffect, attribute: VibrateAttribute): int {
