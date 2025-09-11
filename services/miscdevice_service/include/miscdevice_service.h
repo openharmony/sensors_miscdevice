@@ -162,6 +162,7 @@ private:
         const VibratorCapacity &vibratorCapacity, const std::vector<HdfWaveInformation> &waveInfomation,
         const HdfVibratorPlugInfo &info, VibratorAllInfos &vibratorAllInfos);
     int32_t PerformVibrationControl(const VibratorIdentifierIPC& identifier, int32_t duration, VibrateInfo& info);
+    bool IsVibratorIdValid(const std::vector<VibratorInfoIPC> baseInfo, int32_t target);
     std::mutex isVibrationPriorityReadyMutex_;
     static bool isVibrationPriorityReady_;
     VibratorHdiConnection &vibratorHdiConnection_ = VibratorHdiConnection::GetInstance();
@@ -180,6 +181,7 @@ private:
     std::mutex lightInfosMutex_;
     std::mutex devicesManageMutex_;
     static std::map<int32_t, VibratorAllInfos> devicesManageMap_;
+    int32_t invalidVibratorIdCount_ = 0;
 };
 }  // namespace Sensors
 }  // namespace OHOS
