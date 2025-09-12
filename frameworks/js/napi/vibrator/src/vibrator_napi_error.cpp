@@ -52,7 +52,11 @@ void ThrowErr(const napi_env &env, const int32_t errCode, const std::string &pri
         return;
     }
     napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(env, &scope);
+    napi_status status = napi_open_handle_scope(env, &scope);
+    if (status != napi_ok || scope == nullptr) {
+        MISC_HILOGE("napi_open_handle_scope fail");
+        return;
+    }
     napi_value error = CreateBusinessError(env, errCode, msg.value());
     napi_throw(env, error);
     napi_close_handle_scope(env, scope);
