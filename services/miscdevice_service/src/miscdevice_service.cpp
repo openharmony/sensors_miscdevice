@@ -687,13 +687,20 @@ int32_t MiscdeviceService::PlayVibratorCustom(const VibratorIdentifierIPC& ident
     JsonParser parser(rawFd);
     VibratorDecoderCreator creator;
     std::unique_ptr<IVibratorDecoder> decoder(creator.CreateDecoder(parser));
-    CHKPR(decoder, ERROR);
+    if (decoder == nullptr) {
+        MISC_HILOGE("decoder is nullptr");
+        close(rawFd.fd);
+        return ERROR;
+    }
+
     VibratePackage package;
     int32_t ret = decoder->DecodeEffect(rawFd, parser, package);
     if (ret != SUCCESS || package.patterns.empty()) {
+        close(rawFd.fd);
         MISC_HILOGE("Decode effect error");
         return ERROR;
     }
+    close(rawFd.fd);
     MergeVibratorParmeters(customHapticInfoIPC.parameter, package);
     package.Dump();
     VibrateInfo info = {
