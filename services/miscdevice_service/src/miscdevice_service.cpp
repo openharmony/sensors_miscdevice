@@ -74,6 +74,7 @@ const std::string PHONE_TYPE = "phone";
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_PRESET_INFO
 constexpr int32_t SHORT_VIBRATOR_DURATION = 50;
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_PRESET_INFO
+constexpr int32_t LOG_COUNT_FIVE = 5;
 }  // namespace
 
 bool MiscdeviceService::isVibrationPriorityReady_ = false;
@@ -1699,12 +1700,18 @@ int32_t MiscdeviceService::StartVibrateThreadControl(const VibratorIdentifierIPC
     return (ignoreVibrateNum == result.size()) ? ERROR : ERR_OK;
 }
 
-bool IsVibratorIdValid(const std::vector<VibratorInfoIPC> baseInfo, int32_t target)
+bool MiscdeviceService::IsVibratorIdValid(const std::vector<VibratorInfoIPC> baseInfo, int32_t target)
 {
     for (const auto& item : baseInfo) {
-        if (item.vibratorId == target) {
+        if (item.vibratorId == target || target == -1) {
             return true;
         }
+    }
+    std::string packageName = GetPackageName(GetCallingTokenID());
+    invalidVibratorIdCount_++;
+    if (invalidVibratorIdCount_ == LOG_COUNT_FIVE) {
+        invalidVibratorIdCount_ = 0;
+        MISC_HILOGE("VibratorId is not valid. package:%{public}s vibratorid:%{public}d", packageName.c_str(), target);
     }
     return false;
 }
@@ -1748,17 +1755,19 @@ std::vector<VibratorIdentifierIPC> MiscdeviceService::CheckDeviceIdIsValid(const
         if (deviceIt != devicesManageMap_.end()) {
             processDevice(*deviceIt);
         }
-    } else {
-        for (const auto& pair : devicesManageMap_) {
-            if (!IsVibratorIdValid(pair.second.baseInfo, identifier.vibratorId)) {
-                for (const auto& info : pair.second.baseInfo) {
-                    addToResult(info);
-                }
-            } else {
-                processDevice(pair);
+        return result;
+    }
+
+    for (const auto& pair : devicesManageMap_) {
+        if (!IsVibratorIdValid(pair.second.baseInfo, identifier.vibratorId)) {
+            for (const auto& info : pair.second.baseInfo) {
+                addToResult(info);
             }
+        } else {
+            processDevice(pair);
         }
     }
+
     return result;
 }
 }  // namespace Sensors
