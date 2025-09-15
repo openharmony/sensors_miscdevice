@@ -926,8 +926,8 @@ static void UpdateCallbackInfos(const napi_env& env, std::string& vibratorEvent,
 static int32_t UpdatePlugInfo(VibratorStatusEvent *statusEvent, sptr<AsyncCallbackInfo> &asyncCallbackInfo)
 {
     CALL_LOG_ENTER;
-    MISC_HILOGD("statusEvent : [ type = %{public}d, deviceId = %{public}d]", statusEvent->type, statusEvent->deviceId);
     CHKPR(statusEvent, PARAMETER_ERROR);
+    MISC_HILOGD("statusEvent : [ type = %{public}d, deviceId = %{public}d]", statusEvent->type, statusEvent->deviceId);
     if (statusEvent->type == PLUG_STATE_EVENT_UNKNOWN) {
         MISC_HILOGE("UpdatePlugInfo failed");
         return PARAMETER_ERROR;
