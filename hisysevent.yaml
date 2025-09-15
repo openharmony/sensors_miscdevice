@@ -57,3 +57,16 @@ USER_SWITCHED_EXCEPTION:
   __BASE: {type: FAULT, level: CRITICAL, desc: user switched exception, preserve: true}
   PKG_NAME: {type: STRING, desc: package name}
   ERROR_CODE: {type: INT32, desc: error code}
+
+VIBRATOR_MODES_STATISTICS:
+  __BASE: {type: STATISTIC, level: MINOR, desc: vibrator modes statistics, preserve: true}
+  TIME_MODE_CALL_TIMES: {type: INT32, desc: time mode call times}
+  PRESET_MODE_CALL_TIMES: {type: INT32, desc: preset mode call times}
+  FILE_MODE_CALL_TIMES: {type: INT32, desc: file mode call times}
+  PATTERN_MODE_CALL_TIMES: {type: INT32, desc: pattern mode call times}
+
+INVALID_VIBRATOR_STATISTICS:
+  __BASE: {type: STATISTIC, level: MINOR, desc: invalid vibrator statistics, preserve: true}
+  PKG_NAME: {type: STRING, desc: package name}
+  MAX_INVALID_VIBRATOR_ID: {type: INT32, desc: max invalid vibrator id}
+  INVALID_CALL_TIMES: {type: INT32, desc: invalid call times}
