@@ -68,6 +68,11 @@ struct VibratorAllInfos {
     VibratorAllInfos(const std::vector<int>& vibratorIds) : controlInfo(vibratorIds) {}
 };
 
+struct InvalidVibratorInfo {
+    int32_t maxInvalidVibratorId;
+    int32_t invalidCallTimes;
+};
+
 class MiscdeviceService : public SystemAbility, public MiscdeviceServiceStub {
     DECLARE_SYSTEM_ABILITY(MiscdeviceService)
     MISCDEVICE_DECLARE_DELAYED_SP_SINGLETON(MiscdeviceService);
@@ -163,6 +168,19 @@ private:
         const HdfVibratorPlugInfo &info, VibratorAllInfos &vibratorAllInfos);
     int32_t PerformVibrationControl(const VibratorIdentifierIPC& identifier, int32_t duration, VibrateInfo& info);
     bool IsVibratorIdValid(const std::vector<VibratorInfoIPC> baseInfo, int32_t target);
+    void ReportCallTimes();
+    void SaveInvalidVibratorInfo(const std::string &pageName, int32_t invalidVibratorId);
+    void ReportInvalidVibratorInfo();
+    static std::atomic_int32_t timeModeCallTimes_;
+    static std::atomic_int32_t presetModeCallTimes_;
+    static std::atomic_int32_t fileModeCallTimes_;
+    static std::atomic_int32_t patternModeCallTimes_;
+    static std::atomic_bool stop_;
+    static std::unordered_map<std::string, InvalidVibratorInfo> invalidVibratorInfoMap_;
+    std::thread reportCallTimesThread_;
+    std::mutex invalidVibratorInfoMutex_;
+    std::mutex stopMutex_;
+    std::condition_variable stopCondition_;
     std::mutex isVibrationPriorityReadyMutex_;
     static bool isVibrationPriorityReady_;
     VibratorHdiConnection &vibratorHdiConnection_ = VibratorHdiConnection::GetInstance();
