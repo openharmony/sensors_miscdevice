@@ -893,7 +893,7 @@ int32_t VibrationPriorityManager::RegisterObserver(const sptr<MiscDeviceObserver
     auto uriCrownFeedback = AssembleUri(SETTING_CROWN_FEEDBACK_KEY);
     helper->RegisterObserver(uriCrownFeedback, observer);
     helper->NotifyChange(uriCrownFeedback);
-    auto uriIntensityContrl = AssembleUri(SETTING_CROWN_FEEDBACK_KEY);
+    auto uriIntensityContrl = AssembleUri(SETTING_VIBRATE_INTENSITY_KEY);
     helper->RegisterObserver(uriIntensityContrl, observer);
     helper->NotifyChange(uriIntensityContrl);
 #endif
