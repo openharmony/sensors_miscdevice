@@ -217,6 +217,58 @@ enum EffectId: String {
 }
 
 /**
+ * Simple and universal vibration effects.
+ * 
+ * @enum { string }
+ * @syscap SystemCapability.Sensors.MiscDevice
+ * @since 12
+ */
+enum HapticFeedback: String {
+  /**
+   * Describes the soft vibration effect of the vibrator.
+   *
+   * @syscap SystemCapability.Sensors.MiscDevice
+   * @since 12
+   */
+  EFFECT_SOFT = "haptic.effect.soft",
+  /**
+   * Describes the hard vibration effect of the vibrator.
+   *
+   * @syscap SystemCapability.Sensors.MiscDevice
+   * @since 12
+   */
+  EFFECT_HARD = "haptic.effect.hard",
+  /**
+   * Describes the sharp vibration effect of the vibrator.
+   *
+   * @syscap SystemCapability.Sensors.MiscDevice
+   * @since 12
+   */
+  EFFECT_SHARP = "haptic.effect.sharp",
+  /**
+   * Describes the vibration effect of the successful notice.
+   *
+   * @syscap SystemCapability.Sensors.MiscDevice
+   * @since 18
+   */
+  EFFECT_NOTICE_SUCCESS = "haptic.notice.success",
+  /**
+   * Describes the vibration effect of the failed notice.
+   *
+   * @syscap SystemCapability.Sensors.MiscDevice
+   * @since 18
+   */
+  EFFECT_NOTICE_FAILURE = "haptic.notice.fail",
+  /**
+   * Describes the vibration effect of the warning notice.
+   *
+   * @syscap SystemCapability.Sensors.MiscDevice
+   * @since 18
+   */
+  EFFECT_NOTICE_WARNING = "haptic.notice.warning"
+}
+
+/**
  * Vibrator vibration stop mode.
  *
  * @enum { string }
@@ -613,6 +665,84 @@ struct HapticFileDescriptor {
 }
 
 /**
+* Parameters of vibrator on the device. By default, VibratorInfoParam may default to querying or controlling
+* the local default vibrator.
+* @interface VibratorInfoParam
+* @syscap SystemCapability.Sensors.MiscDevice
+* @since 19
+*/
+struct VibratorInfoParam {
+    /**
+     * Unique identifier for the device that contains one or multiple vibrators.
+     * By default, deviceId may default to querying or controlling the local default vibrator.
+     *
+     * @type { ?i32 }
+     * @syscap SystemCapability.Sensors.MiscDevice
+     * @since 19
+     */
+    deviceId: Optional<i32>;
+    /**
+     * Unique identifier for the vibrator itself within the device.
+     * By default, vibratorId may default to querying or controlling all vibrators on the corresponding device.
+     *
+     * @type { ?i32 }
+     * @syscap SystemCapability.Sensors.MiscDevice
+     * @since 19
+     */
+    vibratorId: Optional<i32>;
+}
+
+/**
+ * Represents the information about a vibrator device in the system.
+ * @interface VibratorInfo
+ * @syscap SystemCapability.Sensors.MiscDevice
+ * @since 19
+ */
+struct VibratorInfo {
+    /**
+     * Unique identifier for the device that contains one or multiple vibrators.
+     *
+     * @type { i32 }
+     * @syscap SystemCapability.Sensors.MiscDevice
+     * @since 19
+     */
+    deviceId: i32;
+    /**
+     * Unique identifier for the vibrator itself within the device.
+     *
+     * @type { i32 }
+     * @syscap SystemCapability.Sensors.MiscDevice
+     * @since 19
+     */
+    vibratorId: i32;
+    /**
+     * Name of the device.
+     *
+     * @type { String }
+     * @syscap SystemCapability.Sensors.MiscDevice
+     * @since 19
+     */
+    deviceName: String;
+    /**
+     * Indicates whether the vibrator device support HD haptic.
+     *
+     * @type { bool }
+     * @syscap SystemCapability.Sensors.MiscDevice
+     * @since 19
+     */
+    isHdHapticSupported: bool;
+    /**
+     * Indicates whether the vibrator is a local device or an external one.
+     * If the value is true, it represents a local device; if false, it represents an external device.
+     *
+     * @type { bool }
+     * @syscap SystemCapability.Sensors.MiscDevice
+     * @since 19
+     */
+    isLocalVibrator: bool;
+}
+
+/**
  * Stop the vibrator from vibrating.
  *
  * @permission ohos.permission.VIBRATE
@@ -674,6 +804,18 @@ function startVibrationSync(effect: VibrateEffect, attribute: VibrateAttribute):
 function isHdHapticSupported(): bool;
 
 /**
+ * Retrieve the list of vibrator information about one or all devices.
+ *
+ * @param { VibratorInfoParam } [param] - Indicate the device and vibrator information that needs to be controlled,
+ * <br> {@code VibratorInfoParam}. By default, this returns all vibrators on all device when param is unspecified.
+ * @returns { Array<VibratorInfo> } Promise used to return a list of vibrator IDs containing information
+ * <br> about the vibrator device.
+ * @syscap SystemCapability.Sensors.MiscDevice
+ * @since 19
+ */
+function getVibratorInfoSync(param: Optional<VibratorInfoParam>): Array<VibratorInfo>;
+
+/**
  * Stop any type of vibration.
  *
  * @permission ohos.permission.VIBRATE
@@ -701,3 +843,52 @@ function stopVibrationSync(): void;
 @gen_async("isSupportEffect")
 @gen_promise("isSupportEffect")
 function isSupportEffectSync(effectId: String): bool;
+
+/**
+ * Provide methods for adding long or short vibration events and generate VibratorPattern objects.
+ *
+ * @name VibratorPatternBuilder
+ * @syscap SystemCapability.Sensors.MiscDevice
+ * @since 18
+ */
+@class
+interface VibratorPatternBuilder {
+    /**
+     * Method for adding long vibration events
+     *
+     * @param { i32 } time Relative starting time of the long-term vibration event.
+     * @param { i32 } duration The duration of the long-term vibration event
+     * @param { ContinuousParam } options Optional parameter object
+     * @returns { VibratorPatternBuilder } Return the current VibratorPatternBuilder object.
+     * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified;
+     * <br> 2. Incorrect parameter types; 3. Parameter verification failed.
+     * @syscap SystemCapability.Sensors.MiscDevice
+     * @since 18
+     */
+    addContinuousEvent(time: i32, duration: i32, options: Optional<ContinuousParam>): VibratorPatternBuilder;
+
+    /**
+     * Method for adding short vibration events.
+     *
+     * @param { i32 } time Relative starting time of short oscillation events.
+     * @param { TransientParam } options Optional parameter object
+     * @returns { VibratorPatternBuilder } Return the current VibratorPatternBuilder object.
+     * @throws { BusinessError } 401 - Parameter error. Possible causes: 1. Mandatory parameters are left unspecified;
+     * <br> 2. Incorrect parameter types; 3. Parameter verification failed.
+     * @syscap SystemCapability.Sensors.MiscDevice
+     * @since 18
+     */
+    addTransientEvent(time: i32, options: Optional<TransientParam>): VibratorPatternBuilder;
+
+    /**
+     * Method for constructing vibration sequences of combined short or long events.
+     *
+     * @returns { VibratorPattern } Return VibratorPattern object.
+     * @syscap SystemCapability.Sensors.MiscDevice
+     * @since 18
+     */
+    build(): VibratorPattern;
+}
+
+@rename @constructor("VibratorPatternBuilder")
+function getVibratorPatternBuilder(): VibratorPatternBuilder;
