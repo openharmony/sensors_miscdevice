@@ -86,6 +86,8 @@ std::atomic_int32_t MiscdeviceService::fileModeCallTimes_ = 0;
 std::atomic_int32_t MiscdeviceService::patternModeCallTimes_ = 0;
 std::atomic_bool MiscdeviceService::stop_ = false;
 std::unordered_map<std::string, InvalidVibratorInfo> MiscdeviceService::invalidVibratorInfoMap_;
+std::mutex MiscdeviceService::invalidVibratorInfoMutex_;
+std::mutex MiscdeviceService::stopMutex_;
 bool MiscdeviceService::isVibrationPriorityReady_ = false;
 std::map<int32_t, VibratorAllInfos> MiscdeviceService::devicesManageMap_;
 std::map<sptr<IRemoteObject>, int32_t> MiscdeviceService::clientPidMap_;
@@ -115,6 +117,7 @@ MiscdeviceService::~MiscdeviceService()
     }
     if (reportCallTimesThread_.joinable()) {
         stop_ = true;
+        stopCondition_.notify_all();
         reportCallTimesThread_.join();
     }
 }

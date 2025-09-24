@@ -77,6 +77,7 @@ constexpr int32_t SECONDS_IN_MINUTE = 60;
 }  // namespace
 
 std::atomic_bool VibrationPriorityManager::stop_ = false;
+std::mutex VibrationPriorityManager::stopMutex_;
 
 VibrationPriorityManager::VibrationPriorityManager()
     : reportSwitchStatusThread_([this]() { this->ReportSwitchStatus(); })
@@ -95,6 +96,7 @@ VibrationPriorityManager::~VibrationPriorityManager()
 #endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
     if (reportSwitchStatusThread_.joinable()) {
         stop_ = true;
+        stopCondition_.notify_all();
         reportSwitchStatusThread_.join();
     }
 }
