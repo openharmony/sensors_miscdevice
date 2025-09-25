@@ -128,7 +128,7 @@ private:
     void ReportSwitchStatus();
     std::thread reportSwitchStatusThread_;
     static std::atomic_bool stop_;
-    std::mutex stopMutex_;
+    static std::mutex stopMutex_;
     std::condition_variable stopCondition_;
     sptr<IRemoteObject> remoteObj_ { nullptr };
     sptr<MiscDeviceObserver> observer_ { nullptr };

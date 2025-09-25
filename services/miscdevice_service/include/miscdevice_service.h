@@ -178,8 +178,8 @@ private:
     static std::atomic_bool stop_;
     static std::unordered_map<std::string, InvalidVibratorInfo> invalidVibratorInfoMap_;
     std::thread reportCallTimesThread_;
-    std::mutex invalidVibratorInfoMutex_;
-    std::mutex stopMutex_;
+    static std::mutex invalidVibratorInfoMutex_;
+    static std::mutex stopMutex_;
     std::condition_variable stopCondition_;
     std::mutex isVibrationPriorityReadyMutex_;
     static bool isVibrationPriorityReady_;
