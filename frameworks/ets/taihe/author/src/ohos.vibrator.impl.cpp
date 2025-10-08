@@ -693,49 +693,14 @@ private:
     {
         ohos::vibrator::VibratorEvent result = {
             .eventType = ConvertVibratorEventType(event.tag),
-            .time = event.time
+            .time = event.time,
+            .duration = taihe::optional<int32_t>(std::in_place_t{}, event.duration),
+            .intensity = taihe::optional<int32_t>(std::in_place_t{}, event.intensity),
+            .frequency = taihe::optional<int32_t>(std::in_place_t{}, event.frequency),
+            .index = taihe::optional<int32_t>(std::in_place_t{}, event.index),
+            .points = taihe::optional<taihe::array<::ohos::vibrator::VibratorCurvePoint>>(
+                std::in_place_t{}, ConvertVibrateCurvePoints(event.points))
         };
-        auto durationPtr = new(std::nothrow) int32_t(event.duration);
-        if (durationPtr == nullptr) {
-            taihe::set_business_error(DEVICE_OPERATION_FAILED, "Malloc failed");
-            return result;
-        }
-        auto intensityPtr = new(std::nothrow) int32_t(event.intensity);
-        if (intensityPtr == nullptr) {
-            delete durationPtr;
-            taihe::set_business_error(DEVICE_OPERATION_FAILED, "Malloc failed");
-            return result;
-        }
-        auto frequencyPtr = new(std::nothrow) int32_t(event.frequency);
-        if (frequencyPtr == nullptr) {
-            delete intensityPtr;
-            delete durationPtr;
-            taihe::set_business_error(DEVICE_OPERATION_FAILED, "Malloc failed");
-            return result;
-        }
-        auto indexPtr = new(std::nothrow) int32_t(event.index);
-        if (indexPtr == nullptr) {
-            delete frequencyPtr;
-            delete intensityPtr;
-            delete durationPtr;
-            taihe::set_business_error(DEVICE_OPERATION_FAILED, "Malloc failed");
-            return result;
-        }
-        auto pointsPtr = new(std::nothrow) taihe::array<::ohos::vibrator::VibratorCurvePoint>(
-            ConvertVibrateCurvePoints(event.points));
-        if (pointsPtr == nullptr) {
-            delete indexPtr;
-            delete frequencyPtr;
-            delete intensityPtr;
-            delete durationPtr;
-            taihe::set_business_error(DEVICE_OPERATION_FAILED, "Malloc failed");
-            return result;
-        }
-        result.duration = taihe::optional<int32_t>(durationPtr);
-        result.intensity = taihe::optional<int32_t>(intensityPtr);
-        result.frequency = taihe::optional<int32_t>(frequencyPtr);
-        result.index = taihe::optional<int32_t>(indexPtr);
-        result.points = taihe::optional<taihe::array<::ohos::vibrator::VibratorCurvePoint>>(pointsPtr);
         return result;
     }
 
@@ -751,21 +716,10 @@ private:
     static ohos::vibrator::VibratorCurvePoint ConvertVibrateCurvePoint(const VibrateCurvePoint &point)
     {
         ohos::vibrator::VibratorCurvePoint result = {
-            .time = point.time
+            .time = point.time,
+            .intensity = taihe::optional<double>(std::in_place_t{}, point.intensity),
+            .frequency = taihe::optional<int32_t>(std::in_place_t{}, point.frequency)
         };
-        auto intensityPtr = new(std::nothrow) double(point.intensity);
-        if (intensityPtr == nullptr) {
-            taihe::set_business_error(DEVICE_OPERATION_FAILED, "Malloc failed");
-            return result;
-        }
-        auto frequencyPtr = new(std::nothrow) int32_t(point.frequency);
-        if (frequencyPtr == nullptr) {
-            delete intensityPtr;
-            taihe::set_business_error(DEVICE_OPERATION_FAILED, "Malloc failed");
-            return result;
-        }
-        result.intensity = taihe::optional<double>(intensityPtr);
-        result.frequency = taihe::optional<int32_t>(frequencyPtr);
         return result;
     }
 
