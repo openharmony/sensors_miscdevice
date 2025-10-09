@@ -555,5 +555,37 @@ int32_t StopVibrateBySessionId(uint32_t sessionId)
     }
     return SUCCESS;
 }
+
+int32_t DisableVibratorByPid(int32_t pid)
+{
+    CALL_LOG_ENTER;
+    MISC_HILOGD("Agent Disable Vibrator for pid:%{public}d", pid);
+    if (pid <= 0) {
+        MISC_HILOGE("Invalid pid: %{pubilc}d", pid);
+        return PARAMETER_ERROR;
+    }
+    int32_t ret = VibratorServiceClient::GetInstance().DisableVibratorByPid(pid);
+    if (ret != ERR_OK) {
+        MISC_HILOGE("Agent disable failed, ret:%{public}d", ret);
+        return NormalizeErrCode(ret);
+    }
+    return SUCCESS;
+}
+
+int32_t EnableVibratorByPid(int32_t pid)
+{
+    CALL_LOG_ENTER;
+    MISC_HILOGD("Agent Enable Vibrator for pid:%{public}d", pid);
+    if (pid <= 0) {
+        MISC_HILOGE("Invalid pid: %{pubilc}d", pid);
+        return PARAMETER_ERROR;
+    }
+    int32_t ret = VibratorServiceClient::GetInstance().EnableVibratorByPid(pid);
+    if (ret != ERR_OK) {
+        MISC_HILOGE("Agent Enable failed, ret:%{public}d", ret);
+        return NormalizeErrCode(ret);
+    }
+    return SUCCESS;
+}
 } // namespace Sensors
 } // namespace OHOS

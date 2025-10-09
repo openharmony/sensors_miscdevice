@@ -105,6 +105,8 @@ public:
     int32_t GetEffectInfo(const VibratorIdentifier& identifier, const std::string& effectType, EffectInfo& effectInfo);
     static int32_t ModulatePackage(const VibratorEvent &modulationCurve,
         const VibratorPackage &beforeModulationPackage, VibratorPackage &afterModulationPackage);
+    int32_t DisableVibratorByPid(int32_t pid);
+    int32_t EnableVibratorByPid(int32_t pid);
 
 private:
     int32_t InitServiceClient();

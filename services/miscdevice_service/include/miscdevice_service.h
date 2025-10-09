@@ -117,6 +117,8 @@ public:
     virtual int32_t GetEffectInfo(const VibratorIdentifierIPC& identifier, const std::string& effectType,
         EffectInfoIPC& effectInfoIPC) override;
     virtual int32_t SubscribeVibratorPlugInfo(const sptr<IRemoteObject> &vibratorServiceClient) override;
+    virtual int32_t DisableVibratorByPid(int32_t pid) override;
+    virtual int32_t EnableVibratorByPid(int32_t pid) override;
 
 private:
     DISALLOW_COPY_AND_MOVE(MiscdeviceService);
@@ -200,6 +202,8 @@ private:
     std::mutex devicesManageMutex_;
     static std::map<int32_t, VibratorAllInfos> devicesManageMap_;
     int32_t invalidVibratorIdCount_ = 0;
+    std::vector<int32_t> disablePids_;
+    std::mutex pidMutex_;
 };
 }  // namespace Sensors
 }  // namespace OHOS

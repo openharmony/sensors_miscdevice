@@ -1025,8 +1025,8 @@ int32_t MiscdeviceService::PlayPattern(const VibratorIdentifierIPC& identifier, 
         .pid = GetCallingPid(),
         .uid = GetCallingUid(),
         .usage = customHapticInfoIPC.usage,
-        .sessionId = sessionId,
-        .systemUsage = customHapticInfoIPC.systemUsage
+        .systemUsage = customHapticInfoIPC.systemUsage,
+        .sessionId = sessionId
     };
     VibratorCapacity capacity;
     if (GetHapticCapacityInfo(identifier, capacity) != ERR_OK) {
@@ -1760,6 +1760,10 @@ int32_t MiscdeviceService::StartVibrateThreadControl(const VibratorIdentifierIPC
         return ERROR;
     }
 
+    if (std::find(disablePids_.begin(), disablePids_.end(), info.pid) != disablePids_.end()) {
+        MISC_HILOGE("Pid :%{public}d is disabled, reject vibration", info.pid);
+        return ERROR;
+    }
     size_t ignoreVibrateNum = 0;
 
     const std::vector<std::string> specialModes = {
@@ -1868,6 +1872,58 @@ std::vector<VibratorIdentifierIPC> MiscdeviceService::CheckDeviceIdIsValid(const
     }
 
     return result;
+}
+
+int32_t MiscdeviceService::DisableVibratorByPid(int32_t pid)
+{
+    CALL_LOG_ENTER;
+    PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
+    int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
+    if (ret != PERMISSION_GRANTED) {
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
+            HiSysEvent::EventType::SECURITY, "PKG_NAME", "PlayPrimitiveEffectStub", "ERROR_CODE", ret);
+        MISC_HILOGE("CheckVibratePermission failed, ret:%{public}d", ret);
+        return PERMISSION_DENIED;
+    }
+    bool result = VibrationPriorityManager::IsSystemServiceCalling();
+    if (!result) {
+        MISC_HILOGE("Non-system service call");
+        return PERMISSION_DENIED;
+    }
+    MISC_HILOGD("Disable pid: %{public}d", pid);
+    std::lock_guard<std::mutex> guard(pidMutex_);
+    auto it = std::find(disablePids_.begin(), disablePids_.end(), pid);
+    if (it == disablePids_.end()) {
+        disablePids_.push_back(pid);
+        MISC_HILOGD("Pid %{public}d added to disabled list", pid);
+    }
+    return ERR_OK;
+}
+
+int32_t MiscdeviceService::EnableVibratorByPid(int32_t pid)
+{
+    CALL_LOG_ENTER;
+    PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
+    int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
+    if (ret != PERMISSION_GRANTED) {
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_PERMISSIONS_EXCEPTION",
+            HiSysEvent::EventType::SECURITY, "PKG_NAME", "PlayPrimitiveEffectStub", "ERROR_CODE", ret);
+        MISC_HILOGE("CheckVibratePermission failed, ret:%{public}d", ret);
+        return PERMISSION_DENIED;
+    }
+    bool result = VibrationPriorityManager::IsSystemServiceCalling();
+    if (!result) {
+        MISC_HILOGE("Non-system service call");
+        return PERMISSION_DENIED;
+    }
+    MISC_HILOGD("Disable pid: %{public}d", pid);
+    std::lock_guard<std::mutex> guard(pidMutex_);
+    auto it = std::find(disablePids_.begin(), disablePids_.end(), pid);
+    if (it != disablePids_.end()) {
+        disablePids_.erase(it);
+        MISC_HILOGD("Pid %{public}d removed from disabled list", pid);
+    }
+    return ERR_OK;
 }
 }  // namespace Sensors
 }  // namespace OHOS

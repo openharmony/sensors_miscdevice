@@ -479,6 +479,22 @@ int32_t PlayPackageBySessionId(uint32_t sessionId, const VibratorPackage &packag
  * @since 20
  */
 int32_t StopVibrateBySessionId(uint32_t sessionId);
+
+/**
+ * @brief Disable vibration for the application with the specified PID.
+ * @param pid Indicates the process ID (PID) of the application to disable vibration.
+ * @return Returns <b>0</b> if the vibration is disabled successfully; returns <b>-1</b> otherwise.
+ * @since 20
+ */
+int32_t DisableVibratorByPid(int32_t pid);
+
+/**
+ * @brief Enable vibration for the application with the specified PID.
+ * @param pid Indicates the process ID (PID) of the application to enable vibration.
+ * @return Returns <b>0</b> if the vibration is enabled successfully; returns <b>-1</b> otherwise.
+ * @since 20
+ */
+int32_t EnableVibratorByPid(int32_t pid);
 } // namespace Sensors
 } // namespace OHOS
 #ifdef __cplusplus
