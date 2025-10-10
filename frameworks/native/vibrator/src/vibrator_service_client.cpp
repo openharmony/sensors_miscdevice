@@ -1468,5 +1468,55 @@ void VibratorServiceClient::WriteOtherHiSysIPCEvent(IMiscdeviceServiceIpcCode co
     }
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
 }
+
+int32_t VibratorServiceClient::DisableVibratorByPid(int32_t pid)
+{
+    CALL_LOG_ENTER;
+    MISC_HILOGD("Disable Vibrator for pid:%{public}d", pid);
+    int32_t ret = InitServiceClient();
+    if (ret != ERR_OK) {
+        MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
+        return MISC_NATIVE_GET_SERVICE_ERR;
+    }
+    CHKPR(miscdeviceProxy_, OHOS::Sensors::ERROR);
+#ifdef HIVIEWDFX_HITRACE_ENABLE
+    StartTrace(HITRACE_TAG_SENSORS, "DisableVibratorByPid");
+#endif // HIVIEWDFX_HITRACE_ENABLE
+    ret = miscdeviceProxy_->DisableVibratorByPid(pid);
+#ifdef HIVIEWDFX_HITRACE_ENABLE
+    FinishTrace(HITRACE_TAG_SENSORS);
+#endif // HIVIEWDFX_HITRACE_ENABLE
+    if (ret != ERR_OK) {
+        MISC_HILOGE("Disable Vibrator failed, [ret = %{public}d, pid = %{public}d]", ret, pid);
+        return ret;
+    }
+    MISC_HILOGD("Disable Vibrator for pid:%{public}d success", pid);
+    return OHOS::Sensors::SUCCESS;
+}
+
+int32_t VibratorServiceClient::EnableVibratorByPid(int32_t pid)
+{
+    CALL_LOG_ENTER;
+    MISC_HILOGD("Enable Vibrator for pid:%{public}d", pid);
+    int32_t ret = InitServiceClient();
+    if (ret != ERR_OK) {
+        MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
+        return MISC_NATIVE_GET_SERVICE_ERR;
+    }
+    CHKPR(miscdeviceProxy_, OHOS::Sensors::ERROR);
+#ifdef HIVIEWDFX_HITRACE_ENABLE
+    StartTrace(HITRACE_TAG_SENSORS, "EnableVibratorByPid");
+#endif // HIVIEWDFX_HITRACE_ENABLE
+    ret = miscdeviceProxy_->EnableVibratorByPid(pid);
+#ifdef HIVIEWDFX_HITRACE_ENABLE
+    FinishTrace(HITRACE_TAG_SENSORS);
+#endif // HIVIEWDFX_HITRACE_ENABLE
+    if (ret != ERR_OK) {
+        MISC_HILOGE("Enable Vibrator failed, [ret = %{public}d, pid = %{public}d]", ret, pid);
+        return ret;
+    }
+    MISC_HILOGD("Enable Vibrator for pid:%{public}d success", pid);
+    return OHOS::Sensors::SUCCESS;
+}
 } // namespace Sensors
 } // namespace OHOS

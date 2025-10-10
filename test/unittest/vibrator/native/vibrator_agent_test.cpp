@@ -50,6 +50,11 @@ constexpr int32_t SESSION_ID_THREE = 3;
 constexpr int32_t SESSION_ID_FOUR = 4;
 constexpr int32_t SESSION_ID_FIVE = 5;
 constexpr int32_t LOOP_TIMES = 5;
+constexpr int32_t PID_ONE = 1;
+constexpr int32_t PID_TWO = 2;
+constexpr int32_t PID_THREE = 3;
+constexpr int32_t PID_FOUR = 4;
+constexpr int32_t PID_FIVE = 5;
 
 PermissionStateFull g_infoManagerTestState = {
     .grantFlags = {1},
@@ -3115,6 +3120,94 @@ HWTEST_F(VibratorAgentTest, StopVibrateBySessionId_004, TestSize.Level1)
     ret = StopVibrateBySessionId(SESSION_ID_FOUR);
     ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
     ret = StopVibrateBySessionId(SESSION_ID_FIVE);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+}
+
+HWTEST_F(VibratorAgentTest, DisableVibratorByPid_001, TestSize.Level1)
+{
+    MISC_HILOGI("DisableVibratorByPid_001 in");
+    int32_t ret = DisableVibratorByPid(0);
+    ASSERT_EQ(ret, PARAMETER_ERROR);
+}
+
+HWTEST_F(VibratorAgentTest, DisableVibratorByPid_002, TestSize.Level1)
+{
+    MISC_HILOGI("DisableVibratorByPid_002 in");
+    int32_t ret = DisableVibratorByPid(PID_ONE);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+}
+
+HWTEST_F(VibratorAgentTest, DisableVibratorByPid_003, TestSize.Level1)
+{
+    MISC_HILOGI("DisableVibratorByPid_003 in");
+    int32_t ret = DisableVibratorByPid(PID_ONE);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ret = DisableVibratorByPid(PID_ONE);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ret = DisableVibratorByPid(PID_ONE);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ret = DisableVibratorByPid(PID_ONE);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ret = DisableVibratorByPid(PID_ONE);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+}
+
+HWTEST_F(VibratorAgentTest, DisableVibratorByPid_004, TestSize.Level1)
+{
+    MISC_HILOGI("DisableVibratorByPid_004 in");
+    int32_t ret = DisableVibratorByPid(PID_ONE);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ret = DisableVibratorByPid(PID_TWO);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ret = DisableVibratorByPid(PID_THREE);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ret = DisableVibratorByPid(PID_FOUR);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ret = DisableVibratorByPid(PID_FIVE);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+}
+
+HWTEST_F(VibratorAgentTest, EnableVibratorByPid_001, TestSize.Level1)
+{
+    MISC_HILOGI("EnableVibratorByPid_001 in");
+    int32_t ret = EnableVibratorByPid(0);
+    ASSERT_EQ(ret, PARAMETER_ERROR);
+}
+
+HWTEST_F(VibratorAgentTest, EnableVibratorByPid_002, TestSize.Level1)
+{
+    MISC_HILOGI("EnableVibratorByPid_002 in");
+    int32_t ret = EnableVibratorByPid(PID_ONE);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+}
+
+HWTEST_F(VibratorAgentTest, EnableVibratorByPid_003, TestSize.Level1)
+{
+    MISC_HILOGI("EnableVibratorByPid_003 in");
+    int32_t ret = EnableVibratorByPid(PID_ONE);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ret = EnableVibratorByPid(PID_ONE);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ret = EnableVibratorByPid(PID_ONE);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ret = EnableVibratorByPid(PID_ONE);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ret = EnableVibratorByPid(PID_ONE);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+}
+
+HWTEST_F(VibratorAgentTest, EnableVibratorByPid_004, TestSize.Level1)
+{
+    MISC_HILOGI("EnableVibratorByPid_004 in");
+    int32_t ret = EnableVibratorByPid(PID_ONE);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ret = EnableVibratorByPid(PID_TWO);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ret = EnableVibratorByPid(PID_THREE);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ret = EnableVibratorByPid(PID_FOUR);
+    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ret = EnableVibratorByPid(PID_FIVE);
     ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
 }
 } // namespace Sensors

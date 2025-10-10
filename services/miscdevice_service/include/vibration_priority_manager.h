@@ -80,6 +80,8 @@ class VibrationPriorityManager {
 public:
     DISALLOW_COPY_AND_MOVE(VibrationPriorityManager);
     bool Init();
+    static bool IsSystemServiceCalling();
+    static bool IsSystemCalling();
     VibrateStatus ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo,
 		const std::shared_ptr<VibratorThread> &vibratorThread, const VibratorIdentifierIPC& identifier);
 #ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
@@ -123,8 +125,6 @@ private:
     bool ReleaseDataShareHelper(std::shared_ptr<DataShare::DataShareHelper> &helper);
     sptr<MiscDeviceObserver> CreateObserver(const MiscDeviceObserver::UpdateFunc &func);
     void UpdateStatus();
-    bool IsSystemServiceCalling();
-    bool IsSystemCalling();
     void ReportSwitchStatus();
     std::thread reportSwitchStatusThread_;
     static std::atomic_bool stop_;
