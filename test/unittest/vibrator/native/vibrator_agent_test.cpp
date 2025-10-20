@@ -3134,37 +3134,37 @@ HWTEST_F(VibratorAgentTest, DisableVibratorByPid_002, TestSize.Level1)
 {
     MISC_HILOGI("DisableVibratorByPid_002 in");
     int32_t ret = DisableVibratorByPid(PID_ONE);
-    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ASSERT_EQ(ret, PERMISSION_DENIED);
 }
 
 HWTEST_F(VibratorAgentTest, DisableVibratorByPid_003, TestSize.Level1)
 {
     MISC_HILOGI("DisableVibratorByPid_003 in");
     int32_t ret = DisableVibratorByPid(PID_ONE);
-    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ASSERT_EQ(ret, PERMISSION_DENIED);
     ret = DisableVibratorByPid(PID_ONE);
-    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ASSERT_EQ(ret, PERMISSION_DENIED);
     ret = DisableVibratorByPid(PID_ONE);
-    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ASSERT_EQ(ret, PERMISSION_DENIED);
     ret = DisableVibratorByPid(PID_ONE);
-    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ASSERT_EQ(ret, PERMISSION_DENIED);
     ret = DisableVibratorByPid(PID_ONE);
-    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ASSERT_EQ(ret, PERMISSION_DENIED);
 }
 
 HWTEST_F(VibratorAgentTest, DisableVibratorByPid_004, TestSize.Level1)
 {
     MISC_HILOGI("DisableVibratorByPid_004 in");
     int32_t ret = DisableVibratorByPid(PID_ONE);
-    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ASSERT_EQ(ret, PERMISSION_DENIED);
     ret = DisableVibratorByPid(PID_TWO);
-    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ASSERT_EQ(ret, PERMISSION_DENIED);
     ret = DisableVibratorByPid(PID_THREE);
-    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ASSERT_EQ(ret, PERMISSION_DENIED);
     ret = DisableVibratorByPid(PID_FOUR);
-    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ASSERT_EQ(ret, PERMISSION_DENIED);
     ret = DisableVibratorByPid(PID_FIVE);
-    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ASSERT_EQ(ret, PERMISSION_DENIED);
 }
 
 HWTEST_F(VibratorAgentTest, EnableVibratorByPid_001, TestSize.Level1)
@@ -3178,37 +3178,37 @@ HWTEST_F(VibratorAgentTest, EnableVibratorByPid_002, TestSize.Level1)
 {
     MISC_HILOGI("EnableVibratorByPid_002 in");
     int32_t ret = EnableVibratorByPid(PID_ONE);
-    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ASSERT_EQ(ret, PERMISSION_DENIED);
 }
 
 HWTEST_F(VibratorAgentTest, EnableVibratorByPid_003, TestSize.Level1)
 {
     MISC_HILOGI("EnableVibratorByPid_003 in");
     int32_t ret = EnableVibratorByPid(PID_ONE);
-    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ASSERT_EQ(ret, PERMISSION_DENIED);
     ret = EnableVibratorByPid(PID_ONE);
-    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ASSERT_EQ(ret, PERMISSION_DENIED);
     ret = EnableVibratorByPid(PID_ONE);
-    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ASSERT_EQ(ret, PERMISSION_DENIED);
     ret = EnableVibratorByPid(PID_ONE);
-    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ASSERT_EQ(ret, PERMISSION_DENIED);
     ret = EnableVibratorByPid(PID_ONE);
-    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ASSERT_EQ(ret, PERMISSION_DENIED);
 }
 
 HWTEST_F(VibratorAgentTest, EnableVibratorByPid_004, TestSize.Level1)
 {
     MISC_HILOGI("EnableVibratorByPid_004 in");
     int32_t ret = EnableVibratorByPid(PID_ONE);
-    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ASSERT_EQ(ret, PERMISSION_DENIED);
     ret = EnableVibratorByPid(PID_TWO);
-    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ASSERT_EQ(ret, PERMISSION_DENIED);
     ret = EnableVibratorByPid(PID_THREE);
-    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ASSERT_EQ(ret, PERMISSION_DENIED);
     ret = EnableVibratorByPid(PID_FOUR);
-    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ASSERT_EQ(ret, PERMISSION_DENIED);
     ret = EnableVibratorByPid(PID_FIVE);
-    ASSERT_EQ(ret, OHOS::Sensors::SUCCESS);
+    ASSERT_EQ(ret, PERMISSION_DENIED);
 }
 } // namespace Sensors
 } // namespace OHOS
