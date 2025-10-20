@@ -182,90 +182,79 @@ static bool ParseVibratorPattern(::ohos::vibrator::VibratorPattern pattern, Vibr
     return true;
 }
 
-static void PrintVibratorPattern(::ohos::vibrator::VibratorPattern &vibratorPattern)
+static void PrintVibratorPattern(VibratorPattern &vibratorPattern)
 {
     CALL_LOG_ENTER;
-    if (vibratorPattern.events.empty()) {
-        MISC_HILOGE("Events is empty");
+    if (vibratorPattern.events == nullptr) {
+        MISC_HILOGE("Events is nullptr");
         return;
     }
-    MISC_HILOGD("PrintVibratorPattern, time:%{public}d, eventNum:%{public}u",
-        vibratorPattern.time, vibratorPattern.events.size());
-    for (int32_t i = 0; i < static_cast<int32_t>(vibratorPattern.events.size()); ++i) {
+    MISC_HILOGD("PrintVibratorPattern, time:%{public}d, eventNum:%{public}d",
+        vibratorPattern.time, vibratorPattern.eventNum);
+    for (int32_t i = 0; i < vibratorPattern.eventNum; ++i) {
         MISC_HILOGD("PrintVibratorPattern, type:%{public}d, time:%{public}d, duration:%{public}d, \
-            intensity:%{public}d, frequency:%{public}d, index:%{public}d, pointNum:%{public}u",
-            static_cast<int32_t>(vibratorPattern.events[i].eventType), vibratorPattern.events[i].time,
-            vibratorPattern.events[i].duration.value(), vibratorPattern.events[i].intensity.value(),
-            vibratorPattern.events[i].frequency.value(), vibratorPattern.events[i].index.value(),
-            vibratorPattern.events[i].points.value().size());
-        if ((!vibratorPattern.events[i].points.has_value()) || vibratorPattern.events[i].points.value().size() <= 0) {
-            MISC_HILOGE("points is empty");
-            return;
-        }
-        ::taihe::array<::ohos::vibrator::VibratorCurvePoint> point = vibratorPattern.events[i].points.value();
-        for (int32_t j = 0; j < static_cast<int32_t>(vibratorPattern.events[i].points.value().size()); ++j) {
-            MISC_HILOGD("PrintVibratorPattern, time:%{public}d, intensity:%{public}d, frequency:%{public}d",
-                point[j].time, static_cast<int32_t>(point[j].intensity.value()), point[j].frequency.value());
+            intensity:%{public}d, frequency:%{public}d, index:%{public}d, pointNum:%{public}d",
+            static_cast<int32_t>(vibratorPattern.events[i].type), vibratorPattern.events[i].time,
+            vibratorPattern.events[i].duration, vibratorPattern.events[i].intensity,
+            vibratorPattern.events[i].frequency, vibratorPattern.events[i].index, vibratorPattern.events[i].pointNum);
+        if (vibratorPattern.events[i].pointNum > 0) {
+            VibratorCurvePoint *point = vibratorPattern.events[i].points;
+            for (int32_t j = 0; j < vibratorPattern.events[i].pointNum; ++j) {
+                MISC_HILOGD("PrintVibratorPattern, time:%{public}d, intensity:%{public}d, frequency:%{public}d",
+                    point[j].time, point[j].intensity, point[j].frequency);
+            }
         }
     }
 }
 
-static bool CheckVibratorCurvePoint(const ::ohos::vibrator::VibratorEvent &event)
+static bool CheckVibratorCurvePoint(const VibratorEvent &event)
 {
     CALL_LOG_ENTER;
-    if ((!event.points.has_value()) || (event.points.value().size() < CURVE_POINT_NUM_MIN) ||
-        (event.points.value().size() > CURVE_POINT_NUM_MAX)) {
-        MISC_HILOGE("The points size is out of range, pointNum:%{public}u", event.points.value().size());
+    if ((event.pointNum < CURVE_POINT_NUM_MIN) || (event.pointNum > CURVE_POINT_NUM_MAX)) {
+        MISC_HILOGE("The points size is out of range, pointNum:%{public}d", event.pointNum);
         return false;
     }
-    for (int32_t j = 0; j < static_cast<int32_t>(event.points.value().size()); ++j) {
-        if ((event.points.value()[j].time < 0) || (event.points.value()[j].time > event.duration.value())) {
-            MISC_HILOGE("time in points is out of range, time:%{public}d", event.points.value()[j].time);
+    for (int32_t j = 0; j < event.pointNum; ++j) {
+        if ((event.points[j].time < 0) || (event.points[j].time > event.duration)) {
+            MISC_HILOGE("time in points is out of range, time:%{public}d", event.points[j].time);
             return false;
         }
-        if ((event.points.value()[j].intensity.value() < 0) ||
-            (event.points.value()[j].intensity.value() > CURVE_POINT_INTENSITY_MAX)) {
-            MISC_HILOGE("intensity in points is out of range, intensity:%{public}d",
-                static_cast<int32_t>(event.points.value()[j].intensity.value()));
+        if ((event.points[j].intensity < 0) || (event.points[j].intensity > CURVE_POINT_INTENSITY_MAX)) {
+            MISC_HILOGE("intensity in points is out of range, intensity:%{public}d", event.points[j].intensity);
             return false;
         }
-        if ((event.points.value()[j].frequency.value() < CURVE_FREQUENCY_MIN) ||
-            (event.points.value()[j].frequency.value() > CURVE_FREQUENCY_MAX)) {
-            MISC_HILOGE("frequency in points is out of range, frequency:%{public}d",
-                event.points.value()[j].frequency.value());
+        if ((event.points[j].frequency < CURVE_FREQUENCY_MIN) || (event.points[j].frequency > CURVE_FREQUENCY_MAX)) {
+            MISC_HILOGE("frequency in points is out of range, frequency:%{public}d", event.points[j].frequency);
             return false;
         }
     }
     return true;
 }
 
-static bool CheckVibratorEvent(const ::ohos::vibrator::VibratorEvent &event)
+static bool CheckVibratorEvent(const VibratorEvent &event)
 {
     CALL_LOG_ENTER;
     if ((event.time < 0) || (event.time > EVENT_START_TIME_MAX)) {
         MISC_HILOGE("The event time is out of range, time:%{public}d", event.time);
         return false;
     }
-    if ((!event.frequency.has_value()) || (event.frequency.value() < FREQUENCY_MIN) ||
-        (event.frequency.value() > FREQUENCY_MAX)) {
-        MISC_HILOGE("The event frequency is out of range, frequency:%{public}d", event.frequency.value());
+    if ((event.frequency < FREQUENCY_MIN) || (event.frequency > FREQUENCY_MAX)) {
+        MISC_HILOGE("The event frequency is out of range, frequency:%{public}d", event.frequency);
         return false;
     }
-    if ((!event.intensity.has_value()) || (event.intensity.value() < INTENSITY_MIN) ||
-        (event.intensity.value() > INTENSITY_MAX)) {
-        MISC_HILOGE("The event intensity is out of range, intensity:%{public}d", event.intensity.value());
+    if ((event.intensity < INTENSITY_MIN) || (event.intensity > INTENSITY_MAX)) {
+        MISC_HILOGE("The event intensity is out of range, intensity:%{public}d", event.intensity);
         return false;
     }
-    if ((!event.duration.has_value()) || (event.duration.value() <= 0) ||
-        (event.duration.value() > CONTINUOUS_DURATION_MAX)) {
-        MISC_HILOGE("The event duration is out of range, duration:%{public}d", event.duration.value());
+    if ((event.duration <= 0) || (event.duration > CONTINUOUS_DURATION_MAX)) {
+        MISC_HILOGE("The event duration is out of range, duration:%{public}d", event.duration);
         return false;
     }
-    if ((!event.index.has_value()) || (event.index.value() < 0) || (event.index.value() > EVENT_INDEX_MAX)) {
-        MISC_HILOGE("The event index is out of range, index:%{public}d", event.index.value());
+    if ((event.index < 0) || (event.index > EVENT_INDEX_MAX)) {
+        MISC_HILOGE("The event index is out of range, index:%{public}d", event.index);
         return false;
     }
-    if ((event.eventType == VibratorEventType::EVENT_TYPE_CONTINUOUS) && (event.points.value().size() > 0)) {
+    if ((event.type == VibratorEventType::EVENT_TYPE_CONTINUOUS) && (event.pointNum > 0)) {
         if (!CheckVibratorCurvePoint(event)) {
             MISC_HILOGE("CheckVibratorCurvePoint failed");
             return false;
@@ -274,18 +263,18 @@ static bool CheckVibratorEvent(const ::ohos::vibrator::VibratorEvent &event)
     return true;
 }
 
-static bool CheckVibratorPatternParameter(::ohos::vibrator::VibratorPattern &vibratorPattern)
+static bool CheckVibratorPatternParameter(VibratorPattern &vibratorPattern)
 {
     CALL_LOG_ENTER;
-    if (vibratorPattern.events.empty()) {
-        MISC_HILOGE("Events is empty");
+    if (vibratorPattern.events == nullptr) {
+        MISC_HILOGE("Events is nullptr");
         return false;
     }
-    if ((vibratorPattern.events.size() <= 0) || (vibratorPattern.events.size() > EVENT_NUM_MAX)) {
-        MISC_HILOGE("The event num  is out of range, eventNum:%{public}u", vibratorPattern.events.size());
+    if ((vibratorPattern.eventNum <= 0) || (vibratorPattern.eventNum > EVENT_NUM_MAX)) {
+        MISC_HILOGE("The event num  is out of range, eventNum:%{public}d", vibratorPattern.eventNum);
         return false;
     }
-    for (int32_t i = 0; i < static_cast<int32_t>(vibratorPattern.events.size()); ++i) {
+    for (int32_t i = 0; i < vibratorPattern.eventNum; ++i) {
         if (!CheckVibratorEvent(vibratorPattern.events[i])) {
             MISC_HILOGE("CheckVibratorEvent failed");
             return false;
@@ -322,8 +311,8 @@ bool ParseParameter(::ohos::vibrator::VibrateEffect const& effect, ::ohos::vibra
         vibrateInfo.type = "pattern";
         ::ohos::vibrator::VibrateFromPattern vibrateFromPattern = effect.get_VibrateFromPattern_type_ref();
         ParseVibratorPattern(vibrateFromPattern.pattern, vibrateInfo);
-        PrintVibratorPattern(vibrateFromPattern.pattern);
-        CHKCF(CheckVibratorPatternParameter(vibrateFromPattern.pattern), "CheckVibratorPatternParameter fail");
+        PrintVibratorPattern(vibrateInfo.vibratorPattern);
+        CHKCF(CheckVibratorPatternParameter(vibrateInfo.vibratorPattern), "CheckVibratorPatternParameter fail");
     }
     vibrateInfo.usage = attribute.usage;
     vibrateInfo.systemUsage = attribute.systemUsage.has_value() ? attribute.systemUsage.value() : false;
