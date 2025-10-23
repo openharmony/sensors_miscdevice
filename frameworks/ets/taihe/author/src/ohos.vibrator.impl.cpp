@@ -46,6 +46,9 @@ constexpr int32_t CURVE_FREQUENCY_MIN = -100;
 constexpr int32_t CURVE_FREQUENCY_MAX = 100;
 constexpr int32_t CONTINUOUS_DURATION_MAX = 5000;
 constexpr int32_t EVENT_INDEX_MAX = 2;
+constexpr int32_t DEFAULT_EVENT_INTENSITY = 100;
+constexpr int32_t DEFAULT_EVENT_FREQUENCY = 50;
+constexpr int32_t TRANSIENT_VIBRATION_DURATION = 48;
 
 static std::map<std::string, int32_t> g_usageType = {
     {"unknown", USAGE_UNKNOWN},
@@ -280,6 +283,27 @@ static bool CheckVibratorPatternParameter(VibratorPattern &vibratorPattern)
     return true;
 }
 
+bool ClearVibratorPattern(VibratorPattern &vibratorPattern)
+{
+    CALL_LOG_ENTER;
+    int32_t eventSize = vibratorPattern.eventNum;
+    if ((eventSize <= 0) || (vibratorPattern.events == nullptr)) {
+        MISC_HILOGW("events is not need to free, eventSize:%{public}d", eventSize);
+        return false;
+    }
+    auto events = vibratorPattern.events;
+    for (int32_t j = 0; j < eventSize; ++j) {
+        if (events[j].points != nullptr) {
+            free(events[j].points);
+            events[j].points = nullptr;
+        }
+    }
+    free(events);
+    events = nullptr;
+    vibratorPattern.events = nullptr;
+    return true;
+}
+
 bool ParseParameter(::ohos::vibrator::VibrateEffect const& effect, ::ohos::vibrator::VibrateAttribute const& attribute,
     VibrateInfo &vibrateInfo)
 {
@@ -309,7 +333,11 @@ bool ParseParameter(::ohos::vibrator::VibrateEffect const& effect, ::ohos::vibra
         ::ohos::vibrator::VibrateFromPattern vibrateFromPattern = effect.get_VibrateFromPattern_type_ref();
         ParseVibratorPattern(vibrateFromPattern.pattern, vibrateInfo);
         PrintVibratorPattern(vibrateInfo.vibratorPattern);
-        CHKCF(CheckVibratorPatternParameter(vibrateInfo.vibratorPattern), "CheckVibratorPatternParameter fail");
+        if (!CheckVibratorPatternParameter(vibrateInfo.vibratorPattern)) {
+            MISC_HILOGE("CheckVibratorPatternParameter fail");
+            ClearVibratorPattern(vibrateInfo.vibratorPattern);
+            return false;
+        }
     }
     vibrateInfo.usage = attribute.usage;
     vibrateInfo.systemUsage = attribute.systemUsage.has_value() ? attribute.systemUsage.value() : false;
@@ -358,26 +386,6 @@ int32_t StartVibrate(const VibrateInfo &info)
     return StartVibratorOnce(info.duration);
 }
 
-bool ClearVibratorPattern(VibratorPattern &vibratorPattern)
-{
-    CALL_LOG_ENTER;
-    int32_t eventSize = vibratorPattern.eventNum;
-    if ((eventSize <= 0) || (vibratorPattern.events == nullptr)) {
-        MISC_HILOGW("events is not need to free, eventSize:%{public}d", eventSize);
-        return false;
-    }
-    auto events = vibratorPattern.events;
-    for (int32_t j = 0; j < eventSize; ++j) {
-        if (events[j].points != nullptr) {
-            free(events[j].points);
-            events[j].points = nullptr;
-        }
-    }
-    free(events);
-    events = nullptr;
-    return true;
-}
-
 void startVibrationSync(::ohos::vibrator::VibrateEffect const& effect,
     ::ohos::vibrator::VibrateAttribute const& attribute)
 {
@@ -418,6 +426,45 @@ bool isHdHapticSupported()
     return IsHdHapticSupported();
 }
 
+taihe::array<ohos::vibrator::VibratorInfo> getVibratorInfoSync(
+    taihe::optional_view<ohos::vibrator::VibratorInfoParam> param)
+{
+    VibratorIdentifier identifier;
+    if (param.has_value()) {
+        const auto &vibratorInfoParam = param.value();
+        if (vibratorInfoParam.deviceId.has_value()) {
+            identifier.deviceId = vibratorInfoParam.deviceId.value();
+        } else {
+            MISC_HILOGW("deviceId is undefined, set default value deviceId = -1");
+        }
+        if (vibratorInfoParam.vibratorId.has_value()) {
+            identifier.vibratorId = vibratorInfoParam.vibratorId.value();
+        } else {
+            MISC_HILOGW("vibratorId is undefined, set default value vibratorId = -1");
+        }
+        MISC_HILOGD("identifier=[deviceId=%{public}d, vibratorId=%{public}d]",
+            identifier.deviceId, identifier.vibratorId);
+    } else {
+        MISC_HILOGW("deviceId and vibratorId is undefined, set default value deviceId = -1 and vibratorId = -1");
+    }
+    std::vector<VibratorInfos> vibratorInfo;
+    std::vector<ohos::vibrator::VibratorInfo> taiheVibratorInfo;
+    int32_t ret = GetVibratorList(identifier, vibratorInfo);
+    if (ret == SUCCESS) {
+        for (auto& info : vibratorInfo) {
+            ohos::vibrator::VibratorInfo taiheInfo = {
+                .deviceId = info.deviceId,
+                .vibratorId = info.vibratorId,
+                .deviceName = taihe::string(info.deviceName),
+                .isHdHapticSupported = info.isSupportHdHaptic,
+                .isLocalVibrator = info.isLocalVibrator
+            };
+            taiheVibratorInfo.push_back(taiheInfo);
+        }
+    }
+    return taihe::array<ohos::vibrator::VibratorInfo>(taiheVibratorInfo);
+}
+
 void stopVibrationSync()
 {
     CALL_LOG_ENTER;
@@ -437,6 +484,257 @@ bool isSupportEffectSync(::taihe::string_view effectId)
     }
     return isSupportEffect;
 }
+
+enum VibrateTag {
+    EVENT_TAG_UNKNOWN = -1,
+    EVENT_TAG_CONTINUOUS = 0,
+    EVENT_TAG_TRANSIENT = 1,
+};
+
+struct VibrateCurvePoint {
+    int32_t time = 0;
+    int32_t intensity = 0;
+    int32_t frequency = 0;
+};
+
+struct VibrateEvent {
+    VibrateTag tag;
+    int32_t time = 0;
+    int32_t duration = 0;
+    int32_t intensity = 0;
+    int32_t frequency = 0;
+    int32_t index = 0;
+    std::vector<VibrateCurvePoint> points;
+};
+
+class VibratorPatternBuilderImpl {
+    public:
+    VibratorPatternBuilderImpl() {
+        // Don't forget to implement the constructor.
+    }
+
+    int64_t GetVibratorPatternBuilderImpl()
+    {
+        return reinterpret_cast<int64_t>(this);
+    }
+
+    ohos::vibrator::VibratorPatternBuilder addContinuousEvent(
+        int32_t time, int32_t duration, taihe::optional_view<ohos::vibrator::ContinuousParam> options)
+    {
+        auto vibratorPatternBuilder =
+            taihe::make_holder<VibratorPatternBuilderImpl, ohos::vibrator::VibratorPatternBuilder>();
+        auto vibratorPatternBuilderImpl =
+            reinterpret_cast<VibratorPatternBuilderImpl *>(vibratorPatternBuilder->GetVibratorPatternBuilderImpl());
+        if (vibratorPatternBuilderImpl == nullptr) {
+            return vibratorPatternBuilder;
+        }
+        VibrateEvent event;
+        event.tag = VibrateTag::EVENT_TAG_CONTINUOUS;
+        event.time = time;
+        event.duration = duration;
+        if (options.has_value()) {
+            const auto &continuousParam = options.value();
+            if (continuousParam.intensity.has_value()) {
+                event.intensity = continuousParam.intensity.value();
+            } else {
+                event.intensity = DEFAULT_EVENT_INTENSITY;
+            }
+            if (continuousParam.frequency.has_value()) {
+                event.frequency = continuousParam.frequency.value();
+            } else {
+                event.frequency = DEFAULT_EVENT_FREQUENCY;
+            }
+            if (continuousParam.index.has_value()) {
+                event.index = continuousParam.index.value();
+            } else {
+                event.index = 0;
+            }
+        } else {
+            event.intensity = DEFAULT_EVENT_INTENSITY;
+            event.frequency = DEFAULT_EVENT_FREQUENCY;
+            event.index = 0;
+        }
+        if (!CheckParameters(event)) {
+            taihe::set_business_error(PARAMETER_ERROR, "Invalid parameter");
+            return vibratorPatternBuilder;
+        }
+        events_.push_back(event);
+        vibratorPatternBuilderImpl->events_ = events_;
+        return vibratorPatternBuilder;
+    }
+
+    ohos::vibrator::VibratorPatternBuilder addTransientEvent(
+        int32_t time, taihe::optional_view<ohos::vibrator::TransientParam> options)
+    {
+        auto vibratorPatternBuilder =
+            taihe::make_holder<VibratorPatternBuilderImpl, ohos::vibrator::VibratorPatternBuilder>();
+        auto vibratorPatternBuilderImpl =
+            reinterpret_cast<VibratorPatternBuilderImpl *>(vibratorPatternBuilder->GetVibratorPatternBuilderImpl());
+        if (vibratorPatternBuilderImpl == nullptr) {
+            return vibratorPatternBuilder;
+        }
+        VibrateEvent event;
+        event.tag = VibrateTag::EVENT_TAG_TRANSIENT;
+        event.duration = TRANSIENT_VIBRATION_DURATION;
+        event.time = time;
+        if (options.has_value()) {
+            const auto &transientParam = options.value();
+            if (transientParam.intensity.has_value()) {
+                event.intensity = transientParam.intensity.value();
+            } else {
+                event.intensity = DEFAULT_EVENT_INTENSITY;
+            }
+            if (transientParam.frequency.has_value()) {
+                event.frequency = transientParam.frequency.value();
+            } else {
+                event.frequency = DEFAULT_EVENT_FREQUENCY;
+            }
+            if (transientParam.index.has_value()) {
+                event.index = transientParam.index.value();
+            } else {
+                event.index = 0;
+            }
+        } else {
+            event.intensity = DEFAULT_EVENT_INTENSITY;
+            event.frequency = DEFAULT_EVENT_FREQUENCY;
+            event.index = 0;
+        }
+        if (!CheckParameters(event)) {
+            taihe::set_business_error(PARAMETER_ERROR, "Invalid parameter");
+            return vibratorPatternBuilder;
+        }
+        events_.push_back(event);
+        vibratorPatternBuilderImpl->events_ = events_;
+        return vibratorPatternBuilder;
+    }
+
+    ohos::vibrator::VibratorPattern build()
+    {
+        ohos::vibrator::VibratorPattern result{};
+        auto eventNum = events_.size();
+        if ((eventNum <= 0) || (eventNum > EVENT_NUM_MAX)) {
+            taihe::set_business_error(PARAMETER_ERROR, "The number of events exceeds the range");
+            return result;
+        }
+        result.time = 0;
+        result.events = ConvertVibrateEvents(events_);
+        return result;
+    }
+
+private:
+    static bool CheckParameters(const VibrateEvent &event)
+    {
+        if ((event.time < 0) || (event.time > EVENT_START_TIME_MAX)) {
+            MISC_HILOGE("The event time is out of range, time:%{public}d", event.time);
+            return false;
+        }
+        if ((event.frequency < FREQUENCY_MIN) || (event.frequency > FREQUENCY_MAX)) {
+            MISC_HILOGE("The event frequency is out of range, frequency:%{public}d", event.frequency);
+            return false;
+        }
+        if ((event.intensity < INTENSITY_MIN) || (event.intensity > INTENSITY_MAX)) {
+            MISC_HILOGE("The event intensity is out of range, intensity:%{public}d", event.intensity);
+            return false;
+        }
+        if ((event.duration <= 0) || (event.duration > CONTINUOUS_DURATION_MAX)) {
+            MISC_HILOGE("The event duration is out of range, duration:%{public}d", event.duration);
+            return false;
+        }
+        if ((event.index < 0) || (event.index > EVENT_INDEX_MAX)) {
+            MISC_HILOGE("The event index is out of range, index:%{public}d", event.index);
+            return false;
+        }
+        if ((event.tag == VibrateTag::EVENT_TAG_CONTINUOUS) && !event.points.empty()) {
+            if (!CheckCurvePoints(event)) {
+                MISC_HILOGE("CheckCurvePoints failed");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    static bool CheckCurvePoints(const VibrateEvent &event)
+    {
+        int32_t pointNum = static_cast<int32_t>(event.points.size());
+        if ((pointNum < CURVE_POINT_NUM_MIN) || (pointNum > CURVE_POINT_NUM_MAX)) {
+            MISC_HILOGE("The points size is out of range, size:%{public}d", pointNum);
+            return false;
+        }
+        for (int32_t i = 0; i < pointNum; ++i) {
+            if ((event.points[i].time < 0) || (event.points[i].time > event.duration)) {
+                MISC_HILOGE("time in points is out of range, time:%{public}d", event.points[i].time);
+                return false;
+            }
+            if ((event.points[i].intensity < 0) || (event.points[i].intensity > CURVE_POINT_INTENSITY_MAX)) {
+                MISC_HILOGE("intensity in points is out of range, intensity:%{public}d", event.points[i].intensity);
+                return false;
+            }
+            if ((event.points[i].frequency < CURVE_FREQUENCY_MIN) ||
+                (event.points[i].frequency > CURVE_FREQUENCY_MAX)) {
+                MISC_HILOGE("frequency in points is out of range, frequency:%{public}d", event.points[i].frequency);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    static ohos::vibrator::VibratorEventType ConvertVibratorEventType(const VibrateTag &tag)
+    {
+        return ohos::vibrator::VibratorEventType::from_value(static_cast<int32_t>(tag));
+    }
+
+    static ohos::vibrator::VibratorEvent ConvertVibrateEvent(const VibrateEvent &event)
+    {
+        ohos::vibrator::VibratorEvent result = {
+            .eventType = ConvertVibratorEventType(event.tag),
+            .time = event.time,
+            .duration = taihe::optional<int32_t>(std::in_place_t{}, event.duration),
+            .intensity = taihe::optional<int32_t>(std::in_place_t{}, event.intensity),
+            .frequency = taihe::optional<int32_t>(std::in_place_t{}, event.frequency),
+            .index = taihe::optional<int32_t>(std::in_place_t{}, event.index),
+            .points = taihe::optional<taihe::array<::ohos::vibrator::VibratorCurvePoint>>(
+                std::in_place_t{}, ConvertVibrateCurvePoints(event.points))
+        };
+        return result;
+    }
+
+    static taihe::array<ohos::vibrator::VibratorEvent> ConvertVibrateEvents(const std::vector<VibrateEvent> events)
+    {
+        std::vector<ohos::vibrator::VibratorEvent> vecEvents;
+        for (const auto &event : events) {
+            vecEvents.push_back(ConvertVibrateEvent(event));
+        }
+        return taihe::array<ohos::vibrator::VibratorEvent>(vecEvents);
+    }
+
+    static ohos::vibrator::VibratorCurvePoint ConvertVibrateCurvePoint(const VibrateCurvePoint &point)
+    {
+        ohos::vibrator::VibratorCurvePoint result = {
+            .time = point.time,
+            .intensity = taihe::optional<double>(std::in_place_t{}, point.intensity),
+            .frequency = taihe::optional<int32_t>(std::in_place_t{}, point.frequency)
+        };
+        return result;
+    }
+
+    static taihe::array<ohos::vibrator::VibratorCurvePoint> ConvertVibrateCurvePoints(
+        const std::vector<VibrateCurvePoint> points)
+    {
+        std::vector<ohos::vibrator::VibratorCurvePoint> vecPoints;
+        for (const auto &point : points) {
+            vecPoints.push_back(ConvertVibrateCurvePoint(point));
+        }
+        return taihe::array<ohos::vibrator::VibratorCurvePoint>(vecPoints);
+    }
+
+private:
+    std::vector<VibrateEvent> events_;
+};
+
+ohos::vibrator::VibratorPatternBuilder getVibratorPatternBuilder()
+{
+    return taihe::make_holder<VibratorPatternBuilderImpl, ohos::vibrator::VibratorPatternBuilder>();
+}
 }  // namespace
 
 // Since these macros are auto-generate, lint will cause false positive.
@@ -444,6 +742,8 @@ bool isSupportEffectSync(::taihe::string_view effectId)
 TH_EXPORT_CPP_API_stopVibrationByModeSync(stopVibrationByModeSync);
 TH_EXPORT_CPP_API_startVibrationSync(startVibrationSync);
 TH_EXPORT_CPP_API_isHdHapticSupported(isHdHapticSupported);
+TH_EXPORT_CPP_API_getVibratorInfoSync(getVibratorInfoSync);
 TH_EXPORT_CPP_API_stopVibrationSync(stopVibrationSync);
 TH_EXPORT_CPP_API_isSupportEffectSync(isSupportEffectSync);
+TH_EXPORT_CPP_API_getVibratorPatternBuilder(getVibratorPatternBuilder);
 // NOLINTEND
