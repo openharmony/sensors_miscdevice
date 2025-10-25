@@ -126,10 +126,10 @@ private:
     sptr<MiscDeviceObserver> CreateObserver(const MiscDeviceObserver::UpdateFunc &func);
     void UpdateStatus();
     void ReportSwitchStatus();
+    std::condition_variable stopCondition_;
     std::thread reportSwitchStatusThread_;
     static std::atomic_bool stop_;
     static std::mutex stopMutex_;
-    std::condition_variable stopCondition_;
     sptr<IRemoteObject> remoteObj_ { nullptr };
     sptr<MiscDeviceObserver> observer_ { nullptr };
     std::shared_ptr<AppExecFwk::AppMgrClient> appMgrClientPtr_ {nullptr};
