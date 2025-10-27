@@ -424,7 +424,11 @@ bool ParseParameter(napi_env env, napi_value args[], size_t argc, VibrateInfo &i
     } else if (info.type == "pattern") {
         CHKCF(ParseVibratorPattern(env, args, info), "ParseVibratorPattern fail");
         PrintVibratorPattern(info.vibratorPattern);
-        CHKCF(CheckVibratorPatternParameter(info.vibratorPattern), "CheckVibratorPatternParameter fail");
+        if (!CheckVibratorPatternParameter(info.vibratorPattern)) {
+            MISC_HILOGE("CheckVibratorPatternParameter fail");
+            ClearVibratorPattern(info.vibratorPattern);
+            return false;
+        }
     }
     CHKCF(GetPropertyString(env, args[1], "usage", info.usage), "Get vibrate usage fail");
     if (!GetPropertyBool(env, args[1], "systemUsage", info.systemUsage)) {

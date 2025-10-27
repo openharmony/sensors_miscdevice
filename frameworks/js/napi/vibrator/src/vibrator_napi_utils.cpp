@@ -62,6 +62,7 @@ bool ClearVibratorPattern(VibratorPattern &vibratorPattern)
     }
     free(events);
     events = nullptr;
+    vibratorPattern.events = nullptr;
     return true;
 }
 
