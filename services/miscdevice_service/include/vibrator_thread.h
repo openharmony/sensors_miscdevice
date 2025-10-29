@@ -52,7 +52,6 @@ private:
     std::mutex currentVibrationMutex_;
     VibrateInfo currentVibration_;
     std::vector<HdfWaveInformation> waveInfos_;
-    std::mutex currentVibrateParamsMutex_;
     VibratorIdentifierIPC currentVibrateParams_;
     std::mutex vibrateMutex_;
     std::condition_variable cv_;
