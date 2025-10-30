@@ -47,9 +47,7 @@ sptr<T> MiscdeviceDelayedSpSingleton<T>::GetInstance()
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (!instance_) {
-        if (instance_ == nullptr) {
-            instance_ = new T();
-        }
+        instance_ = new T();
     }
     return instance_;
 }

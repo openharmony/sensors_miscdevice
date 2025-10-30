@@ -282,13 +282,13 @@ VibrateInfo VibratorThread::GetCurrentVibrateInfo()
 
 VibratorIdentifierIPC VibratorThread::GetCurrentVibrateParams()
 {
-    std::unique_lock<std::mutex> lck(currentVibrateParamsMutex_);
+    std::unique_lock<std::mutex> lck(currentVibrationMutex_);
     return currentVibrateParams_;
 }
 
 std::vector<HdfWaveInformation> VibratorThread::GetCurrentWaveInfo()
 {
-    std::unique_lock<std::mutex> lck(currentVibrateParamsMutex_);
+    std::unique_lock<std::mutex> lck(currentVibrationMutex_);
     return waveInfos_;
 }
 
