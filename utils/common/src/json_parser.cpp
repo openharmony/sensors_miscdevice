@@ -136,8 +136,8 @@ double JsonParser::GetDoubleValue(cJSON *json) const
 
 std::string JsonParser::GetStringValue(cJSON *json) const
 {
-    if (!cJSON_IsString(json)) {
-        return NULL;
+    if (json == nullptr || !cJSON_IsString(json)) {
+        return "";
     }
     return json->valuestring;
 }
