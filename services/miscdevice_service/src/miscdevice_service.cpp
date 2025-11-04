@@ -1475,9 +1475,7 @@ int32_t MiscdeviceService::GetVibratorList(const VibratorIdentifierIPC& identifi
 {
     CALL_LOG_ENTER;
     identifier.Dump();
-    if (devicesManageMap_.empty()) {
-        GetOnlineVibratorInfo();
-    }
+    GetOnlineVibratorInfo();
     std::lock_guard<std::mutex> lockManage(devicesManageMutex_);
     int32_t ret;
     if ((identifier.deviceId == -1) && (identifier.vibratorId == -1)) {
@@ -1686,6 +1684,11 @@ void MiscdeviceService::ConvertToServerInfos(const std::vector<HdfVibratorInfo> 
 void MiscdeviceService::GetOnlineVibratorInfo()
 {
     CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> lockManage(devicesManageMutex_);
+    if (!devicesManageMap_.empty()) {
+        MISC_HILOGD("devicesManageMap_ not empty");
+        return;
+    }
     std::vector<HdfVibratorInfo> vibratorInfo;
     auto ret = vibratorHdiConnection_.GetVibratorInfo(vibratorInfo);
     if (ret != NO_ERROR || vibratorInfo.empty()) {
@@ -1693,7 +1696,6 @@ void MiscdeviceService::GetOnlineVibratorInfo()
         return;
     }
 
-    std::lock_guard<std::mutex> lockManage(devicesManageMutex_);
     const std::string deviceName = "";
     for (auto &info : vibratorInfo) {
         const auto it = devicesManageMap_.find(info.deviceId);
@@ -1759,10 +1761,12 @@ int32_t MiscdeviceService::StartVibrateThreadControl(const VibratorIdentifierIPC
         MISC_HILOGE("No vibration found");
         return ERROR;
     }
-
-    if (std::find(disablePids_.begin(), disablePids_.end(), info.pid) != disablePids_.end()) {
-        MISC_HILOGE("Pid :%{public}d is disabled, reject vibration", info.pid);
-        return ERROR;
+    {
+        std::lock_guard<std::mutex> guard(pidMutex_);
+        if (std::find(disablePids_.begin(), disablePids_.end(), info.pid) != disablePids_.end()) {
+            MISC_HILOGE("Pid :%{public}d is disabled, reject vibration", info.pid);
+            return ERROR;
+        }
     }
     size_t ignoreVibrateNum = 0;
 
