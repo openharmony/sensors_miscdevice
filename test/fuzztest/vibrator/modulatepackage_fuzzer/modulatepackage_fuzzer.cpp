@@ -29,6 +29,7 @@
 #include "vibrator_agent.h"
 
 namespace OHOS {
+namespace Sensors {
 using namespace Security::AccessToken;
 using Security::AccessToken::AccessTokenID;
 
@@ -67,6 +68,7 @@ bool ModulatePackageFuzzTest(FuzzedDataProvider &provider)
     OHOS::Sensors::ModulatePackage(&modulationCurve, curvePointNum, duration, package, packageAfterModulation);
     return true;
 }
+} // namespace Sensors
 } // namespace OHOS
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
