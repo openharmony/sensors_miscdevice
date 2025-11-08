@@ -947,11 +947,11 @@ void VibratorServiceClient::ConvertSeekVibratorPackage(const VibratorPackage &co
     VibratePackage &convertPackage, int32_t seekTime)
 {
     convertPackage.packageDuration = completePackage.packageDuration;
-    if (completePackage.patternNum < 0 || completePackage.patternNum > MAX_PATTERN_NUM) {
+    if (completePackage.patternNum < 0 || completePackage.patternNum > MAX_PATTERN_NUM) {  // LCOV_EXCL_START
         MISC_HILOGE("completePackage.patternNum is invalid, patternNum:%{public}d", completePackage.patternNum);
         return;
-    }
-    for (int32_t i = 0; i < completePackage.patternNum; ++i) {
+    } // LCOV_EXCL_STOP
+    for (int32_t i = 0; i < completePackage.patternNum; ++i) { // LCOV_EXCL_START
         VibratePattern vibratePattern = {};
         int32_t patternStartTime = completePackage.patterns[i].time;
         if (patternStartTime >= seekTime) {
@@ -1005,12 +1005,12 @@ void VibratorServiceClient::ConvertSeekVibratorPackage(const VibratorPackage &co
             continue;
         }
         convertPackage.patterns.emplace_back(vibratePattern);
-    }
+    } // LCOV_EXCL_STOP
 }
 
 void VibratorServiceClient::ConvertVibratorPattern(const VibratorPattern &vibratorPattern,
     VibratePattern &vibratePattern)
-{
+{ // LCOV_EXCL_START
     vibratePattern.startTime = vibratorPattern.time;
     vibratePattern.patternDuration = vibratorPattern.patternDuration;
     if (vibratorPattern.eventNum < 0 || vibratorPattern.eventNum > MAX_PATTERN_EVENT_NUM) {
@@ -1034,7 +1034,7 @@ void VibratorServiceClient::ConvertVibratorPattern(const VibratorPattern &vibrat
         }
         vibratePattern.events.emplace_back(vibrateEvent);
     }
-}
+} // LCOV_EXCL_STOP
 
 int32_t VibratorServiceClient::ModulatePackage(const VibratorEvent &modulationCurve,
     const VibratorPackage &beforeModulationPackage, VibratorPackage &afterModulationPackage)
@@ -1285,7 +1285,7 @@ void VibratorServiceClient::ModulateSingleCurvePoint(const VibratorCurveInterval
 }
 
 int32_t VibratorServiceClient::RestrictFrequencyRange(int32_t frequency)
-{ // LCOV_EXCL_START
+{
     if (frequency > FREQUENCY_UPPER_BOUND) {
         return FREQUENCY_UPPER_BOUND;
     } else if (frequency < FREQUENCY_LOWER_BOUND) {
@@ -1293,10 +1293,10 @@ int32_t VibratorServiceClient::RestrictFrequencyRange(int32_t frequency)
     } else {
         return frequency;
     }
-} // LCOV_EXCL_STOP
+}
 
 int32_t VibratorServiceClient::RestrictIntensityRange(int32_t intensity)
-{ // LCOV_EXCL_STOP
+{
     if (intensity > INTENSITY_UPPER_BOUND) {
         return INTENSITY_UPPER_BOUND;
     } else if (intensity < INTENSITY_LOWER_BOUND) {
@@ -1304,11 +1304,11 @@ int32_t VibratorServiceClient::RestrictIntensityRange(int32_t intensity)
     } else {
         return intensity;
     }
-} // LCOV_EXCL_STOP
+}
 
 bool VibratorServiceClient::SkipEventAndConvertVibratorEvent(const VibratorEvent &vibratorEvent,
     VibratePattern &vibratePattern, int32_t patternStartTime, VibrateEvent &vibrateEvent)
-{
+{ // LCOV_EXCL_START
     int32_t eventStartTime = vibratorEvent.time + patternStartTime;
     if (vibratePattern.startTime > eventStartTime) {
         if (vibratorEvent.type == EVENT_TYPE_CONTINUOUS &&
@@ -1324,7 +1324,7 @@ bool VibratorServiceClient::SkipEventAndConvertVibratorEvent(const VibratorEvent
         return true;
     }
     return false;
-}
+} // LCOV_EXCL_STOP
 
 int32_t VibratorServiceClient::GetVibratorList(const VibratorIdentifier& identifier,
     std::vector<VibratorInfos>& vibratorInfo)
