@@ -18,6 +18,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <fuzzer/FuzzedDataProvider.h>
 #include <string>
 
 #include "accesstoken_kit.h"
@@ -32,76 +33,45 @@ using namespace Security::AccessToken;
 using Security::AccessToken::AccessTokenID;
 
 namespace {
-constexpr size_t U32_AT_SIZE = 12;
-VibratorCurvePoint vibratorCurvePoint{
-    .time = 0,
-    .intensity = 100,
-    .frequency = 100
-};
-
-VibratorEvent vibratorEvent{
-    .type = EVENT_TYPE_CONTINUOUS,
-    .time = 0,
-    .duration = 500,
-    .intensity = 100,
-    .frequency = 100,
-    .index = 0,
-    .pointNum = 1,
-    .points = &vibratorCurvePoint
-};
-
-VibratorPattern vibratorPattern{
-    .time = 500,
-    .eventNum = 10,
-    .patternDuration = 5000,
-    .events = &vibratorEvent
-};
-
-VibratorPackage beforeModulationPackage {
-    .patternNum = 1,
-    .packageDuration = 5000,
-    .patterns = &vibratorPattern
-};
+constexpr int32_t PARAMETER_NUM_ONE = 1;
 } // namespace
 
-template<class T>
-size_t GetObject(const uint8_t *data, size_t size, T &object)
+bool ModulatePackageFuzzTest(FuzzedDataProvider &provider)
 {
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
-}
-
-bool ModulatePackageFuzzTest(const uint8_t *data, size_t size)
-{
-    if (data == nullptr || size < U32_AT_SIZE) {
-        return false;
-    }
-    VibratorCurvePoint modulationCurve {
-        .time = 100,
-        .intensity = 0,
-        .frequency = 0
-    };
-    size_t startPos = 0;
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, modulationCurve.intensity);
-    GetObject<int32_t>(data + startPos, size - startPos, modulationCurve.frequency);
+    VibratorCurvePoint modulationCurve;
+    modulationCurve.time = provider.ConsumeIntegral<int32_t>();
+    modulationCurve.intensity = provider.ConsumeIntegral<int32_t>();
+    modulationCurve.frequency = provider.ConsumeIntegral<int32_t>();
+    VibratorEvent event;
+    event.time = provider.ConsumeIntegral<int32_t>();
+    event.duration = provider.ConsumeIntegral<int32_t>();
+    event.intensity = provider.ConsumeIntegral<int32_t>();
+    event.frequency = provider.ConsumeIntegral<int32_t>();
+    event.pointNum = PARAMETER_NUM_ONE;
+    event.points = &modulationCurve;
+    VibratorPattern pattern;
+    pattern.time = provider.ConsumeIntegral<int32_t>();
+    pattern.eventNum = PARAMETER_NUM_ONE;
+    pattern.patternDuration = provider.ConsumeIntegral<int32_t>();
+    pattern.events = &event;
     int32_t curvePointNum = 1;
     int32_t duration = 300;
-    VibratorPackage afterModulationPackage;
-    OHOS::Sensors::ModulatePackage(&modulationCurve, curvePointNum, duration,
-        beforeModulationPackage, afterModulationPackage);
+    VibratorPackage package;
+    package.patternNum = PARAMETER_NUM_ONE;
+    package.packageDuration = provider.ConsumeIntegral<int32_t>();
+    package.patterns = &pattern;
+    VibratorPackage packageAfterModulation;
+    packageAfterModulation.patternNum = PARAMETER_NUM_ONE;
+    packageAfterModulation.packageDuration = provider.ConsumeIntegral<int32_t>();
+    packageAfterModulation.patterns = &pattern;
+    OHOS::Sensors::ModulatePackage(&modulationCurve, curvePointNum, duration, package, packageAfterModulation);
     return true;
 }
 } // namespace OHOS
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    OHOS::ModulatePackageFuzzTest(data, size);
+    FuzzedDataProvider provider(data, size);
+    OHOS::ModulatePackageFuzzTest(provider);
     return 0;
 }
