@@ -1159,7 +1159,7 @@ int32_t VibratorServiceClient::ModulateEventWithoutCurvePoints(std::vector<Vibra
     int32_t idx = 0;
     BinarySearchInterval(modInterval, startTime, idx);
     if (modInterval.empty()) {
-        MISC_HILOGD("modInterval is empty");
+        MISC_HILOGE("modInterval is empty");
         return ERROR;
     }
     if (idx >= 0) {
