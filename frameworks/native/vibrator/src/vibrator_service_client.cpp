@@ -1448,7 +1448,7 @@ void VibratorServiceClient::WriteVibratorHiSysIPCEvent(IMiscdeviceServiceIpcCode
                 break;
             default: // LCOV_EXCL_START
                 MISC_HILOGW("Code does not exist, code:%{public}d", static_cast<int32_t>(code));
-                break;// LCOV_EXCL_STOP
+                break; // LCOV_EXCL_STOP
         }
     }
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
