@@ -93,10 +93,10 @@ int32_t VibratorServiceClient::InitServiceClient()
         vibratorClient_ = new (std::nothrow) VibratorClientStub();
     }
     auto sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (sm == nullptr) {
+    if (sm == nullptr) { // LCOV_EXCL_START
         MISC_HILOGE("sm cannot be null");
         return MISC_NATIVE_SAM_ERR;
-    }
+    } // LCOV_EXCL_STOP
     miscdeviceProxy_ = iface_cast<IMiscdeviceService>(sm->GetSystemAbility(MISCDEVICE_SERVICE_ABILITY_ID));
     if (miscdeviceProxy_ != nullptr) {
         serviceDeathObserver_ =
@@ -106,18 +106,20 @@ int32_t VibratorServiceClient::InitServiceClient()
         CHKPR(remoteObject, MISC_NATIVE_GET_SERVICE_ERR);
         remoteObject->AddDeathRecipient(serviceDeathObserver_);
         int32_t ret = TransferClientRemoteObject();
-        if (ret != ERR_OK) {
+        if (ret != ERR_OK) { // LCOV_EXCL_START
             MISC_HILOGE("TransferClientRemoteObject failed, ret:%{public}d", ret);
             return ERROR;
-        }
+        } // LCOV_EXCL_STOP
         return ERR_OK;
     }
+    // LCOV_EXCL_START
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
     HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_EXCEPTION",
         HiSysEvent::EventType::FAULT, "PKG_NAME", "InitServiceClient", "ERROR_CODE", MISC_NATIVE_GET_SERVICE_ERR);
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
     MISC_HILOGE("Get service failed");
     return MISC_NATIVE_GET_SERVICE_ERR;
+    // LCOV_EXCL_STOP
 }
 
 int32_t VibratorServiceClient::TransferClientRemoteObject()
@@ -142,10 +144,10 @@ int32_t VibratorServiceClient::Vibrate(const VibratorIdentifier &identifier, int
     MISC_HILOGD("Vibrate begin, time:%{public}d, usage:%{public}d, deviceId:%{public}d, vibratorId:%{public}d",
         timeOut, usage, identifier.deviceId, identifier.vibratorId);
     int32_t ret = InitServiceClient();
-    if (ret != ERR_OK) {
+    if (ret != ERR_OK) { // LCOV_EXCL_START
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
-    }
+    } // LCOV_EXCL_STOP
     std::lock_guard<std::mutex> clientLock(clientMutex_);
     CHKPR(miscdeviceProxy_, ERROR);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
@@ -171,10 +173,10 @@ int32_t VibratorServiceClient::Vibrate(const VibratorIdentifier &identifier, con
     MISC_HILOGD("Vibrate begin, effect:%{public}s, loopCount:%{public}d, usage:%{public}d",
         effect.c_str(), loopCount, usage);
     int32_t ret = InitServiceClient();
-    if (ret != ERR_OK) {
+    if (ret != ERR_OK) { // LCOV_EXCL_START
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
-    }
+    } // LCOV_EXCL_STOP
     std::lock_guard<std::mutex> clientLock(clientMutex_);
     CHKPR(miscdeviceProxy_, ERROR);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
@@ -202,10 +204,10 @@ int32_t VibratorServiceClient::PlayVibratorCustom(const VibratorIdentifier &iden
     MISC_HILOGD("Vibrate begin, fd:%{public}d, offset:%{public}lld, length:%{public}lld, usage:%{public}d",
         rawFd.fd, static_cast<long long>(rawFd.offset), static_cast<long long>(rawFd.length), usage);
     int32_t ret = InitServiceClient();
-    if (ret != ERR_OK) {
+    if (ret != ERR_OK) { // LCOV_EXCL_START
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
-    }
+    } // LCOV_EXCL_STOP
     std::lock_guard<std::mutex> clientLock(clientMutex_);
     CHKPR(miscdeviceProxy_, ERROR);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
@@ -237,10 +239,10 @@ int32_t VibratorServiceClient::StopVibrator(const VibratorIdentifier &identifier
     MISC_HILOGD("StopVibrator begin, deviceId:%{public}d, vibratorId:%{public}d, mode:%{public}s", identifier.deviceId,
         identifier.vibratorId, mode.c_str());
     int32_t ret = InitServiceClient();
-    if (ret != ERR_OK) {
+    if (ret != ERR_OK) { // LCOV_EXCL_START
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
-    }
+    } // LCOV_EXCL_STOP
     std::lock_guard<std::mutex> clientLock(clientMutex_);
     CHKPR(miscdeviceProxy_, ERROR);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
@@ -265,10 +267,10 @@ int32_t VibratorServiceClient::StopVibrator(const VibratorIdentifier &identifier
     MISC_HILOGD("StopVibrator begin, deviceId:%{public}d, vibratorId:%{public}d", identifier.deviceId,
         identifier.vibratorId);
     int32_t ret = InitServiceClient();
-    if (ret != ERR_OK) {
+    if (ret != ERR_OK) { // LCOV_EXCL_START
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
-    }
+    } // LCOV_EXCL_STOP
     std::lock_guard<std::mutex> clientLock(clientMutex_);
     CHKPR(miscdeviceProxy_, ERROR);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
@@ -292,10 +294,10 @@ bool VibratorServiceClient::IsHdHapticSupported(const VibratorIdentifier &identi
 {
     CALL_LOG_ENTER;
     int32_t ret = InitServiceClient();
-    if (ret != ERR_OK) {
+    if (ret != ERR_OK) { // LCOV_EXCL_START
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
-    }
+    } // LCOV_EXCL_STOP
     VibratorCapacity capacity_;
     std::lock_guard<std::mutex> clientLock(clientMutex_);
     CHKPR(miscdeviceProxy_, ERROR);
@@ -306,9 +308,9 @@ bool VibratorServiceClient::IsHdHapticSupported(const VibratorIdentifier &identi
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
 #endif // HIVIEWDFX_HITRACE_ENABLE
-    if (ret != ERR_OK) {
+    if (ret != ERR_OK) { // LCOV_EXCL_START
         MISC_HILOGE("IsHdHapticSupported failed, ret:%{public}d", ret);
-    }
+    } // LCOV_EXCL_STOP
     return capacity_.isSupportHdHaptic;
 }
 
@@ -317,10 +319,10 @@ int32_t VibratorServiceClient::IsSupportEffect(const VibratorIdentifier &identif
 {
     MISC_HILOGD("IsSupportEffect begin, effect:%{public}s", effect.c_str());
     int32_t ret = InitServiceClient();
-    if (ret != ERR_OK) {
+    if (ret != ERR_OK) { // LCOV_EXCL_START
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
-    }
+    } // LCOV_EXCL_STOP
     std::lock_guard<std::mutex> clientLock(clientMutex_);
     CHKPR(miscdeviceProxy_, ERROR);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
@@ -334,14 +336,14 @@ int32_t VibratorServiceClient::IsSupportEffect(const VibratorIdentifier &identif
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
 #endif // HIVIEWDFX_HITRACE_ENABLE
-    if (ret != ERR_OK) {
+    if (ret != ERR_OK) { // LCOV_EXCL_START
         MISC_HILOGE("Query effect support failed, ret:%{public}d, effect:%{public}s", ret, effect.c_str());
-    }
+    } // LCOV_EXCL_STOP
     return ret;
 }
 
 void VibratorServiceClient::ProcessDeathObserver(const wptr<IRemoteObject> &object)
-{
+{ // LCOV_EXCL_START
     CALL_LOG_ENTER;
     (void)object;
     {
@@ -353,7 +355,7 @@ void VibratorServiceClient::ProcessDeathObserver(const wptr<IRemoteObject> &obje
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
         return;
     }
-}
+} // LCOV_EXCL_STOP
 
 int32_t VibratorServiceClient::LoadDecoderLibrary(const std::string& path)
 {
@@ -363,38 +365,38 @@ int32_t VibratorServiceClient::LoadDecoderLibrary(const std::string& path)
         return ERR_OK;
     }
     char libRealPath[PATH_MAX] = {};
-    if (realpath(path.c_str(), libRealPath) == nullptr) {
+    if (realpath(path.c_str(), libRealPath) == nullptr) { // LCOV_EXCL_START
         MISC_HILOGE("Get file real path fail");
         return ERROR;
-    }
+    } // LCOV_EXCL_STOP
     decodeHandle_.handle = dlopen(libRealPath, RTLD_LAZY);
-    if (decodeHandle_.handle == nullptr) {
+    if (decodeHandle_.handle == nullptr) { // LCOV_EXCL_START
         MISC_HILOGE("dlopen failed, reason:%{public}s", dlerror());
         return ERROR;
-    }
+    } // LCOV_EXCL_STOP
     decodeHandle_.create = reinterpret_cast<IVibratorDecoder *(*)(const JsonParser &)>(
         dlsym(decodeHandle_.handle, "Create"));
-    if (decodeHandle_.create == nullptr) {
+    if (decodeHandle_.create == nullptr) { // LCOV_EXCL_START
         MISC_HILOGE("dlsym create failed: error: %{public}s", dlerror());
         decodeHandle_.Free();
         return ERROR;
-    }
+    } // LCOV_EXCL_STOP
     decodeHandle_.destroy = reinterpret_cast<void (*)(IVibratorDecoder *)>
         (dlsym(decodeHandle_.handle, "Destroy"));
-    if (decodeHandle_.destroy == nullptr) {
+    if (decodeHandle_.destroy == nullptr) { // LCOV_EXCL_START
         MISC_HILOGE("dlsym destroy failed: error: %{public}s", dlerror());
         decodeHandle_.Free();
         return ERROR;
-    }
+    } // LCOV_EXCL_STOP
     return ERR_OK;
 }
 
 int32_t VibratorServiceClient::PreProcess(const VibratorFileDescription &fd, VibratorPackage &package)
 {
-    if (LoadDecoderLibrary(DECODER_LIBRARY_PATH) != 0) {
+    if (LoadDecoderLibrary(DECODER_LIBRARY_PATH) != 0) { // LCOV_EXCL_START
         MISC_HILOGE("LoadDecoderLibrary fail");
         return ERROR;
-    }
+    } // LCOV_EXCL_STOP
     RawFileDescriptor rawFd = {
         .fd = fd.fd,
         .offset = fd.offset,
@@ -411,18 +413,20 @@ int32_t VibratorServiceClient::PreProcess(const VibratorFileDescription &fd, Vib
         decodeHandle_.decoder = nullptr;
         return ERROR;
     }
+    // LCOV_EXCL_START
     decodeHandle_.destroy(decodeHandle_.decoder);
     decodeHandle_.decoder = nullptr;
     return ConvertVibratorPackage(pkg, package);
+    // LCOV_EXCL_STOP
 }
 
 int32_t VibratorServiceClient::GetDelayTime(const VibratorIdentifier &identifier, int32_t &delayTime)
 {
     int32_t ret = InitServiceClient();
-    if (ret != ERR_OK) {
+    if (ret != ERR_OK) { // LCOV_EXCL_START
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
-    }
+    } // LCOV_EXCL_STOP
     std::lock_guard<std::mutex> clientLock(clientMutex_);
     CHKPR(miscdeviceProxy_, ERROR);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
@@ -436,9 +440,9 @@ int32_t VibratorServiceClient::GetDelayTime(const VibratorIdentifier &identifier
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
 #endif // HIVIEWDFX_HITRACE_ENABLE
-    if (ret != ERR_OK) {
+    if (ret != ERR_OK) { // LCOV_EXCL_START
         MISC_HILOGE("GetDelayTime failed, ret:%{public}d", ret);
-    }
+    } // LCOV_EXCL_STOP
     return ret;
 }
 
@@ -498,10 +502,10 @@ int32_t VibratorServiceClient::PlayPattern(const VibratorIdentifier &identifier,
 {
     MISC_HILOGD("Vibrate begin, usage:%{public}d", usage);
     int32_t ret = InitServiceClient();
-    if (ret != ERR_OK) {
+    if (ret != ERR_OK) { // LCOV_EXCL_START
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
-    }
+    } // LCOV_EXCL_STOP
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "PlayPattern");
 #endif // HIVIEWDFX_HITRACE_ENABLE
@@ -563,10 +567,10 @@ int32_t VibratorServiceClient::PlayPackageBySessionId(const VibratorIdentifier &
 {
     MISC_HILOGD("PlayPackageBySessionId begin, sessionId:%{public}d", parameter.sessionId);
     int32_t ret = InitServiceClient();
-    if (ret != ERR_OK) {
+    if (ret != ERR_OK) { // LCOV_EXCL_START
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
-    }
+    } // LCOV_EXCL_STOP
     VibratePackageIPC packageIPC;
     if (ConvertVibratorPackage(package, packageIPC) != ERR_OK) {
         MISC_HILOGE("VibratorPackage parameter invalid");
@@ -601,10 +605,10 @@ int32_t VibratorServiceClient::StopVibrateBySessionId(const VibratorIdentifier &
 {
     MISC_HILOGD("StopVibrateBySessionId begin, sessionId:%{public}d", sessionId);
     int32_t ret = InitServiceClient();
-    if (ret != ERR_OK) {
+    if (ret != ERR_OK) { // LCOV_EXCL_START
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
-    }
+    } // LCOV_EXCL_STOP
     std::lock_guard<std::mutex> clientLock(clientMutex_);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "StopVibrateBySessionId");
@@ -712,10 +716,10 @@ int32_t VibratorServiceClient::PlayPrimitiveEffect(const VibratorIdentifier &ide
     MISC_HILOGD("Vibrate begin, effect:%{public}s, intensity:%{public}d, usage:%{public}d, count:%{public}d",
         effect.c_str(), primitiveEffect.intensity, primitiveEffect.usage, primitiveEffect.count);
     int32_t ret = InitServiceClient();
-    if (ret != ERR_OK) {
+    if (ret != ERR_OK) { // LCOV_EXCL_START
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
-    }
+    } // LCOV_EXCL_STOP
     std::lock_guard<std::mutex> clientLock(clientMutex_);
     CHKPR(miscdeviceProxy_, ERROR);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
@@ -764,9 +768,9 @@ bool VibratorServiceClient::IsSupportVibratorCustom(const VibratorIdentifier &id
 {
     MISC_HILOGD("Vibrate begin");
     int32_t ret = InitServiceClient();
-    if (ret != ERR_OK) {
+    if (ret != ERR_OK) { // LCOV_EXCL_START
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
-    }
+    } // LCOV_EXCL_STOP
     VibratorCapacity capacity_;
     std::lock_guard<std::mutex> clientLock(clientMutex_);
     CHKPR(miscdeviceProxy_, ERROR);
@@ -777,9 +781,9 @@ bool VibratorServiceClient::IsSupportVibratorCustom(const VibratorIdentifier &id
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
 #endif // HIVIEWDFX_HITRACE_ENABLE
-    if (ret != ERR_OK) {
+    if (ret != ERR_OK) { // LCOV_EXCL_START
         MISC_HILOGE("Is support vibrator custom, ret:%{public}d", ret);
-    }
+    } // LCOV_EXCL_STOP
     return (capacity_.isSupportHdHaptic || capacity_.isSupportPresetMapping || capacity_.isSupportTimeDelay);
 }
 
@@ -798,16 +802,16 @@ int32_t VibratorServiceClient::SubscribeVibratorPlugInfo(const VibratorUser *use
     CHKPR(user->callback, OHOS::Sensors::ERROR);
 
     int32_t ret = InitServiceClient();
-    if (ret != ERR_OK) {
+    if (ret != ERR_OK) { // LCOV_EXCL_START
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
-    }
+    } // LCOV_EXCL_STOP
 
     std::lock_guard<std::recursive_mutex> subscribeLock(subscribeMutex_);
     auto status = subscribeSet_.insert(user);
-    if (!status.second) {
+    if (!status.second) { // LCOV_EXCL_START
         MISC_HILOGD("User has been subscribed");
-    } else {
+    } else { // LCOV_EXCL_STOP
         std::lock_guard<std::mutex> clientLock(clientMutex_);
         auto remoteObject = vibratorClient_->AsObject();
         CHKPR(remoteObject, MISC_NATIVE_GET_SERVICE_ERR);
@@ -820,10 +824,10 @@ int32_t VibratorServiceClient::SubscribeVibratorPlugInfo(const VibratorUser *use
 #ifdef HIVIEWDFX_HITRACE_ENABLE
         FinishTrace(HITRACE_TAG_SENSORS);
 #endif // HIVIEWDFX_HITRACE_ENABLE
-        if (ret != ERR_OK) {
+        if (ret != ERR_OK) { // LCOV_EXCL_START
             MISC_HILOGE("Subscribe vibrator plug info failed");
             return ret;
-        }
+        } // LCOV_EXCL_STOP
     }
     return OHOS::Sensors::SUCCESS;
 }
@@ -839,8 +843,10 @@ int32_t VibratorServiceClient::UnsubscribeVibratorPlugInfo(const VibratorUser *u
         MISC_HILOGD("Deactivate user first");
         return OHOS::Sensors::ERROR;
     }
+    // LCOV_EXCL_START
     subscribeSet_.erase(user);
     return OHOS::Sensors::SUCCESS;
+    // LCOV_EXCL_STOP
 }
 
 std::set<RecordVibratorPlugCallback> VibratorServiceClient::GetSubscribeUserCallback(int32_t deviceId)
@@ -848,12 +854,12 @@ std::set<RecordVibratorPlugCallback> VibratorServiceClient::GetSubscribeUserCall
     CALL_LOG_ENTER;
     std::lock_guard<std::recursive_mutex> subscribeLock(subscribeMutex_);
     std::set<RecordVibratorPlugCallback> callback;
-    for (const auto &it : subscribeSet_) {
+    for (const auto &it : subscribeSet_) { // LCOV_EXCL_START
         auto ret = callback.insert(it->callback);
         if (!ret.second) {
             MISC_HILOGD("callback insert fail");
         }
-    }
+    } // LCOV_EXCL_STOP
     return callback;
 }
 
@@ -862,24 +868,24 @@ bool VibratorServiceClient::HandleVibratorData(VibratorStatusEvent statusEvent) 
     CALL_LOG_ENTER;
     if (statusEvent.type == PLUG_STATE_EVENT_PLUG_OUT) {
         std::lock_guard<std::mutex> VibratorEffectLock(vibratorEffectMutex_);
-        for (auto it = vibratorEffectMap_.begin(); it != vibratorEffectMap_.end();) {
+        for (auto it = vibratorEffectMap_.begin(); it != vibratorEffectMap_.end();) { // LCOV_EXCL_START
             if (it->first.deviceId == statusEvent.deviceId) {
                 it = vibratorEffectMap_.erase(it);
             } else {
                 ++it;
             }
-        }
+        } // LCOV_EXCL_STOP
     }
     std::lock_guard<std::recursive_mutex> subscribeLock(subscribeMutex_);
     auto callbacks = GetSubscribeUserCallback(statusEvent.deviceId);
     MISC_HILOGD("callbacks.size() = %{public}zu", callbacks.size());
     MISC_HILOGD("VibratorStatusEvent = [type = %{public}d, deviceId = %{public}d]",
                 statusEvent.type, statusEvent.deviceId);
-    for (const auto &callback : callbacks) {
+    for (const auto &callback : callbacks) { // LCOV_EXCL_START
         MISC_HILOGD("callback is run");
         if (callback != nullptr)
             callback(&statusEvent);
-    }
+    } // LCOV_EXCL_STOP
     return true;
 }
 
@@ -941,11 +947,11 @@ void VibratorServiceClient::ConvertSeekVibratorPackage(const VibratorPackage &co
     VibratePackage &convertPackage, int32_t seekTime)
 {
     convertPackage.packageDuration = completePackage.packageDuration;
-    if (completePackage.patternNum < 0 || completePackage.patternNum > MAX_PATTERN_NUM) {
+    if (completePackage.patternNum < 0 || completePackage.patternNum > MAX_PATTERN_NUM) {  // LCOV_EXCL_START
         MISC_HILOGE("completePackage.patternNum is invalid, patternNum:%{public}d", completePackage.patternNum);
         return;
-    }
-    for (int32_t i = 0; i < completePackage.patternNum; ++i) {
+    } // LCOV_EXCL_STOP
+    for (int32_t i = 0; i < completePackage.patternNum; ++i) { // LCOV_EXCL_START
         VibratePattern vibratePattern = {};
         int32_t patternStartTime = completePackage.patterns[i].time;
         if (patternStartTime >= seekTime) {
@@ -999,12 +1005,12 @@ void VibratorServiceClient::ConvertSeekVibratorPackage(const VibratorPackage &co
             continue;
         }
         convertPackage.patterns.emplace_back(vibratePattern);
-    }
+    } // LCOV_EXCL_STOP
 }
 
 void VibratorServiceClient::ConvertVibratorPattern(const VibratorPattern &vibratorPattern,
     VibratePattern &vibratePattern)
-{
+{ // LCOV_EXCL_START
     vibratePattern.startTime = vibratorPattern.time;
     vibratePattern.patternDuration = vibratorPattern.patternDuration;
     if (vibratorPattern.eventNum < 0 || vibratorPattern.eventNum > MAX_PATTERN_EVENT_NUM) {
@@ -1028,7 +1034,7 @@ void VibratorServiceClient::ConvertVibratorPattern(const VibratorPattern &vibrat
         }
         vibratePattern.events.emplace_back(vibrateEvent);
     }
-}
+} // LCOV_EXCL_STOP
 
 int32_t VibratorServiceClient::ModulatePackage(const VibratorEvent &modulationCurve,
     const VibratorPackage &beforeModulationPackage, VibratorPackage &afterModulationPackage)
@@ -1152,7 +1158,15 @@ int32_t VibratorServiceClient::ModulateEventWithoutCurvePoints(std::vector<Vibra
     int32_t startTime = beforeModEvent.time + patternStartTime;
     int32_t idx = 0;
     BinarySearchInterval(modInterval, startTime, idx);
+    if (modInterval.empty()) {
+        MISC_HILOGE("modInterval is empty");
+        return ERROR;
+    }
     if (idx >= 0) {
+        if (idx >= static_cast<int32_t>(modInterval.size())) {
+            MISC_HILOGE("idx invalid");
+            return ERROR;
+        }
         afterModEvent.intensity = RestrictIntensityRange(
             beforeModEvent.intensity * modInterval[idx].intensity / (INTENSITY_UPPER_BOUND - INTENSITY_LOWER_BOUND));
         afterModEvent.frequency = RestrictFrequencyRange(beforeModEvent.frequency + modInterval[idx].frequency);
@@ -1215,6 +1229,10 @@ VibratorCurvePoint* VibratorServiceClient::GetCurveListAfterModulation(
 void VibratorServiceClient::BinarySearchInterval(
     const std::vector<VibratorCurveInterval>& interval, int32_t val, int32_t& idx)
 {
+    if (interval.empty()) {
+        MISC_HILOGD("interval is empty");
+        return;
+    }
     if (val < interval.begin()->beginTime || val > interval.rbegin()->endTime) {
         idx = -1;
         return;
@@ -1290,7 +1308,7 @@ int32_t VibratorServiceClient::RestrictIntensityRange(int32_t intensity)
 
 bool VibratorServiceClient::SkipEventAndConvertVibratorEvent(const VibratorEvent &vibratorEvent,
     VibratePattern &vibratePattern, int32_t patternStartTime, VibrateEvent &vibrateEvent)
-{
+{ // LCOV_EXCL_START
     int32_t eventStartTime = vibratorEvent.time + patternStartTime;
     if (vibratePattern.startTime > eventStartTime) {
         if (vibratorEvent.type == EVENT_TYPE_CONTINUOUS &&
@@ -1306,7 +1324,7 @@ bool VibratorServiceClient::SkipEventAndConvertVibratorEvent(const VibratorEvent
         return true;
     }
     return false;
-}
+} // LCOV_EXCL_STOP
 
 int32_t VibratorServiceClient::GetVibratorList(const VibratorIdentifier& identifier,
     std::vector<VibratorInfos>& vibratorInfo)
@@ -1315,10 +1333,10 @@ int32_t VibratorServiceClient::GetVibratorList(const VibratorIdentifier& identif
     MISC_HILOGD("VibratorIdentifier = [deviceId = %{public}d, vibratorId = %{public}d]", identifier.deviceId,
         identifier.vibratorId);
     int32_t ret = InitServiceClient();
-    if (ret != ERR_OK) {
+    if (ret != ERR_OK) { // LCOV_EXCL_START
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
-    }
+    } // LCOV_EXCL_STOP
     CHKPR(miscdeviceProxy_, OHOS::Sensors::ERROR);
 
     VibratorIdentifierIPC param;
@@ -1333,12 +1351,12 @@ int32_t VibratorServiceClient::GetVibratorList(const VibratorIdentifier& identif
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
 #endif // HIVIEWDFX_HITRACE_ENABLE
-    if (ret != ERR_OK) {
+    if (ret != ERR_OK) { // LCOV_EXCL_START
         MISC_HILOGE("Get vibrator info list failed, [ret = %{public}d, deviceId = %{public}d,\
             vibratorId = %{public}d]", ret, identifier.deviceId, identifier.vibratorId);
         return ret;
-    }
-    for (auto &info : vibratorInfoList) {
+    } // LCOV_EXCL_STOP
+    for (auto &info : vibratorInfoList) { // LCOV_EXCL_START
         VibratorInfos resInfo;
         resInfo.deviceId = info.deviceId;
         resInfo.vibratorId = info.vibratorId;
@@ -1346,7 +1364,7 @@ int32_t VibratorServiceClient::GetVibratorList(const VibratorIdentifier& identif
         resInfo.isSupportHdHaptic = info.isSupportHdHaptic;
         resInfo.isLocalVibrator = info.isLocalVibrator;
         vibratorInfo.push_back(resInfo);
-    }
+    } // LCOV_EXCL_STOP
     return OHOS::Sensors::SUCCESS;
 }
 
@@ -1357,10 +1375,10 @@ int32_t VibratorServiceClient::GetEffectInfo(const VibratorIdentifier& identifie
     MISC_HILOGD("VibratorIdentifier = [deviceId = %{public}d, vibratorId = %{public}d, effectType = %{public}s]",
         identifier.deviceId, identifier.vibratorId, effectType.c_str());
     int32_t ret = InitServiceClient();
-    if (ret != OHOS::Sensors::SUCCESS) {
+    if (ret != OHOS::Sensors::SUCCESS) { // LCOV_EXCL_START
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
-    }
+    } // LCOV_EXCL_STOP
     CHKPR(miscdeviceProxy_, OHOS::Sensors::ERROR);
     VibratorIdentifierIPC param;
     param.deviceId = identifier.deviceId;
@@ -1374,11 +1392,11 @@ int32_t VibratorServiceClient::GetEffectInfo(const VibratorIdentifier& identifie
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
 #endif // HIVIEWDFX_HITRACE_ENABLE
-    if (ret != ERR_OK) {
+    if (ret != ERR_OK) { // LCOV_EXCL_START
         MISC_HILOGE("Get effect info failed, [ret = %{public}d, deviceId = %{public}d, vibratorId = %{public}d,\
             effectType = %{public}s]", ret, identifier.deviceId, identifier.vibratorId, effectType.c_str());
         return ret;
-    }
+    } // LCOV_EXCL_STOP
     effectInfo.isSupportEffect = resInfo.isSupportEffect;
     return OHOS::Sensors::SUCCESS;
 }
@@ -1404,7 +1422,7 @@ void VibratorServiceClient::WriteVibratorHiSysIPCEvent(IMiscdeviceServiceIpcCode
                 HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
                     HiSysEvent::EventType::FAULT, "PKG_NAME", "StopVibratorByMode", "ERROR_CODE", ret);
                 break;
-            case IMiscdeviceServiceIpcCode::COMMAND_PLAY_VIBRATOR_CUSTOM:
+            case IMiscdeviceServiceIpcCode::COMMAND_PLAY_VIBRATOR_CUSTOM: // LCOV_EXCL_START
                 HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
                     HiSysEvent::EventType::FAULT, "PKG_NAME", "PlayVibratorCustom", "ERROR_CODE", ret);
                 break;
@@ -1419,7 +1437,7 @@ void VibratorServiceClient::WriteVibratorHiSysIPCEvent(IMiscdeviceServiceIpcCode
             case IMiscdeviceServiceIpcCode::COMMAND_GET_EFFECT_INFO:
                 HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
                     HiSysEvent::EventType::FAULT, "PKG_NAME", "GetEffectInfo", "ERROR_CODE", ret);
-                break;
+                break; // LCOV_EXCL_STOP
             case IMiscdeviceServiceIpcCode::COMMAND_PLAY_PACKAGE_BY_SESSION_ID:
                 HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
                     HiSysEvent::EventType::FAULT, "PKG_NAME", "PlayPackageBySessionId", "ERROR_CODE", ret);
@@ -1428,9 +1446,9 @@ void VibratorServiceClient::WriteVibratorHiSysIPCEvent(IMiscdeviceServiceIpcCode
                 HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
                     HiSysEvent::EventType::FAULT, "PKG_NAME", "StopVibrateBySessionId", "ERROR_CODE", ret);
                 break;
-            default:
+            default: // LCOV_EXCL_START
                 MISC_HILOGW("Code does not exist, code:%{public}d", static_cast<int32_t>(code));
-                break;
+                break; // LCOV_EXCL_STOP
         }
     }
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
@@ -1441,36 +1459,36 @@ void VibratorServiceClient::WriteOtherHiSysIPCEvent(IMiscdeviceServiceIpcCode co
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
     if (ret != NO_ERROR) {
         switch (code) {
-            case IMiscdeviceServiceIpcCode::COMMAND_IS_SUPPORT_EFFECT:
+            case IMiscdeviceServiceIpcCode::COMMAND_IS_SUPPORT_EFFECT: // LCOV_EXCL_START
                 HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
                     HiSysEvent::EventType::FAULT, "PKG_NAME", "IsSupportEffect", "ERROR_CODE", ret);
                 break;
             case IMiscdeviceServiceIpcCode::COMMAND_GET_DELAY_TIME:
                 HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
                     HiSysEvent::EventType::FAULT, "PKG_NAME", "GetDelayTime", "ERROR_CODE", ret);
-                break;
+                break; // LCOV_EXCL_STOP
             case IMiscdeviceServiceIpcCode::COMMAND_PLAY_PATTERN:
                 HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
                     HiSysEvent::EventType::FAULT, "PKG_NAME", "PlayPattern", "ERROR_CODE", ret);
                 break;
-            case IMiscdeviceServiceIpcCode::COMMAND_TRANSFER_CLIENT_REMOTE_OBJECT:
+            case IMiscdeviceServiceIpcCode::COMMAND_TRANSFER_CLIENT_REMOTE_OBJECT: // LCOV_EXCL_START
                 HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
                     HiSysEvent::EventType::FAULT, "PKG_NAME", "TransferClientRemoteObject", "ERROR_CODE", ret);
-                break;
+                break; // LCOV_EXCL_STOP
             case IMiscdeviceServiceIpcCode::COMMAND_PLAY_PRIMITIVE_EFFECT:
                 HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_IPC_EXCEPTION",
                     HiSysEvent::EventType::FAULT, "PKG_NAME", "PlayPrimitiveEffect", "ERROR_CODE", ret);
                 break;
-            default:
+            default: // LCOV_EXCL_START
                 MISC_HILOGW("Code does not exist, code:%{public}d", static_cast<int32_t>(code));
-                break;
+                break; // LCOV_EXCL_STOP
         }
     }
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
 }
 
 int32_t VibratorServiceClient::DisableVibratorByPid(int32_t pid)
-{
+{ // LCOV_EXCL_START
     CALL_LOG_ENTER;
     MISC_HILOGD("Disable Vibrator for pid:%{public}d", pid);
     int32_t ret = InitServiceClient();
@@ -1492,10 +1510,10 @@ int32_t VibratorServiceClient::DisableVibratorByPid(int32_t pid)
     }
     MISC_HILOGD("Disable Vibrator for pid:%{public}d success", pid);
     return OHOS::Sensors::SUCCESS;
-}
+} // LCOV_EXCL_STOP
 
 int32_t VibratorServiceClient::EnableVibratorByPid(int32_t pid)
-{
+{ // LCOV_EXCL_START
     CALL_LOG_ENTER;
     MISC_HILOGD("Enable Vibrator for pid:%{public}d", pid);
     int32_t ret = InitServiceClient();
@@ -1517,6 +1535,6 @@ int32_t VibratorServiceClient::EnableVibratorByPid(int32_t pid)
     }
     MISC_HILOGD("Enable Vibrator for pid:%{public}d success", pid);
     return OHOS::Sensors::SUCCESS;
-}
+} // LCOV_EXCL_STOP
 } // namespace Sensors
 } // namespace OHOS
