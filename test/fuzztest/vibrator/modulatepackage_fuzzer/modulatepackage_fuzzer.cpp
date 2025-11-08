@@ -74,6 +74,6 @@ bool ModulatePackageFuzzTest(FuzzedDataProvider &provider)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     FuzzedDataProvider provider(data, size);
-    OHOS::ModulatePackageFuzzTest(provider);
+    OHOS::Sensors::ModulatePackageFuzzTest(provider);
     return 0;
 }
