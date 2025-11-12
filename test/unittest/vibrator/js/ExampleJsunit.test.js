@@ -3557,7 +3557,7 @@ describe("VibratorJsTest", function () {
      * @tc.require: I53SGE
      * @tc.number: VibrateJsTest052
      */
-    it("VibrateJsTest052", 0, async function () {
+    it("VibrateJsTest052", 0, async function (done) {
         let ret = vibrator.isSupportEffectSync("haptic.notice.success");
         if (ret) {
             vibrator.startVibration({
@@ -3593,7 +3593,7 @@ describe("VibratorJsTest", function () {
      * @tc.require: I53SGE
      * @tc.number: VibrateJsTest053
      */
-    it("VibrateJsTest053", 0, async function () {
+    it("VibrateJsTest053", 0, async function (done) {
         let ret = vibrator.isSupportEffectSync("haptic.notice.fail");
         if (ret) {
             vibrator.startVibration({
@@ -3629,7 +3629,7 @@ describe("VibratorJsTest", function () {
      * @tc.require: I53SGE
      * @tc.number: VibrateJsTest054
      */
-    it("VibrateJsTest054", 0, async function () {
+    it("VibrateJsTest054", 0, async function (done) {
         let ret = vibrator.isSupportEffectSync("haptic.notice.warning");
         if (ret) {
             vibrator.startVibration({
