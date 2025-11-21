@@ -64,6 +64,7 @@ const std::string WHITE_LIST_KEY_BUNDLE = "bundle";
 const std::string WHITE_LIST_KEY_UID = "uid";
 constexpr const char *USERID_REPLACE = "##USERID##";
 const std::string VIBRATE_WHEN_RINGING_KEY = "hw_vibrate_when_ringing";
+const std::string SETTING_USER_URI_PROXY = "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_";
 #endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
 const std::string SETTING_CROWN_FEEDBACK_KEY = "watch_crown_feedback_enabled";
@@ -75,9 +76,6 @@ constexpr int32_t DATA_SHARE_NOT_READY = 1055;
 constexpr int32_t HOURS_IN_DAY = 24;
 constexpr int32_t MINUTES_IN_HOUR = 60;
 constexpr int32_t SECONDS_IN_MINUTE = 60;
-// const std::string SETTING_USER_URI_PROXY = "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_";
-// const std::string SETTING_USER_SECURE_URI_PROXY =
-//     "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_";
 }  // namespace
 
 std::atomic_bool VibrationPriorityManager::stop_ = false;
@@ -96,6 +94,9 @@ VibrationPriorityManager::~VibrationPriorityManager()
 #ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
     if (UnregisterUserObserver() != ERR_OK) {
         MISC_HILOGE("UnregisterUserObserver failed");
+    }
+    if (UnregisterUser100Observer() != ERR_OK) {
+        MISC_HILOGE("UnregisterUser100Observer failed");
     }
 #endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
     if (reportSwitchStatusThread_.joinable()) {
@@ -215,6 +216,7 @@ void VibrationPriorityManager::ReregisterCurrentUserObserver()
     UnregisterUserObserver();
     UpdateCurrentUserId();
     RegisterUserObserver();
+    RegisterUser100Observer();
 }
 
 void VibrationPriorityManager::UpdateCurrentUserId()
@@ -261,7 +263,6 @@ int32_t VibrationPriorityManager::RegisterUserObserver()
     std::lock_guard<std::mutex> currentUserObserverLock(currentUserObserverMutex_);
     MiscDeviceObserver::UpdateFunc updateFunc = [&]() {
         InitDoNotDisturbData();
-        InitVibrateWhenRing();
     };
     currentUserObserver_ = CreateObserver(updateFunc);
     if (currentUserObserver_ == nullptr) {
@@ -269,8 +270,9 @@ int32_t VibrationPriorityManager::RegisterUserObserver()
         return MISC_NO_INIT_ERR;
     }
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
+    std::string tableType = "normal";
     auto doNotDisturbHelper =
-        CreateDataShareHelper(ReplaceUserIdForUri(USER_SETTING_SECURE_URI_PROXY, g_currentUserId));
+        CreateDataShareHelper(ReplaceUserIdForUri(USER_SETTING_SECURE_URI_PROXY, g_currentUserId), tableType);
     if (doNotDisturbHelper == nullptr) {
         IPCSkeleton::SetCallingIdentity(callingIdentity);
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
@@ -303,8 +305,9 @@ int32_t VibrationPriorityManager::UnregisterUserObserver()
     }
     std::lock_guard<std::mutex> currentUserObserverLock(currentUserObserverMutex_);
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
+    std::string tableType = "normal";
     auto doNotDisturbHelper =
-        CreateDataShareHelper(ReplaceUserIdForUri(USER_SETTING_SECURE_URI_PROXY, g_currentUserId));
+        CreateDataShareHelper(ReplaceUserIdForUri(USER_SETTING_SECURE_URI_PROXY, g_currentUserId), tableType);
     if (doNotDisturbHelper == nullptr) {
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "DATASHARE_EXCEPTION", HiSysEvent::EventType::FAULT,
@@ -326,6 +329,71 @@ int32_t VibrationPriorityManager::UnregisterUserObserver()
     return ERR_OK;
 }
 
+int32_t VibrationPriorityManager::RegisterUser100Observer()
+{
+    MISC_HILOGI("RegisterUser100Observer start");
+    std::lock_guard<std::mutex> currentUserObserverLock(currentUserObserverMutex_);
+    MiscDeviceObserver::UpdateFunc updateFunc = [&]() {
+        InitVibrateWhenRing();
+    };
+    currentUserObserver_ = CreateObserver(updateFunc);
+    if (currentUserObserver_ == nullptr) {
+        MISC_HILOGE("currentUserObserver_ is null");
+        return MISC_NO_INIT_ERR;
+    }
+    std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
+    std::string tableType = "system";
+    auto helper =
+        CreateDataShareHelper(SETTING_USER_URI_PROXY, tableType);
+    if (helper == nullptr) {
+        IPCSkeleton::SetCallingIdentity(callingIdentity);
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "DATASHARE_EXCEPTION", HiSysEvent::EventType::FAULT,
+            "PKG_NAME", "RegisterUser100Observer", "ERROR_CODE", MISC_NO_INIT_ERR);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
+        MISC_HILOGE("doNotDisturbHelper is nullptr");
+        return MISC_NO_INIT_ERR;
+    }
+    auto vibrateWhenRing = AssembleUri(VIBRATE_WHEN_RINGING_KEY);
+    helper->RegisterObserver(vibrateWhenRing, currentUserObserver_);
+    helper->NotifyChange(vibrateWhenRing);
+    std::thread execCb(VibrationPriorityManager::ExecRegisterCb, currentUserObserver_);
+    execCb.detach();
+    ReleaseDataShareHelper(helper);
+    IPCSkeleton::SetCallingIdentity(callingIdentity);
+    MISC_HILOGI("Succeed to RegisterUser100Observer of uri");
+    return ERR_OK;
+}
+
+int32_t VibrationPriorityManager::UnregisterUser100Observer()
+{
+    MISC_HILOGI("UnregisterUser100Observer start");
+    if (currentUserObserver_ == nullptr) {
+        MISC_HILOGE("currentUserObserver_ is nullptr");
+        return MISC_NO_INIT_ERR;
+    }
+    std::lock_guard<std::mutex> currentUserObserverLock(currentUserObserverMutex_);
+    std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
+    std::string tableType = "normal";
+    auto helper = CreateDataShareHelper(ReplaceUserIdForUri(USER_SETTING_SECURE_URI_PROXY, g_currentUserId), tableType);
+    if (helper == nullptr) {
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "DATASHARE_EXCEPTION", HiSysEvent::EventType::FAULT,
+            "PKG_NAME", "UnregisterUser100Observer", "ERROR_CODE", MISC_NO_INIT_ERR);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
+        IPCSkeleton::SetCallingIdentity(callingIdentity);
+        currentUserObserver_ = nullptr;
+        MISC_HILOGE("helper is nullptr");
+        return MISC_NO_INIT_ERR;
+    }
+    auto virateWhenRing = AssembleUri(VIBRATE_WHEN_RINGING_KEY);
+    helper->UnregisterObserver(virateWhenRing, currentUserObserver_);
+    IPCSkeleton::SetCallingIdentity(callingIdentity);
+    currentUserObserver_ = nullptr;
+    MISC_HILOGI("Succeed to UnregisterUser100Observer observer");
+    return ERR_OK;
+}
+
 std::string VibrationPriorityManager::ReplaceUserIdForUri(std::string uri, int32_t userId)
 {
     std::string tempUri = uri;
@@ -342,7 +410,8 @@ Uri VibrationPriorityManager::DoNotDisturbAssembleUri(const std::string &key)
 int32_t VibrationPriorityManager::GetDoNotDisturbStringValue(const std::string &key, std::string &value)
 {
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
-    auto helper = CreateDataShareHelper(ReplaceUserIdForUri(USER_SETTING_SECURE_URI_PROXY, g_currentUserId));
+    std::string tableType = "normal";
+    auto helper = CreateDataShareHelper(ReplaceUserIdForUri(USER_SETTING_SECURE_URI_PROXY, g_currentUserId), tableType);
     if (helper == nullptr) {
         IPCSkeleton::SetCallingIdentity(callingIdentity);
         MISC_HILOGE("helper is nullptr");
@@ -529,10 +598,11 @@ bool VibrationPriorityManager::ShouldIgnoreByIntensity(const VibrateInfo &vibrat
 }
 #endif
 
-int32_t VibrationPriorityManager::GetIntValue(const std::string &uri, const std::string &key, int32_t &value)
+int32_t VibrationPriorityManager::GetIntValue(const std::string &uri, const std::string &key, int32_t &value,
+    const std::string &tableType)
 {
     int64_t valueLong;
-    int32_t ret = GetLongValue(uri, key, valueLong);
+    int32_t ret = GetLongValue(uri, key, valueLong, tableType);
     if (ret != ERR_OK) {
         return ret;
     }
@@ -540,10 +610,11 @@ int32_t VibrationPriorityManager::GetIntValue(const std::string &uri, const std:
     return ERR_OK;
 }
 
-int32_t VibrationPriorityManager::GetLongValue(const std::string &uri, const std::string &key, int64_t &value)
+int32_t VibrationPriorityManager::GetLongValue(const std::string &uri, const std::string &key, int64_t &value,
+    const std::string &tableType)
 {
     std::string valueStr;
-    int32_t ret = GetStringValue(uri, key, valueStr);
+    int32_t ret = GetStringValue(uri, key, valueStr, tableType);
     if (ret != ERR_OK) {
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "DATASHARE_EXCEPTION", HiSysEvent::EventType::FAULT,
@@ -557,18 +628,18 @@ int32_t VibrationPriorityManager::GetLongValue(const std::string &uri, const std
 }
 
 int32_t VibrationPriorityManager::GetStringValue(const std::string &uriProxy, const std::string &key,
-    std::string &value)
+    std::string &value, const std::string &tableType)
 {
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
-    auto helper = CreateDataShareHelper(uriProxy);
+    auto helper = CreateDataShareHelper(uriProxy, tableType);
     if (helper == nullptr) {
         IPCSkeleton::SetCallingIdentity(callingIdentity);
         return MISC_NO_INIT_ERR;
     }
-    std::vector<std::string> columns = {uriProxy};
+    std::vector<std::string> columns = {SETTING_COLUMN_VALUE};
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(SETTING_COLUMN_KEYWORD, key);
-    Uri uri(AssembleUri(uriProxy, key));
+    Uri uri(AssembleUri(uriProxy, key, tableType));
     auto resultSet = helper->Query(uri, predicates, columns);
     ReleaseDataShareHelper(helper);
     if (resultSet == nullptr) {
@@ -600,7 +671,8 @@ void VibrationPriorityManager::UpdateStatus()
 {
     if (miscFeedback_ == FEEDBACK_MODE_INVALID) {
         int32_t feedback = FEEDBACK_MODE_INVALID;
-        if (GetIntValue(SETTING_URI_PROXY, SETTING_FEEDBACK_KEY, feedback) != ERR_OK) {
+        std::string tableType = "normal";
+        if (GetIntValue(SETTING_URI_PROXY, SETTING_FEEDBACK_KEY, feedback, tableType) != ERR_OK) {
             feedback = FEEDBACK_MODE_ON;
             MISC_HILOGE("Get feedback failed");
         }
@@ -608,7 +680,8 @@ void VibrationPriorityManager::UpdateStatus()
     }
     if (miscAudioRingerMode_ == RINGER_MODE_INVALID) {
         int32_t ringerMode = RINGER_MODE_INVALID;
-        if (GetIntValue(SETTING_URI_PROXY, SETTING_RINGER_MODE_KEY, ringerMode) != ERR_OK) {
+        std::string tableType = "normal";
+        if (GetIntValue(SETTING_URI_PROXY, SETTING_RINGER_MODE_KEY, ringerMode, tableType) != ERR_OK) {
             ringerMode = RINGER_MODE_NORMAL;
             MISC_HILOGE("Get ringerMode failed");
         }
@@ -625,7 +698,8 @@ void VibrationPriorityManager::UpdateStatus()
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
     if (miscCrownFeedback_ == FEEDBACK_MODE_INVALID) {
         int32_t corwnfeedback = FEEDBACK_MODE_INVALID;
-        if (GetIntValue(SETTING_URI_PROXY, SETTING_CROWN_FEEDBACK_KEY, corwnfeedback) != ERR_OK) {
+        std::string tableType = "normal";
+        if (GetIntValue(SETTING_URI_PROXY, SETTING_CROWN_FEEDBACK_KEY, corwnfeedback, tableType) != ERR_OK) {
             corwnfeedback = FEEDBACK_MODE_ON;
             MISC_HILOGE("Get corwnfeedback failed");
         }
@@ -633,7 +707,8 @@ void VibrationPriorityManager::UpdateStatus()
     }
     if (miscIntensity_ == FEEDBACK_INTENSITY_INVALID) {
         int32_t intensity = FEEDBACK_INTENSITY_INVALID;
-        if (GetIntValue(SETTING_URI_PROXY, SETTING_VIBRATE_INTENSITY_KEY, intensity) != ERR_OK) {
+        std::string tableType = "normal";
+        if (GetIntValue(SETTING_URI_PROXY, SETTING_VIBRATE_INTENSITY_KEY, intensity, tableType) != ERR_OK) {
             intensity = FEEDBACK_INTENSITY_STRONGE;
             MISC_HILOGE("Get intensity failed");
         }
@@ -857,26 +932,40 @@ sptr<MiscDeviceObserver> VibrationPriorityManager::CreateObserver(const MiscDevi
     return observer;
 }
 
-Uri VibrationPriorityManager::AssembleUri(const std::string &uriProxy, const std::string &key)
+Uri VibrationPriorityManager::AssembleUri(const std::string &uriProxy, const std::string &key,
+    const std::string &tableType)
 {
+    std::string settingSystemUrlProxy = "";
+    if (g_currentUserId > 0 && tableType == "system") {
+        SettingSystemUrlProxy = uriProxy + std::to_string(g_currentUserId) + "?Proxy=true";
+        Uri uri(settingSystemUrlProxy + "&key=" + key);
+        return uri;
+    }
     Uri uri(uriProxy + "&key=" + key);
     return uri;
 }
 
-std::shared_ptr<DataShare::DataShareHelper> VibrationPriorityManager::CreateDataShareHelper(const std::string &tableUrl)
+std::shared_ptr<DataShare::DataShareHelper> VibrationPriorityManager::CreateDataShareHelper(const std::string &tableUrl,
+    const std::string &tableType)
 {
     if (remoteObj_ == nullptr) {
         MISC_HILOGE("remoteObj_ is nullptr");
         return nullptr;
     }
-    auto [ret, helper] = DataShare::DataShareHelper::Create(remoteObj_, tableUrl, SETTINGS_DATA_EXT_URI);
-    if (ret == DATA_SHARE_READY) {
-        return helper;
-    } else if (ret == DATA_SHARE_NOT_READY) {
+    std::shared_ptr<DataShare::DataShareHelper> helper = nullptr;
+    std::string SettingSystemUrlProxy = "";
+    if (g_currentUserId > 0 && tableType == "system") {
+        SettingSystemUrlProxy =
+            tableUrl + std::to_string(g_currentUserId) + "?Proxy=true";
+        helper = DataShare::DataShareHelper::Creator(remoteObj, SettingSystemUrlProxy, SETTINGS_DATA_EXT_URI);
+    } else {
+        helper = DataShare::DataShareHelper::Create(remoteObj_, tableUrl, SETTINGS_DATA_EXT_URI);
+    }
+    if (helper == nullptr) {
         MISC_HILOGE("Create data_share helper failed, uri proxy:%{public}s", tableUrl.c_str());
         return nullptr;
     }
-    MISC_HILOGI("Data_share create unknown");
+    MISC_HILOGI("Data share create success");
     return nullptr;
 }
 
@@ -905,7 +994,8 @@ int32_t VibrationPriorityManager::RegisterObserver(const sptr<MiscDeviceObserver
         return MISC_NO_INIT_ERR;
     }
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
-    auto helper = CreateDataShareHelper(SETTING_URI_PROXY);
+    std::string tableType = "normal";
+    auto helper = CreateDataShareHelper(SETTING_URI_PROXY, tableType);
     if (helper == nullptr) {
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "DATASHARE_EXCEPTION", HiSysEvent::EventType::FAULT,
@@ -914,18 +1004,18 @@ int32_t VibrationPriorityManager::RegisterObserver(const sptr<MiscDeviceObserver
         IPCSkeleton::SetCallingIdentity(callingIdentity);
         return MISC_NO_INIT_ERR;
     }
-    auto uriFeedback = AssembleUri(SETTING_URI_PROXY, SETTING_FEEDBACK_KEY);
+    auto uriFeedback = AssembleUri(SETTING_URI_PROXY, SETTING_FEEDBACK_KEY, tableType);
     helper->RegisterObserver(uriFeedback, observer);
     helper->NotifyChange(uriFeedback);
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
-    auto uriCrownFeedback = AssembleUri(SETTING_URI_PROXY, SETTING_CROWN_FEEDBACK_KEY);
+    auto uriCrownFeedback = AssembleUri(SETTING_URI_PROXY, SETTING_CROWN_FEEDBACK_KEY, tableType);
     helper->RegisterObserver(uriCrownFeedback, observer);
     helper->NotifyChange(uriCrownFeedback);
-    auto uriIntensityContrl = AssembleUri(SETTING_URI_PROXY, SETTING_VIBRATE_INTENSITY_KEY);
+    auto uriIntensityContrl = AssembleUri(SETTING_URI_PROXY, SETTING_VIBRATE_INTENSITY_KEY, tableType);
     helper->RegisterObserver(uriIntensityContrl, observer);
     helper->NotifyChange(uriIntensityContrl);
 #endif
-    auto uriRingerMode = AssembleUri(SETTING_URI_PROXY, SETTING_RINGER_MODE_KEY);
+    auto uriRingerMode = AssembleUri(SETTING_URI_PROXY, SETTING_RINGER_MODE_KEY, tableType);
     helper->RegisterObserver(uriRingerMode, observer);
     helper->NotifyChange(uriRingerMode);
     std::thread execCb(VibrationPriorityManager::ExecRegisterCb, observer);
@@ -943,7 +1033,8 @@ int32_t VibrationPriorityManager::UnregisterObserver(const sptr<MiscDeviceObserv
         return MISC_NO_INIT_ERR;
     }
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
-    auto helper = CreateDataShareHelper(SETTING_URI_PROXY);
+    std::string tableType = "normal";
+    auto helper = CreateDataShareHelper(SETTING_URI_PROXY, tableType);
     if (helper == nullptr) {
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "DATASHARE_EXCEPTION", HiSysEvent::EventType::FAULT,
@@ -952,15 +1043,15 @@ int32_t VibrationPriorityManager::UnregisterObserver(const sptr<MiscDeviceObserv
         IPCSkeleton::SetCallingIdentity(callingIdentity);
         return MISC_NO_INIT_ERR;
     }
-    auto uriFeedback = AssembleUri(SETTING_URI_PROXY, SETTING_FEEDBACK_KEY);
+    auto uriFeedback = AssembleUri(SETTING_URI_PROXY, SETTING_FEEDBACK_KEY, tableType);
     helper->UnregisterObserver(uriFeedback, observer);
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
-    auto uriCrownnFeedback = AssembleUri(SETTING_URI_PROXY, SETTING_CROWN_FEEDBACK_KEY);
+    auto uriCrownnFeedback = AssembleUri(SETTING_URI_PROXY, SETTING_CROWN_FEEDBACK_KEY, tableType);
     helper->UnregisterObserver(uriCrownnFeedback, observer);
-    auto uriIntensityContrl = AssembleUri(SETTING_URI_PROXY, SETTING_CROWN_FEEDBACK_KEY);
+    auto uriIntensityContrl = AssembleUri(SETTING_URI_PROXY, SETTING_CROWN_FEEDBACK_KEY, tableType);
     helper->UnregisterObserver(uriIntensityContrl, observer);
 #endif
-    auto uriRingerMode = AssembleUri(SETTING_URI_PROXY, SETTING_RINGER_MODE_KEY);
+    auto uriRingerMode = AssembleUri(SETTING_URI_PROXY, SETTING_RINGER_MODE_KEY, tableType);
     helper->UnregisterObserver(uriRingerMode, observer);
     ReleaseDataShareHelper(helper);
     IPCSkeleton::SetCallingIdentity(callingIdentity);

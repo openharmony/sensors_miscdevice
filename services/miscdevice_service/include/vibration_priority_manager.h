@@ -111,9 +111,10 @@ private:
     static void ExecRegisterCb(const sptr<MiscDeviceObserver> &observer);
     int32_t RegisterObserver(const sptr<MiscDeviceObserver> &observer);
     int32_t UnregisterObserver(const sptr<MiscDeviceObserver> &observer);
-    int32_t GetIntValue(const std::string &uri, const std::string &key, int32_t &value);
-    int32_t GetLongValue(const std::string &uri, const std::string &key, int64_t &value);
-    int32_t GetStringValue(const std::string &uriProxy, const std::string &key, std::string &value);
+    int32_t GetIntValue(const std::string &uri, const std::string &key, int32_t &value, const std::string &tableType);
+    int32_t GetLongValue(const std::string &uri, const std::string &key, int64_t &value, const std::string &tableType);
+    int32_t GetStringValue(const std::string &uriProxy, const std::string &key, std::string &value,
+        const std::string &tableType);
 #ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
     int32_t GetDoNotDisturbStringValue(const std::string &key, std::string &value);
     int32_t GetDoNotDisturbIntValue(const std::string &key, int32_t &value);
@@ -127,8 +128,9 @@ private:
     std::string ReplaceUserIdForUri(std::string uri, int32_t userId);
     Uri DoNotDisturbAssembleUri(const std::string &key);
 #endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
-    Uri AssembleUri(const std::string &uriProxy, const std::string &key);
-    std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(const std::string &tableUrl);
+    Uri AssembleUri(const std::string &uriProxy, const std::string &key, const std::string &tableType);
+    std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(const std::string &tableUrl,
+        const std::string &tableType);
     bool ReleaseDataShareHelper(std::shared_ptr<DataShare::DataShareHelper> &helper);
     sptr<MiscDeviceObserver> CreateObserver(const MiscDeviceObserver::UpdateFunc &func);
     void UpdateStatus();
