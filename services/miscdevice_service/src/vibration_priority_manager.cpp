@@ -966,7 +966,6 @@ std::shared_ptr<DataShare::DataShareHelper> VibrationPriorityManager::CreateData
     if (helper == nullptr) {
         MISC_HILOGE("Create data_share helper failed, uri proxy:%{public}s", tableUrl.c_str());
     }
-    MISC_HILOGI("Data share create success");
     return helper;
 }
 
