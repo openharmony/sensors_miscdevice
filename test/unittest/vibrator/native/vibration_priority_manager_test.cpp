@@ -34,7 +34,7 @@ using namespace testing::ext;
 using namespace Security::AccessToken;
 using Security::AccessToken::AccessTokenID;
 
-#define PriorityManager DelayedSingleton<VibrationPriorityManager>::GetInstance()
+#define PRIORITY_MANAGER DelayedSingleton<VibrationPriorityManager>::GetInstance()
 
 PermissionStateFull g_infoManagerTestState = {
     .grantFlags = {1},
@@ -99,21 +99,21 @@ void VibrationPriorityManagerTest::TearDown()
 HWTEST_F(VibrationPriorityManagerTest, InitVibrateWhenRing_001, TestSize.Level1)
 {
     MISC_HILOGI("InitVibrateWhenRing_001 in");
-    ASSERT_NO_FATAL_FAILURE(PriorityManager->InitVibrateWhenRing());
+    ASSERT_NO_FATAL_FAILURE(PRIORITY_MANAGER->InitVibrateWhenRing());
     MISC_HILOGI("InitVibrateWhenRing_001 out");
 }
 
 HWTEST_F(VibrationPriorityManagerTest, RegisterUser100ObserverTest_001, TestSize.Level1)
 {
     MISC_HILOGI("RegisterUser100ObserverTest_001 in");
-    ASSERT_NO_FATAL_FAILURE(PriorityManager->RegisterUser100Observer());
+    ASSERT_NO_FATAL_FAILURE(PRIORITY_MANAGER->RegisterUser100Observer());
     MISC_HILOGI("RegisterUser100ObserverTest_001 out");
 }
 
 HWTEST_F(VibrationPriorityManagerTest, UnregisterUser100ObserverTest_001, TestSize.Level1)
 {
     MISC_HILOGI("UnregisterUser100ObserverTest_001 in");
-    ASSERT_NO_FATAL_FAILURE(PriorityManager->UnregisterUser100Observer());
+    ASSERT_NO_FATAL_FAILURE(PRIORITY_MANAGER->UnregisterUser100Observer());
     MISC_HILOGI("UnregisterUser100ObserverTest_001 out");
 }
 } // namespace Sensors
