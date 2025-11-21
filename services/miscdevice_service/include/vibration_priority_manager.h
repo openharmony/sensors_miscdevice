@@ -17,9 +17,7 @@
 #define VIBRATION_PRIORITY_MANAGER_H
 
 #include "app_mgr_client.h"
-#ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
 #include "cJSON.h"
-#endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
 #include "datashare_helper.h"
 
 #include "miscdevice_observer.h"
@@ -69,7 +67,6 @@ enum FeedbackIntensity {
 };
 #endif
 
-#ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
 enum DoNotDisturbSwitch {
     DONOTDISTURB_SWITCH_INVALID = -1,
     DONOTDISTURB_SWITCH_OFF = 0,
@@ -80,7 +77,6 @@ struct WhiteListAppInfo {
     std::string bundle;
     int64_t uid;
 };
-#endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
 
 class VibrationPriorityManager {
     DECLARE_DELAYED_SINGLETON(VibrationPriorityManager);
@@ -90,11 +86,9 @@ public:
     static bool IsSystemServiceCalling();
     static bool IsSystemCalling();
     VibrateStatus ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo,
-		const std::shared_ptr<VibratorThread> &vibratorThread, const VibratorIdentifierIPC& identifier);
-#ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
+        const std::shared_ptr<VibratorThread> &vibratorThread, const VibratorIdentifierIPC& identifier);
     void InitDoNotDisturbData();
     void ReregisterCurrentUserObserver();
-#endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
     bool ShouldIgnoreByIntensity(const VibrateInfo &vibrateInfo);
     void MiscCrownIntensityFeedbackInit(void);
@@ -115,7 +109,6 @@ private:
     int32_t GetLongValue(const std::string &uri, const std::string &key, int64_t &value, const std::string &tableType);
     int32_t GetStringValue(const std::string &uriProxy, const std::string &key, std::string &value,
         const std::string &tableType);
-#ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
     int32_t GetDoNotDisturbStringValue(const std::string &key, std::string &value);
     int32_t GetDoNotDisturbIntValue(const std::string &key, int32_t &value);
     int32_t GetDoNotDisturbLongValue(const std::string &key, int64_t &value);
@@ -127,7 +120,6 @@ private:
     int32_t UnregisterUserObserver();
     std::string ReplaceUserIdForUri(std::string uri, int32_t userId);
     Uri DoNotDisturbAssembleUri(const std::string &key);
-#endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
     Uri AssembleUri(const std::string &uriProxy, const std::string &key, const std::string &tableType);
     std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(const std::string &tableUrl,
         const std::string &tableType);
@@ -148,13 +140,11 @@ private:
     std::atomic_int32_t miscFeedback_ = FEEDBACK_MODE_INVALID;
     std::atomic_int32_t miscAudioRingerMode_ = RINGER_MODE_INVALID;
     std::atomic_int32_t vibrateWhenRing_ = VIBRATE_WHEN_RING_MODE_INVALID;
-#ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
     std::atomic_int32_t doNotDisturbSwitch_ = DONOTDISTURB_SWITCH_INVALID;
     std::vector<WhiteListAppInfo> doNotDisturbWhiteList_;
     sptr<MiscDeviceObserver> currentUserObserver_;
     std::mutex currentUserObserverMutex_;
     std::mutex whiteListMutex_;
-#endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
     std::atomic_int32_t miscCrownFeedback_ = FEEDBACK_MODE_INVALID;
     std::atomic_int32_t miscIntensity_ = FEEDBACK_INTENSITY_INVALID;

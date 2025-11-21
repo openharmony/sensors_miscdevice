@@ -16,9 +16,7 @@
 #include "vibration_priority_manager.h"
 
 #include <tokenid_kit.h>
-#ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
 #include <regex>
-#endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
 
 #include "accesstoken_kit.h"
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
@@ -41,12 +39,10 @@
 namespace OHOS {
 namespace Sensors {
 using namespace OHOS::HiviewDFX;
-#ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
 const int32_t INVALID_USERID = 100;
 const int32_t WHITE_LIST_MAX_COUNT = 100;
 static int32_t g_currentUserId = INVALID_USERID;
 static std::mutex g_settingMutex;
-#endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
 namespace {
 const std::string SETTING_COLUMN_KEYWORD = "KEYWORD";
 const std::string SETTING_COLUMN_VALUE = "VALUE";
@@ -55,7 +51,6 @@ const std::string SETTING_RINGER_MODE_KEY = "ringer_mode";
 const std::string SETTING_URI_PROXY = "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
 const std::string SCENEBOARD_BUNDLENAME = "com.ohos.sceneboard";
 constexpr const char *SETTINGS_DATA_EXT_URI = "datashare:///com.ohos.settingsdata.DataAbility";
-#ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
 const std::string USER_SETTING_SECURE_URI_PROXY = "datashare:///com.ohos.settingsdata/entry/settingsdata/"
                                                   "USER_SETTINGSDATA_SECURE_##USERID##?Proxy=true";
 const std::string DO_NOT_DISTURB_SWITCH = "focus_mode_enable";
@@ -65,7 +60,6 @@ const std::string WHITE_LIST_KEY_UID = "uid";
 constexpr const char *USERID_REPLACE = "##USERID##";
 const std::string VIBRATE_WHEN_RINGING_KEY = "hw_vibrate_when_ringing";
 const std::string SETTING_USER_URI_PROXY = "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_";
-#endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
 const std::string SETTING_CROWN_FEEDBACK_KEY = "watch_crown_feedback_enabled";
 const std::string SETTING_VIBRATE_INTENSITY_KEY = "vibration_intensity_index";
@@ -89,14 +83,12 @@ VibrationPriorityManager::~VibrationPriorityManager()
     if (UnregisterObserver(observer_) != ERR_OK) {
         MISC_HILOGE("UnregisterObserver failed");
     }
-#ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
     if (UnregisterUserObserver() != ERR_OK) {
         MISC_HILOGE("UnregisterUserObserver failed");
     }
     if (UnregisterUser100Observer() != ERR_OK) {
         MISC_HILOGE("UnregisterUser100Observer failed");
     }
-#endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
     if (reportSwitchStatusThread_.joinable()) {
         stop_ = true;
         stopCondition_.notify_all();
@@ -151,13 +143,10 @@ bool VibrationPriorityManager::Init()
         MISC_HILOGE("RegisterObserver failed");
         return false;
     }
-#ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
     ReregisterCurrentUserObserver();
-#endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
     return true;
 }
 
-#ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
 void VibrationPriorityManager::InitDoNotDisturbData()
 {
     int32_t switchTemp = doNotDisturbSwitch_;
@@ -555,7 +544,6 @@ bool VibrationPriorityManager::IgnoreAppVibrations(const VibrateInfo &vibrateInf
     MISC_HILOGI("Ignore app vibration, bundleName::%{public}s", vibrateInfo.packageName.c_str());
     return true;
 }
-#endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
 void VibrationPriorityManager::MiscCrownIntensityFeedbackInit(void)
@@ -690,14 +678,12 @@ void VibrationPriorityManager::UpdateStatus()
         }
         miscAudioRingerMode_ = ringerMode;
     }
-#ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
     if (doNotDisturbSwitch_ == DONOTDISTURB_SWITCH_INVALID) {
         InitDoNotDisturbData();
     }
     if (vibrateWhenRing_ == VIBRATE_WHEN_RING_MODE_INVALID) {
         InitVibrateWhenRing();
     }
-#endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
     if (miscCrownFeedback_ == FEEDBACK_MODE_INVALID) {
         int32_t corwnfeedback = FEEDBACK_MODE_INVALID;
@@ -770,11 +756,9 @@ void VibrationPriorityManager::ReportSwitchStatus()
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "SWITCHES_TOGGLE", HiSysEvent::EventType::BEHAVIOR,
             "SWITCH_TYPE", "intensity", "STATUS", intensity);
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CROWN
-#ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
         int32_t currentDoNotDisturbSwitch = doNotDisturbSwitch_;
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "SWITCHES_TOGGLE", HiSysEvent::EventType::BEHAVIOR,
             "SWITCH_TYPE", "currentDoNotDisturbSwitch", "STATUS", currentDoNotDisturbSwitch);
-#endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
         MISC_HILOGI("feedbackCurrentStatus:%{public}d, ringerModeCurrentStatus:%{public}d", feedbackTemp, ringModeTemp);
         stopCondition_.wait_for(lock, std::chrono::hours(HOURS_IN_DAY), [this] { return stop_.load(); });
@@ -839,12 +823,10 @@ VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &v
 {
     UpdateStatus();
     if (!IsSystemCalling() || vibrateInfo.systemUsage == false) {
-#ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
     if (IgnoreAppVibrations(vibrateInfo)) {
         MISC_HILOGD("Vibration is ignored for doNotDisturb, usage:%{public}d", vibrateInfo.usage);
         return IGNORE_GLOBAL_SETTINGS;
     }
-#endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
     if ((vibrateInfo.usage == USAGE_ALARM || vibrateInfo.usage == USAGE_RING
         || vibrateInfo.usage == USAGE_NOTIFICATION || vibrateInfo.usage == USAGE_COMMUNICATION)
         && (miscAudioRingerMode_ == RINGER_MODE_SILENT)) {
