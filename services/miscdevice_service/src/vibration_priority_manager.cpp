@@ -556,18 +556,18 @@ int32_t VibrationPriorityManager::GetLongValue(const std::string &uri, const std
     return ERR_OK;
 }
 
-int32_t VibrationPriorityManager::GetStringValue(const std::string &uri, const std::string &key, std::string &value)
+int32_t VibrationPriorityManager::GetStringValue(const std::string &uriProxy, const std::string &key, std::string &value)
 {
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
-    auto helper = CreateDataShareHelper(uri);
+    auto helper = CreateDataShareHelper(uriProxy);
     if (helper == nullptr) {
         IPCSkeleton::SetCallingIdentity(callingIdentity);
         return MISC_NO_INIT_ERR;
     }
-    std::vector<std::string> columns = {uri};
+    std::vector<std::string> columns = {uriProxy};
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(SETTING_COLUMN_KEYWORD, key);
-    Uri uri(AssembleUri(SETTING_URI_PROXY, key));
+    Uri uri(AssembleUri(uriProxy, key));
     auto resultSet = helper->Query(uri, predicates, columns);
     ReleaseDataShareHelper(helper);
     if (resultSet == nullptr) {
@@ -856,9 +856,9 @@ sptr<MiscDeviceObserver> VibrationPriorityManager::CreateObserver(const MiscDevi
     return observer;
 }
 
-Uri VibrationPriorityManager::AssembleUri(const std::string &uri, const std::string &key)
+Uri VibrationPriorityManager::AssembleUri(const std::string &uriProxy, const std::string &key)
 {
-    Uri uri(uri + "&key=" + key);
+    Uri uri(uriProxy + "&key=" + key);
     return uri;
 }
 
