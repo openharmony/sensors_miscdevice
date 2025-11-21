@@ -355,7 +355,7 @@ int32_t VibrationPriorityManager::RegisterUser100Observer()
         MISC_HILOGE("doNotDisturbHelper is nullptr");
         return MISC_NO_INIT_ERR;
     }
-    auto vibrateWhenRing = AssembleUri(VIBRATE_WHEN_RINGING_KEY, tableType);
+    auto vibrateWhenRing = AssembleUri(SETTING_USER_URI_PROXY, VIBRATE_WHEN_RINGING_KEY, tableType);
     helper->RegisterObserver(vibrateWhenRing, currentUserObserver_);
     helper->NotifyChange(vibrateWhenRing);
     std::thread execCb(VibrationPriorityManager::ExecRegisterCb, currentUserObserver_);
@@ -387,7 +387,7 @@ int32_t VibrationPriorityManager::UnregisterUser100Observer()
         MISC_HILOGE("helper is nullptr");
         return MISC_NO_INIT_ERR;
     }
-    auto virateWhenRing = AssembleUri(VIBRATE_WHEN_RINGING_KEY, tableType);
+    auto virateWhenRing = AssembleUri(SETTING_USER_URI_PROXY, VIBRATE_WHEN_RINGING_KEY, tableType);
     helper->UnregisterObserver(virateWhenRing, currentUserObserver_);
     IPCSkeleton::SetCallingIdentity(callingIdentity);
     currentUserObserver_ = nullptr;
