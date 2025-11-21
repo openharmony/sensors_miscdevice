@@ -63,6 +63,7 @@ const std::string DO_NOT_DISTURB_WHITE_LIST = "intelligent_scene_notification_wh
 const std::string WHITE_LIST_KEY_BUNDLE = "bundle";
 const std::string WHITE_LIST_KEY_UID = "uid";
 constexpr const char *USERID_REPLACE = "##USERID##";
+const std::string VIBRATE_WHEN_RINGING_KEY = "hw_vibrate_when_ringing";
 #endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
 const std::string SETTING_CROWN_FEEDBACK_KEY = "watch_crown_feedback_enabled";
@@ -74,6 +75,9 @@ constexpr int32_t DATA_SHARE_NOT_READY = 1055;
 constexpr int32_t HOURS_IN_DAY = 24;
 constexpr int32_t MINUTES_IN_HOUR = 60;
 constexpr int32_t SECONDS_IN_MINUTE = 60;
+// const std::string SETTING_USER_URI_PROXY = "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_";
+// const std::string SETTING_USER_SECURE_URI_PROXY =
+//     "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_";
 }  // namespace
 
 std::atomic_bool VibrationPriorityManager::stop_ = false;
@@ -115,7 +119,7 @@ bool VibrationPriorityManager::Init()
     }
     MiscDeviceObserver::UpdateFunc updateFunc = [&]() {
         int32_t feedback = miscFeedback_;
-        if (GetIntValue(SETTING_FEEDBACK_KEY, feedback) != ERR_OK) {
+        if (GetIntValue(SETTING_URI_PROXY, SETTING_FEEDBACK_KEY, feedback) != ERR_OK) {
             MISC_HILOGE("Get feedback failed");
         }
         miscFeedback_ = feedback;
@@ -125,7 +129,7 @@ bool VibrationPriorityManager::Init()
             HiSysEvent::EventType::BEHAVIOR, "SWITCH_TYPE", "feedback", "STATUS", feedback);
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
         int32_t ringerMode = miscAudioRingerMode_;
-        if (GetIntValue(SETTING_RINGER_MODE_KEY, ringerMode) != ERR_OK) {
+        if (GetIntValue(SETTING_URI_PROXY, SETTING_RINGER_MODE_KEY, ringerMode) != ERR_OK) {
             MISC_HILOGE("Get ringerMode failed");
         }
         miscAudioRingerMode_ = ringerMode;
@@ -242,11 +246,23 @@ void VibrationPriorityManager::UpdateCurrentUserId()
     MISC_HILOGI("g_currentUserId is %{public}d", g_currentUserId);
 }
 
+void VibrationPriorityManager::InitVibrateWhenRing()
+{
+    int32_t vibrateWhenRing = VIBRATE_WHEN_RING_MODE_INVALID;
+    if (GetIntValue(USER_SETTING_SECURE_URI_PROXY, VIBRATE_WHEN_RINGING_KEY, vibrateWhenRing) != ERR_OK) {
+        MISC_HILOGE("Get vibrateWhenRing failed");
+    }
+    vibrateWhenRing_ = vibrateWhenRing;
+}
+
 int32_t VibrationPriorityManager::RegisterUserObserver()
 {
     MISC_HILOGI("RegisterUserObserver start");
     std::lock_guard<std::mutex> currentUserObserverLock(currentUserObserverMutex_);
-    MiscDeviceObserver::UpdateFunc updateFunc = [&]() { InitDoNotDisturbData(); };
+    MiscDeviceObserver::UpdateFunc updateFunc = [&]() {
+        InitDoNotDisturbData();
+        InitVibrateWhenRing();
+    };
     currentUserObserver_ = CreateObserver(updateFunc);
     if (currentUserObserver_ == nullptr) {
         MISC_HILOGE("currentUserObserver_ is null");
@@ -474,7 +490,7 @@ bool VibrationPriorityManager::IgnoreAppVibrations(const VibrateInfo &vibrateInf
 void VibrationPriorityManager::MiscCrownIntensityFeedbackInit(void)
 {
     int32_t crownfeedback = miscCrownFeedback_;
-    if (GetIntValue(SETTING_CROWN_FEEDBACK_KEY, crownfeedback) != ERR_OK) {
+    if (GetIntValue(SETTING_URI_PROXY, SETTING_CROWN_FEEDBACK_KEY, crownfeedback) != ERR_OK) {
         MISC_HILOGE("Get crownfeedback failed");
     }
     miscCrownFeedback_ = crownfeedback;
@@ -483,7 +499,7 @@ void VibrationPriorityManager::MiscCrownIntensityFeedbackInit(void)
         "crownfeedback", "STATUS", crownfeedback);
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
     int32_t intensity = miscIntensity_;
-    if (GetIntValue(SETTING_VIBRATE_INTENSITY_KEY, intensity) != ERR_OK) {
+    if (GetIntValue(SETTING_URI_PROXY, SETTING_VIBRATE_INTENSITY_KEY, intensity) != ERR_OK) {
         intensity = FEEDBACK_INTENSITY_STRONGE;
         MISC_HILOGE("Get intensity failed");
     }
@@ -513,10 +529,10 @@ bool VibrationPriorityManager::ShouldIgnoreByIntensity(const VibrateInfo &vibrat
 }
 #endif
 
-int32_t VibrationPriorityManager::GetIntValue(const std::string &key, int32_t &value)
+int32_t VibrationPriorityManager::GetIntValue(const std::string &uri, const std::string &key, int32_t &value)
 {
     int64_t valueLong;
-    int32_t ret = GetLongValue(key, valueLong);
+    int32_t ret = GetLongValue(uri, key, valueLong);
     if (ret != ERR_OK) {
         return ret;
     }
@@ -524,10 +540,10 @@ int32_t VibrationPriorityManager::GetIntValue(const std::string &key, int32_t &v
     return ERR_OK;
 }
 
-int32_t VibrationPriorityManager::GetLongValue(const std::string &key, int64_t &value)
+int32_t VibrationPriorityManager::GetLongValue(const std::string &uri, const std::string &key, int64_t &value)
 {
     std::string valueStr;
-    int32_t ret = GetStringValue(key, valueStr);
+    int32_t ret = GetStringValue(uri, key, valueStr);
     if (ret != ERR_OK) {
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "DATASHARE_EXCEPTION", HiSysEvent::EventType::FAULT,
@@ -540,18 +556,18 @@ int32_t VibrationPriorityManager::GetLongValue(const std::string &key, int64_t &
     return ERR_OK;
 }
 
-int32_t VibrationPriorityManager::GetStringValue(const std::string &key, std::string &value)
+int32_t VibrationPriorityManager::GetStringValue(const std::string &uri, const std::string &key, std::string &value)
 {
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
-    auto helper = CreateDataShareHelper(SETTING_URI_PROXY);
+    auto helper = CreateDataShareHelper(uri);
     if (helper == nullptr) {
         IPCSkeleton::SetCallingIdentity(callingIdentity);
         return MISC_NO_INIT_ERR;
     }
-    std::vector<std::string> columns = {SETTING_COLUMN_VALUE};
+    std::vector<std::string> columns = {uri};
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(SETTING_COLUMN_KEYWORD, key);
-    Uri uri(AssembleUri(key));
+    Uri uri(AssembleUri(SETTING_URI_PROXY, key));
     auto resultSet = helper->Query(uri, predicates, columns);
     ReleaseDataShareHelper(helper);
     if (resultSet == nullptr) {
@@ -583,7 +599,7 @@ void VibrationPriorityManager::UpdateStatus()
 {
     if (miscFeedback_ == FEEDBACK_MODE_INVALID) {
         int32_t feedback = FEEDBACK_MODE_INVALID;
-        if (GetIntValue(SETTING_FEEDBACK_KEY, feedback) != ERR_OK) {
+        if (GetIntValue(SETTING_URI_PROXY, SETTING_FEEDBACK_KEY, feedback) != ERR_OK) {
             feedback = FEEDBACK_MODE_ON;
             MISC_HILOGE("Get feedback failed");
         }
@@ -591,7 +607,7 @@ void VibrationPriorityManager::UpdateStatus()
     }
     if (miscAudioRingerMode_ == RINGER_MODE_INVALID) {
         int32_t ringerMode = RINGER_MODE_INVALID;
-        if (GetIntValue(SETTING_RINGER_MODE_KEY, ringerMode) != ERR_OK) {
+        if (GetIntValue(SETTING_URI_PROXY, SETTING_RINGER_MODE_KEY, ringerMode) != ERR_OK) {
             ringerMode = RINGER_MODE_NORMAL;
             MISC_HILOGE("Get ringerMode failed");
         }
@@ -601,11 +617,14 @@ void VibrationPriorityManager::UpdateStatus()
     if (doNotDisturbSwitch_ == DONOTDISTURB_SWITCH_INVALID) {
         InitDoNotDisturbData();
     }
+    if (vibrateWhenRing_ == VIBRATE_WHEN_RING_MODE_INVALID) {
+        InitVibrateWhenRing();
+    }
 #endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
     if (miscCrownFeedback_ == FEEDBACK_MODE_INVALID) {
         int32_t corwnfeedback = FEEDBACK_MODE_INVALID;
-        if (GetIntValue(SETTING_CROWN_FEEDBACK_KEY, corwnfeedback) != ERR_OK) {
+        if (GetIntValue(SETTING_URI_PROXY, SETTING_CROWN_FEEDBACK_KEY, corwnfeedback) != ERR_OK) {
             corwnfeedback = FEEDBACK_MODE_ON;
             MISC_HILOGE("Get corwnfeedback failed");
         }
@@ -613,7 +632,7 @@ void VibrationPriorityManager::UpdateStatus()
     }
     if (miscIntensity_ == FEEDBACK_INTENSITY_INVALID) {
         int32_t intensity = FEEDBACK_INTENSITY_INVALID;
-        if (GetIntValue(SETTING_VIBRATE_INTENSITY_KEY, intensity) != ERR_OK) {
+        if (GetIntValue(SETTING_URI_PROXY, SETTING_VIBRATE_INTENSITY_KEY, intensity) != ERR_OK) {
             intensity = FEEDBACK_INTENSITY_STRONGE;
             MISC_HILOGE("Get intensity failed");
         }
@@ -753,6 +772,12 @@ VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &v
         MISC_HILOGD("Vibration is ignored for ringer mode:%{public}d", static_cast<int32_t>(miscAudioRingerMode_));
         return IGNORE_RINGER_MODE;
     }
+    if ((vibrateInfo.usage == USAGE_RING || vibrateInfo.usage == USAGE_COMMUNICATION)
+        && (miscAudioRingerMode_ == RINGER_MODE_NORMAL) && (vibrateWhenRing_ == VIBRATE_WHEN_RING_MODE_ON)) {
+            MISC_HILOGD("Vibration is ignored for vibrateWhenRinging, ringer:%{public}d, vibrateWhenRinging:%{public}d",
+                static_cast<int32_t>(miscAudioRingerMode_), static_cast<int32_t>(vibrateWhenRing_));
+            return IGNORE_RINGER_VIBRATE_WHEN_RING;
+    }
     if (((vibrateInfo.usage == USAGE_TOUCH || vibrateInfo.usage == USAGE_MEDIA || vibrateInfo.usage == USAGE_UNKNOWN
         || vibrateInfo.usage == USAGE_PHYSICAL_FEEDBACK || vibrateInfo.usage == USAGE_SIMULATE_REALITY)
         && (miscFeedback_ == FEEDBACK_MODE_OFF))
@@ -831,9 +856,9 @@ sptr<MiscDeviceObserver> VibrationPriorityManager::CreateObserver(const MiscDevi
     return observer;
 }
 
-Uri VibrationPriorityManager::AssembleUri(const std::string &key)
+Uri VibrationPriorityManager::AssembleUri(const std::string &uri, const std::string &key)
 {
-    Uri uri(SETTING_URI_PROXY + "&key=" + key);
+    Uri uri(uri + "&key=" + key);
     return uri;
 }
 
@@ -888,18 +913,18 @@ int32_t VibrationPriorityManager::RegisterObserver(const sptr<MiscDeviceObserver
         IPCSkeleton::SetCallingIdentity(callingIdentity);
         return MISC_NO_INIT_ERR;
     }
-    auto uriFeedback = AssembleUri(SETTING_FEEDBACK_KEY);
+    auto uriFeedback = AssembleUri(SETTING_URI_PROXY, SETTING_FEEDBACK_KEY);
     helper->RegisterObserver(uriFeedback, observer);
     helper->NotifyChange(uriFeedback);
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
-    auto uriCrownFeedback = AssembleUri(SETTING_CROWN_FEEDBACK_KEY);
+    auto uriCrownFeedback = AssembleUri(SETTING_URI_PROXY, SETTING_CROWN_FEEDBACK_KEY);
     helper->RegisterObserver(uriCrownFeedback, observer);
     helper->NotifyChange(uriCrownFeedback);
-    auto uriIntensityContrl = AssembleUri(SETTING_VIBRATE_INTENSITY_KEY);
+    auto uriIntensityContrl = AssembleUri(SETTING_URI_PROXY, SETTING_VIBRATE_INTENSITY_KEY);
     helper->RegisterObserver(uriIntensityContrl, observer);
     helper->NotifyChange(uriIntensityContrl);
 #endif
-    auto uriRingerMode = AssembleUri(SETTING_RINGER_MODE_KEY);
+    auto uriRingerMode = AssembleUri(SETTING_URI_PROXY, SETTING_RINGER_MODE_KEY);
     helper->RegisterObserver(uriRingerMode, observer);
     helper->NotifyChange(uriRingerMode);
     std::thread execCb(VibrationPriorityManager::ExecRegisterCb, observer);
@@ -926,15 +951,15 @@ int32_t VibrationPriorityManager::UnregisterObserver(const sptr<MiscDeviceObserv
         IPCSkeleton::SetCallingIdentity(callingIdentity);
         return MISC_NO_INIT_ERR;
     }
-    auto uriFeedback = AssembleUri(SETTING_FEEDBACK_KEY);
+    auto uriFeedback = AssembleUri(SETTING_URI_PROXY, SETTING_FEEDBACK_KEY);
     helper->UnregisterObserver(uriFeedback, observer);
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
-    auto uriCrownnFeedback = AssembleUri(SETTING_CROWN_FEEDBACK_KEY);
+    auto uriCrownnFeedback = AssembleUri(SETTING_URI_PROXY, SETTING_CROWN_FEEDBACK_KEY);
     helper->UnregisterObserver(uriCrownnFeedback, observer);
-    auto uriIntensityContrl = AssembleUri(SETTING_CROWN_FEEDBACK_KEY);
+    auto uriIntensityContrl = AssembleUri(SETTING_URI_PROXY, SETTING_CROWN_FEEDBACK_KEY);
     helper->UnregisterObserver(uriIntensityContrl, observer);
 #endif
-    auto uriRingerMode = AssembleUri(SETTING_RINGER_MODE_KEY);
+    auto uriRingerMode = AssembleUri(SETTING_URI_PROXY, SETTING_RINGER_MODE_KEY);
     helper->UnregisterObserver(uriRingerMode, observer);
     ReleaseDataShareHelper(helper);
     IPCSkeleton::SetCallingIdentity(callingIdentity);

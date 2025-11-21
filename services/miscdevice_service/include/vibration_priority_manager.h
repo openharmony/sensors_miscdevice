@@ -38,6 +38,7 @@ enum VibrateStatus {
     IGNORE_UNKNOWN = 7,
     IGNORE_RINGER_MODE = 8,
     IGNORE_FEEDBACK = 9,
+    IGNORE_RINGER_VIBRATE_WHEN_RING = 10,
 };
 
 enum RingerMode {
@@ -51,6 +52,12 @@ enum FeedbackMode {
     FEEDBACK_MODE_INVALID = -1,
     FEEDBACK_MODE_OFF = 0,
     FEEDBACK_MODE_ON = 1
+};
+
+enum VibrateWhenRingMode {
+    VIBRATE_WHEN_RING_MODE_INVALID = -1,
+    VIBRATE_WHEN_RING_MODE_OFF = 0,
+    VIBRATE_WHEN_RING_MODE_ON = 1
 };
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
@@ -104,9 +111,9 @@ private:
     static void ExecRegisterCb(const sptr<MiscDeviceObserver> &observer);
     int32_t RegisterObserver(const sptr<MiscDeviceObserver> &observer);
     int32_t UnregisterObserver(const sptr<MiscDeviceObserver> &observer);
-    int32_t GetIntValue(const std::string &key, int32_t &value);
-    int32_t GetLongValue(const std::string &key, int64_t &value);
-    int32_t GetStringValue(const std::string &key, std::string &value);
+    int32_t GetIntValue(const std::string &uri, const std::string &key, int32_t &value);
+    int32_t GetLongValue(const std::string &uri, const std::string &key, int64_t &value);
+    int32_t GetStringValue(const std::string &uri, const std::string &key, std::string &value);
 #ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
     int32_t GetDoNotDisturbStringValue(const std::string &key, std::string &value);
     int32_t GetDoNotDisturbIntValue(const std::string &key, int32_t &value);
@@ -120,7 +127,7 @@ private:
     std::string ReplaceUserIdForUri(std::string uri, int32_t userId);
     Uri DoNotDisturbAssembleUri(const std::string &key);
 #endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
-    Uri AssembleUri(const std::string &key);
+    Uri AssembleUri(const std::string &uri, const std::string &key);
     std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(const std::string &tableUrl);
     bool ReleaseDataShareHelper(std::shared_ptr<DataShare::DataShareHelper> &helper);
     sptr<MiscDeviceObserver> CreateObserver(const MiscDeviceObserver::UpdateFunc &func);
@@ -135,6 +142,7 @@ private:
     std::shared_ptr<AppExecFwk::AppMgrClient> appMgrClientPtr_ {nullptr};
     std::atomic_int32_t miscFeedback_ = FEEDBACK_MODE_INVALID;
     std::atomic_int32_t miscAudioRingerMode_ = RINGER_MODE_INVALID;
+    std::atomic_int32_t vibrateWhenRing_ = VIBRATE_WHEN_RING_MODE_INVALID;
 #ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
     std::atomic_int32_t doNotDisturbSwitch_ = DONOTDISTURB_SWITCH_INVALID;
     std::vector<WhiteListAppInfo> doNotDisturbWhiteList_;
