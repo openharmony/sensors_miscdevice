@@ -265,9 +265,7 @@ int32_t VibrationPriorityManager::RegisterUserObserver()
 {
     MISC_HILOGI("RegisterUserObserver start");
     std::lock_guard<std::mutex> currentUserObserverLock(currentUserObserverMutex_);
-    MiscDeviceObserver::UpdateFunc updateFunc = [&]() {
-        InitDoNotDisturbData();
-    };
+    MiscDeviceObserver::UpdateFunc updateFunc = [&]() { InitDoNotDisturbData(); };
     currentUserObserver_ = CreateObserver(updateFunc);
     if (currentUserObserver_ == nullptr) {
         MISC_HILOGE("currentUserObserver_ is null");
