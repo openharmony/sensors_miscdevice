@@ -71,8 +71,6 @@ const std::string SETTING_CROWN_FEEDBACK_KEY = "watch_crown_feedback_enabled";
 const std::string SETTING_VIBRATE_INTENSITY_KEY = "vibration_intensity_index";
 #endif
 constexpr int32_t DECEM_BASE = 10;
-constexpr int32_t DATA_SHARE_READY = 0;
-constexpr int32_t DATA_SHARE_NOT_READY = 1055;
 constexpr int32_t HOURS_IN_DAY = 24;
 constexpr int32_t MINUTES_IN_HOUR = 60;
 constexpr int32_t SECONDS_IN_MINUTE = 60;
@@ -253,9 +251,10 @@ void VibrationPriorityManager::InitVibrateWhenRing()
 {
     int32_t vibrateWhenRing = VIBRATE_WHEN_RING_MODE_INVALID;
     std::string tableType = "system";
-    if (GetIntValue(USER_SETTING_SECURE_URI_PROXY, VIBRATE_WHEN_RINGING_KEY, vibrateWhenRing, tableType) != ERR_OK) {
+    if (GetIntValue(SETTING_USER_URI_PROXY, VIBRATE_WHEN_RINGING_KEY, vibrateWhenRing, tableType) != ERR_OK) {
         MISC_HILOGE("Get vibrateWhenRing failed");
     }
+    MISC_HILOGI("vibrateWhenRing:%{public}d", vibrateWhenRing);
     vibrateWhenRing_ = vibrateWhenRing;
 }
 
@@ -356,7 +355,7 @@ int32_t VibrationPriorityManager::RegisterUser100Observer()
         MISC_HILOGE("doNotDisturbHelper is nullptr");
         return MISC_NO_INIT_ERR;
     }
-    auto vibrateWhenRing = AssembleUri(VIBRATE_WHEN_RINGING_KEY);
+    auto vibrateWhenRing = AssembleUri(VIBRATE_WHEN_RINGING_KEY, tableType);
     helper->RegisterObserver(vibrateWhenRing, currentUserObserver_);
     helper->NotifyChange(vibrateWhenRing);
     std::thread execCb(VibrationPriorityManager::ExecRegisterCb, currentUserObserver_);
@@ -388,7 +387,7 @@ int32_t VibrationPriorityManager::UnregisterUser100Observer()
         MISC_HILOGE("helper is nullptr");
         return MISC_NO_INIT_ERR;
     }
-    auto virateWhenRing = AssembleUri(VIBRATE_WHEN_RINGING_KEY);
+    auto virateWhenRing = AssembleUri(VIBRATE_WHEN_RINGING_KEY, tableType);
     helper->UnregisterObserver(virateWhenRing, currentUserObserver_);
     IPCSkeleton::SetCallingIdentity(callingIdentity);
     currentUserObserver_ = nullptr;
@@ -940,7 +939,7 @@ Uri VibrationPriorityManager::AssembleUri(const std::string &uriProxy, const std
 {
     std::string settingSystemUrlProxy = "";
     if (g_currentUserId > 0 && tableType == "system") {
-        SettingSystemUrlProxy = uriProxy + std::to_string(g_currentUserId) + "?Proxy=true";
+        settingSystemUrlProxy = uriProxy + std::to_string(g_currentUserId) + "?Proxy=true";
         Uri uri(settingSystemUrlProxy + "&key=" + key);
         return uri;
     }
@@ -960,9 +959,9 @@ std::shared_ptr<DataShare::DataShareHelper> VibrationPriorityManager::CreateData
     if (g_currentUserId > 0 && tableType == "system") {
         SettingSystemUrlProxy =
             tableUrl + std::to_string(g_currentUserId) + "?Proxy=true";
-        helper = DataShare::DataShareHelper::Creator(remoteObj, SettingSystemUrlProxy, SETTINGS_DATA_EXT_URI);
+        helper = DataShare::DataShareHelper::Creator(remoteObj_, SettingSystemUrlProxy, SETTINGS_DATA_EXT_URI);
     } else {
-        helper = DataShare::DataShareHelper::Create(remoteObj_, tableUrl, SETTINGS_DATA_EXT_URI);
+        helper = DataShare::DataShareHelper::Creator(remoteObj_, tableUrl, SETTINGS_DATA_EXT_URI);
     }
     if (helper == nullptr) {
         MISC_HILOGE("Create data_share helper failed, uri proxy:%{public}s", tableUrl.c_str());
