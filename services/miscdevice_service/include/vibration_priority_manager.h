@@ -136,6 +136,8 @@ private:
     void UpdateStatus();
     void ReportSwitchStatus();
     void InitVibrateWhenRing();
+    int32_t RegisterUser100Observer();
+    int32_t UnregisterUser100Observer();
     std::condition_variable stopCondition_;
     std::thread reportSwitchStatusThread_;
     static std::atomic_bool stop_;

@@ -120,7 +120,8 @@ bool VibrationPriorityManager::Init()
     }
     MiscDeviceObserver::UpdateFunc updateFunc = [&]() {
         int32_t feedback = miscFeedback_;
-        if (GetIntValue(SETTING_URI_PROXY, SETTING_FEEDBACK_KEY, feedback) != ERR_OK) {
+        std::string tableType = "normal";
+        if (GetIntValue(SETTING_URI_PROXY, SETTING_FEEDBACK_KEY, feedback， tableType) != ERR_OK) {
             MISC_HILOGE("Get feedback failed");
         }
         miscFeedback_ = feedback;
@@ -130,7 +131,7 @@ bool VibrationPriorityManager::Init()
             HiSysEvent::EventType::BEHAVIOR, "SWITCH_TYPE", "feedback", "STATUS", feedback);
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
         int32_t ringerMode = miscAudioRingerMode_;
-        if (GetIntValue(SETTING_URI_PROXY, SETTING_RINGER_MODE_KEY, ringerMode) != ERR_OK) {
+        if (GetIntValue(SETTING_URI_PROXY, SETTING_RINGER_MODE_KEY, ringerMode, tableType) != ERR_OK) {
             MISC_HILOGE("Get ringerMode failed");
         }
         miscAudioRingerMode_ = ringerMode;
@@ -251,7 +252,8 @@ void VibrationPriorityManager::UpdateCurrentUserId()
 void VibrationPriorityManager::InitVibrateWhenRing()
 {
     int32_t vibrateWhenRing = VIBRATE_WHEN_RING_MODE_INVALID;
-    if (GetIntValue(USER_SETTING_SECURE_URI_PROXY, VIBRATE_WHEN_RINGING_KEY, vibrateWhenRing) != ERR_OK) {
+    std::string tableType = "system";
+    if (GetIntValue(USER_SETTING_SECURE_URI_PROXY, VIBRATE_WHEN_RINGING_KEY, vibrateWhenRing, tableType) != ERR_OK) {
         MISC_HILOGE("Get vibrateWhenRing failed");
     }
     vibrateWhenRing_ = vibrateWhenRing;
@@ -559,7 +561,8 @@ bool VibrationPriorityManager::IgnoreAppVibrations(const VibrateInfo &vibrateInf
 void VibrationPriorityManager::MiscCrownIntensityFeedbackInit(void)
 {
     int32_t crownfeedback = miscCrownFeedback_;
-    if (GetIntValue(SETTING_URI_PROXY, SETTING_CROWN_FEEDBACK_KEY, crownfeedback) != ERR_OK) {
+    std::string tableType = "normal";
+    if (GetIntValue(SETTING_URI_PROXY, SETTING_CROWN_FEEDBACK_KEY, crownfeedback, tableType) != ERR_OK) {
         MISC_HILOGE("Get crownfeedback failed");
     }
     miscCrownFeedback_ = crownfeedback;
@@ -568,7 +571,7 @@ void VibrationPriorityManager::MiscCrownIntensityFeedbackInit(void)
         "crownfeedback", "STATUS", crownfeedback);
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
     int32_t intensity = miscIntensity_;
-    if (GetIntValue(SETTING_URI_PROXY, SETTING_VIBRATE_INTENSITY_KEY, intensity) != ERR_OK) {
+    if (GetIntValue(SETTING_URI_PROXY, SETTING_VIBRATE_INTENSITY_KEY, intensity, tableType) != ERR_OK) {
         intensity = FEEDBACK_INTENSITY_STRONGE;
         MISC_HILOGE("Get intensity failed");
     }
