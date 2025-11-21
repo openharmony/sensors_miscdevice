@@ -213,6 +213,7 @@ void VibrationPriorityManager::InitDoNotDisturbData()
 void VibrationPriorityManager::ReregisterCurrentUserObserver()
 {
     UnregisterUserObserver();
+    UnregisterUser100Observer();
     UpdateCurrentUserId();
     RegisterUserObserver();
     RegisterUser100Observer();
