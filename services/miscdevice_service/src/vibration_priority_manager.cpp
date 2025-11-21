@@ -255,6 +255,8 @@ void VibrationPriorityManager::InitVibrateWhenRing()
     if (GetIntValue(SETTING_USER_URI_PROXY, VIBRATE_WHEN_RINGING_KEY, vibrateWhenRing, tableType) != ERR_OK) {
         MISC_HILOGE("Get vibrateWhenRing failed");
     }
+    HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "SWITCHES_TOGGLE",
+        HiSysEvent::EventType::BEHAVIOR, "SWITCH_TYPE", "vibrateWhenRing", "STATUS", vibrateWhenRing);
     MISC_HILOGI("vibrateWhenRing:%{public}d", vibrateWhenRing);
     vibrateWhenRing_ = vibrateWhenRing;
 }
