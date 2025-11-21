@@ -556,7 +556,8 @@ int32_t VibrationPriorityManager::GetLongValue(const std::string &uri, const std
     return ERR_OK;
 }
 
-int32_t VibrationPriorityManager::GetStringValue(const std::string &uriProxy, const std::string &key, std::string &value)
+int32_t VibrationPriorityManager::GetStringValue(const std::string &uriProxy, const std::string &key,
+    std::string &value)
 {
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
     auto helper = CreateDataShareHelper(uriProxy);
