@@ -121,7 +121,7 @@ bool VibrationPriorityManager::Init()
     MiscDeviceObserver::UpdateFunc updateFunc = [&]() {
         int32_t feedback = miscFeedback_;
         std::string tableType = "normal";
-        if (GetIntValue(SETTING_URI_PROXY, SETTING_FEEDBACK_KEY, feedback， tableType) != ERR_OK) {
+        if (GetIntValue(SETTING_URI_PROXY, SETTING_FEEDBACK_KEY, feedback, tableType) != ERR_OK) {
             MISC_HILOGE("Get feedback failed");
         }
         miscFeedback_ = feedback;
@@ -966,10 +966,9 @@ std::shared_ptr<DataShare::DataShareHelper> VibrationPriorityManager::CreateData
     }
     if (helper == nullptr) {
         MISC_HILOGE("Create data_share helper failed, uri proxy:%{public}s", tableUrl.c_str());
-        return nullptr;
     }
     MISC_HILOGI("Data share create success");
-    return nullptr;
+    return helper;
 }
 
 bool VibrationPriorityManager::ReleaseDataShareHelper(std::shared_ptr<DataShare::DataShareHelper> &helper)
