@@ -920,12 +920,10 @@ sptr<MiscDeviceObserver> VibrationPriorityManager::CreateObserver(const MiscDevi
 Uri VibrationPriorityManager::AssembleUri(const std::string &uriProxy, const std::string &key,
     const std::string &tableType)
 {
-    std::string finalUri;
+    std::string finalUri = uriProxy;;
     int32_t currentUserId = g_currentUserId.load();
     if (currentUserId > 0 && tableType == "system") {
-        finalUri = uriProxy + std::to_string(currentUserId) + "?Proxy=true";
-    } else {
-        finalUri = uriProxy;
+        finalUri += std::to_string(currentUserId) + "?Proxy=true";
     }
     return Uri(finalUri + "&key=" + key);
 }
