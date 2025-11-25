@@ -827,7 +827,7 @@ bool VibrationPriorityManager::ShouldIgnoreInputMethod(const VibrateInfo &vibrat
 }
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 
-int32_t VibrationPriorityManager::SettingVibrateControl()
+VibrateStatus VibrationPriorityManager::SettingVibrateControl(const VibrateInfo &vibrateInfo)
 {
     int32_t ringerMode = miscAudioRingerMode_.load();
     if ((vibrateInfo.usage == USAGE_ALARM || vibrateInfo.usage == USAGE_RING
@@ -868,7 +868,7 @@ VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &v
         MISC_HILOGD("Vibration is ignored for doNotDisturb, usage:%{public}d", vibrateInfo.usage);
         return IGNORE_GLOBAL_SETTINGS;
     }
-    int32_t ret = SettingVibrateControl();
+    int32_t ret = SettingVibrateControl(vibrateInfo);
     if (ret != VIBRATION) {
         MISC_HILOGD("Vibration is ignored by setting, ret:%{public}d", ret);
         return ret;
