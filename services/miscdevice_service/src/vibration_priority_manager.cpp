@@ -359,11 +359,11 @@ int32_t VibrationPriorityManager::RegisterUser100Observer()
 int32_t VibrationPriorityManager::UnregisterUser100Observer()
 {
     MISC_HILOGI("UnregisterUser100Observer start");
+    std::lock_guard<std::mutex> currentUserObserverLock(currentUserObserverMutex_);
     if (currentUserObserver_ == nullptr) {
         MISC_HILOGE("currentUserObserver_ is nullptr");
         return MISC_NO_INIT_ERR;
     }
-    std::lock_guard<std::mutex> currentUserObserverLock(currentUserObserverMutex_);
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
     std::string tableType = "system";
     auto helper = CreateDataShareHelper(SETTING_USER_URI_PROXY, tableType);
@@ -389,7 +389,13 @@ int32_t VibrationPriorityManager::UnregisterUser100Observer()
     std::string VibrationPriorityManager::ReplaceUserIdForUri(std::string uri, int32_t userId)
     std::string tempUri = uri;
     std::regex pattern(USERID_REPLACE);
-    return std::regex_replace(tempUri, pattern, std::to_string(userId));
+    std::string result = std::regex_replace(tempUri, pattern, userIdStr);
+    const size_t MAX_URI_LENGTH = 2048;
+    if (result.length() > MAX_URI_LENGTH) {
+        MISC_HILOGE("URI too long after replacement:%{public}zu", result.length());
+        return uri;
+    } 
+    return result;
 }
 
 Uri VibrationPriorityManager::DoNotDisturbAssembleUri(const std::string &key)
