@@ -143,6 +143,9 @@ private:
     std::atomic_int32_t doNotDisturbSwitch_ = DONOTDISTURB_SWITCH_INVALID;
     std::vector<WhiteListAppInfo> doNotDisturbWhiteList_;
     sptr<MiscDeviceObserver> currentUserObserver_;
+    std::mutex vibrateWhenRingObserverMutex_;
+    sptr<MiscDeviceObserver> vibrateWhenRingObserver_;
+    sptr<MiscDeviceObserver> vibratorWhenRingObserver_;
     std::mutex currentUserObserverMutex_;
     std::mutex whiteListMutex_;
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN

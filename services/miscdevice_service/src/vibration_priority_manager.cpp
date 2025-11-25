@@ -352,8 +352,8 @@ int32_t VibrationPriorityManager::RegisterUser100Observer()
     ReleaseDataShareHelper(helper);
     IPCSkeleton::SetCallingIdentity(callingIdentity);
     {
-        std::lock_guard<std::mutex> lock(currentUserObserverMutex_);
-        currentUserObserver_ = observer;
+        std::lock_guard<std::mutex> lock(vibrateWhenRingObserverMutex_);
+        vibrateWhenRingObserver_ = observer;
     }
     MISC_HILOGI("Succeed to RegisterUser100Observer of uri");
     return ERR_OK;
@@ -362,9 +362,9 @@ int32_t VibrationPriorityManager::RegisterUser100Observer()
 int32_t VibrationPriorityManager::UnregisterUser100Observer()
 {
     MISC_HILOGI("UnregisterUser100Observer start");
-    std::lock_guard<std::mutex> currentUserObserverLock(currentUserObserverMutex_);
-    if (currentUserObserver_ == nullptr) {
-        MISC_HILOGE("currentUserObserver_ is nullptr");
+    std::lock_guard<std::mutex> currentUserObserverLock(vibrateWhenRingObserverMutex_);
+    if (vibrateWhenRingObserver_ == nullptr) {
+        MISC_HILOGE("vibrateWhenRingObserver_ is nullptr");
         return MISC_NO_INIT_ERR;
     }
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
@@ -376,14 +376,14 @@ int32_t VibrationPriorityManager::UnregisterUser100Observer()
             "PKG_NAME", "UnregisterUser100Observer", "ERROR_CODE", MISC_NO_INIT_ERR);
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
         IPCSkeleton::SetCallingIdentity(callingIdentity);
-        currentUserObserver_ = nullptr;
+        vibrateWhenRingObserver_ = nullptr;
         MISC_HILOGE("helper is nullptr");
         return MISC_NO_INIT_ERR;
     }
     auto vibrateWhenRing = AssembleUri(SETTING_USER_URI_PROXY, VIBRATE_WHEN_RINGING_KEY, tableType);
-    helper->UnregisterObserver(vibrateWhenRing, currentUserObserver_);
+    helper->UnregisterObserver(vibrateWhenRing, vibrateWhenRingObserver_);
     IPCSkeleton::SetCallingIdentity(callingIdentity);
-    currentUserObserver_ = nullptr;
+    vibrateWhenRingObserver_ = nullptr;
     MISC_HILOGI("Succeed to UnregisterUser100Observer observer");
     return ERR_OK;
 }
