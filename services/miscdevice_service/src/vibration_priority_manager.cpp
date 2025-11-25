@@ -229,7 +229,7 @@ void VibrationPriorityManager::UpdateCurrentUserId()
         MISC_HILOGE("activeUserIds empty");
         return;
     }
-    g_currentUserId = activeUserIds[0];
+    g_currentUserId.store(activeUserIds[0]);
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
     HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "USER_SWITCHED_EXCEPTION", HiSysEvent::EventType::FAULT,
         "PKG_NAME", "UpdateCurrentUserId", "ERROR_CODE", ERR_OK);
@@ -263,7 +263,7 @@ int32_t VibrationPriorityManager::RegisterUserObserver()
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
     std::string tableType = "normal";
     auto doNotDisturbHelper =
-        CreateDataShareHelper(ReplaceUserIdForUri(USER_SETTING_SECURE_URI_PROXY, g_currentUserId), tableType);
+        CreateDataShareHelper(ReplaceUserIdForUri(USER_SETTING_SECURE_URI_PROXY, g_currentUserId.load()), tableType);
     if (doNotDisturbHelper == nullptr) {
         IPCSkeleton::SetCallingIdentity(callingIdentity);
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
@@ -298,7 +298,7 @@ int32_t VibrationPriorityManager::UnregisterUserObserver()
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
     std::string tableType = "normal";
     auto doNotDisturbHelper =
-        CreateDataShareHelper(ReplaceUserIdForUri(USER_SETTING_SECURE_URI_PROXY, g_currentUserId), tableType);
+        CreateDataShareHelper(ReplaceUserIdForUri(USER_SETTING_SECURE_URI_PROXY, g_currentUserId.load()), tableType);
     if (doNotDisturbHelper == nullptr) {
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "DATASHARE_EXCEPTION", HiSysEvent::EventType::FAULT,
@@ -365,8 +365,8 @@ int32_t VibrationPriorityManager::UnregisterUser100Observer()
     }
     std::lock_guard<std::mutex> currentUserObserverLock(currentUserObserverMutex_);
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
-    std::string tableType = "normal";
-    auto helper = CreateDataShareHelper(ReplaceUserIdForUri(USER_SETTING_SECURE_URI_PROXY, g_currentUserId), tableType);
+    std::string tableType = "system";
+    auto helper = CreateDataShareHelper(ReplaceUserIdForUri(USER_SETTING_SECURE_URI_PROXY, g_currentUserId.load()), tableType);
     if (helper == nullptr) {
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "DATASHARE_EXCEPTION", HiSysEvent::EventType::FAULT,
@@ -377,16 +377,16 @@ int32_t VibrationPriorityManager::UnregisterUser100Observer()
         MISC_HILOGE("helper is nullptr");
         return MISC_NO_INIT_ERR;
     }
-    auto virateWhenRing = AssembleUri(SETTING_USER_URI_PROXY, VIBRATE_WHEN_RINGING_KEY, tableType);
-    helper->UnregisterObserver(virateWhenRing, currentUserObserver_);
+    auto vibrateWhenRing = AssembleUri(SETTING_USER_URI_PROXY, VIBRATE_WHEN_RINGING_KEY, tableType);
+    helper->UnregisterObserver(vibrateWhenRing, currentUserObserver_);
     IPCSkeleton::SetCallingIdentity(callingIdentity);
     currentUserObserver_ = nullptr;
     MISC_HILOGI("Succeed to UnregisterUser100Observer observer");
     return ERR_OK;
 }
 
-std::string VibrationPriorityManager::ReplaceUserIdForUri(std::string uri, int32_t userId)
 {
+    std::string VibrationPriorityManager::ReplaceUserIdForUri(std::string uri, int32_t userId)
     std::string tempUri = uri;
     std::regex pattern(USERID_REPLACE);
     return std::regex_replace(tempUri, pattern, std::to_string(userId));
@@ -394,7 +394,7 @@ std::string VibrationPriorityManager::ReplaceUserIdForUri(std::string uri, int32
 
 Uri VibrationPriorityManager::DoNotDisturbAssembleUri(const std::string &key)
 {
-    Uri uri(ReplaceUserIdForUri(USER_SETTING_SECURE_URI_PROXY, g_currentUserId) + "&key=" + key);
+    Uri uri(ReplaceUserIdForUri(USER_SETTING_SECURE_URI_PROXY, g_currentUserId.load()) + "&key=" + key);
     return uri;
 }
 
@@ -402,7 +402,7 @@ int32_t VibrationPriorityManager::GetDoNotDisturbStringValue(const std::string &
 {
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
     std::string tableType = "normal";
-    auto helper = CreateDataShareHelper(ReplaceUserIdForUri(USER_SETTING_SECURE_URI_PROXY, g_currentUserId), tableType);
+    auto helper = CreateDataShareHelper(ReplaceUserIdForUri(USER_SETTING_SECURE_URI_PROXY, g_currentUserId.load()), tableType);
     if (helper == nullptr) {
         IPCSkeleton::SetCallingIdentity(callingIdentity);
         MISC_HILOGE("helper is nullptr");
@@ -921,8 +921,9 @@ Uri VibrationPriorityManager::AssembleUri(const std::string &uriProxy, const std
     const std::string &tableType)
 {
     std::string settingSystemUrlProxy = "";
-    if (g_currentUserId > 0 && tableType == "system") {
-        settingSystemUrlProxy = uriProxy + std::to_string(g_currentUserId) + "?Proxy=true";
+    int32_t currentUserId = g_currentUserId.load();
+    if (currentUserId > 0 && tableType == "system") {
+        settingSystemUrlProxy = uriProxy + std::to_string(currentUserId) + "?Proxy=true";
         Uri uri(settingSystemUrlProxy + "&key=" + key);
         return uri;
     }
@@ -939,9 +940,10 @@ std::shared_ptr<DataShare::DataShareHelper> VibrationPriorityManager::CreateData
     }
     std::shared_ptr<DataShare::DataShareHelper> helper = nullptr;
     std::string SettingSystemUrlProxy = "";
-    if (g_currentUserId > 0 && tableType == "system") {
+    int32_t currentUserId = g_currentUserId.load();
+    if (currentUserId > 0 && tableType == "system") {
         SettingSystemUrlProxy =
-            tableUrl + std::to_string(g_currentUserId) + "?Proxy=true";
+            tableUrl + std::to_string(currentUserId) + "?Proxy=true";
         helper = DataShare::DataShareHelper::Creator(remoteObj_, SettingSystemUrlProxy, SETTINGS_DATA_EXT_URI);
     } else {
         helper = DataShare::DataShareHelper::Creator(remoteObj_, tableUrl, SETTINGS_DATA_EXT_URI);
