@@ -392,7 +392,7 @@ std::string VibrationPriorityManager::ReplaceUserIdForUri(std::string uri, int32
 {
     std::string tempUri = uri;
     std::regex pattern(USERID_REPLACE);
-    std::string result = std::regex_replace(tempUri, pattern, userId);
+    std::string result = std::regex_replace(tempUri, pattern, std::to_string(userId));
     const size_t MAX_URI_LENGTH = 2048;
     if (result.length() > MAX_URI_LENGTH) {
         MISC_HILOGE("URI too long after replacement:%{public}zu", result.length());
