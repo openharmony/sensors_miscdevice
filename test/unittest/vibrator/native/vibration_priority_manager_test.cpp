@@ -44,14 +44,14 @@ PermissionStateFull g_infoManagerTestState = {
     .resDeviceID = {"local"}
 };
 
-HapPolicyParams g_infoManagerTestPolicyPrams = {
+HapPolicyParams g_infoManagerTestPolicyParams = {
     .apl = APL_NORMAL,
     .domain = "test.domain",
     .permList = {},
     .permStateList = {g_infoManagerTestState}
 };
 
-HapInfoParams g_infoManagerTestInfoParms = {
+HapInfoParams g_infoManagerTestInfoParams = {
     .bundleName = "VibrationPriorityManagerTest",
     .userID = 1,
     .instIndex = 0,
@@ -74,7 +74,7 @@ AccessTokenID VibrationPriorityManagerTest::tokenID_ = 0;
 void VibrationPriorityManagerTest::SetUpTestCase()
 {
     AccessTokenIDEx tokenIdEx = {0};
-    tokenIdEx = AccessTokenKit::AllocHapToken(g_infoManagerTestInfoParms, g_infoManagerTestPolicyPrams);
+    tokenIdEx = AccessTokenKit::AllocHapToken(g_infoManagerTestInfoParams, g_infoManagerTestPolicyParams);
     tokenID_ = tokenIdEx.tokenIdExStruct.tokenID;
     ASSERT_NE(0, tokenID_);
     ASSERT_EQ(0, SetSelfTokenID(tokenID_));

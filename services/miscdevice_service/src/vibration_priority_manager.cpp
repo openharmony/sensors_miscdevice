@@ -41,7 +41,7 @@ namespace Sensors {
 using namespace OHOS::HiviewDFX;
 const int32_t INVALID_USERID = 100;
 const int32_t WHITE_LIST_MAX_COUNT = 100;
-static int32_t g_currentUserId = INVALID_USERID;
+static std::atomic_int32_t g_currentUserId = INVALID_USERID;
 static std::mutex g_settingMutex;
 namespace {
 const std::string SETTING_COLUMN_KEYWORD = "KEYWORD";
@@ -234,7 +234,7 @@ void VibrationPriorityManager::UpdateCurrentUserId()
     HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "USER_SWITCHED_EXCEPTION", HiSysEvent::EventType::FAULT,
         "PKG_NAME", "UpdateCurrentUserId", "ERROR_CODE", ERR_OK);
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
-    MISC_HILOGI("g_currentUserId is %{public}d", g_currentUserId);
+    MISC_HILOGI("g_currentUserId is %{public}d", g_currentUserId.load());
 }
 
 void VibrationPriorityManager::InitVibrateWhenRing()
@@ -1031,7 +1031,7 @@ int32_t VibrationPriorityManager::UnregisterObserver(const sptr<MiscDeviceObserv
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
     auto uriCrownnFeedback = AssembleUri(SETTING_URI_PROXY, SETTING_CROWN_FEEDBACK_KEY, tableType);
     helper->UnregisterObserver(uriCrownnFeedback, observer);
-    auto uriIntensityContrl = AssembleUri(SETTING_URI_PROXY, SETTING_CROWN_FEEDBACK_KEY, tableType);
+    auto uriIntensityContrl = AssembleUri(SETTING_URI_PROXY, SETTING_VIBRATE_INTENSITY_KEY, tableType);
     helper->UnregisterObserver(uriIntensityContrl, observer);
 #endif
     auto uriRingerMode = AssembleUri(SETTING_URI_PROXY, SETTING_RINGER_MODE_KEY, tableType);
