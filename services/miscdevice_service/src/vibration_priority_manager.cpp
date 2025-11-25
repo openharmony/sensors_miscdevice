@@ -366,7 +366,7 @@ int32_t VibrationPriorityManager::UnregisterUser100Observer()
     std::lock_guard<std::mutex> currentUserObserverLock(currentUserObserverMutex_);
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
     std::string tableType = "system";
-    auto helper = CreateDataShareHelper(ReplaceUserIdForUri(USER_SETTING_SECURE_URI_PROXY, g_currentUserId.load()), tableType);
+    auto helper = CreateDataShareHelper(ReplaceUserIdForUri(SETTING_USER_URI_PROXY, g_currentUserId.load()), tableType);
     if (helper == nullptr) {
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "DATASHARE_EXCEPTION", HiSysEvent::EventType::FAULT,
