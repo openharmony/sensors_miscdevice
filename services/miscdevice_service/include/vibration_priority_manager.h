@@ -98,7 +98,6 @@ private:
     bool IsCurrentVibrate(const std::shared_ptr<VibratorThread> &vibratorThread,
         const VibratorIdentifierIPC& identifier) const;
     bool IsLoopVibrate(const VibrateInfo &vibrateInfo) const;
-    VibrateStatus SettingVibrateControl(const VibrateInfo &vibrateInfo);
     VibrateStatus ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo, VibrateInfo currentVibrateInfo) const;
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
     bool ShouldIgnoreInputMethod(const VibrateInfo &vibrateInfo);
