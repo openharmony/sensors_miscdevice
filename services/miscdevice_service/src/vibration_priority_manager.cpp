@@ -362,7 +362,7 @@ int32_t VibrationPriorityManager::RegisterUser100Observer()
 int32_t VibrationPriorityManager::UnregisterUser100Observer()
 {
     MISC_HILOGI("UnregisterUser100Observer start");
-    std::lock_guard<std::mutex> currentUserObserverLock(vibrateWhenRingObserverMutex_);
+    std::lock_guard<std::mutex> lock(vibrateWhenRingObserverMutex_);
     if (vibrateWhenRingObserver_ == nullptr) {
         MISC_HILOGE("vibrateWhenRingObserver_ is nullptr");
         return MISC_NO_INIT_ERR;
