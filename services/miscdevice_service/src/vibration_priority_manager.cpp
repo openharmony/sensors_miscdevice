@@ -323,13 +323,12 @@ int32_t VibrationPriorityManager::UnregisterUserObserver()
 int32_t VibrationPriorityManager::RegisterUser100Observer()
 {
     MISC_HILOGI("RegisterUser100Observer start");
-    std::lock_guard<std::mutex> currentUserObserverLock(currentUserObserverMutex_);
     MiscDeviceObserver::UpdateFunc updateFunc = [&]() {
         InitVibrateWhenRing();
     };
-    currentUserObserver_ = CreateObserver(updateFunc);
-    if (currentUserObserver_ == nullptr) {
-        MISC_HILOGE("currentUserObserver_ is null");
+    auto observer = CreateObserver(updateFunc);
+    if (observer == nullptr) {
+        MISC_HILOGE("observer is null");
         return MISC_NO_INIT_ERR;
     }
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
@@ -346,12 +345,16 @@ int32_t VibrationPriorityManager::RegisterUser100Observer()
         return MISC_NO_INIT_ERR;
     }
     auto vibrateWhenRing = AssembleUri(SETTING_USER_URI_PROXY, VIBRATE_WHEN_RINGING_KEY, tableType);
-    helper->RegisterObserver(vibrateWhenRing, currentUserObserver_);
+    helper->RegisterObserver(vibrateWhenRing, observer);
     helper->NotifyChange(vibrateWhenRing);
-    std::thread execCb(VibrationPriorityManager::ExecRegisterCb, currentUserObserver_);
+    std::thread execCb(VibrationPriorityManager::ExecRegisterCb, observer);
     execCb.detach();
     ReleaseDataShareHelper(helper);
     IPCSkeleton::SetCallingIdentity(callingIdentity);
+    {
+        std::lock_guard<std::mutex> lock(currentUserObserverMutex_);
+        currentUserObserver_ = observer;
+    }
     MISC_HILOGI("Succeed to RegisterUser100Observer of uri");
     return ERR_OK;
 }
@@ -824,6 +827,38 @@ bool VibrationPriorityManager::ShouldIgnoreInputMethod(const VibrateInfo &vibrat
 }
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 
+int32_t VibrationPriorityManager::SettingVibrateControl()
+{
+    int32_t ringerMode = miscAudioRingerMode_.load();
+    if ((vibrateInfo.usage == USAGE_ALARM || vibrateInfo.usage == USAGE_RING
+        || vibrateInfo.usage == USAGE_NOTIFICATION || vibrateInfo.usage == USAGE_COMMUNICATION)
+        && (ringerMode == RINGER_MODE_SILENT)) {
+        MISC_HILOGD("Vibration is ignored for ringer mode:%{public}d", ringerMode);
+        return IGNORE_RINGER_MODE;
+    }
+    int32_t vibrateWhenRing = vibrateWhenRing_.load();
+    if ((vibrateInfo.usage == USAGE_RING || vibrateInfo.usage == USAGE_COMMUNICATION)
+        && (ringerMode == RINGER_MODE_NORMAL) && (vibrateWhenRing == VIBRATE_WHEN_RING_MODE_ON)) {
+            MISC_HILOGD("Vibration is ignored for vibrateWhenRinging, ringer:%{public}d, vibrateWhenRinging:%{public}d",
+                vibrateWhenRing, vibrateWhenRing);
+        return IGNORE_RINGER_VIBRATE_WHEN_RING;
+    }
+    int32_t feedback = miscFeedback_.load();
+    if (((vibrateInfo.usage == USAGE_TOUCH || vibrateInfo.usage == USAGE_MEDIA || vibrateInfo.usage == USAGE_UNKNOWN
+        || vibrateInfo.usage == USAGE_PHYSICAL_FEEDBACK || vibrateInfo.usage == USAGE_SIMULATE_REALITY)
+        && (feedback == FEEDBACK_MODE_OFF))
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
+        && !ShouldIgnoreInputMethod(vibrateInfo)) {
+#else // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
+        ) {
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
+        MISC_HILOGD("Vibration is ignored for feedback:%{public}d", feedback);
+        return IGNORE_FEEDBACK;
+        }
+    }
+    return VIBRATION;
+}
+
 VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo,
     const std::shared_ptr<VibratorThread> &vibratorThread, const VibratorIdentifierIPC& identifier)
 {
@@ -833,29 +868,10 @@ VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &v
         MISC_HILOGD("Vibration is ignored for doNotDisturb, usage:%{public}d", vibrateInfo.usage);
         return IGNORE_GLOBAL_SETTINGS;
     }
-    if ((vibrateInfo.usage == USAGE_ALARM || vibrateInfo.usage == USAGE_RING
-        || vibrateInfo.usage == USAGE_NOTIFICATION || vibrateInfo.usage == USAGE_COMMUNICATION)
-        && (miscAudioRingerMode_ == RINGER_MODE_SILENT)) {
-        MISC_HILOGD("Vibration is ignored for ringer mode:%{public}d", static_cast<int32_t>(miscAudioRingerMode_));
-        return IGNORE_RINGER_MODE;
-    }
-    if ((vibrateInfo.usage == USAGE_RING || vibrateInfo.usage == USAGE_COMMUNICATION)
-        && (miscAudioRingerMode_ == RINGER_MODE_NORMAL) && (vibrateWhenRing_ == VIBRATE_WHEN_RING_MODE_ON)) {
-            MISC_HILOGD("Vibration is ignored for vibrateWhenRinging, ringer:%{public}d, vibrateWhenRinging:%{public}d",
-                static_cast<int32_t>(miscAudioRingerMode_), static_cast<int32_t>(vibrateWhenRing_));
-        return IGNORE_RINGER_VIBRATE_WHEN_RING;
-    }
-    if (((vibrateInfo.usage == USAGE_TOUCH || vibrateInfo.usage == USAGE_MEDIA || vibrateInfo.usage == USAGE_UNKNOWN
-        || vibrateInfo.usage == USAGE_PHYSICAL_FEEDBACK || vibrateInfo.usage == USAGE_SIMULATE_REALITY)
-        && (miscFeedback_ == FEEDBACK_MODE_OFF))
-#ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
-        && !ShouldIgnoreInputMethod(vibrateInfo)) {
-#else // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
-        ) {
-#endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
-        MISC_HILOGD("Vibration is ignored for feedback:%{public}d", static_cast<int32_t>(miscFeedback_));
-        return IGNORE_FEEDBACK;
-        }
+    int32_t ret = SettingVibrateControl();
+    if (ret != VIBRATION) {
+        MISC_HILOGD("Vibration is ignored by setting, ret:%{public}d", ret);
+        return ret;
     }
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
     if (ShouldIgnoreByIntensity(vibrateInfo)) {
