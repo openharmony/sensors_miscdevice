@@ -837,7 +837,7 @@ VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &v
         && (miscAudioRingerMode_ == RINGER_MODE_NORMAL) && (vibrateWhenRing_ == VIBRATE_WHEN_RING_MODE_ON)) {
             MISC_HILOGD("Vibration is ignored for vibrateWhenRinging, ringer:%{public}d, vibrateWhenRinging:%{public}d",
                 static_cast<int32_t>(miscAudioRingerMode_), static_cast<int32_t>(vibrateWhenRing_));
-            return IGNORE_RINGER_VIBRATE_WHEN_RING;
+        return IGNORE_RINGER_VIBRATE_WHEN_RING;
     }
     if (((vibrateInfo.usage == USAGE_TOUCH || vibrateInfo.usage == USAGE_MEDIA || vibrateInfo.usage == USAGE_UNKNOWN
         || vibrateInfo.usage == USAGE_PHYSICAL_FEEDBACK || vibrateInfo.usage == USAGE_SIMULATE_REALITY)
@@ -920,15 +920,14 @@ sptr<MiscDeviceObserver> VibrationPriorityManager::CreateObserver(const MiscDevi
 Uri VibrationPriorityManager::AssembleUri(const std::string &uriProxy, const std::string &key,
     const std::string &tableType)
 {
-    std::string settingSystemUrlProxy = "";
+    std::string finalUri;
     int32_t currentUserId = g_currentUserId.load();
     if (currentUserId > 0 && tableType == "system") {
-        settingSystemUrlProxy = uriProxy + std::to_string(currentUserId) + "?Proxy=true";
-        Uri uri(settingSystemUrlProxy + "&key=" + key);
-        return uri;
+        finalUri = uriProxy + std::to_string(currentUserId) + "?Proxy=true";
+    } else {
+        finalUri = uriProxy;
     }
-    Uri uri(uriProxy + "&key=" + key);
-    return uri;
+    return Uri(finalUri + "&key=" + key);
 }
 
 std::shared_ptr<DataShare::DataShareHelper> VibrationPriorityManager::CreateDataShareHelper(const std::string &tableUrl,
