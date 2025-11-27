@@ -251,7 +251,7 @@ void VibrationPriorityManager::InitVibrateWhenRing()
     HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "SWITCHES_TOGGLE",
         HiSysEvent::EventType::BEHAVIOR, "SWITCH_TYPE", "vibrateWhenRing", "STATUS", vibrateWhenRing);
     MISC_HILOGI("vibrateWhenRing:%{public}d", vibrateWhenRing);
-    vibrateWhenRing_ = vibrateWhenRing;
+    vibrateWhenRing_.store(vibrateWhenRing);
 }
 
 int32_t VibrationPriorityManager::RegisterUserObserver()
@@ -331,7 +331,7 @@ int32_t VibrationPriorityManager::RegisterUser100Observer()
         InitVibrateWhenRing();
     };
     std::lock_guard<std::mutex> lock(vibrateWhenRingObserverMutex_);
-    auto vibrateWhenRingObserver_ = CreateObserver(updateFunc);
+    vibrateWhenRingObserver_ = CreateObserver(updateFunc);
     if (vibrateWhenRingObserver_ == nullptr) {
         MISC_HILOGE("vibrateWhenRingObserver_ is null");
         return MISC_NO_INIT_ERR;
@@ -412,7 +412,8 @@ int32_t VibrationPriorityManager::GetDoNotDisturbStringValue(const std::string &
 {
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
     std::string tableType = "normal";
-    auto helper = CreateDataShareHelper(ReplaceUserIdForUri(USER_SETTING_SECURE_URI_PROXY, g_currentUserId.load()), tableType);
+    auto helper = CreateDataShareHelper(ReplaceUserIdForUri(USER_SETTING_SECURE_URI_PROXY, g_currentUserId.load()),
+        tableType);
     if (helper == nullptr) {
         IPCSkeleton::SetCallingIdentity(callingIdentity);
         MISC_HILOGE("helper is nullptr");
@@ -691,7 +692,7 @@ void VibrationPriorityManager::UpdateStatus()
     if (doNotDisturbSwitch_ == DONOTDISTURB_SWITCH_INVALID) {
         InitDoNotDisturbData();
     }
-    if (vibrateWhenRing_ == VIBRATE_WHEN_RING_MODE_INVALID) {
+    if (vibrateWhenRing_.load() == VIBRATE_WHEN_RING_MODE_INVALID) {
         InitVibrateWhenRing();
     }
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
@@ -846,7 +847,7 @@ VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &v
     int32_t ringerMode = miscAudioRingerMode_.load();
     int32_t vibrateWhenRing = vibrateWhenRing_.load();
     if ((vibrateInfo.usage == USAGE_RING || vibrateInfo.usage == USAGE_COMMUNICATION)
-        && (ringerMode == RINGER_MODE_NORMAL) && (vibrateWhenRing == VIBRATE_WHEN_RING_MODE_ON)) {
+        && (ringerMode == RINGER_MODE_NORMAL) && (vibrateWhenRing == VIBRATE_WHEN_RING_MODE_OFF)) {
             MISC_HILOGD("Vibration is ignored for vibrateWhenRinging, ringer:%{public}d, vibrateWhenRinging:%{public}d",
                 ringerMode, vibrateWhenRing);
         return IGNORE_RINGER_VIBRATE_WHEN_RING;
