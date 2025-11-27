@@ -203,11 +203,14 @@ void VibrationPriorityManager::ReregisterCurrentUserObserver()
 {
     UnregisterUserObserver();
     UnregisterUser100Observer();
+#ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
     UpdateCurrentUserId();
+#endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
     RegisterUserObserver();
     RegisterUser100Observer();
 }
 
+#ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
 void VibrationPriorityManager::UpdateCurrentUserId()
 {
     std::lock_guard<std::mutex> lock(g_settingMutex);
@@ -236,6 +239,7 @@ void VibrationPriorityManager::UpdateCurrentUserId()
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
     MISC_HILOGI("g_currentUserId is %{public}d", g_currentUserId.load());
 }
+#endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
 
 void VibrationPriorityManager::InitVibrateWhenRing()
 {
@@ -326,9 +330,10 @@ int32_t VibrationPriorityManager::RegisterUser100Observer()
     MiscDeviceObserver::UpdateFunc updateFunc = [&]() {
         InitVibrateWhenRing();
     };
-    auto observer = CreateObserver(updateFunc);
-    if (observer == nullptr) {
-        MISC_HILOGE("observer is null");
+    std::lock_guard<std::mutex> lock(vibrateWhenRingObserverMutex_);
+    auto vibrateWhenRingObserver_ = CreateObserver(updateFunc);
+    if (vibrateWhenRingObserver_ == nullptr) {
+        MISC_HILOGE("vibrateWhenRingObserver_ is null");
         return MISC_NO_INIT_ERR;
     }
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
@@ -345,16 +350,12 @@ int32_t VibrationPriorityManager::RegisterUser100Observer()
         return MISC_NO_INIT_ERR;
     }
     auto vibrateWhenRing = AssembleUri(SETTING_USER_URI_PROXY, VIBRATE_WHEN_RINGING_KEY, tableType);
-    helper->RegisterObserver(vibrateWhenRing, observer);
+    helper->RegisterObserver(vibrateWhenRing, vibrateWhenRingObserver_);
     helper->NotifyChange(vibrateWhenRing);
-    std::thread execCb(VibrationPriorityManager::ExecRegisterCb, observer);
+    std::thread execCb(VibrationPriorityManager::ExecRegisterCb, vibrateWhenRingObserver_);
     execCb.detach();
     ReleaseDataShareHelper(helper);
     IPCSkeleton::SetCallingIdentity(callingIdentity);
-    {
-        std::lock_guard<std::mutex> lock(vibrateWhenRingObserverMutex_);
-        vibrateWhenRingObserver_ = observer;
-    }
     MISC_HILOGI("Succeed to RegisterUser100Observer of uri");
     return ERR_OK;
 }
