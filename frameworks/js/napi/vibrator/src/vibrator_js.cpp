@@ -1082,7 +1082,7 @@ static napi_value Off(napi_env env, napi_callback_info info)
 
     int32_t ret = UnSubscribeVibratorPlug(user);
     if (ret != ERR_OK) {
-        ThrowErr(env, ret, "User callback unsubscribe fail");
+        MISC_HILOGE("User callback unsubscribe fail");
         return nullptr;
     }
     return nullptr;
