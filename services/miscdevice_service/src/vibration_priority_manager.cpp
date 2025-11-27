@@ -398,7 +398,7 @@ std::string VibrationPriorityManager::ReplaceUserIdForUri(std::string uri, int32
     if (result.length() > MAX_URI_LENGTH) {
         MISC_HILOGE("URI too long after replacement:%{public}zu", result.length());
         return uri;
-    } 
+    }
     return result;
 }
 
