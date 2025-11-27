@@ -38,6 +38,7 @@ enum VibrateStatus {
     IGNORE_UNKNOWN = 7,
     IGNORE_RINGER_MODE = 8,
     IGNORE_FEEDBACK = 9,
+    IGNORE_VIBRATOR_MUTE = 11,
 };
 
 enum RingerMode {
@@ -92,6 +93,7 @@ public:
     bool ShouldIgnoreByIntensity(const VibrateInfo &vibrateInfo);
     void MiscCrownIntensityFeedbackInit(void);
 #endif
+    void SetIgnoreSwitchStatus(bool status);
 
 private:
     bool IsCurrentVibrate(const std::shared_ptr<VibratorThread> &vibratorThread,
@@ -146,6 +148,7 @@ private:
     std::atomic_int32_t miscCrownFeedback_ = FEEDBACK_MODE_INVALID;
     std::atomic_int32_t miscIntensity_ = FEEDBACK_INTENSITY_INVALID;
 #endif
+    static std::atomic_bool isVibratorMute_;
 };
 #define PriorityManager DelayedSingleton<VibrationPriorityManager>::GetInstance()
 }  // namespace Sensors

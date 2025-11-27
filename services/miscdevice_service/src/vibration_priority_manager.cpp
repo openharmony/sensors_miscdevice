@@ -78,6 +78,7 @@ constexpr int32_t SECONDS_IN_MINUTE = 60;
 
 std::atomic_bool VibrationPriorityManager::stop_ = false;
 std::mutex VibrationPriorityManager::stopMutex_;
+std::atomic_bool VibrationPriorityManager::isVibratorMute_ = false;
 
 VibrationPriorityManager::VibrationPriorityManager()
     : reportSwitchStatusThread_([this]() { this->ReportSwitchStatus(); })
@@ -740,6 +741,12 @@ VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &v
     const std::shared_ptr<VibratorThread> &vibratorThread, const VibratorIdentifierIPC& identifier)
 {
     UpdateStatus();
+    if ((vibrateInfo.usage == USAGE_ALARM || vibrateInfo.usage == USAGE_RING
+        || vibrateInfo.usage == USAGE_NOTIFICATION || vibrateInfo.usage == USAGE_COMMUNICATION)
+        && (isVibratorMute_.load())) {
+        MISC_HILOGD("Vibration is ignored for vibrator mute");
+        return IGNORE_VIBRATOR_MUTE;
+    }
     if (!IsSystemCalling() || vibrateInfo.systemUsage == false) {
 #ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
     if (IgnoreAppVibrations(vibrateInfo)) {
@@ -940,6 +947,11 @@ int32_t VibrationPriorityManager::UnregisterObserver(const sptr<MiscDeviceObserv
     IPCSkeleton::SetCallingIdentity(callingIdentity);
     MISC_HILOGI("Succeed to unregister observer");
     return ERR_OK;
+}
+
+void VibrationPriorityManager::SetIgnoreSwitchStatus(bool status)
+{
+    isVibratorMute_.store(status);
 }
 }  // namespace Sensors
 }  // namespace OHOS

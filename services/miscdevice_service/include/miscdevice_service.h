@@ -173,6 +173,10 @@ private:
     void ReportCallTimes();
     void SaveInvalidVibratorInfo(const std::string &pageName, int32_t invalidVibratorId);
     void ReportInvalidVibratorInfo();
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+    static void ParameterCallback(const char *key, const char *value, void *context);
+    void RegisterDeviceMuteObserver();
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     static std::atomic_int32_t timeModeCallTimes_;
     static std::atomic_int32_t presetModeCallTimes_;
     static std::atomic_int32_t fileModeCallTimes_;
@@ -204,6 +208,8 @@ private:
     int32_t invalidVibratorIdCount_ = 0;
     std::vector<int32_t> disablePids_;
     std::mutex pidMutex_;
+    static std::atomic_bool deviceMute_;
+    std::once_flag isRegistered_;
 };
 }  // namespace Sensors
 }  // namespace OHOS
