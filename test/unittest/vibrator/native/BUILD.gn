@@ -110,9 +110,54 @@ ohos_unittest("VibratorAgentModulationTest") {
   }
 }
 
+ohos_unittest("VibrationPriorityManagerTest") {
+  module_out_path = "miscdevice/miscdevice/native"
+
+  sources = [ "vibration_priority_manager_test.cpp" ]
+
+  include_dirs = [
+    "$SUBSYSTEM_DIR/interfaces/inner_api/light",
+    "$SUBSYSTEM_DIR/interfaces/inner_api/vibrator",
+    "$SUBSYSTEM_DIR/services/miscdevice_service/hdi_connection/adapter/include",
+    "$SUBSYSTEM_DIR/services/miscdevice_service/hdi_connection/interface/include",
+    "$SUBSYSTEM_DIR/services/miscdevice_service/include",
+    "$SUBSYSTEM_DIR/utils/common/include",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  deps = [
+    "$SUBSYSTEM_DIR/frameworks/native/vibrator:miscdevice_service_stub",
+    "$SUBSYSTEM_DIR/services/miscdevice_service:libmiscdevice_service_static",
+    "$SUBSYSTEM_DIR/utils/common:libmiscdevice_utils",
+  ]
+
+  external_deps = [
+    "ability_runtime:app_manager",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken_shared",
+    "access_token:libtokensetproc_shared",
+    "cJSON:cjson",
+    "c_utils:utils",
+    "data_share:datashare_consumer",
+    "drivers_interface_vibrator:libvibrator_proxy_2.0",
+    "googletest:gmock",
+    "googletest:gtest_main",
+    "hilog:libhilog",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+    "samgr:samgr_proxy",
+  ]
+  defines = miscdevice_default_defines
+}
+
 group("unittest") {
   testonly = true
   deps = [
+    ":VibrationPriorityManagerTest",
     ":VibratorAgentSeekTest",
     ":VibratorAgentTest",
     ":VibratorAgentModulationTest",
