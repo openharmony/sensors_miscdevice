@@ -705,7 +705,7 @@ std::string MiscdeviceService::GetCurrentTime()
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 void MiscdeviceService::ParameterCallback(const char *key, const char *value, void *context)
 {
-    if((key == nullptr) || (value == nullptr) || (context == nullptr)) {
+    if ((key == nullptr) || (value == nullptr) || (context == nullptr)) {
         MISC_HILOGE("ParameterCallback return invalid param");
         return;
     }
