@@ -716,16 +716,12 @@ void MiscdeviceService::ParameterCallback(const char *key, const char *value, vo
         identifier.deviceId = -1;
         identifier.vibratorId = -1;
         MiscdeviceService *service = reinterpret_cast<MiscdeviceService *>(context);
-        if (service == nullptr) {
-            MISC_HILOGE("Converted context is null");
-        }
         int32_t ret = service->StopVibratorService(identifier);
         if (ret != ERR_OK) {
             MISC_HILOGE("StopVibrator failed,ret:%{public}d", ret);
         }
     }
     MISC_HILOGI("deviceMute is %{public}d", deviceMute_.load());
-    return;
 }
 
 void MiscdeviceService::RegisterDeviceMuteObserver()
@@ -733,11 +729,10 @@ void MiscdeviceService::RegisterDeviceMuteObserver()
     CALL_LOG_ENTER;
     deviceMute_.store(OHOS::system::GetBoolParameter(DEVICE_MUTE_FLAG, false));
     PriorityManager->SetIgnoreSwitchStatus(deviceMute_.load());
-    int ret = WatchParameter(DEVICE_MUTE_FLAG, ParameterCallback, this);
+    int32_t ret = WatchParameter(DEVICE_MUTE_FLAG, ParameterCallback, this);
     if (ret != SUCCESS) {
         MISC_HILOGE("WatchParameter fail");
     }
-    return;
 }
 
 int32_t MiscdeviceService::PlayVibratorCustom(const VibratorIdentifierIPC& identifier, int32_t fd,
