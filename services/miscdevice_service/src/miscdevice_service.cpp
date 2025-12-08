@@ -510,7 +510,7 @@ int32_t MiscdeviceService::PlayVibratorEffect(const VibratorIdentifierIPC& ident
     }
     if (!(effectInfo->isSupportEffect)) {
         MISC_HILOGE("Effect not supported");
-        return DEVICE_OPERATION_FAILED;
+        return PARAMETER_ERROR;
     }
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
     VibrateInfo info = {
