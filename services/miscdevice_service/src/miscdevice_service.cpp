@@ -36,6 +36,8 @@
 #endif // HDF_DRIVERS_INTERFACE_LIGHT
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+#include "parameter.h"
+#include "parameters.h"
 #include "permission_util.h"
 #include "vibrator_decoder_creator.h"
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
@@ -78,6 +80,7 @@ const std::string PHONE_TYPE = "phone";
 constexpr int32_t SHORT_VIBRATOR_DURATION = 50;
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_PRESET_INFO
 constexpr int32_t LOG_COUNT_FIVE = 5;
+const inline char *DEVICE_MUTE_FLAG = "vendor.device.vibrator.mute";
 }  // namespace
 
 std::atomic_int32_t MiscdeviceService::timeModeCallTimes_ = 0;
@@ -91,6 +94,7 @@ std::mutex MiscdeviceService::stopMutex_;
 bool MiscdeviceService::isVibrationPriorityReady_ = false;
 std::map<int32_t, VibratorAllInfos> MiscdeviceService::devicesManageMap_;
 std::map<sptr<IRemoteObject>, int32_t> MiscdeviceService::clientPidMap_;
+std::atomic_bool MiscdeviceService::deviceMute_ = false;
 
 MiscdeviceService::MiscdeviceService()
     : SystemAbility(MISCDEVICE_SERVICE_ABILITY_ID, true),
@@ -120,6 +124,9 @@ MiscdeviceService::~MiscdeviceService()
         stopCondition_.notify_all();
         reportCallTimesThread_.join();
     }
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+    RemoveParameterWatcher(DEVICE_MUTE_FLAG, ParameterCallback, this);
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 }
 
 void MiscdeviceService::OnDump()
@@ -210,6 +217,9 @@ void MiscdeviceService::OnReceiveEvent(const EventFwk::CommonEventData &data)
         if (PriorityManager->Init()) {
             MISC_HILOGI("PriorityManager init");
             isVibrationPriorityReady_ = true;
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+            std::call_once(isRegistered_, [this]() { RegisterDeviceMuteObserver(); });
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
         } else {
             MISC_HILOGE("PriorityManager init fail");
         }
@@ -384,6 +394,9 @@ bool MiscdeviceService::ShouldIgnoreVibrate(const VibrateInfo &info, const Vibra
         MISC_HILOGE("Vibraion priority manager not ready");
         return VIBRATION;
     }
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+    std::call_once(isRegistered_, [this]() { RegisterDeviceMuteObserver(); });
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     std::string curVibrateTime = GetCurrentTime();
     auto vibratorThread_ = GetVibratorThread(identifier);
     int32_t ret = PriorityManager->ShouldIgnoreVibrate(info, vibratorThread_, identifier);
@@ -690,6 +703,38 @@ std::string MiscdeviceService::GetCurrentTime()
 }
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
+void MiscdeviceService::ParameterCallback(const char *key, const char *value, void *context)
+{
+    if ((key == nullptr) || (value == nullptr) || (context == nullptr)) {
+        MISC_HILOGE("ParameterCallback return invalid param");
+        return;
+    }
+    deviceMute_.store(OHOS::system::GetBoolParameter(DEVICE_MUTE_FLAG, false));
+    PriorityManager->SetIgnoreSwitchStatus(deviceMute_.load());
+    if (deviceMute_.load()) {
+        VibratorIdentifierIPC identifier;
+        identifier.deviceId = -1;
+        identifier.vibratorId = -1;
+        MiscdeviceService *service = reinterpret_cast<MiscdeviceService *>(context);
+        int32_t ret = service->StopVibratorService(identifier);
+        if (ret != ERR_OK) {
+            MISC_HILOGE("StopVibrator failed,ret:%{public}d", ret);
+        }
+    }
+    MISC_HILOGI("deviceMute is %{public}d", deviceMute_.load());
+}
+
+void MiscdeviceService::RegisterDeviceMuteObserver()
+{
+    CALL_LOG_ENTER;
+    deviceMute_.store(OHOS::system::GetBoolParameter(DEVICE_MUTE_FLAG, false));
+    PriorityManager->SetIgnoreSwitchStatus(deviceMute_.load());
+    int32_t ret = WatchParameter(DEVICE_MUTE_FLAG, ParameterCallback, this);
+    if (ret != SUCCESS) {
+        MISC_HILOGE("WatchParameter fail");
+    }
+}
+
 int32_t MiscdeviceService::PlayVibratorCustom(const VibratorIdentifierIPC& identifier, int32_t fd,
     int64_t offset, int64_t length, const CustomHapticInfoIPC& customHapticInfoIPC)
 {

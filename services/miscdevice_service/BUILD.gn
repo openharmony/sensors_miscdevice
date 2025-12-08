@@ -97,7 +97,10 @@ ohos_shared_library("libmiscdevice_service") {
   }
 
   if (miscdevice_feature_vibrator_custom) {
-    external_deps += [ "init:libbegetutil" ]
+    external_deps += [
+      "init:libbegetutil",
+      "init:libbeget_proxy"
+    ]
   }
 
   if (miscdevice_feature_hdf_drivers_interface_vibrator) {
@@ -211,7 +214,10 @@ ohos_static_library("libmiscdevice_service_static") {
   }
 
   if (miscdevice_feature_vibrator_custom) {
-    external_deps += [ "init:libbegetutil" ]
+    external_deps += [
+      "init:libbegetutil",
+      "init:libbeget_proxy"
+    ]
   }
 
   if (miscdevice_feature_hdf_drivers_interface_vibrator) {
