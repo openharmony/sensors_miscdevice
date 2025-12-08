@@ -80,7 +80,7 @@ const std::string PHONE_TYPE = "phone";
 constexpr int32_t SHORT_VIBRATOR_DURATION = 50;
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_PRESET_INFO
 constexpr int32_t LOG_COUNT_FIVE = 5;
-const inline char *DEVICE_MUTE_FLAG = "vendor.camera.device.vibrator.mute";
+const inline char *DEVICE_MUTE_FLAG = "vendor.device.vibrator.mute";
 }  // namespace
 
 std::atomic_int32_t MiscdeviceService::timeModeCallTimes_ = 0;
