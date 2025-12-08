@@ -107,18 +107,6 @@ MiscdeviceService::MiscdeviceService()
 
 MiscdeviceService::~MiscdeviceService()
 {
-    std::lock_guard<std::mutex> lock(devicesManageMutex_);
-    auto it = devicesManageMap_.begin();
-    while (it != devicesManageMap_.end()) {
-        int deviceId = it->first;
-        const VibratorControlInfo& vibratorControlInfo_ = it->second.controlInfo;
-        MISC_HILOGI("Device ID:%d, Motor Count:%d", deviceId, vibratorControlInfo_.motorCount);
-        VibratorIdentifierIPC identifier;
-        identifier.deviceId = deviceId;
-        identifier.vibratorId = -1;
-        StopVibratorService(identifier);
-        it = devicesManageMap_.erase(it);
-    }
     if (reportCallTimesThread_.joinable()) {
         stop_ = true;
         stopCondition_.notify_all();
