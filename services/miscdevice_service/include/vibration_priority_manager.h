@@ -129,6 +129,7 @@ private:
     sptr<MiscDeviceObserver> CreateObserver(const MiscDeviceObserver::UpdateFunc &func);
     void UpdateStatus();
     void ReportSwitchStatus();
+    void StartReportSwitchStatus();
     void InitVibrateWhenRing();
     int32_t RegisterUser100Observer();
     int32_t UnregisterUser100Observer();
@@ -154,6 +155,7 @@ private:
     std::atomic_int32_t miscIntensity_ = FEEDBACK_INTENSITY_INVALID;
 #endif
     static std::atomic_bool isVibratorMute_;
+    static std::once_flag flag_;
 };
 #define PriorityManager DelayedSingleton<VibrationPriorityManager>::GetInstance()
 }  // namespace Sensors

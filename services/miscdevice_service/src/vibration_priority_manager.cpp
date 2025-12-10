@@ -73,10 +73,9 @@ constexpr int32_t SECONDS_IN_MINUTE = 60;
 std::atomic_bool VibrationPriorityManager::stop_ = false;
 std::mutex VibrationPriorityManager::stopMutex_;
 std::atomic_bool VibrationPriorityManager::isVibratorMute_ = false;
+std::once_flag VibrationPriorityManager::flag_;
 
-VibrationPriorityManager::VibrationPriorityManager()
-    : reportSwitchStatusThread_([this]() { this->ReportSwitchStatus(); })
-{}
+VibrationPriorityManager::VibrationPriorityManager() {}
 
 VibrationPriorityManager::~VibrationPriorityManager()
 {
@@ -145,6 +144,7 @@ bool VibrationPriorityManager::Init()
         return false;
     }
     ReregisterCurrentUserObserver();
+    StartReportSwitchStatus();
     return true;
 }
 
@@ -775,6 +775,13 @@ void VibrationPriorityManager::ReportSwitchStatus()
         MISC_HILOGI("feedbackCurrentStatus:%{public}d, ringerModeCurrentStatus:%{public}d", feedbackTemp, ringModeTemp);
         stopCondition_.wait_for(lock, std::chrono::hours(HOURS_IN_DAY), [this] { return stop_.load(); });
     }
+}
+
+void VibrationPriorityManager::StartReportSwitchStatus()
+{
+    std::call_once(flag_, [this] () {
+        reportSwitchStatusThread_ = std::thread([this]() { this->ReportSwitchStatus(); });
+    });
 }
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
