@@ -15,9 +15,9 @@
 
 #include "miscdevice_service.h"
 
-#ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 #include "common_event_support.h"
-#endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 #include "death_recipient_template.h"
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
 #include "hisysevent.h"
@@ -159,13 +159,13 @@ void MiscdeviceService::OnAddSystemAbility(int32_t systemAbilityId, const std::s
             if (ret != ERR_OK) {
                 MISC_HILOGE("Subscribe usual.event.DATA_SHARE_READY fail");
             }
-#ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
             ret = SubscribeCommonEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED,
                 [this](const EventFwk::CommonEventData &data) { this->OnReceiveUserSwitchEvent(data); });
             if (ret != ERR_OK) {
                 MISC_HILOGE("Subscribe usual.event.USER_SWITCHED fail");
             }
-#endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
             AddSystemAbilityListener(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
             break;
         }
@@ -214,7 +214,7 @@ void MiscdeviceService::OnReceiveEvent(const EventFwk::CommonEventData &data)
     }
 }
 
-#ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 void MiscdeviceService::OnReceiveUserSwitchEvent(const EventFwk::CommonEventData &data)
 {
     const auto &want = data.GetWant();
@@ -222,13 +222,9 @@ void MiscdeviceService::OnReceiveUserSwitchEvent(const EventFwk::CommonEventData
     if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
         MISC_HILOGI("OnReceiveUserSwitchEvent user switched");
         PriorityManager->ReregisterCurrentUserObserver();
-#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
-        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "USER_SWITCHED_EXCEPTION", HiSysEvent::EventType::FAULT,
-            "PKG_NAME", "OnReceiveUserSwitchEvent", "ERROR_CODE", ERR_OK);
-#endif // HIVIEWDFX_HISYSEVENT_ENABLE
     }
 }
-#endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 
 void MiscdeviceService::OnStart()
 {
@@ -980,10 +976,11 @@ void MiscdeviceService::ReportCallTimes()
     std::unique_lock<std::mutex> lock(stopMutex_);
     stopCondition_.wait_for(lock, durationToMidnight, [this] { return stop_.load(); });
     while (!stop_) {
+        std::vector<int32_t> vibratorModeStatisticVec = {timeModeCallTimes_.load(), presetModeCallTimes_.load(),
+            fileModeCallTimes_.load(), patternModeCallTimes_.load()};
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
-        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_MODES_STATISTICS", HiSysEvent::EventType::STATISTIC,
-            "TIME_MODE_CALL_TIMES", timeModeCallTimes_.load(), "PRESET_MODE_CALL_TIMES", presetModeCallTimes_.load(),
-            "FILE_MODE_CALL_TIMES", fileModeCallTimes_.load(), "PATTERN_MODE_CALL_TIMES", patternModeCallTimes_.load());
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_STATISTICS", HiSysEvent::EventType::STATISTIC,
+            "STATISTICS_TYPE", "VIBRATOR_MODE", "PKG_NAME", "", "STATISTICS_DATA", vibratorModeStatisticVec);
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
         ReportInvalidVibratorInfo();
         MISC_HILOGI("CallTimesReport timeModeCallTimes:%{public}d, presetModeCallTimes:%{public}d, "
@@ -1024,10 +1021,11 @@ void MiscdeviceService::ReportInvalidVibratorInfo()
     for (const auto &item : invalidVibratorInfoMap_) {
         std::string pageName = item.first;
         InvalidVibratorInfo invalidVibratorInfo = item.second;
+        std::vector<int32_t> vibratorIdInvalidVec = {invalidVibratorInfo.maxInvalidVibratorId,
+            invalidVibratorInfo.invalidCallTimes, 0, 0};
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
-        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "INVALID_VIBRATOR_STATISTICS", HiSysEvent::EventType::STATISTIC,
-            "PKG_NAME", pageName, "MAX_INVALID_VIBRATOR_ID", invalidVibratorInfo.maxInvalidVibratorId,
-            "INVALID_CALL_TIMES", invalidVibratorInfo.invalidCallTimes);
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_STATISTICS", HiSysEvent::EventType::STATISTIC,
+            "STATISTICS_TYPE", "INVALID_VIBRATOR", "PKG_NAME", pageName, "STATISTICS_DATA", vibratorIdInvalidVec);
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
     }
     invalidVibratorInfoMap_.clear();

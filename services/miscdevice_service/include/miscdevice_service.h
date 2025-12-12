@@ -146,9 +146,9 @@ private:
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
     int32_t SubscribeCommonEvent(const std::string &eventName, EventReceiver receiver);
     void OnReceiveEvent(const EventFwk::CommonEventData &data);
-#ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
     void OnReceiveUserSwitchEvent(const EventFwk::CommonEventData &data);
-#endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
     int32_t CheckAuthAndParam(int32_t usage, const VibrateParameter &parameter,
         const VibratorIdentifierIPC& identifier);
     int32_t PlayPatternCheckAuthAndParam(int32_t usage, const VibrateParameter &parameter);
