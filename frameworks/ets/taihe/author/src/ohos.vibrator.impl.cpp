@@ -508,10 +508,8 @@ struct VibrateEvent {
 };
 
 class VibratorPatternBuilderImpl {
-    public:
-    VibratorPatternBuilderImpl() {
-        // Don't forget to implement the constructor.
-    }
+public:
+    VibratorPatternBuilderImpl() {}
 
     int64_t GetVibratorPatternBuilderImpl()
     {
