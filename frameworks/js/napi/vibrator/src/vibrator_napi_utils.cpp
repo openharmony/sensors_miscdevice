@@ -413,6 +413,7 @@ napi_value ConvertToJsVibratorPlungInfo(const napi_env& env, const VibratorStatu
     napi_value jsObject = nullptr;
     napi_status status = napi_create_object(env, &jsObject);
     if (status != napi_ok) {
+        MISC_HILOGE("Failed to create JS object");
         return jsObject;
     }
     if (statusEvent.type == PLUG_STATE_EVENT_PLUG_IN) {

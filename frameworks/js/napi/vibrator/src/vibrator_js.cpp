@@ -727,7 +727,7 @@ static napi_value EnumClassConstructor(const napi_env env, const napi_callback_i
     napi_value args[1] = {0};
     napi_value res = nullptr;
     void *data = nullptr;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, args, &res, &data));
+    IMF_CALL(napi_get_cb_info(env, info, &argc, args, &res, &data));
     return res;
 }
 
@@ -735,35 +735,35 @@ static napi_value CreateEnumStopMode(const napi_env env, napi_value exports)
 {
     napi_value timeMode = nullptr;
     napi_value presetMode = nullptr;
-    NAPI_CALL(env, napi_create_string_utf8(env, "time", NAPI_AUTO_LENGTH, &timeMode));
-    NAPI_CALL(env, napi_create_string_utf8(env, "preset", NAPI_AUTO_LENGTH, &presetMode));
+    IMF_CALL(napi_create_string_utf8(env, "time", NAPI_AUTO_LENGTH, &timeMode));
+    IMF_CALL(napi_create_string_utf8(env, "preset", NAPI_AUTO_LENGTH, &presetMode));
 
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_PROPERTY("VIBRATOR_STOP_MODE_TIME", timeMode),
         DECLARE_NAPI_STATIC_PROPERTY("VIBRATOR_STOP_MODE_PRESET", presetMode),
     };
     napi_value result = nullptr;
-    NAPI_CALL(env, napi_define_class(env, "VibratorStopMode", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+    IMF_CALL(napi_define_class(env, "VibratorStopMode", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
         sizeof(desc) / sizeof(*desc), desc, &result));
-    NAPI_CALL(env, napi_set_named_property(env, exports, "VibratorStopMode", result));
+    IMF_CALL(napi_set_named_property(env, exports, "VibratorStopMode", result));
     return exports;
 }
 
 static napi_value CreateEnumVibratorEventType(const napi_env env, napi_value exports)
 {
     napi_value continuous = nullptr;
-    NAPI_CALL(env, napi_create_int32(env, EVENT_TYPE_CONTINUOUS, &continuous));
+    IMF_CALL(napi_create_int32(env, EVENT_TYPE_CONTINUOUS, &continuous));
     napi_value transient = nullptr;
-    NAPI_CALL(env, napi_create_int32(env, EVENT_TYPE_TRANSIENT, &transient));
+    IMF_CALL(napi_create_int32(env, EVENT_TYPE_TRANSIENT, &transient));
 
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_PROPERTY("CONTINUOUS", continuous),
         DECLARE_NAPI_STATIC_PROPERTY("TRANSIENT", transient),
     };
     napi_value result = nullptr;
-    NAPI_CALL(env, napi_define_class(env, "VibratorEventType", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+    IMF_CALL(napi_define_class(env, "VibratorEventType", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
         sizeof(desc) / sizeof(*desc), desc, &result));
-    NAPI_CALL(env, napi_set_named_property(env, exports, "VibratorEventType", result));
+    IMF_CALL(napi_set_named_property(env, exports, "VibratorEventType", result));
     return exports;
 }
 
@@ -775,24 +775,24 @@ static napi_value CreateClassVibratePattern(const napi_env env, const napi_value
     DECLARE_NAPI_FUNCTION("build", VibratorPatternBuilder::Build),
     };
     napi_value cons = nullptr;
-    NAPI_CALL(env, napi_define_class(env, "VibratorPatternBuilder", NAPI_AUTO_LENGTH,
+    IMF_CALL(napi_define_class(env, "VibratorPatternBuilder", NAPI_AUTO_LENGTH,
         VibratorPatternBuilder::VibratorPatternConstructor, nullptr, sizeof(clzDes) / sizeof(napi_property_descriptor),
         clzDes, &cons));
-    NAPI_CALL(env, napi_set_named_property(env, exports, "VibratorPatternBuilder", cons));
+    IMF_CALL(napi_set_named_property(env, exports, "VibratorPatternBuilder", cons));
     return exports;
 }
 
 static napi_value CreateEnumEffectId(const napi_env env, const napi_value exports)
 {
     napi_value clockTime = nullptr;
-    NAPI_CALL(env, napi_create_string_utf8(env, "haptic.clock.timer", NAPI_AUTO_LENGTH, &clockTime));
+    IMF_CALL(napi_create_string_utf8(env, "haptic.clock.timer", NAPI_AUTO_LENGTH, &clockTime));
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_PROPERTY("EFFECT_CLOCK_TIMER", clockTime),
     };
     napi_value result = nullptr;
-    NAPI_CALL(env, napi_define_class(env, "EffectId", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+    IMF_CALL(napi_define_class(env, "EffectId", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
         sizeof(desc) / sizeof(*desc), desc, &result));
-    NAPI_CALL(env, napi_set_named_property(env, exports, "EffectId", result));
+    IMF_CALL(napi_set_named_property(env, exports, "EffectId", result));
     return exports;
 }
 
@@ -1095,12 +1095,12 @@ static napi_value CreateEnumHapticFeedback(const napi_env env, napi_value export
     napi_value effectNoticeSuccess = nullptr;
     napi_value effectNoticeFail = nullptr;
     napi_value effectNoticeWarning = nullptr;
-    NAPI_CALL(env, napi_create_string_utf8(env, "haptic.effect.soft", NAPI_AUTO_LENGTH, &effectSoft));
-    NAPI_CALL(env, napi_create_string_utf8(env, "haptic.effect.hard", NAPI_AUTO_LENGTH, &effectHard));
-    NAPI_CALL(env, napi_create_string_utf8(env, "haptic.effect.sharp", NAPI_AUTO_LENGTH, &effectSharp));
-    NAPI_CALL(env, napi_create_string_utf8(env, "haptic.notice.success", NAPI_AUTO_LENGTH, &effectNoticeSuccess));
-    NAPI_CALL(env, napi_create_string_utf8(env, "haptic.notice.fail", NAPI_AUTO_LENGTH, &effectNoticeFail));
-    NAPI_CALL(env, napi_create_string_utf8(env, "haptic.notice.warning", NAPI_AUTO_LENGTH, &effectNoticeWarning));
+    IMF_CALL(napi_create_string_utf8(env, "haptic.effect.soft", NAPI_AUTO_LENGTH, &effectSoft));
+    IMF_CALL(napi_create_string_utf8(env, "haptic.effect.hard", NAPI_AUTO_LENGTH, &effectHard));
+    IMF_CALL(napi_create_string_utf8(env, "haptic.effect.sharp", NAPI_AUTO_LENGTH, &effectSharp));
+    IMF_CALL(napi_create_string_utf8(env, "haptic.notice.success", NAPI_AUTO_LENGTH, &effectNoticeSuccess));
+    IMF_CALL(napi_create_string_utf8(env, "haptic.notice.fail", NAPI_AUTO_LENGTH, &effectNoticeFail));
+    IMF_CALL(napi_create_string_utf8(env, "haptic.notice.warning", NAPI_AUTO_LENGTH, &effectNoticeWarning));
 
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_PROPERTY("EFFECT_SOFT", effectSoft),
@@ -1111,9 +1111,9 @@ static napi_value CreateEnumHapticFeedback(const napi_env env, napi_value export
         DECLARE_NAPI_STATIC_PROPERTY("EFFECT_NOTICE_WARNING", effectNoticeWarning),
     };
     napi_value result = nullptr;
-    NAPI_CALL(env, napi_define_class(env, "HapticFeedback", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+    IMF_CALL(napi_define_class(env, "HapticFeedback", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
         sizeof(desc) / sizeof(*desc), desc, &result));
-    NAPI_CALL(env, napi_set_named_property(env, exports, "HapticFeedback", result));
+    IMF_CALL(napi_set_named_property(env, exports, "HapticFeedback", result));
     return exports;
 }
 
@@ -1133,7 +1133,7 @@ static napi_value Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("on", On),
         DECLARE_NAPI_FUNCTION("off", Off),
     };
-    NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(napi_property_descriptor), desc));
+    IMF_CALL(napi_define_properties(env, exports, sizeof(desc) / sizeof(napi_property_descriptor), desc));
     NAPI_ASSERT_BASE(env, CreateEnumStopMode(env, exports) != nullptr, "Create enum stop mode fail", exports);
     NAPI_ASSERT_BASE(env, CreateEnumEffectId(env, exports) != nullptr, "Create enum effect id fail", exports);
     NAPI_ASSERT_BASE(env, CreateEnumHapticFeedback(env, exports) != nullptr, "Create enum haptic feedback fail",

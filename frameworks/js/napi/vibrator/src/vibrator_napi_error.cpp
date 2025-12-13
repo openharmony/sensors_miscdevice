@@ -27,9 +27,9 @@ napi_value CreateBusinessError(const napi_env &env, const int32_t errCode, const
     napi_value businessError = nullptr;
     napi_value code = nullptr;
     napi_value msg = nullptr;
-    NAPI_CALL(env, napi_create_int32(env, errCode, &code));
-    NAPI_CALL(env, napi_create_string_utf8(env, errMessage.c_str(), NAPI_AUTO_LENGTH, &msg));
-    NAPI_CALL(env, napi_create_error(env, nullptr, msg, &businessError));
+    IMF_CALL(napi_create_int32(env, errCode, &code));
+    IMF_CALL(napi_create_string_utf8(env, errMessage.c_str(), NAPI_AUTO_LENGTH, &msg));
+    IMF_CALL(napi_create_error(env, nullptr, msg, &businessError));
     napi_set_named_property(env, businessError, "code", code);
     return businessError;
 }
