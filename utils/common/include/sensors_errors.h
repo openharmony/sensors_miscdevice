@@ -25,7 +25,7 @@
 #define IMF_CALL_BASE(theCall, retVal)                                      \
     do {                                                                    \
         if ((theCall) != napi_ok) {                                         \
-            IMSA_HILOGE("napi call failed, theCall: %{public}s", #theCall); \
+            MISC_HILOGE("napi call failed, theCall: %{public}s", #theCall); \
             return retVal;                                                  \
         }                                                                   \
     } while (0)
