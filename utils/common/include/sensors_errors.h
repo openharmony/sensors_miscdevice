@@ -22,14 +22,14 @@
 
 #include "miscdevice_log.h"
 
-#define IMF_CALL_BASE(theCall, retVal)                                      \
+#define MISC_CALL_BASE(theCall, retVal)                                      \
     do {                                                                    \
         if ((theCall) != napi_ok) {                                         \
             MISC_HILOGE("napi call failed, theCall: %{public}s", #theCall); \
             return retVal;                                                  \
         }                                                                   \
     } while (0)
-#define IMF_CALL(theCall)             IMF_CALL_BASE(theCall, nullptr)
+#define MISC_CALL(theCall) MISC_CALL_BASE(theCall, nullptr)
 
 namespace OHOS {
 namespace Sensors {
