@@ -413,7 +413,7 @@ napi_value ConvertToJsVibratorPlungInfo(const napi_env& env, const VibratorStatu
     napi_value jsObject = nullptr;
     napi_status status = napi_create_object(env, &jsObject);
     if (status != napi_ok) {
-        napi_throw_error(env, nullptr, "Failed to create JS object");
+        MISC_HILOGE("Failed to create JS object");
         return jsObject;
     }
     if (statusEvent.type == PLUG_STATE_EVENT_PLUG_IN) {
@@ -548,14 +548,12 @@ void EmitUvEventLoop(sptr<AsyncCallbackInfo> asyncCallbackInfo)
         napi_value callback = nullptr;
         if (napi_get_reference_value(env, asyncCallbackInfo->callback[0], &callback) != napi_ok) {
             MISC_HILOGE("napi_get_reference_value fail");
-            napi_throw_error(env, nullptr, "napi_get_reference_value fail");
             return;
         }
         napi_value callResult = nullptr;
         napi_value result[RESULT_LENGTH] = {0};
         if (!(g_convertFuncList.find(asyncCallbackInfo->callbackType) != g_convertFuncList.end())) {
             MISC_HILOGE("asyncCallbackInfo type is invalid");
-            napi_throw_error(env, nullptr, "asyncCallbackInfo type is invalid");
             return;
         }
         bool state = g_convertFuncList[asyncCallbackInfo->callbackType](env, asyncCallbackInfo, result,
@@ -563,7 +561,6 @@ void EmitUvEventLoop(sptr<AsyncCallbackInfo> asyncCallbackInfo)
         CHKCV(state, "Create napi data fail in async work");
         if (napi_call_function(env, nullptr, callback, 2, result, &callResult) != napi_ok) {
             MISC_HILOGE("napi_call_function callback fail");
-            napi_throw_error(env, nullptr, "napi_call_function callback fail");
             return;
         }
     };

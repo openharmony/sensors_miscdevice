@@ -58,7 +58,7 @@ napi_value VibratorPatternBuilder::VibratorPatternConstructor(napi_env env, napi
     napi_value args[1] = {0};
     napi_value res = nullptr;
     void *data = nullptr;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, args, &res, &data));
+    MISC_CALL(napi_get_cb_info(env, info, &argc, args, &res, &data));
 
     auto vibratorPatternBuilder = new (std::nothrow) VibratorPatternBuilder();
     CHKPP(vibratorPatternBuilder);

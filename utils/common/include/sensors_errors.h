@@ -22,6 +22,15 @@
 
 #include "miscdevice_log.h"
 
+#define MISC_CALL_BASE(theCall, retVal)                                      \
+    do {                                                                    \
+        if ((theCall) != napi_ok) {                                         \
+            MISC_HILOGE("napi call failed, theCall: %{public}s", #theCall); \
+            return retVal;                                                  \
+        }                                                                   \
+    } while (0)
+#define MISC_CALL(theCall) MISC_CALL_BASE(theCall, nullptr)
+
 namespace OHOS {
 namespace Sensors {
 // Error code for user
