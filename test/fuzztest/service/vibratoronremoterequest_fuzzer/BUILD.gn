@@ -69,11 +69,6 @@ ohos_fuzztest("VibratorOnRemoteRequestFuzzTest") {
   if (hdf_drivers_interface_light) {
     external_deps += [ "drivers_interface_light:liblight_proxy_1.0" ]
   }
-  if (miscdevice_feature_vibrator_input_method_enable) {
-    external_deps += [
-      "bundle_framework:appexecfwk_core",
-    ]
-  }
 }
 
 group("fuzztest") {

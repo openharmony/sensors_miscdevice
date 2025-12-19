@@ -76,6 +76,7 @@ ohos_shared_library("libmiscdevice_service") {
     "access_token:libaccesstoken_sdk",
     "access_token:libtokenid_sdk",
     "cJSON:cjson",
+    "common_event_service:cesfwk_innerkits",
     "data_share:datashare_consumer",
     "hilog:libhilog",
     "safwk:system_ability_fwk",
@@ -84,7 +85,6 @@ ohos_shared_library("libmiscdevice_service") {
 
   if (miscdevice_feature_vibrator_input_method_enable) {
     external_deps += [
-      "bundle_framework:appexecfwk_core",
       "os_account:os_account_innerkits",
     ]
   }
@@ -193,6 +193,7 @@ ohos_static_library("libmiscdevice_service_static") {
     "access_token:libaccesstoken_sdk",
     "access_token:libtokenid_sdk",
     "cJSON:cjson",
+    "common_event_service:cesfwk_innerkits",
     "data_share:datashare_consumer",
     "hilog:libhilog",
     "safwk:system_ability_fwk",
@@ -201,7 +202,6 @@ ohos_static_library("libmiscdevice_service_static") {
 
   if (miscdevice_feature_vibrator_input_method_enable) {
     external_deps += [
-      "bundle_framework:appexecfwk_core",
       "os_account:os_account_innerkits",
     ]
   }

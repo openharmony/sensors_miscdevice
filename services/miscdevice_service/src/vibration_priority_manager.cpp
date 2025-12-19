@@ -27,7 +27,6 @@
 #include "system_ability_definition.h"
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
-#include "bundle_mgr_client.h"
 #include "os_account_manager.h"
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 
@@ -60,6 +59,9 @@ const std::string WHITE_LIST_KEY_UID = "uid";
 constexpr const char *USERID_REPLACE = "##USERID##";
 const std::string VIBRATE_WHEN_RINGING_KEY = "hw_vibrate_when_ringing";
 const std::string SETTING_USER_URI_PROXY = "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_";
+const std::string USER_SETTINGS_ENABLE_IME = "settings.inputmethod.enable_ime";
+const std::string INPUT_METHODS_KEY = "inputmethods";
+const std::string INPUT_METHOD_KEY_BUNDLE_NAME = "bundleName";
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
 const std::string SETTING_CROWN_FEEDBACK_KEY = "watch_crown_feedback_enabled";
 const std::string SETTING_VIBRATE_INTENSITY_KEY = "vibration_intensity_index";
@@ -88,6 +90,9 @@ VibrationPriorityManager::~VibrationPriorityManager()
     }
     if (UnregisterUser100Observer() != ERR_OK) {
         MISC_HILOGE("UnregisterUser100Observer failed");
+    }
+    if (UnregisterUserImfObserver() != ERR_OK) {
+        MISC_HILOGE("UnregisterUserImfObserver failed");
     }
     if (reportSwitchStatusThread_.joinable()) {
         stop_ = true;
@@ -155,6 +160,7 @@ void VibrationPriorityManager::InitDoNotDisturbData()
         doNotDisturbSwitch_ = DONOTDISTURB_SWITCH_OFF;
         MISC_HILOGE("Get doNotDisturbSwitch failed");
     } else {
+        PrintDoNotDisturbSwitchStatus(doNotDisturbSwitch_.load(), switchTemp);
         doNotDisturbSwitch_ = switchTemp;
         MISC_HILOGI("doNotDisturbSwitch:%{public}d", switchTemp);
     }
@@ -165,7 +171,7 @@ void VibrationPriorityManager::InitDoNotDisturbData()
         if (whiteListRet != ERR_OK) {
             doNotDisturbSwitch_ = DONOTDISTURB_SWITCH_OFF;
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
-            HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "DATASHARE_EXCEPTION", HiSysEvent::EventType::FAULT,
+            HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_EXCEPTION", HiSysEvent::EventType::FAULT,
                 "PKG_NAME", "GetWhiteListValue", "ERROR_CODE", whiteListRet);
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
             MISC_HILOGE("Get doNotDisturbWhiteList failed");
@@ -173,16 +179,12 @@ void VibrationPriorityManager::InitDoNotDisturbData()
             int32_t whiteListSize = static_cast<int32_t>(whiteListTemp.size());
             if (whiteListSize == 0) {
                 doNotDisturbWhiteList_.clear();
-#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
-                HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "WHITELIST_COUNT_EXCEPTION",
-                    HiSysEvent::EventType::FAULT, "PKG_NAME", "InitDoNotDisturbData", "ACTUAL_COUNT", whiteListSize);
-#endif // HIVIEWDFX_HISYSEVENT_ENABLE
             } else if (whiteListSize > WHITE_LIST_MAX_COUNT) {
                 doNotDisturbWhiteList_.clear();
                 doNotDisturbWhiteList_.assign(whiteListTemp.begin(), whiteListTemp.begin() + WHITE_LIST_MAX_COUNT);
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
-                HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "WHITELIST_COUNT_EXCEPTION",
-                    HiSysEvent::EventType::FAULT, "PKG_NAME", "InitDoNotDisturbData", "ACTUAL_COUNT", whiteListSize);
+                HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_EXCEPTION",
+                    HiSysEvent::EventType::FAULT, "PKG_NAME", "whiteListActualCount", "ERROR_CODE", whiteListSize);
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
                 MISC_HILOGW("whiteListTemp size:%{public}d", whiteListSize);
             } else {
@@ -202,45 +204,40 @@ void VibrationPriorityManager::InitDoNotDisturbData()
 
 void VibrationPriorityManager::ReregisterCurrentUserObserver()
 {
+    MISC_HILOGI("ReregisterCurrentUserObserver start");
+#ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
     UnregisterUserObserver();
     UnregisterUser100Observer();
-#ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
-    UpdateCurrentUserId();
 #endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
+    UnregisterUserImfObserver();
+    UpdateCurrentUserId();
+    RegisterUserImfObserver();
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
+#ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
     RegisterUserObserver();
     RegisterUser100Observer();
+#endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
 }
 
-#ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 void VibrationPriorityManager::UpdateCurrentUserId()
 {
     std::lock_guard<std::mutex> lock(g_settingMutex);
     std::vector<int32_t> activeUserIds;
     int retId = AccountSA::OsAccountManager::QueryActiveOsAccountIds(activeUserIds);
     if (retId != 0) {
-#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
-        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "USER_SWITCHED_EXCEPTION", HiSysEvent::EventType::FAULT,
-            "PKG_NAME", "QueryActiveOsAccountIds", "ERROR_CODE", retId);
-#endif // HIVIEWDFX_HISYSEVENT_ENABLE
         MISC_HILOGE("QueryActiveOsAccountIds failed %{public}d", retId);
         return;
     }
     if (activeUserIds.empty()) {
-#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
-        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "USER_SWITCHED_EXCEPTION", HiSysEvent::EventType::FAULT,
-            "PKG_NAME", "activeUserIdsEmpty", "ERROR_CODE", ERROR);
-#endif // HIVIEWDFX_HISYSEVENT_ENABLE
         MISC_HILOGE("activeUserIds empty");
         return;
     }
     g_currentUserId.store(activeUserIds[0]);
-#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
-    HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "USER_SWITCHED_EXCEPTION", HiSysEvent::EventType::FAULT,
-        "PKG_NAME", "UpdateCurrentUserId", "ERROR_CODE", ERR_OK);
-#endif // HIVIEWDFX_HISYSEVENT_ENABLE
     MISC_HILOGI("g_currentUserId is %{public}d", g_currentUserId.load());
 }
-#endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 
 void VibrationPriorityManager::InitVibrateWhenRing()
 {
@@ -248,6 +245,7 @@ void VibrationPriorityManager::InitVibrateWhenRing()
     std::string tableType = "system";
     if (GetIntValue(SETTING_USER_URI_PROXY, VIBRATE_WHEN_RINGING_KEY, vibrateWhenRing, tableType) != ERR_OK) {
         MISC_HILOGE("Get vibrateWhenRing failed");
+        return;
     }
     HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "SWITCHES_TOGGLE",
         HiSysEvent::EventType::BEHAVIOR, "SWITCH_TYPE", "vibrateWhenRing", "STATUS", vibrateWhenRing);
@@ -272,7 +270,7 @@ int32_t VibrationPriorityManager::RegisterUserObserver()
     if (doNotDisturbHelper == nullptr) {
         IPCSkeleton::SetCallingIdentity(callingIdentity);
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
-        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "DATASHARE_EXCEPTION", HiSysEvent::EventType::FAULT,
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_EXCEPTION", HiSysEvent::EventType::FAULT,
             "PKG_NAME", "RegisterUserObserver", "ERROR_CODE", MISC_NO_INIT_ERR);
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
         MISC_HILOGE("doNotDisturbHelper is nullptr");
@@ -306,7 +304,7 @@ int32_t VibrationPriorityManager::UnregisterUserObserver()
         CreateDataShareHelper(ReplaceUserIdForUri(USER_SETTING_SECURE_URI_PROXY, g_currentUserId.load()), tableType);
     if (doNotDisturbHelper == nullptr) {
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
-        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "DATASHARE_EXCEPTION", HiSysEvent::EventType::FAULT,
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_EXCEPTION", HiSysEvent::EventType::FAULT,
             "PKG_NAME", "UnregisterUserObserver", "ERROR_CODE", MISC_NO_INIT_ERR);
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
         IPCSkeleton::SetCallingIdentity(callingIdentity);
@@ -344,7 +342,7 @@ int32_t VibrationPriorityManager::RegisterUser100Observer()
     if (helper == nullptr) {
         IPCSkeleton::SetCallingIdentity(callingIdentity);
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
-        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "DATASHARE_EXCEPTION", HiSysEvent::EventType::FAULT,
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_EXCEPTION", HiSysEvent::EventType::FAULT,
             "PKG_NAME", "RegisterUser100Observer", "ERROR_CODE", MISC_NO_INIT_ERR);
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
         MISC_HILOGE("doNotDisturbHelper is nullptr");
@@ -374,7 +372,7 @@ int32_t VibrationPriorityManager::UnregisterUser100Observer()
     auto helper = CreateDataShareHelper(SETTING_USER_URI_PROXY, tableType);
     if (helper == nullptr) {
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
-        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "DATASHARE_EXCEPTION", HiSysEvent::EventType::FAULT,
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_EXCEPTION", HiSysEvent::EventType::FAULT,
             "PKG_NAME", "UnregisterUser100Observer", "ERROR_CODE", MISC_NO_INIT_ERR);
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
         IPCSkeleton::SetCallingIdentity(callingIdentity);
@@ -469,7 +467,7 @@ int32_t VibrationPriorityManager::GetDoNotDisturbLongValue(const std::string &ke
     int32_t ret = GetDoNotDisturbStringValue(key, valueStr);
     if (ret != ERR_OK) {
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
-        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "DATASHARE_EXCEPTION", HiSysEvent::EventType::FAULT,
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_EXCEPTION", HiSysEvent::EventType::FAULT,
             "PKG_NAME", "GetDoNotDisturbStringValue", "ERROR_CODE", ret);
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
         MISC_HILOGE("GetDoNotDisturbStringValue failed, ret:%{public}d", ret);
@@ -620,7 +618,7 @@ int32_t VibrationPriorityManager::GetLongValue(const std::string &uri, const std
     int32_t ret = GetStringValue(uri, key, valueStr, tableType);
     if (ret != ERR_OK) {
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
-        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "DATASHARE_EXCEPTION", HiSysEvent::EventType::FAULT,
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_EXCEPTION", HiSysEvent::EventType::FAULT,
             "PKG_NAME", "GetStringValue", "ERROR_CODE", ret);
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
         MISC_HILOGE("GetStringValue failed, ret:%{public}d", ret);
@@ -784,6 +782,124 @@ void VibrationPriorityManager::StartReportSwitchStatus()
     });
 }
 
+void VibrationPriorityManager::PrintDoNotDisturbSwitchStatus(int32_t oldSwitchStatus, int32_t currentSwitchStatus)
+{
+    if (oldSwitchStatus != currentSwitchStatus) {
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "SWITCHES_TOGGLE",
+            HiSysEvent::EventType::BEHAVIOR, "SWITCH_TYPE", "doNotDisturbSwitch", "STATUS", currentSwitchStatus);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
+    }
+}
+
+void VibrationPriorityManager::InitInputMethodData()
+{
+    std::string valueStr;
+    std::string tableType = "system";
+    int32_t ret = GetStringValue(SETTING_USER_URI_PROXY, USER_SETTINGS_ENABLE_IME, valueStr, tableType);
+    if (ret != ERR_OK) {
+        MISC_HILOGE("GetStringValue failed, ret:%{public}d", ret);
+        return;
+    }
+    if (valueStr.empty()) {
+        MISC_HILOGE("String value empty");
+        return;
+    }
+    cJSON *jsonValue = cJSON_Parse(valueStr.c_str());
+    if (jsonValue == nullptr) {
+        MISC_HILOGE("String value is not json");
+        return;
+    }
+    cJSON *inputMethodsJson = cJSON_GetObjectItem(jsonValue, INPUT_METHODS_KEY.c_str());
+    if (inputMethodsJson == nullptr || !cJSON_IsArray(inputMethodsJson)) {
+        MISC_HILOGE("Data is empty or data structure is incorrect");
+        cJSON_Delete(jsonValue);
+        return;
+    }
+    std::lock_guard<std::mutex> inputMethodBundleNamesLock(inputMethodBundleNamesMutex_);
+    inputMethodBundleNames_.clear();
+    int32_t size = cJSON_GetArraySize(inputMethodsJson);
+    for (int32_t i = 0; i < size; ++i) {
+        cJSON *valJson = cJSON_GetArrayItem(inputMethodsJson, i);
+        if (valJson == nullptr) {
+            MISC_HILOGE("Data is empty or data structure is incorrect");
+            cJSON_Delete(jsonValue);
+            return;
+        }
+        cJSON *valBundleName = cJSON_GetObjectItem(valJson, INPUT_METHOD_KEY_BUNDLE_NAME.c_str());
+        if (valBundleName == nullptr || !cJSON_IsString(valBundleName)) {
+            MISC_HILOGE("Data is empty or data structure is incorrect");
+            cJSON_Delete(jsonValue);
+            return;
+        }
+        inputMethodBundleNames_.push_back(valBundleName->valuestring);
+    }
+    cJSON_Delete(jsonValue);
+}
+
+int32_t VibrationPriorityManager::RegisterUserImfObserver()
+{
+    MISC_HILOGI("RegisterUserImfObserver start");
+    std::lock_guard<std::mutex> currentUserImfObserverLock(currentUserImfObserverMutex_);
+    MiscDeviceObserver::UpdateFunc updateFunc = [&]() { InitInputMethodData(); };
+    currentUserImfObserver_ = CreateObserver(updateFunc);
+    if (currentUserImfObserver_ == nullptr) {
+        MISC_HILOGE("currentUserImfObserver_ is null");
+        return MISC_NO_INIT_ERR;
+    }
+    std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
+    std::string tableType = "system";
+    auto inputMethodHelper = CreateDataShareHelper(SETTING_USER_URI_PROXY, tableType);
+    if (inputMethodHelper == nullptr) {
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_EXCEPTION", HiSysEvent::EventType::FAULT,
+            "PKG_NAME", "RegisterUserImfObserver", "ERROR_CODE", MISC_NO_INIT_ERR);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
+        IPCSkeleton::SetCallingIdentity(callingIdentity);
+        MISC_HILOGE("inputMethodHelper is nullptr");
+        return MISC_NO_INIT_ERR;
+    }
+    Uri uriImf = AssembleUri(SETTING_USER_URI_PROXY, USER_SETTINGS_ENABLE_IME, tableType);
+    inputMethodHelper->RegisterObserver(uriImf, currentUserImfObserver_);
+    inputMethodHelper->NotifyChange(uriImf);
+    std::thread execCb(VibrationPriorityManager::ExecRegisterCb, currentUserImfObserver_);
+    execCb.detach();
+    ReleaseDataShareHelper(inputMethodHelper);
+    IPCSkeleton::SetCallingIdentity(callingIdentity);
+    MISC_HILOGI("Succeed to RegisterUserImfObserver");
+    return ERR_OK;
+}
+
+int32_t VibrationPriorityManager::UnregisterUserImfObserver()
+{
+    MISC_HILOGI("UnregisterUserImfObserver start");
+    std::lock_guard<std::mutex> currentUserImfObserverLock(currentUserImfObserverMutex_);
+    if (currentUserImfObserver_ == nullptr) {
+        MISC_HILOGE("currentUserImfObserver_ is nullptr");
+        return MISC_NO_INIT_ERR;
+    }
+    std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
+    std::string tableType = "system";
+    auto inputMethodHelper = CreateDataShareHelper(SETTING_USER_URI_PROXY, tableType);
+    if (inputMethodHelper == nullptr) {
+#ifdef HIVIEWDFX_HISYSEVENT_ENABLE
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_EXCEPTION", HiSysEvent::EventType::FAULT,
+            "PKG_NAME", "UnregisterUserImfObserver", "ERROR_CODE", MISC_NO_INIT_ERR);
+#endif // HIVIEWDFX_HISYSEVENT_ENABLE
+        IPCSkeleton::SetCallingIdentity(callingIdentity);
+        currentUserImfObserver_ = nullptr;
+        MISC_HILOGE("inputMethodHelper is nullptr");
+        return MISC_NO_INIT_ERR;
+    }
+    Uri uriImf = AssembleUri(SETTING_USER_URI_PROXY, USER_SETTINGS_ENABLE_IME, tableType);
+    inputMethodHelper->UnregisterObserver(uriImf, currentUserImfObserver_);
+    ReleaseDataShareHelper(inputMethodHelper);
+    IPCSkeleton::SetCallingIdentity(callingIdentity);
+    currentUserImfObserver_ = nullptr;
+    MISC_HILOGI("Succeed to UnregisterUserImfObserver");
+    return ERR_OK;
+}
+
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 bool VibrationPriorityManager::ShouldIgnoreInputMethod(const VibrateInfo &vibrateInfo)
 {
@@ -791,47 +907,11 @@ bool VibrationPriorityManager::ShouldIgnoreInputMethod(const VibrateInfo &vibrat
         MISC_HILOGD("Can not ignore for %{public}s", vibrateInfo.packageName.c_str());
         return false;
     }
-    int32_t pid = vibrateInfo.pid;
-    AppExecFwk::RunningProcessInfo processinfo{};
-    appMgrClientPtr_ = DelayedSingleton<AppExecFwk::AppMgrClient>::GetInstance();
-    if (appMgrClientPtr_ == nullptr) {
-        MISC_HILOGE("appMgrClientPtr is nullptr");
-        return false;
-    }
-    int32_t ret = appMgrClientPtr_->AppExecFwk::AppMgrClient::GetRunningProcessInfoByPid(pid, processinfo);
-    if (ret != ERR_OK) {
-        MISC_HILOGE("Getrunningprocessinfobypid failed");
-        return false;
-    }
-    if (processinfo.extensionType_ == AppExecFwk::ExtensionAbilityType::INPUTMETHOD) {
+    std::lock_guard<std::mutex> inputMethodBundleNamesLock(inputMethodBundleNamesMutex_);
+    if (std::find(inputMethodBundleNames_.begin(), inputMethodBundleNames_.end(),
+        vibrateInfo.packageName) != inputMethodBundleNames_.end()) {
+        MISC_HILOGD("Input method bundleName:%{public}s", vibrateInfo.packageName.c_str());
         return true;
-    }
-    std::vector<int32_t> activeUserIds;
-    int retId = AccountSA::OsAccountManager::QueryActiveOsAccountIds(activeUserIds);
-    if (retId != 0) {
-        MISC_HILOGE("QueryActiveOsAccountIds failed %{public}d", retId);
-        return false;
-    }
-    if (activeUserIds.empty()) {
-        MISC_HILOGE("activeUserId empty");
-        return false;
-    }
-    for (const auto &bundleName : processinfo.bundleNames) {
-        MISC_HILOGD("bundleName = %{public}s", bundleName.c_str());
-        AppExecFwk::BundleMgrClient bundleMgrClient;
-        AppExecFwk::BundleInfo bundleInfo;
-        auto res = bundleMgrClient.AppExecFwk::BundleMgrClient::GetBundleInfo(bundleName,
-            AppExecFwk::BundleFlag::GET_BUNDLE_WITH_EXTENSION_INFO, bundleInfo, activeUserIds[0]);
-        if (!res) {
-            MISC_HILOGE("Getbundleinfo fail");
-            return false;
-        }
-        for (const auto &extensionInfo : bundleInfo.extensionInfos) {
-            if (extensionInfo.type == AppExecFwk::ExtensionAbilityType::INPUTMETHOD) {
-                MISC_HILOGD("extensioninfo type is %{public}d", extensionInfo.type);
-                return true;
-            }
-        }
     }
     return false;
 }
@@ -1007,7 +1087,7 @@ int32_t VibrationPriorityManager::RegisterObserver(const sptr<MiscDeviceObserver
     auto helper = CreateDataShareHelper(SETTING_URI_PROXY, tableType);
     if (helper == nullptr) {
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
-        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "DATASHARE_EXCEPTION", HiSysEvent::EventType::FAULT,
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_EXCEPTION", HiSysEvent::EventType::FAULT,
             "PKG_NAME", "RegisterObserver", "ERROR_CODE", MISC_NO_INIT_ERR);
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
         IPCSkeleton::SetCallingIdentity(callingIdentity);
@@ -1046,7 +1126,7 @@ int32_t VibrationPriorityManager::UnregisterObserver(const sptr<MiscDeviceObserv
     auto helper = CreateDataShareHelper(SETTING_URI_PROXY, tableType);
     if (helper == nullptr) {
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
-        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "DATASHARE_EXCEPTION", HiSysEvent::EventType::FAULT,
+        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "MISC_SERVICE_EXCEPTION", HiSysEvent::EventType::FAULT,
             "PKG_NAME", "UnregisterObserver", "ERROR_CODE", MISC_NO_INIT_ERR);
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
         IPCSkeleton::SetCallingIdentity(callingIdentity);

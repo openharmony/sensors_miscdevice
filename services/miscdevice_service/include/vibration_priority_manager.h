@@ -117,7 +117,9 @@ private:
     int32_t GetWhiteListValue(const std::string &key, std::vector<WhiteListAppInfo> &value);
     void DeleteCJSONValue(cJSON *jsonValue);
     bool IgnoreAppVibrations(const VibrateInfo &vibrateInfo);
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
     void UpdateCurrentUserId();
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
     int32_t RegisterUserObserver();
     int32_t UnregisterUserObserver();
     std::string ReplaceUserIdForUri(std::string uri, int32_t userId);
@@ -133,13 +135,16 @@ private:
     void InitVibrateWhenRing();
     int32_t RegisterUser100Observer();
     int32_t UnregisterUser100Observer();
+    void PrintDoNotDisturbSwitchStatus(int32_t oldSwitchStatus, int32_t currentSwitchStatus);
+    void InitInputMethodData();
+    int32_t RegisterUserImfObserver();
+    int32_t UnregisterUserImfObserver();
     std::condition_variable stopCondition_;
     std::thread reportSwitchStatusThread_;
     static std::atomic_bool stop_;
     static std::mutex stopMutex_;
     sptr<IRemoteObject> remoteObj_ { nullptr };
     sptr<MiscDeviceObserver> observer_ { nullptr };
-    std::shared_ptr<AppExecFwk::AppMgrClient> appMgrClientPtr_ {nullptr};
     std::atomic_int32_t miscFeedback_ = FEEDBACK_MODE_INVALID;
     std::atomic_int32_t miscAudioRingerMode_ = RINGER_MODE_INVALID;
     std::atomic_int32_t vibrateWhenRing_ = VIBRATE_WHEN_RING_MODE_INVALID;
@@ -150,6 +155,10 @@ private:
     std::mutex whiteListMutex_;
     std::mutex vibrateWhenRingObserverMutex_;
     sptr<MiscDeviceObserver> vibrateWhenRingObserver_;
+    std::mutex currentUserImfObserverMutex_;
+    sptr<MiscDeviceObserver> currentUserImfObserver_;
+    std::vector<std::string> inputMethodBundleNames_;
+    std::mutex inputMethodBundleNamesMutex_;
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
     std::atomic_int32_t miscCrownFeedback_ = FEEDBACK_MODE_INVALID;
     std::atomic_int32_t miscIntensity_ = FEEDBACK_INTENSITY_INVALID;

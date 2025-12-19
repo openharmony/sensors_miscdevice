@@ -1375,18 +1375,19 @@ HWTEST_F(VibratorAgentTest, StartVibratorUseNotifactionTest, TestSize.Level1)
     ASSERT_TRUE(flag);
     bool isSupport = false;
     ASSERT_EQ(IsSupportEffect(VIBRATOR_TYPE_FAIL, &isSupport), 0);
-    if (!isSupport) {
+    if (isSupport) {
+        int32_t ret = StartVibrator(VIBRATOR_TYPE_FAIL);
+        ASSERT_EQ(ret, SUCCESS);
+        flag = SetUsage(USAGE_NOTIFICATION);
+        ASSERT_TRUE(flag);
+        ret = StartVibrator(VIBRATOR_TYPE_FAIL);
+        ASSERT_TRUE(ret == SUCCESS);
+        Cancel();
+    } else {
         MISC_HILOGW("effect %{public}s is not supported, skip test case StartVibratorUseNotifactionTest",
             VIBRATOR_TYPE_FAIL);
-        return;
+        ASSERT_EQ(isSupport, false);
     }
-    int32_t ret = StartVibrator(VIBRATOR_TYPE_FAIL);
-    ASSERT_EQ(ret, SUCCESS);
-    flag = SetUsage(USAGE_NOTIFICATION);
-    ASSERT_TRUE(flag);
-    ret = StartVibrator(VIBRATOR_TYPE_FAIL);
-    ASSERT_TRUE(ret == SUCCESS || ret == DEVICE_OPERATION_FAILED);
-    Cancel();
 }
 
 HWTEST_F(VibratorAgentTest, StartVibratorUseRingTest, TestSize.Level1)
@@ -1396,18 +1397,19 @@ HWTEST_F(VibratorAgentTest, StartVibratorUseRingTest, TestSize.Level1)
     ASSERT_TRUE(flag);
     bool isSupport = false;
     ASSERT_EQ(IsSupportEffect(VIBRATOR_TYPE_FAIL, &isSupport), 0);
-    if (!isSupport) {
+    if (isSupport) {
+        int32_t ret = StartVibrator(VIBRATOR_TYPE_FAIL);
+        ASSERT_EQ(ret, SUCCESS);
+        flag = SetUsage(USAGE_RING);
+        ASSERT_TRUE(flag);
+        ret = StartVibrator(VIBRATOR_TYPE_FAIL);
+        ASSERT_TRUE(ret == SUCCESS);
+        Cancel();
+    } else {
         MISC_HILOGW("effect %{public}s is not supported, skip test case StartVibratorUseRingTest",
             VIBRATOR_TYPE_FAIL);
-        return;
+        ASSERT_EQ(isSupport, false);
     }
-    int32_t ret = StartVibrator(VIBRATOR_TYPE_FAIL);
-    ASSERT_EQ(ret, SUCCESS);
-    flag = SetUsage(USAGE_RING);
-    ASSERT_TRUE(flag);
-    ret = StartVibrator(VIBRATOR_TYPE_FAIL);
-    ASSERT_TRUE(ret == SUCCESS || ret == DEVICE_OPERATION_FAILED);
-    Cancel();
 }
 
 HWTEST_F(VibratorAgentTest, GetVibrateModeTest, TestSize.Level1)
