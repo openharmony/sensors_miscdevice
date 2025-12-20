@@ -537,7 +537,6 @@ int32_t VibratorServiceClient::PlayPattern(const VibratorIdentifier &identifier,
 
 int32_t VibratorServiceClient::ConvertVibratorPackage(const VibratorPackage& inPkg, VibratePackage &outPkg)
 {
-    outPkg.patternNum = inPkg.patternNum;
     outPkg.packageDuration = inPkg.packageDuration;
     for (int32_t i = 0; i < inPkg.patternNum; ++i) {
         if (inPkg.patterns == nullptr) {
@@ -587,7 +586,7 @@ int32_t VibratorServiceClient::PlayPackageBySessionId(const VibratorIdentifier &
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
     } // LCOV_EXCL_STOP
-    VibratorPackage packageIPC;
+    VibratePackage packageIPC;
     if (ConvertVibratorPackage(package, packageIPC) != ERR_OK) {
         MISC_HILOGE("VibratorPackage parameter invalid");
         return PARAMETER_ERROR;
