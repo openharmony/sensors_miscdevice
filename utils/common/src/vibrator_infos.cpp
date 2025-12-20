@@ -21,6 +21,10 @@
 
 namespace OHOS {
 namespace Sensors {
+namespace {
+constexpr int32_t MAX_PATTERN_NUM = 1000;
+} // namespace
+
 void VibratePattern::Dump() const
 {
     int32_t size = static_cast<int32_t>(events.size());
@@ -235,21 +239,17 @@ VibratePattern* VibratePattern::Unmarshalling(Parcel &data)
     return pattern;
 }
 
-bool VibratePackageIPC::Marshalling(Parcel &parcel) const
+bool VibratePackage::Marshalling(Parcel &parcel) const
 {
     if (!parcel.WriteInt32(packageDuration)) {
         MISC_HILOGE("Write packageDuration failed");
         return false;
     }
-    if (!parcel.WriteInt32(patternNum)) {
-        MISC_HILOGE("Write pattern's patternNum failed");
+    if (!parcel.WriteInt32(static_cast<int32_t>(patterns.size()))) {
+        MISC_HILOGE("Write pattern's size failed");
         return false;
     }
-    if (patternNum != static_cast<int32_t>(patterns.size())) {
-        MISC_HILOGE("patternNum does not match patterns size");
-        return false;
-    }
-    for (int32_t i = 0; i < patternNum; ++i) {
+    for (size_t i = 0; i < patterns.size(); ++i) {
         if (!parcel.WriteInt32(patterns[i].startTime)) {
             MISC_HILOGE("Write pattern's startTime failed");
             return false;
@@ -310,9 +310,9 @@ bool VibratePackageIPC::Marshalling(Parcel &parcel) const
     return true;
 }
 
-VibratePackageIPC* VibratePackageIPC::Unmarshalling(Parcel &data)
+VibratePackage* VibratePackage::Unmarshalling(Parcel &data)
 {
-    auto package = new (std::nothrow) VibratePackageIPC();
+    auto package = new (std::nothrow) VibratePackage();
     if (package == nullptr || !(data.ReadInt32(package->packageDuration))) {
         MISC_HILOGE("Read pattern basic info failed");
         if (package != nullptr) {
@@ -322,17 +322,22 @@ VibratePackageIPC* VibratePackageIPC::Unmarshalling(Parcel &data)
         return package;
     }
     int32_t patternNum{ 0 };
-    if (!(data.ReadInt32(patternNum)) || patternNum > MAX_EVENT_SIZE) {
+    if (!data.ReadInt32(patternNum) || patternNum < 0 || patternNum > MAX_PATTERN_NUM) {
         MISC_HILOGE("Read patternNum failed or patternNum exceed the maximum");
         delete package;
         package = nullptr;
         return package;
     }
-    package->patternNum = patternNum;
     for (int32_t i = 0; i < patternNum; ++i) {
         VibratePattern pattern;
-        if (!(data.ReadInt32(pattern.startTime)) || !(data.ReadInt32(pattern.patternDuration))) {
-            MISC_HILOGE("Read pattern basic info failed");
+        if (!data.ReadInt32(pattern.startTime)) {
+            MISC_HILOGE("Read pattern startTime failed");
+            delete package;
+            package = nullptr;
+            return package;
+        }
+        if (!data.ReadInt32(pattern.patternDuration)) {
+            MISC_HILOGE("Read pattern patternDuration failed");
             delete package;
             package = nullptr;
             return package;
@@ -349,6 +354,12 @@ VibratePackageIPC* VibratePackageIPC::Unmarshalling(Parcel &data)
             int32_t tag{ -1 };
             if (!data.ReadInt32(tag)) {
                 MISC_HILOGE("Read type failed");
+                delete package;
+                package = nullptr;
+                return package;
+            }
+            if (tag != VibrateTag::EVENT_TAG_CONTINUOUS && tag != VibrateTag::EVENT_TAG_TRANSIENT) {
+                MISC_HILOGE("Invalid tag value");
                 delete package;
                 package = nullptr;
                 return package;
@@ -384,15 +395,6 @@ VibratePackageIPC* VibratePackageIPC::Unmarshalling(Parcel &data)
         package->patterns.emplace_back(pattern);
     }
     return package;
-}
-
-void VibratePackageIPC::Dump() const
-{
-    int32_t size = static_cast<int32_t>(patterns.size());
-    MISC_HILOGD("Vibrate package pattern size:%{public}d", size);
-    for (int32_t i = 0; i < size; ++i) {
-        patterns[i].Dump();
-    }
 }
 
 void VibrateParameter::Dump() const
@@ -636,6 +638,7 @@ CustomHapticInfoIPC* CustomHapticInfoIPC::Unmarshalling(Parcel &data)
     }
     if (!data.ReadUint32(customHapticInfoIPC->parameter.sessionId)) {
         MISC_HILOGE("Read sessionId failed");
+        delete customHapticInfoIPC;
         customHapticInfoIPC = nullptr;
         return customHapticInfoIPC;
     }

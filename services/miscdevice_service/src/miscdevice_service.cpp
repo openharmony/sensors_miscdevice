@@ -424,7 +424,7 @@ int32_t MiscdeviceService::Vibrate(const VibratorIdentifierIPC& identifier, int3
             curVibrateTime.c_str());
         return ERROR;
     }
-    MISC_HILOGI("Start vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, usage:%{public}d,"
+    MISC_HILOGW("Start vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, usage:%{public}d,"
         "deviceId:%{public}d, vibratorId:%{public}d, duration:%{public}d", curVibrateTime.c_str(),
         info.packageName.c_str(), info.pid, info.usage, identifier.deviceId, identifier.vibratorId, info.duration);
     return NO_ERROR;
@@ -483,7 +483,7 @@ int32_t MiscdeviceService::StopVibratorService(const VibratorIdentifierIPC& iden
     }
     std::string packageName = GetPackageName(GetCallingTokenID());
     std::string curVibrateTime = GetCurrentTime();
-    MISC_HILOGI("Stop vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, deviceId:%{public}d,"
+    MISC_HILOGW("Stop vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, deviceId:%{public}d,"
         "vibratorId:%{public}d", curVibrateTime.c_str(), packageName.c_str(), GetCallingPid(), identifier.deviceId,
         identifier.vibratorId);
     return NO_ERROR;
@@ -529,7 +529,7 @@ int32_t MiscdeviceService::PlayVibratorEffect(const VibratorIdentifierIPC& ident
             curVibrateTime.c_str());
         return ERROR;
     }
-    MISC_HILOGI("Start vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, usage:%{public}d,"
+    MISC_HILOGW("Start vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, usage:%{public}d,"
         "deviceId:%{public}d, vibratorId:%{public}d, duration:%{public}d, effect:%{public}s, count:%{public}d",
         curVibrateTime.c_str(), info.packageName.c_str(), info.pid, info.usage, identifier.deviceId,
         identifier.vibratorId, info.duration, info.effect.c_str(), info.count);
@@ -644,7 +644,7 @@ int32_t MiscdeviceService::StopVibratorByMode(const VibratorIdentifierIPC& ident
     }
     std::string packageName = GetPackageName(GetCallingTokenID());
     std::string curVibrateTime = GetCurrentTime();
-    MISC_HILOGI("Stop vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, deviceId:%{public}d,"
+    MISC_HILOGW("Stop vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, deviceId:%{public}d,"
         "vibratorId:%{public}d, mode:%{public}s", curVibrateTime.c_str(), packageName.c_str(), GetCallingPid(),
         identifier.deviceId, identifier.vibratorId, mode.c_str());
     return NO_ERROR;
@@ -719,47 +719,25 @@ void MiscdeviceService::RegisterDeviceMuteObserver()
     }
 }
 
-int32_t MiscdeviceService::PlayVibratorCustom(const VibratorIdentifierIPC& identifier, int32_t fd,
-    int64_t offset, int64_t length, const CustomHapticInfoIPC& customHapticInfoIPC)
+int32_t MiscdeviceService::PlayVibratorCustom(const VibratorIdentifierIPC& identifier, const VibratePackage &pkg,
+    const CustomHapticInfoIPC& customHapticInfoIPC)
 {
     fileModeCallTimes_ += 1;
     int32_t checkResult = CheckAuthAndParam(customHapticInfoIPC.usage, customHapticInfoIPC.parameter, identifier);
     if (checkResult != ERR_OK) {
         MISC_HILOGE("CheckAuthAndParam failed, ret:%{public}d", checkResult);
-        close(fd);
         return checkResult;
     }
-    RawFileDescriptor rawFd;
-    rawFd.fd = fd;
-    rawFd.offset = offset;
-    rawFd.length = length;
-    JsonParser parser(rawFd);
-    VibratorDecoderCreator creator;
-    std::unique_ptr<IVibratorDecoder> decoder(creator.CreateDecoder(parser));
-    if (decoder == nullptr) {
-        MISC_HILOGE("decoder is nullptr");
-        close(rawFd.fd);
-        return ERROR;
-    }
-
-    VibratePackage package;
-    int32_t ret = decoder->DecodeEffect(rawFd, parser, package);
-    if (ret != SUCCESS || package.patterns.empty()) {
-        close(rawFd.fd);
-        MISC_HILOGE("Decode effect error");
-        return ERROR;
-    }
-    close(rawFd.fd);
-    MergeVibratorParmeters(customHapticInfoIPC.parameter, package);
-    package.Dump();
     VibrateInfo info = {
         .packageName = GetPackageName(GetCallingTokenID()),
         .pid = GetCallingPid(),
         .uid = GetCallingUid(),
         .usage = customHapticInfoIPC.usage,
         .systemUsage = customHapticInfoIPC.systemUsage,
-        .package = package,
+        .package = pkg,
     };
+    MergeVibratorParmeters(customHapticInfoIPC.parameter, info.package);
+    info.package.Dump();
     VibratorCapacity capacity;
     if (GetHapticCapacityInfo(identifier, capacity) != ERR_OK) {
         MISC_HILOGE("GetVibratorCapacity failed");
@@ -778,9 +756,9 @@ int32_t MiscdeviceService::PlayVibratorCustom(const VibratorIdentifierIPC& ident
             curVibrateTime.c_str());
         return ERROR;
     }
-    MISC_HILOGI("Start vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, usage:%{public}d,"
+    MISC_HILOGW("Start vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, usage:%{public}d,"
         "vibratorId:%{public}d, duration:%{public}d", curVibrateTime.c_str(), info.packageName.c_str(), info.pid,
-        info.usage, identifier.vibratorId, package.packageDuration);
+        info.usage, identifier.vibratorId, pkg.packageDuration);
     return NO_ERROR;
 }
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
@@ -955,7 +933,7 @@ int32_t MiscdeviceService::PerformVibrationControl(const VibratorIdentifierIPC& 
             curVibrateTime.c_str());
         return ERROR;
     }
-    MISC_HILOGI("Start vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, usage:%{public}d,"
+    MISC_HILOGW("Start vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, usage:%{public}d,"
         "duration:%{public}d", curVibrateTime.c_str(), info.packageName.c_str(), info.pid, info.usage, duration);
     return ERR_OK;
 }
@@ -1045,9 +1023,8 @@ int32_t MiscdeviceService::PlayPattern(const VibratorIdentifierIPC& identifier, 
     vibratePattern.startTime = ((sessionId > 0) ? pattern.startTime : 0);
     vibratePattern.events = pattern.events;
     std::vector<VibratePattern> patterns = {vibratePattern};
-    VibratePackage package = {
-        .patterns = patterns
-    };
+    VibratePackage package;
+    package.patterns = patterns;
     MergeVibratorParmeters(customHapticInfoIPC.parameter, package);
     package.Dump();
     VibrateInfo info = {
@@ -1084,7 +1061,7 @@ int32_t MiscdeviceService::PlayPattern(const VibratorIdentifierIPC& identifier, 
 }
 
 int32_t MiscdeviceService::PlayPackageBySessionId(const VibratorIdentifierIPC &identifier,
-    const VibratePackageIPC &package, const CustomHapticInfoIPC &customHapticInfoIPC)
+    const VibratePackage &package, const CustomHapticInfoIPC &customHapticInfoIPC)
 {
     CALL_LOG_ENTER;
     int32_t checkResult = PlayPatternCheckAuthAndParam(customHapticInfoIPC.usage, customHapticInfoIPC.parameter);
@@ -1152,7 +1129,7 @@ int32_t MiscdeviceService::StopVibrateBySessionId(const VibratorIdentifierIPC &i
             continue;
         }
         if (vibratorHdiConnection_.IsVibratorRunning(paramIt)) {
-            vibratorHdiConnection_.StopVibrateBySessionId(identifier, sessionId);
+            vibratorHdiConnection_.StopVibrateBySessionId(paramIt, sessionId);
         }
     }
     if (ignoreVibrateNum == result.size()) {
@@ -1161,7 +1138,7 @@ int32_t MiscdeviceService::StopVibrateBySessionId(const VibratorIdentifierIPC &i
     }
     std::string packageName = GetPackageName(GetCallingTokenID());
     std::string curVibrateTime = GetCurrentTime();
-    MISC_HILOGI("Stop vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, deviceId:%{public}d,"
+    MISC_HILOGW("Stop vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, deviceId:%{public}d,"
         "vibratorId:%{public}d, sessionId:%{public}d", curVibrateTime.c_str(), packageName.c_str(), GetCallingPid(),
         identifier.deviceId, identifier.vibratorId, sessionId);
     return NO_ERROR;
@@ -1439,7 +1416,7 @@ int32_t MiscdeviceService::PlayPrimitiveEffect(const VibratorIdentifierIPC& iden
             curVibrateTime.c_str());
         return ERROR;
     }
-    MISC_HILOGI("Start vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, usage:%{public}d,"
+    MISC_HILOGW("Start vibrator, currentTime:%{public}s, package:%{public}s, pid:%{public}d, usage:%{public}d,"
         "deviceId:%{public}d, vibratorId:%{public}d, duration:%{public}d, effect:%{public}s, intensity:%{public}d",
         curVibrateTime.c_str(), info.packageName.c_str(), info.pid, info.usage, identifier.deviceId,
         identifier.vibratorId, info.duration, info.effect.c_str(), info.intensity);

@@ -45,7 +45,7 @@ public:
     int32_t PlayPatternBySessionId(const VibratorIdentifierIPC &identifier, uint32_t sessionId,
         const VibratePattern &pattern) override;
     int32_t PlayPackageBySessionId(const VibratorIdentifierIPC &identifier, uint32_t sessionId,
-        const VibratePackageIPC &package) override;
+        const VibratePackage &package) override;
     int32_t StopVibrateBySessionId(const VibratorIdentifierIPC &identifier, uint32_t sessionId) override;
     int32_t DestroyHdiConnection() override;
     int32_t StartByIntensity(const VibratorIdentifierIPC &identifier, const std::string &effect,

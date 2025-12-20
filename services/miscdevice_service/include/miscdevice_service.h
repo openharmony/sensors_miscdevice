@@ -91,8 +91,8 @@ public:
     virtual int32_t PlayVibratorEffect(const VibratorIdentifierIPC& identifier, const std::string &effect,
         int32_t loopCount, int32_t usage, bool systemUsage) override;
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
-    virtual int32_t PlayVibratorCustom(const VibratorIdentifierIPC& identifier, int32_t fd, int64_t offset,
-        int64_t length, const CustomHapticInfoIPC& customHapticInfoIPC) override;
+    virtual int32_t PlayVibratorCustom(const VibratorIdentifierIPC& identifier, const VibratePackage &pkg,
+        const CustomHapticInfoIPC& customHapticInfoIPC) override;
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
     virtual int32_t StopVibrator(const VibratorIdentifierIPC& identifier) override;
     virtual int32_t StopVibratorByMode(const VibratorIdentifierIPC& identifier, const std::string &mode) override;
@@ -104,7 +104,7 @@ public:
     virtual int32_t PlayPattern(const VibratorIdentifierIPC& identifier, const VibratePattern &pattern,
         const CustomHapticInfoIPC& customHapticInfoIPC) override;
 
-    virtual int32_t PlayPackageBySessionId(const VibratorIdentifierIPC &identifier, const VibratePackageIPC &package,
+    virtual int32_t PlayPackageBySessionId(const VibratorIdentifierIPC &identifier, const VibratePackage &package,
         const CustomHapticInfoIPC &customHapticInfoIPC) override;
     virtual int32_t StopVibrateBySessionId(const VibratorIdentifierIPC &identifier, uint32_t sessionId) override;
     virtual int32_t GetDelayTime(const VibratorIdentifierIPC& identifier, int32_t &delayTime) override;

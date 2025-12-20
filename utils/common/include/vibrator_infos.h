@@ -91,10 +91,12 @@ struct VibratePattern : public Parcelable {
     static VibratePattern* Unmarshalling(Parcel &data);
 };
 
-struct VibratePackage {
+struct VibratePackage : public Parcelable {
     std::vector<VibratePattern> patterns;
     int32_t packageDuration = 0;
     void Dump() const;
+    bool Marshalling(Parcel &parcel) const;
+    static VibratePackage* Unmarshalling(Parcel &data);
 };
 
 struct VibratePackageIPC : public Parcelable {
@@ -136,7 +138,7 @@ struct VibrateInfo {
     int32_t intensity = 0;
     uint32_t sessionId = 0;
     VibratePackage package;
-    VibratePackageIPC packageIPC;
+    VibratePackage packageIPC;
 };
 
 struct VibrateParameter : public Parcelable {

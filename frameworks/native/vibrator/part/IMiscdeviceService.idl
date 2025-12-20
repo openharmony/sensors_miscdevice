@@ -25,7 +25,7 @@ sequenceable vibrator_infos..OHOS.Sensors.VibratorInfoIPC;
 sequenceable vibrator_infos..OHOS.Sensors.EffectInfoIPC;
 sequenceable vibrator_infos..OHOS.Sensors.CustomHapticInfoIPC;
 sequenceable vibrator_infos..OHOS.Sensors.PrimitiveEffectIPC;
-sequenceable vibrator_infos..OHOS.Sensors.VibratePackageIPC;
+sequenceable vibrator_infos..OHOS.Sensors.VibratePackage;
 
 interface OHOS.Sensors.IMiscdeviceService {
     void Vibrate([in] VibratorIdentifierIPC identifier, [in] int timeOut, [in] int usage, [in] boolean systemUsage);
@@ -44,7 +44,7 @@ interface OHOS.Sensors.IMiscdeviceService {
     void GetVibratorList([in] VibratorIdentifierIPC identifier, [out] VibratorInfoIPC[] vibratorInfoIPC);
     void GetEffectInfo([in] VibratorIdentifierIPC identifier, [in] String effectType, [out] EffectInfoIPC effectInfoIPC);
     void SubscribeVibratorPlugInfo([in] IRemoteObject vibratorClient);
-    void PlayPackageBySessionId([in] VibratorIdentifierIPC identifier, [in] VibratePackageIPC packageIPC, [in] CustomHapticInfoIPC customHapticInfoIPC);
+    void PlayPackageBySessionId([in] VibratorIdentifierIPC identifier, [in] VibratePackage packageIPC, [in] CustomHapticInfoIPC customHapticInfoIPC);
     void StopVibrateBySessionId([in] VibratorIdentifierIPC identifier, [in] unsigned int sessionId);
     void DisableVibratorByPid([in] int pid);
     void EnableVibratorByPid([in] int pid);
