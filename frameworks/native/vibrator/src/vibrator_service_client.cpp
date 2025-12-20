@@ -221,8 +221,24 @@ int32_t VibratorServiceClient::PlayVibratorCustom(const VibratorIdentifier &iden
     VibratorIdentifierIPC vibrateIdentifier;
     vibrateIdentifier.deviceId = identifier.deviceId;
     vibrateIdentifier.vibratorId = identifier.vibratorId;
-    ret = miscdeviceProxy_->PlayVibratorCustom(vibrateIdentifier, rawFd.fd, rawFd.offset,
-        rawFd.length, customHapticInfoIPC);
+    if (LoadDecoderLibrary(DECODER_LIBRARY_PATH) != ERR_OK) {
+        MISC_HILOGE("LoadDecoderLibrary fail");
+        return ERROR;
+    }
+    JsonParser parser(rawFd);
+    std::lock_guard<std::mutex> decodeLock(decodeMutex_);
+    decodeHandle_.decoder = decodeHandle_.create(parser);
+    CHKPR(decodeHandle_.decoder, ERROR);
+    VibratePackage pkg = {};
+    if (decodeHandle_.decoder->DecodeEffect(rawFd, parser, pkg) != ERR_OK) {
+        MISC_HILOGE("DecodeEffect fail");
+        decodeHandle_.destroy(decodeHandle_.decoder);
+        decodeHandle_.decoder = nullptr;
+        return ERROR;
+    }
+    decodeHandle_.destroy(decodeHandle_.decoder);
+    decodeHandle_.decoder = nullptr;
+    ret = miscdeviceProxy_->PlayVibratorCustom(vibrateIdentifier, pkg, customHapticInfoIPC);
     WriteVibratorHiSysIPCEvent(IMiscdeviceServiceIpcCode::COMMAND_PLAY_VIBRATOR_CUSTOM, ret);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     FinishTrace(HITRACE_TAG_SENSORS);
@@ -519,7 +535,7 @@ int32_t VibratorServiceClient::PlayPattern(const VibratorIdentifier &identifier,
     return ret;
 }
 
-int32_t VibratorServiceClient::ConvertVibratorPackage(const VibratorPackage& inPkg, VibratePackageIPC &outPkg)
+int32_t VibratorServiceClient::ConvertVibratorPackage(const VibratorPackage& inPkg, VibratePackage &outPkg)
 {
     outPkg.patternNum = inPkg.patternNum;
     outPkg.packageDuration = inPkg.packageDuration;
@@ -571,7 +587,7 @@ int32_t VibratorServiceClient::PlayPackageBySessionId(const VibratorIdentifier &
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
     } // LCOV_EXCL_STOP
-    VibratePackageIPC packageIPC;
+    VibratorPackage packageIPC;
     if (ConvertVibratorPackage(package, packageIPC) != ERR_OK) {
         MISC_HILOGE("VibratorPackage parameter invalid");
         return PARAMETER_ERROR;
@@ -623,7 +639,7 @@ int32_t VibratorServiceClient::StopVibrateBySessionId(const VibratorIdentifier &
     FinishTrace(HITRACE_TAG_SENSORS);
 #endif // HIVIEWDFX_HITRACE_ENABLE
     if (ret != ERR_OK) {
-        MISC_HILOGD("StopVibrateBySessionId failed, ret:%{public}d, sessionId:%{public}d", ret, sessionId);
+        MISC_HILOGE("StopVibrateBySessionId failed, ret:%{public}d, sessionId:%{public}d", ret, sessionId);
     }
     return ret;
 }

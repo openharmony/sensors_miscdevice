@@ -185,7 +185,7 @@ int32_t CompatibleConnection::PlayPatternBySessionId(const VibratorIdentifierIPC
 }
 
 int32_t CompatibleConnection::PlayPackageBySessionId(const VibratorIdentifierIPC &identifier, uint32_t sessionId,
-    const VibratePackageIPC &package)
+    const VibratePackage &package)
 {
     return ERR_OK;
 }

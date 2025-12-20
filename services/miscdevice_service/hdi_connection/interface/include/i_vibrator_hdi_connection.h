@@ -84,7 +84,7 @@ public:
     virtual int32_t GetEffectInfo(const VibratorIdentifierIPC &identifier, const std::string &effectType,
         HdfEffectInfo &effectInfo) = 0;
     virtual int32_t PlayPackageBySessionId(const VibratorIdentifierIPC &identifier, uint32_t sessionId,
-        const VibratePackageIPC &package) = 0;
+        const VibratePackage &package) = 0;
     virtual int32_t StopVibrateBySessionId(const VibratorIdentifierIPC &identifier, uint32_t sessionId) = 0;
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
     virtual int32_t RegisterVibratorPlugCallback(DevicePlugCallback cb) = 0;

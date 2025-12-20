@@ -81,7 +81,7 @@ bool OnRemoteRequestFuzzTest(const uint8_t *data, size_t size)
     size_t startPos = 0;
     VibratorIdentifierIPC identifier;
     startPos += GetObject<int32_t>(data + startPos, size - startPos, identifier.deviceId);
-    VibratePackageIPC packageIPC;
+    VibratePackage packageIPC;
     CustomHapticInfoIPC customHapticInfoIPC;
     datas.WriteParcelable(&identifier);
     datas.WriteParcelable(&packageIPC);

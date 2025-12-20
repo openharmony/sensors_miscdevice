@@ -172,7 +172,7 @@ int32_t VibratorHdiConnection::PlayPatternBySessionId(const VibratorIdentifierIP
 }
 
 int32_t VibratorHdiConnection::PlayPackageBySessionId(const VibratorIdentifierIPC &identifier, uint32_t sessionId,
-    const VibratePackageIPC &package)
+    const VibratePackage &package)
 {
     CHKPR(iVibratorHdiConnection_, VIBRATOR_HDF_CONNECT_ERR);
     return iVibratorHdiConnection_->PlayPackageBySessionId(identifier, sessionId, package);
