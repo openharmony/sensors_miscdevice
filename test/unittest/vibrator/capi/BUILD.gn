@@ -31,6 +31,7 @@ ohos_unittest("NativeVibratorTest") {
   sources = [
     "vibrator_test.cpp",
     "$SUBSYSTEM_DIR/test/unittest/common/src/common_utils.cpp",
+    "$SUBSYSTEM_DIR/test/unittest/common/src/vibrator_test_common.cpp",
   ]
 
   external_deps = [

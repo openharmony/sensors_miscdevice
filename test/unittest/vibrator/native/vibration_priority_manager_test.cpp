@@ -36,56 +36,20 @@ using Security::AccessToken::AccessTokenID;
 
 #define PRIORITY_MANAGER DelayedSingleton<VibrationPriorityManager>::GetInstance()
 
-PermissionStateFull g_infoManagerTestState = {
-    .grantFlags = {1},
-    .grantStatus = {PermissionState::PERMISSION_GRANTED},
-    .isGeneral = true,
-    .permissionName = "ohos.permission.VIBRATE",
-    .resDeviceID = {"local"}
-};
-
-HapPolicyParams g_infoManagerTestPolicyParams = {
-    .apl = APL_NORMAL,
-    .domain = "test.domain",
-    .permList = {},
-    .permStateList = {g_infoManagerTestState}
-};
-
-HapInfoParams g_infoManagerTestInfoParams = {
-    .bundleName = "VibrationPriorityManagerTest",
-    .userID = 1,
-    .instIndex = 0,
-    .appIDDesc = "VibrationPriorityManagerTest"
-};
-
 class VibrationPriorityManagerTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
-
-private:
-    static AccessTokenID tokenID_;
 };
-
-AccessTokenID VibrationPriorityManagerTest::tokenID_ = 0;
 
 void VibrationPriorityManagerTest::SetUpTestCase()
 {
-    AccessTokenIDEx tokenIdEx = {0};
-    tokenIdEx = AccessTokenKit::AllocHapToken(g_infoManagerTestInfoParams, g_infoManagerTestPolicyParams);
-    tokenID_ = tokenIdEx.tokenIdExStruct.tokenID;
-    ASSERT_NE(0, tokenID_);
-    ASSERT_EQ(0, SetSelfTokenID(tokenID_));
 }
 
 void VibrationPriorityManagerTest::TearDownTestCase()
 {
-    int32_t ret = AccessTokenKit::DeleteToken(tokenID_);
-    if (tokenID_ != 0) {
-        ASSERT_EQ(RET_SUCCESS, ret);
-    }
 }
 
 void VibrationPriorityManagerTest::SetUp()
