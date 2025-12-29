@@ -29,6 +29,7 @@
 #include "vibrator_agent.h"
 #include "vibrator_agent_type.h"
 #include "vibrator_infos.h"
+#include "vibrator_test_common.h"
 
 #undef LOG_TAG
 #define LOG_TAG "VibratorAgentSeekTest"
@@ -54,6 +55,8 @@ constexpr int32_t TIME_WAIT_FOR_OP = 2000;
 constexpr int32_t TIME_WAIT_FOR_EACH_CASE = 200;
 constexpr int32_t TEST_SUCCESS = 0;
 constexpr int32_t TEST_FAILED = -1;
+static MockHapToken* g_mock = nullptr;
+uint64_t g_selfShellTokenId;
 }
 
 using namespace Security::AccessToken;
@@ -95,19 +98,25 @@ AccessTokenID VibratorAgentModulationTest::tokenID_ = 0;
 
 void VibratorAgentModulationTest::SetUpTestCase()
 {
+    g_selfShellTokenId = GetSelfTokenID();
+    VibratorTestCommon::SetTestEvironment(g_selfShellTokenId);
+    std::vector<std::string> reqPerm;
+    reqPerm.emplace_back("ohos.permission.VIBRATE");
+    g_mock = new (std::nothrow) MockHapToken("vibratoragent_test", reqPerm, true);
     AccessTokenIDEx tokenIdEx = {0};
-    tokenIdEx = AccessTokenKit::AllocHapToken(g_infoManagerTestInfoParms, g_infoManagerTestPolicyPrams);
+    VibratorTestCommon::AllocTestHapToken(g_infoManagerTestInfoParms, g_infoManagerTestPolicyPrams, tokenIdEx);
     tokenID_ = tokenIdEx.tokenIdExStruct.tokenID;
-    ASSERT_NE(0, tokenID_);
-    ASSERT_EQ(0, SetSelfTokenID(tokenID_));
+    VibratorTestCommon::AllocAndGrantHapTokenByTest(g_infoManagerTestInfoParms, g_infoManagerTestPolicyPrams);
 }
 
 void VibratorAgentModulationTest::TearDownTestCase()
 {
-    int32_t ret = AccessTokenKit::DeleteToken(tokenID_);
-    if (tokenID_ != 0) {
-        ASSERT_EQ(RET_SUCCESS, ret);
+    if (g_mock != nullptr) {
+        delete g_mock;
+        g_mock = nullptr;
     }
+    EXPECT_EQ(0, SetSelfTokenID(g_selfShellTokenId));
+    VibratorTestCommon::ResetTestEvironment();
 }
 
 void VibratorAgentModulationTest::SetUp()

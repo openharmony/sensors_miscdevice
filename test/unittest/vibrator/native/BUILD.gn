@@ -17,10 +17,15 @@ import("./../../../../miscdevice.gni")
 ohos_unittest("VibratorAgentTest") {
   module_out_path = "miscdevice/miscdevice/native"
 
-  sources = [ "vibrator_agent_test.cpp" ]
+  sources = [
+    "vibrator_agent_test.cpp",
+    "$SUBSYSTEM_DIR/test/unittest/common/src/vibrator_test_common.cpp",
+
+  ]
 
   include_dirs = [
     "$SUBSYSTEM_DIR/interfaces/inner_api/vibrator",
+    "$SUBSYSTEM_DIR/test/unittest/common/include",
     "$SUBSYSTEM_DIR/utils/common/include",
   ]
 
@@ -80,10 +85,14 @@ ohos_unittest("VibratorAgentSeekTest") {
 ohos_unittest("VibratorAgentModulationTest") {
   module_out_path = "miscdevice/miscdevice/native"
 
-  sources = [ "vibrator_agent_modulation_test.cpp" ]
+  sources = [
+    "vibrator_agent_modulation_test.cpp",
+    "$SUBSYSTEM_DIR/test/unittest/common/src/vibrator_test_common.cpp",
+  ]
 
   include_dirs = [
     "$SUBSYSTEM_DIR/interfaces/inner_api/vibrator",
+    "$SUBSYSTEM_DIR/test/unittest/common/include",
     "$SUBSYSTEM_DIR/utils/common/include",
   ]
 
