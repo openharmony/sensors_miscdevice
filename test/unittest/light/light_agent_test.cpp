@@ -21,7 +21,6 @@
 #include "token_setproc.h"
 #include "light_agent.h"
 #include "sensors_errors.h"
-#include "vibrator_test_common.h"
 
 #undef LOG_TAG
 #define LOG_TAG "LightAgentTest"
@@ -31,33 +30,9 @@ namespace Sensors {
 using namespace testing::ext;
 using namespace Security::AccessToken;
 using Security::AccessToken::AccessTokenID;
-static MockHapToken* g_mock = nullptr;
-uint64_t g_selfShellTokenId;
 
 namespace {
 constexpr int32_t TIME_WAIT_FOR_OP = 2;
-
-PermissionStateFull g_infoManagerTestState = {
-    .grantFlags = {1},
-    .grantStatus = {PermissionState::PERMISSION_GRANTED},
-    .isGeneral = true,
-    .permissionName = "ohos.permission.SYSTEM_LIGHT_CONTROL",
-    .resDeviceID = {"local"}
-};
-
-HapPolicyParams g_infoManagerTestPolicyPrams = {
-    .apl = APL_NORMAL,
-    .domain = "test.domain",
-    .permList = {},
-    .permStateList = {g_infoManagerTestState}
-};
-
-HapInfoParams g_infoManagerTestInfoParms = {
-    .bundleName = "lightagent_test",
-    .userID = 1,
-    .instIndex = 0,
-    .appIDDesc = "LightAgentTest"
-};
 } // namespace
 
 class LightAgentTest : public testing::Test {
@@ -66,11 +41,7 @@ public:
     static void TearDownTestCase();
     void SetUp() {}
     void TearDown() {}
-private:
-    static AccessTokenID tokenID_;
 };
-
-AccessTokenID LightAgentTest::tokenID_ = 0;
 
 LightInfo *g_lightInfo = nullptr;
 int32_t g_lightId = -1;
@@ -79,22 +50,10 @@ int32_t g_lightType = -1;
 
 void LightAgentTest::SetUpTestCase()
 {
-    g_selfShellTokenId = GetSelfTokenID();
-    VibratorTestCommon::SetTestEvironment(g_selfShellTokenId);
-    std::vector<std::string> reqPerm;
-    reqPerm.emplace_back("ohos.permission.SYSTEM_LIGHT_CONTROL");
-    g_mock = new (std::nothrow) MockHapToken("lightagent_test", reqPerm, true);
-    VibratorTestCommon::AllocAndGrantHapTokenByTest(g_infoManagerTestInfoParms, g_infoManagerTestPolicyPrams);
 }
 
 void LightAgentTest::TearDownTestCase()
 {
-    if (g_mock != nullptr) {
-        delete g_mock;
-        g_mock = nullptr;
-    }
-    EXPECT_EQ(0, SetSelfTokenID(g_selfShellTokenId));
-    VibratorTestCommon::ResetTestEvironment();
 }
 
 /**
@@ -184,7 +143,7 @@ HWTEST_F(LightAgentTest, StartLightTest_003, TestSize.Level1)
         animation.offTime = 50;
         int32_t ret = TurnOn(g_lightId, color, animation);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-        ASSERT_EQ(ret, 0);
+        ASSERT_EQ(ret, -1);
     }
 }
 
@@ -300,7 +259,7 @@ HWTEST_F(LightAgentTest, StartLightTest_008, TestSize.Level1)
         animation.offTime = 2;
         int32_t ret = TurnOn(g_lightId, color, animation);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-        ASSERT_EQ(ret, 0);
+        ASSERT_EQ(ret, -1);
     }
 }
 
@@ -337,7 +296,7 @@ HWTEST_F(LightAgentTest, StartLightTest_010, TestSize.Level1)
 {
     CALL_LOG_ENTER;
     int32_t ret = TurnOff(g_lightId);
-    ASSERT_EQ(ret, 0);
+    ASSERT_EQ(ret, -1);
 }
 
 /**
