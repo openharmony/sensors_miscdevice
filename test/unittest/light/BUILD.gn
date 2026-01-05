@@ -17,14 +17,10 @@ import("./../../../miscdevice.gni")
 ohos_unittest("LightAgentTest") {
   module_out_path = "miscdevice/miscdevice/test"
 
-  sources = [
-    "light_agent_test.cpp",
-    "$SUBSYSTEM_DIR/test/unittest/common/src/vibrator_test_common.cpp",
-  ]
+  sources = [ "light_agent_test.cpp" ]
 
   include_dirs = [
     "$SUBSYSTEM_DIR/interfaces/inner_api/light",
-    "$SUBSYSTEM_DIR/test/unittest/common/include",
     "$SUBSYSTEM_DIR/utils/common/include",
   ]
 
