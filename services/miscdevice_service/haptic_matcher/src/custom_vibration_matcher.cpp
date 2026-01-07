@@ -334,6 +334,10 @@ void CustomVibrationMatcher::ProcessContinuousEvent(const VibrateEvent &event, i
         return;
     }
     const std::vector<VibrateCurvePoint> &curve = event.points;
+    if (curve.empty()) {
+        MISC_HILOGD("curve is empty");
+        return;
+    }
     int32_t endTime = curve.back().time;
     int32_t curTime = curve.front().time;
     int32_t curIntensity = curve.front().intensity;
