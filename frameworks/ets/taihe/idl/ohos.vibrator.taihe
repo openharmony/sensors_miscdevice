@@ -827,7 +827,7 @@ function getVibratorInfoSync(param: Optional<VibratorInfoParam>): Array<Vibrator
  */
 @gen_async("stopVibration")
 @gen_promise("stopVibration")
-function stopVibrationSync(): void;
+function stopVibrationAsync(): void;
 
 /**
  * Whether the preset vibration effect is supported.
@@ -842,7 +842,7 @@ function stopVibrationSync(): void;
  */
 @gen_async("isSupportEffect")
 @gen_promise("isSupportEffect")
-function isSupportEffectSync(effectId: String): bool;
+function isSupportEffectAsync(effectId: String): bool;
 
 /**
  * Provide methods for adding long or short vibration events and generate VibratorPattern objects.
@@ -892,3 +892,23 @@ interface VibratorPatternBuilder {
 
 @rename @constructor("VibratorPatternBuilder")
 function getVibratorPatternBuilder(): VibratorPatternBuilder;
+
+function stopVibrationSync(): void;
+function isSupportEffectSync(effectId: String): bool;
+
+@gen_promise("stopVibration")
+function stopVibrationParam(param: Optional<VibratorInfoParam>): void;
+
+struct EffectInfo {
+    isEffectSupported: bool;
+}
+function getEffectInfoSync(effectId: String, param: Optional<VibratorInfoParam>): EffectInfo;
+
+struct VibratorStatusEvent {
+    timestamp: i64;
+    deviceId: i32;
+    vibratorCount: i32;
+    isVibratorOnline: bool;
+}
+function onVibratorStateChange(f: (event: VibratorStatusEvent) => void, @sts_last opq: Opaque): void;
+function offVibratorStateChange(opq: Optional<@sts_type("Function1<VibratorStatusEvent, void>") Opaque>): void;

@@ -21,6 +21,7 @@
 #include "stdexcept"
 #include "taihe/runtime.hpp"
 
+#include "refbase.h"
 #include "file_utils.h"
 #include "miscdevice_log.h"
 #include "sensors_errors.h"
@@ -30,7 +31,10 @@
 #define LOG_TAG "VibratorImpl"
 
 namespace {
+using namespace taihe;
 using namespace OHOS::Sensors;
+// using namespace ohos::vibrator;
+using namespace OHOS;
 
 constexpr int32_t INTENSITY_ADJUST_MAX = 100;
 constexpr int32_t EVENT_START_TIME_MAX = 1800000;
@@ -62,7 +66,49 @@ static std::map<std::string, int32_t> g_usageType = {
     {"simulateReality", USAGE_SIMULATE_REALITY},
 };
 
+enum FunctionType {
+    SYSTEM_VIBRATE_CALLBACK = 1,
+    COMMON_CALLBACK,
+    IS_SUPPORT_EFFECT_CALLBACK,
+    VIBRATOR_STATE_CHANGE,
+};
+
+typedef struct AniCallbackData {
+    bool isSupportEffect;
+    std::string flag;
+    FunctionType funcType;
+} AniCallbackData;
+
 static std::set<std::string> g_allowedTypes = {"time", "preset", "file", "pattern"};
+using callbackType = std::variant<taihe::callback<void(::ohos::vibrator::VibratorStatusEvent const&)>>;
+
+struct CallbackObject : public RefBase {
+    CallbackObject(callbackType cb, ani_ref ref) : callback(cb), ref(ref)
+    {
+    }
+    ~CallbackObject()
+    {
+    }
+    callbackType callback;
+    ani_ref ref;
+};
+
+void CallBackVibratorStatusEvent(::ohos::vibrator::VibratorStatusEvent event, sptr<CallbackObject> callbackObject);
+
+struct AsyncCallbackError {
+    int32_t code {0};
+    std::string message;
+    std::string name;
+    std::string stack;
+};
+
+static std::map<std::string, std::vector<sptr<CallbackObject>>> g_onCallbackInfos;
+static std::mutex g_Mutex;
+
+std::map<std::string, std::function<void(::ohos::vibrator::VibratorStatusEvent, sptr<CallbackObject>)>>
+    g_functionByVibratorStatusEvent = {
+        { "vibratorStateChange", CallBackVibratorStatusEvent },
+    };
 
 struct VibrateInfo {
     std::string type;
@@ -465,7 +511,7 @@ taihe::array<ohos::vibrator::VibratorInfo> getVibratorInfoSync(
     return taihe::array<ohos::vibrator::VibratorInfo>(taiheVibratorInfo);
 }
 
-void stopVibrationSync()
+void stopVibrationAsync()
 {
     CALL_LOG_ENTER;
     int32_t ret = Cancel();
@@ -474,7 +520,7 @@ void stopVibrationSync()
     }
 }
 
-bool isSupportEffectSync(::taihe::string_view effectId)
+bool isSupportEffectAsync(::taihe::string_view effectId)
 {
     CALL_LOG_ENTER;
     bool isSupportEffect = false;
@@ -483,6 +529,223 @@ bool isSupportEffectSync(::taihe::string_view effectId)
         taihe::set_business_error(ret, "IsSupportEffect execution failed");
     }
     return isSupportEffect;
+}
+
+void stopVibrationSync()
+{
+    int32_t ret = Cancel();
+    if (ret != SUCCESS) {
+        taihe::set_business_error(ret, "Cancel execution fail");
+    }
+}
+
+bool isSupportEffectSync(::taihe::string_view effectId)
+{
+    return isSupportEffectAsync(effectId);
+}
+
+void stopVibrationParam(::taihe::optional_view<::ohos::vibrator::VibratorInfoParam> param)
+{
+    int32_t ret = SUCCESS;
+    if (!param.has_value()) {
+        ret = Cancel();
+    } else {
+        VibratorIdentifier info = {
+            .deviceId = param->deviceId.value(),
+            .vibratorId = param->vibratorId.value()
+        };
+        ret = CancelEnhanced(info);
+    }
+    if (ret != SUCCESS) {
+        taihe::set_business_error(ret, "Cancel execution fail");
+    }
+}
+
+::ohos::vibrator::EffectInfo getEffectInfoSync(::taihe::string_view effectId,
+    ::taihe::optional_view<::ohos::vibrator::VibratorInfoParam> param)
+{
+    EffectInfo effectInfo;
+    VibratorIdentifier identifierInfo;
+    if (param.has_value()) {
+        identifierInfo.deviceId = param->deviceId.value();
+        identifierInfo.vibratorId = param->vibratorId.value();
+    }
+    int32_t ret = GetEffectInfo(identifierInfo, std::string(effectId), effectInfo);
+    if (ret != OHOS::ERR_OK) {
+        effectInfo.isSupportEffect = false;
+        MISC_HILOGW("Get effect info failed, ret:%{public}d", ret);
+    }
+    ::ohos::vibrator::EffectInfo info = {
+        .isEffectSupported = effectInfo.isSupportEffect
+    };
+    return info;
+}
+
+void CallBackVibratorStatusEvent(::ohos::vibrator::VibratorStatusEvent event, sptr<CallbackObject> callbackObject)
+{
+    auto &func = std::get<taihe::callback<void(::ohos::vibrator::VibratorStatusEvent const&)>>(
+        callbackObject->callback);
+    func(event);
+}
+
+static void UpdateCallbackInfos(std::string& vibratorEvent, callbackType callback, uintptr_t opq)
+{
+    CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> onSubcribeLock(g_Mutex);
+    ani_object callbackObj = reinterpret_cast<ani_object>(opq);
+    ani_ref callbackRef;
+    ani_env *env = taihe::get_env();
+    if (env == nullptr || env->GlobalReference_Create(callbackObj, &callbackRef) != ANI_OK) {
+        MISC_HILOGW("Failed to create callbackRef, sensorTypeId:%{public}s", vibratorEvent.c_str());
+        return;
+    }
+    std::vector<sptr<CallbackObject>> callbackInfos = g_onCallbackInfos[vibratorEvent];
+    bool isSubscribedCallback =
+        std::any_of(callbackInfos.begin(), callbackInfos.end(), [env, callbackRef](const CallbackObject *obj) {
+            ani_boolean isEqual = false;
+            return (env->Reference_StrictEquals(callbackRef, obj->ref, &isEqual) == ANI_OK) && isEqual;
+        });
+    if (isSubscribedCallback) {
+        env->GlobalReference_Delete(callbackRef);
+        MISC_HILOGW("Callback is already subscribed, sensorTypeId:%{public}s", vibratorEvent.c_str());
+        return;
+    }
+    sptr<CallbackObject> taiheCallbackInfo = new (std::nothrow) CallbackObject(callback, callbackRef);
+    if (taiheCallbackInfo == nullptr) {
+        MISC_HILOGW("taiheCallbackInfo is nullptr");
+        return;
+    }
+    callbackInfos.push_back(taiheCallbackInfo);
+    g_onCallbackInfos[vibratorEvent] = callbackInfos;
+}
+
+void CallbackVibratorStatusEvent(std::string eventType, VibratorStatusEvent statusEvent,
+    sptr<CallbackObject> callbackObject)
+{
+    if (g_functionByVibratorStatusEvent.find(eventType) == g_functionByVibratorStatusEvent.end()) {
+        MISC_HILOGW("SensorTypeId not exist, id:%{public}s", eventType.c_str());
+        return;
+    }
+    ::ohos::vibrator::VibratorStatusEvent event {
+        .timestamp = statusEvent.timestamp,
+        .deviceId = statusEvent.deviceId,
+        .vibratorCount = statusEvent.vibratorCnt,
+        .isVibratorOnline = statusEvent.type == PLUG_STATE_EVENT_PLUG_IN ? true : false
+    };
+    g_functionByVibratorStatusEvent[eventType](event, callbackObject);
+}
+
+void DataCallbackImpl(VibratorStatusEvent *statusEvent)
+{
+    CALL_LOG_ENTER;
+    if (statusEvent == nullptr) {
+        MISC_HILOGW("statusEvent is nullptr");
+        return;
+    }
+    if (statusEvent->type == PLUG_STATE_EVENT_UNKNOWN) {
+        MISC_HILOGE("UpdatePlugInfo failed");
+        return;
+    }
+    std::string eventType("vibratorStateChange");
+    std::lock_guard<std::mutex> onCallbackLock(g_Mutex);
+    auto it = g_onCallbackInfos.find(eventType);
+    if (it == g_onCallbackInfos.end()) {
+        MISC_HILOGW("not find callback info");
+        return;
+    }
+    for (auto &callbackInfo : it->second) {
+        CallbackVibratorStatusEvent(eventType, *statusEvent, callbackInfo);
+    }
+}
+
+const VibratorUser user = {
+    .callback = DataCallbackImpl
+};
+
+void onVibratorStateChange(callback_view<void(::ohos::vibrator::VibratorStatusEvent const& event)> f, uintptr_t opq)
+{
+    int32_t ret = SubscribeVibratorPlug(user);
+    if (ret != OHOS::ERR_OK) {
+        taihe::set_business_error(ret, "SubscribeVibratorPlug fail");
+        return;
+    }
+    std::string eventType("vibratorStateChange");
+    UpdateCallbackInfos(eventType, f, opq);
+}
+
+static int32_t RemoveAllCallback(std::string& eventType)
+{
+    CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> onCancelLock(g_Mutex);
+    std::vector<sptr<CallbackObject>>& callbackInfos = g_onCallbackInfos[eventType];
+    for (auto iter = callbackInfos.begin(); iter != callbackInfos.end();) {
+        CHKPC(*iter);
+        if (auto *env = taihe::get_env()) {
+            env->GlobalReference_Delete((*iter)->ref);
+        }
+        iter = callbackInfos.erase(iter);
+    }
+    if (callbackInfos.empty()) {
+        MISC_HILOGD("No subscription to change");
+        g_onCallbackInfos.erase(eventType);
+        return callbackInfos.size();
+    }
+    g_onCallbackInfos[eventType] = callbackInfos;
+    return callbackInfos.size();
+}
+
+static int32_t RemoveCallback(std::string& eventType, uintptr_t opq)
+{
+    CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> onCallbackLock(g_Mutex);
+    ani_object callbackObj = reinterpret_cast<ani_object>(opq);
+    ani_ref callbackRef;
+    ani_env *env = taihe::get_env();
+    if (env == nullptr || env->GlobalReference_Create(callbackObj, &callbackRef) != ANI_OK) {
+        MISC_HILOGE("Failed to create callbackRef, sensorTypeId:%{public}s", eventType.c_str());
+        return 0;
+    }
+    std::vector<sptr<CallbackObject>>& callbackInfos = g_onCallbackInfos[eventType];
+    for (auto iter = callbackInfos.begin(); iter != callbackInfos.end();) {
+        CHKPC(*iter);
+        ani_boolean isEqual = false;
+        if ((env->Reference_StrictEquals(callbackRef, (*iter)->ref, &isEqual) == ANI_OK) && isEqual) {
+            env->GlobalReference_Delete((*iter)->ref);
+            iter = callbackInfos.erase(iter);
+            MISC_HILOGE("Remove callback success");
+            break;
+        } else {
+            ++iter;
+        }
+    }
+    env->GlobalReference_Delete(callbackRef);
+    if (callbackInfos.empty()) {
+        MISC_HILOGD("No subscription to change data");
+        g_onCallbackInfos.erase(eventType);
+        return 0;
+    }
+    g_onCallbackInfos[eventType] = callbackInfos;
+    return callbackInfos.size();
+}
+
+void offVibratorStateChange(::taihe::optional_view<uintptr_t> opq)
+{
+    int32_t subscribeSize = -1;
+    std::string eventType = "vibratorStateChange";
+    if (opq.has_value()) {
+        subscribeSize = RemoveCallback(eventType, opq.value());
+    } else {
+        subscribeSize = RemoveAllCallback(eventType);
+    }
+    if (subscribeSize > 0) {
+        MISC_HILOGW("There are other client subscribe system js api as well, not need unsubscribe");
+        return;
+    }
+
+    int32_t ret = UnSubscribeVibratorPlug(user);
+    if (ret != OHOS::ERR_OK) {
+        MISC_HILOGE("User callback unsubscribe fail, ret:%{public}d", ret);
+    }
 }
 
 enum VibrateTag {
@@ -741,7 +1004,13 @@ TH_EXPORT_CPP_API_stopVibrationByModeSync(stopVibrationByModeSync);
 TH_EXPORT_CPP_API_startVibrationSync(startVibrationSync);
 TH_EXPORT_CPP_API_isHdHapticSupported(isHdHapticSupported);
 TH_EXPORT_CPP_API_getVibratorInfoSync(getVibratorInfoSync);
+TH_EXPORT_CPP_API_stopVibrationAsync(stopVibrationAsync);
+TH_EXPORT_CPP_API_isSupportEffectAsync(isSupportEffectAsync);
+TH_EXPORT_CPP_API_getVibratorPatternBuilder(getVibratorPatternBuilder);
 TH_EXPORT_CPP_API_stopVibrationSync(stopVibrationSync);
 TH_EXPORT_CPP_API_isSupportEffectSync(isSupportEffectSync);
-TH_EXPORT_CPP_API_getVibratorPatternBuilder(getVibratorPatternBuilder);
+TH_EXPORT_CPP_API_stopVibrationParam(stopVibrationParam);
+TH_EXPORT_CPP_API_getEffectInfoSync(getEffectInfoSync);
+TH_EXPORT_CPP_API_onVibratorStateChange(onVibratorStateChange);
+TH_EXPORT_CPP_API_offVibratorStateChange(offVibratorStateChange);
 // NOLINTEND
