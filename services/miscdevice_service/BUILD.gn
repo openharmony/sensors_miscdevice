@@ -36,8 +36,6 @@ ohos_shared_library("libmiscdevice_service") {
     "$SUBSYSTEM_DIR/services/miscdevice_service/hdi_connection/adapter/include",
     "$SUBSYSTEM_DIR/services/miscdevice_service/hdi_connection/interface/include",
     "$SUBSYSTEM_DIR/utils/common/include",
-    "$SUBSYSTEM_DIR/utils/haptic_decoder/interface",
-    "$SUBSYSTEM_DIR/utils/haptic_decoder/oh_json/include",
   ]
 
   cflags = [
@@ -68,7 +66,7 @@ ohos_shared_library("libmiscdevice_service") {
 
   deps = [
     "$SUBSYSTEM_DIR/frameworks/native/vibrator:miscdevice_service_stub",
-    "$SUBSYSTEM_DIR/utils:miscdevice_utils_target",
+    "$SUBSYSTEM_DIR/utils/common:libmiscdevice_utils",
   ]
 
   external_deps = [
@@ -153,8 +151,6 @@ ohos_static_library("libmiscdevice_service_static") {
     "$SUBSYSTEM_DIR/services/miscdevice_service/hdi_connection/adapter/include",
     "$SUBSYSTEM_DIR/services/miscdevice_service/hdi_connection/interface/include",
     "$SUBSYSTEM_DIR/utils/common/include",
-    "$SUBSYSTEM_DIR/utils/haptic_decoder/interface",
-    "$SUBSYSTEM_DIR/utils/haptic_decoder/oh_json/include",
   ]
 
   cflags = [
@@ -185,7 +181,7 @@ ohos_static_library("libmiscdevice_service_static") {
 
   deps = [
     "$SUBSYSTEM_DIR/frameworks/native/vibrator:miscdevice_service_stub",
-    "$SUBSYSTEM_DIR/utils:miscdevice_utils_target",
+    "$SUBSYSTEM_DIR/utils/common:libmiscdevice_utils",
   ]
 
   external_deps = [

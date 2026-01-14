@@ -39,7 +39,6 @@
 #include "parameter.h"
 #include "parameters.h"
 #include "permission_util.h"
-#include "vibrator_decoder_creator.h"
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 
 #undef LOG_TAG
