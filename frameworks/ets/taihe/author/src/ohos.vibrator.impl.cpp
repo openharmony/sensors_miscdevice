@@ -90,7 +90,7 @@ struct CallbackObject : public RefBase {
     {
     }
     callbackType callback;
-    ani_ref ref;
+    ani_ref ref = nullptr;
 };
 
 void CallBackVibratorStatusEvent(::ohos::vibrator::VibratorStatusEvent event, sptr<CallbackObject> callbackObject);
@@ -697,7 +697,6 @@ static int32_t RemoveAllCallback(std::string& eventType)
 static int32_t RemoveCallback(std::string& eventType, uintptr_t opq)
 {
     CALL_LOG_ENTER;
-    std::lock_guard<std::mutex> onCallbackLock(g_Mutex);
     ani_object callbackObj = reinterpret_cast<ani_object>(opq);
     ani_ref callbackRef;
     ani_env *env = taihe::get_env();
@@ -705,6 +704,7 @@ static int32_t RemoveCallback(std::string& eventType, uintptr_t opq)
         MISC_HILOGE("Failed to create callbackRef, sensorTypeId:%{public}s", eventType.c_str());
         return 0;
     }
+    std::lock_guard<std::mutex> onCallbackLock(g_Mutex);
     std::vector<sptr<CallbackObject>>& callbackInfos = g_onCallbackInfos[eventType];
     for (auto iter = callbackInfos.begin(); iter != callbackInfos.end();) {
         CHKPC(*iter);
@@ -725,7 +725,7 @@ static int32_t RemoveCallback(std::string& eventType, uintptr_t opq)
         return 0;
     }
     g_onCallbackInfos[eventType] = callbackInfos;
-    return callbackInfos.size();
+    return static_cast<int32_t>(callbackInfos.size());
 }
 
 void offVibratorStateChange(::taihe::optional_view<uintptr_t> opq)
