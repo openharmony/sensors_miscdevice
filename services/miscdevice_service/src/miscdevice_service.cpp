@@ -960,6 +960,7 @@ void MiscdeviceService::ReportCallTimes()
             "STATISTICS_TYPE", "VIBRATOR_MODE", "PKG_NAME", "", "STATISTICS_DATA", vibratorModeStatisticVec);
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
         ReportInvalidVibratorInfo();
+        PriorityManager->ReportSwitchStatus();
         MISC_HILOGI("CallTimesReport timeModeCallTimes:%{public}d, presetModeCallTimes:%{public}d, "
                     "fileModeCallTimes:%{public}d, patternModeCallTimes:%{public}d",
             timeModeCallTimes_.load(), presetModeCallTimes_.load(), fileModeCallTimes_.load(),

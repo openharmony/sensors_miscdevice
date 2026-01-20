@@ -67,15 +67,9 @@ const std::string SETTING_CROWN_FEEDBACK_KEY = "watch_crown_feedback_enabled";
 const std::string SETTING_VIBRATE_INTENSITY_KEY = "vibration_intensity_index";
 #endif
 constexpr int32_t DECEM_BASE = 10;
-constexpr int32_t HOURS_IN_DAY = 24;
-constexpr int32_t MINUTES_IN_HOUR = 60;
-constexpr int32_t SECONDS_IN_MINUTE = 60;
 }  // namespace
 
-std::atomic_bool VibrationPriorityManager::stop_ = false;
-std::mutex VibrationPriorityManager::stopMutex_;
 std::atomic_bool VibrationPriorityManager::isVibratorMute_ = false;
-std::once_flag VibrationPriorityManager::flag_;
 
 VibrationPriorityManager::VibrationPriorityManager() {}
 
@@ -93,11 +87,6 @@ VibrationPriorityManager::~VibrationPriorityManager()
     }
     if (UnregisterUserImfObserver() != ERR_OK) {
         MISC_HILOGE("UnregisterUserImfObserver failed");
-    }
-    if (reportSwitchStatusThread_.joinable()) {
-        stop_ = true;
-        stopCondition_.notify_all();
-        reportSwitchStatusThread_.join();
     }
 }
 
@@ -149,7 +138,6 @@ bool VibrationPriorityManager::Init()
         return false;
     }
     ReregisterCurrentUserObserver();
-    StartReportSwitchStatus();
     return true;
 }
 
@@ -737,49 +725,20 @@ bool VibrationPriorityManager::IsSystemCalling()
 
 void VibrationPriorityManager::ReportSwitchStatus()
 {
-    std::time_t now = std::time(nullptr);
-    std::tm *nowTm = std::localtime(&now);
-    if (nowTm == nullptr) {
-        MISC_HILOGE("Get the current time failed!");
-        return;
-    }
-    int32_t hoursToMidnight = HOURS_IN_DAY - 1 - nowTm->tm_hour;
-    int32_t minutesToMidnight = MINUTES_IN_HOUR - 1 - nowTm->tm_min;
-    int32_t secondsToMidnight = SECONDS_IN_MINUTE - nowTm->tm_sec;
-    auto durationToMidnight = std::chrono::hours(hoursToMidnight) + std::chrono::minutes(minutesToMidnight) +
-                              std::chrono::seconds(secondsToMidnight);
-    std::unique_lock<std::mutex> lock(stopMutex_);
-    stopCondition_.wait_for(lock, durationToMidnight, [this] { return stop_.load(); });
-    while (!stop_) {
-        int32_t feedbackTemp = miscFeedback_;
-        int32_t ringModeTemp = miscAudioRingerMode_;
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
-        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "SWITCHES_TOGGLE", HiSysEvent::EventType::BEHAVIOR,
-            "SWITCH_TYPE", "feedbackCurrentStatus", "STATUS", feedbackTemp);
-        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "SWITCHES_TOGGLE", HiSysEvent::EventType::BEHAVIOR,
-            "SWITCH_TYPE", "ringerModeCurrentStatus", "STATUS", ringModeTemp);
+    HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "SWITCHES_TOGGLE", HiSysEvent::EventType::BEHAVIOR,
+        "SWITCH_TYPE", "feedbackCurrentStatus", "STATUS", miscFeedback_.load());
+    HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "SWITCHES_TOGGLE", HiSysEvent::EventType::BEHAVIOR,
+        "SWITCH_TYPE", "ringerModeCurrentStatus", "STATUS", miscAudioRingerMode_.load());
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
-        int32_t crownfeedback = miscCrownFeedback_;
-        int32_t intensity = miscIntensity_;
-        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "SWITCHES_TOGGLE", HiSysEvent::EventType::BEHAVIOR,
-            "SWITCH_TYPE", "crownfeedback", "STATUS", crownfeedback);
-        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "SWITCHES_TOGGLE", HiSysEvent::EventType::BEHAVIOR,
-            "SWITCH_TYPE", "intensity", "STATUS", intensity);
+    HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "SWITCHES_TOGGLE", HiSysEvent::EventType::BEHAVIOR,
+        "SWITCH_TYPE", "crownfeedback", "STATUS", miscCrownFeedback_.load());
+    HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "SWITCHES_TOGGLE", HiSysEvent::EventType::BEHAVIOR,
+        "SWITCH_TYPE", "intensity", "STATUS", miscIntensity_.load());
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CROWN
-        int32_t currentDoNotDisturbSwitch = doNotDisturbSwitch_;
-        HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "SWITCHES_TOGGLE", HiSysEvent::EventType::BEHAVIOR,
-            "SWITCH_TYPE", "currentDoNotDisturbSwitch", "STATUS", currentDoNotDisturbSwitch);
+    HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "SWITCHES_TOGGLE", HiSysEvent::EventType::BEHAVIOR,
+        "SWITCH_TYPE", "currentDoNotDisturbSwitch", "STATUS", doNotDisturbSwitch_.load());
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
-        MISC_HILOGI("feedbackCurrentStatus:%{public}d, ringerModeCurrentStatus:%{public}d", feedbackTemp, ringModeTemp);
-        stopCondition_.wait_for(lock, std::chrono::hours(HOURS_IN_DAY), [this] { return stop_.load(); });
-    }
-}
-
-void VibrationPriorityManager::StartReportSwitchStatus()
-{
-    std::call_once(flag_, [this] () {
-        reportSwitchStatusThread_ = std::thread([this]() { this->ReportSwitchStatus(); });
-    });
 }
 
 void VibrationPriorityManager::PrintDoNotDisturbSwitchStatus(int32_t oldSwitchStatus, int32_t currentSwitchStatus)
