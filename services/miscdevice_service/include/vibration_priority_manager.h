@@ -95,6 +95,7 @@ public:
     void MiscCrownIntensityFeedbackInit(void);
 #endif
     void SetIgnoreSwitchStatus(bool status);
+    void ReportSwitchStatus();
 
 private:
     bool IsCurrentVibrate(const std::shared_ptr<VibratorThread> &vibratorThread,
@@ -130,8 +131,6 @@ private:
     bool ReleaseDataShareHelper(std::shared_ptr<DataShare::DataShareHelper> &helper);
     sptr<MiscDeviceObserver> CreateObserver(const MiscDeviceObserver::UpdateFunc &func);
     void UpdateStatus();
-    void ReportSwitchStatus();
-    void StartReportSwitchStatus();
     void InitVibrateWhenRing();
     int32_t RegisterUser100Observer();
     int32_t UnregisterUser100Observer();
@@ -139,10 +138,6 @@ private:
     void InitInputMethodData();
     int32_t RegisterUserImfObserver();
     int32_t UnregisterUserImfObserver();
-    std::condition_variable stopCondition_;
-    std::thread reportSwitchStatusThread_;
-    static std::atomic_bool stop_;
-    static std::mutex stopMutex_;
     sptr<IRemoteObject> remoteObj_ { nullptr };
     sptr<MiscDeviceObserver> observer_ { nullptr };
     std::atomic_int32_t miscFeedback_ = FEEDBACK_MODE_INVALID;
@@ -164,7 +159,6 @@ private:
     std::atomic_int32_t miscIntensity_ = FEEDBACK_INTENSITY_INVALID;
 #endif
     static std::atomic_bool isVibratorMute_;
-    static std::once_flag flag_;
 };
 #define PriorityManager DelayedSingleton<VibrationPriorityManager>::GetInstance()
 }  // namespace Sensors

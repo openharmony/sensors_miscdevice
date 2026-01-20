@@ -22,7 +22,7 @@ ohos_shared_library("vibrator") {
   ]
   defines = [
     "APP_LOG_TAG = \"vibratorJs\"",
-    "LOG_DOMAIN = 0xD002700",
+    "LOG_DOMAIN = 0xD002701",
   ]
 
   branch_protector_ret = "pac_ret"

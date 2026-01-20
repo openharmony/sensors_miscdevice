@@ -57,7 +57,7 @@ taihe_shared_library("vibrator_taihe_native") {
   ]
   defines = [
     "APP_LOG_TAG = \"VibratorImpl\"",
-    "LOG_DOMAIN = 0xD002700",
+    "LOG_DOMAIN = 0xD002701",
   ]
   sources = get_target_outputs(":run_taihe")
   sources += [
