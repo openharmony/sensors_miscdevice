@@ -281,11 +281,11 @@ int32_t VibrationPriorityManager::RegisterUserObserver()
 int32_t VibrationPriorityManager::UnregisterUserObserver()
 {
     MISC_HILOGI("UnregisterUserObserver start");
+    std::lock_guard<std::mutex> currentUserObserverLock(currentUserObserverMutex_);
     if (currentUserObserver_ == nullptr) {
         MISC_HILOGE("currentUserObserver_ is nullptr");
         return MISC_NO_INIT_ERR;
     }
-    std::lock_guard<std::mutex> currentUserObserverLock(currentUserObserverMutex_);
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
     std::string tableType = "normal";
     auto doNotDisturbHelper =
