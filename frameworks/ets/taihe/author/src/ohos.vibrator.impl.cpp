@@ -525,7 +525,7 @@ bool isSupportEffectAsync(::taihe::string_view effectId)
     CALL_LOG_ENTER;
     bool isSupportEffect = false;
     int32_t ret = IsSupportEffect(effectId.c_str(), &isSupportEffect);
-    if (ret != SUCCESS) {
+    if (ret == PERMISSION_DENIED || ret == PARAMETER_ERROR) {
         taihe::set_business_error(ret, "IsSupportEffect execution failed");
     }
     return isSupportEffect;
@@ -541,7 +541,13 @@ void stopVibrationSync()
 
 bool isSupportEffectSync(::taihe::string_view effectId)
 {
-    return isSupportEffectAsync(effectId);
+    CALL_LOG_ENTER;
+    bool isSupportEffect = false;
+    int32_t ret = IsSupportEffect(effectId.c_str(), &isSupportEffect);
+    if (ret != SUCCESS) {
+        taihe::set_business_error(ret, "IsSupportEffect execution failed");
+    }
+    return isSupportEffect;
 }
 
 void stopVibrationParam(::taihe::optional_view<::ohos::vibrator::VibratorInfoParam> param)
