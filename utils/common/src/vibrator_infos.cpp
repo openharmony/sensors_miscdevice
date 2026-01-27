@@ -422,10 +422,17 @@ VibrateParameter* VibrateParameter::Unmarshalling(Parcel &data)
         MISC_HILOGE("Read init parameter failed");
         return nullptr;
     }
-    if (!(data.ReadInt32(parameter->intensity)) && !(data.ReadInt32(parameter->frequency))) {
+    if (!data.ReadInt32(parameter->intensity)) {
         MISC_HILOGE("Read parameter's intensity failed");
         delete parameter;
         parameter = nullptr;
+        return parameter;
+    }
+    if (!data.ReadInt32(parameter->frequency)) {
+        MISC_HILOGE("Read parameter's frequency failed");
+        delete parameter;
+        parameter = nullptr;
+        return parameter;
     }
     return parameter;
 }

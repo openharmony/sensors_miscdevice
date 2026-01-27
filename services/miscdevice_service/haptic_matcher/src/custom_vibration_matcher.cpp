@@ -307,7 +307,7 @@ std::vector<VibrateCurvePoint> CustomVibrationMatcher::MergeCurve(const std::vec
                 newCurvePoint.frequency = (curveRight[j].frequency + frequency) / 2;
                 ++j;
             } else {
-                newCurvePoint.time = curveRight[i].time;
+                newCurvePoint.time = curveRight[j].time;
                 newCurvePoint.intensity = std::max(curveLeft[i].intensity, curveRight[j].intensity);
                 newCurvePoint.frequency = (curveLeft[i].frequency + curveRight[j].frequency) / 2;
                 ++i;

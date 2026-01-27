@@ -3218,5 +3218,35 @@ HWTEST_F(VibratorAgentTest, EnableVibratorByPid_004, TestSize.Level1)
     ret = EnableVibratorByPid(PID_FIVE);
     ASSERT_EQ(ret, PERMISSION_DENIED);
 }
+
+HWTEST_F(VibratorAgentTest, VibrateParameterTest, TestSize.Level1)
+{
+    MISC_HILOGI("VibrateParameterTest in");
+    VibrateParameter vibrateParameter;
+    vibrateParameter.intensity = 100;
+    vibrateParameter.frequency = 1;
+    Parcel data;
+    bool flag = vibrateParameter.Marshalling(data);
+    ASSERT_EQ(flag, true);
+    VibrateParameter *ret = vibrateParameter.Unmarshalling(data);
+    ASSERT_NE(ret, nullptr);
+    ASSERT_EQ(ret->intensity, 100);
+    ASSERT_EQ(ret->frequency, 1);
+    delete ret;
+    ret = nullptr;
+}
+
+HWTEST_F(VibratorAgentTest, VibrateParameterInvalidTest, TestSize.Level1)
+{
+    MISC_HILOGI("VibrateParameterInvalidTest in");
+    VibrateParameter vibrateParameter;
+    Parcel data;
+    VibrateParameter *ret = vibrateParameter.Unmarshalling(data);
+    ASSERT_EQ(ret, nullptr);
+    int32_t intensity = 100;
+    ASSERT_EQ(data.WriteInt32(intensity), true);
+    ret = vibrateParameter.Unmarshalling(data);
+    ASSERT_EQ(ret, nullptr);
+}
 } // namespace Sensors
 } // namespace OHOS
