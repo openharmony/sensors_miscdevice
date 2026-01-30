@@ -700,7 +700,7 @@ static int32_t RemoveAllCallback(const std::string& eventType)
     return callbackInfos.size();
 }
 
-static int32_t RemoveCallback(const std::string& eventType, uintptr_t opq)
+static int32_t RemoveCallback(std::string& eventType, uintptr_t opq)
 {
     CALL_LOG_ENTER;
     ani_object callbackObj = reinterpret_cast<ani_object>(opq);
