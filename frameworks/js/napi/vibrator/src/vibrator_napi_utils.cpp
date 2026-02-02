@@ -527,8 +527,7 @@ void ExecuteCallBack(napi_env env, void *data)
     if (asyncCallbackInfo->flag == VIBRATOR_PRESET) {
         asyncCallbackInfo->error.code = PlayPrimitiveEffect(asyncCallbackInfo->info.effectId.c_str(),
             asyncCallbackInfo->info.intensity);
-    }
-    if (asyncCallbackInfo->flag == VIBRATOR_IS_SUPPORT_EFFECT) {
+    } else if (asyncCallbackInfo->flag == VIBRATOR_IS_SUPPORT_EFFECT) {
         bool isSupportEffect = false;
         int32_t ret = IsSupportEffect(asyncCallbackInfo->info.effectId.c_str(), &isSupportEffect);
         if (ret == PERMISSION_DENIED || ret == PARAMETER_ERROR) {
