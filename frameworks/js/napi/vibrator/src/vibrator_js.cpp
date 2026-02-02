@@ -502,7 +502,7 @@ static napi_value VibrateEffect(napi_env env, napi_value args[], size_t argc)
             ThrowErr(env, PARAMETER_ERROR, "SetLoopCount fail or parameter invalid");
             return nullptr;
         }
-        asyncCallbackInfo->flag = "preset";
+        asyncCallbackInfo->flag = VIBRATOR_PRESET;
     } else {
         asyncCallbackInfo->error.code = StartVibrate(asyncCallbackInfo->info, identifier);
         if (asyncCallbackInfo->info.vibratorPattern.events != nullptr) {
@@ -680,7 +680,7 @@ static napi_value IsSupportEffect(napi_env env, napi_callback_info info)
     CHKPP(asyncCallbackInfo);
     asyncCallbackInfo->callbackType = IS_SUPPORT_EFFECT_CALLBACK;
     asyncCallbackInfo->info.effectId = effectId;
-    asyncCallbackInfo->flag = "isSupportEffect";
+    asyncCallbackInfo->flag = VIBRATOR_IS_SUPPORT_EFFECT;
     if ((argc > 1) && (IsMatchType(env, args[1], napi_function))) {
         return EmitAsyncWork(args[1], asyncCallbackInfo);
     }
