@@ -527,6 +527,14 @@ void ExecuteCallBack(napi_env env, void *data)
         asyncCallbackInfo->error.code = PlayPrimitiveEffect(asyncCallbackInfo->info.effectId.c_str(),
             asyncCallbackInfo->info.intensity);
     }
+    if (asyncCallbackInfo->flag == "isSupportEffect") {
+        bool isSupportEffect = false;
+        int32_t ret = IsSupportEffect(effectId.c_str(), &isSupportEffect);
+        if (ret == PERMISSION_DENIED || ret == PARAMETER_ERROR) {
+            asyncCallbackInfo->error.code = ret;
+        }
+        asyncCallbackInfo->isSupportEffect = isSupportEffect;
+    }
 }
 
 void EmitUvEventLoop(sptr<AsyncCallbackInfo> asyncCallbackInfo)
