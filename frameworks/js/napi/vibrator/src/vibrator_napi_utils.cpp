@@ -530,7 +530,7 @@ void ExecuteCallBack(napi_env env, void *data)
     }
     if (asyncCallbackInfo->flag == "isSupportEffect") {
         bool isSupportEffect = false;
-        int32_t ret = IsSupportEffect(effectId.c_str(), &isSupportEffect);
+        int32_t ret = IsSupportEffect(asyncCallbackInfo->info.effectId.c_str(), &isSupportEffect);
         if (ret == PERMISSION_DENIED || ret == PARAMETER_ERROR) {
             asyncCallbackInfo->error.code = ret;
         }
