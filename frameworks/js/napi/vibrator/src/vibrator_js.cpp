@@ -684,14 +684,14 @@ static napi_value IsSupportEffect(napi_env env, napi_callback_info info)
     {
         std::lock_guard<std::mutex> lock(g_cacheMutex);
         if (g_supportedEffects.find(effectId) == g_supportedEffects.end()) {
-            bool isEffectSupported = false;
-            int32_t ret = IsHdHapticSupported(effectId.c_str(), &isSupportEffect);
-            if (ret == PERMISSION_DENIED || ret == PARAMETER_ERROR) { 
+            bool isSupportEffect = false;
+            int32_t ret = IsSupportEffect(effectId.c_str(), &isSupportEffect);
+            if (ret == PERMISSION_DENIED || ret == PARAMETER_ERROR) {
                 asyncCallbackInfo->error.code = ret;
             }
             g_supportedEffects[effectId] = isSupportEffect;
         }
-        asyncCallbackInfo->isSupportEffect = isSupportEffect;
+        asyncCallbackInfo->isSupportEffect = g_supportedEffects[effectId];
     }
     if ((argc > 1) && (IsMatchType(env, args[1], napi_function))) {
         return EmitAsyncWork(args[1], asyncCallbackInfo);
