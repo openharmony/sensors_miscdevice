@@ -50,11 +50,6 @@ enum CallbackType {
     VIBRATOR_STATE_CHANGE,
 };
 
-enum VibratorEventFlag {
-    VIBRATOR_PRESET = 1,
-    VIBRATOR_IS_SUPPORT_EFFECT,
-};
-
 struct VibrateInfo {
     std::string type;
     std::string usage;
@@ -91,7 +86,7 @@ public:
     int32_t arrayLength = -1;
     EffectInfo effectInfo;
     VibratorStatusEvent statusEvent;
-    VibratorEventFlag flag;
+    std::string flag;
     AsyncCallbackInfo(napi_env env) : env(env) {}
     ~AsyncCallbackInfo();
 };
