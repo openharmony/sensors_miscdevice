@@ -70,6 +70,8 @@ static std::map<std::string, int32_t> g_usageType = {
 static std::set<std::string> g_allowedTypes = {"time", "preset", "file", "pattern"};
 static std::map<std::string, std::vector<sptr<AsyncCallbackInfo>>> g_onCallbackInfos;
 static std::mutex g_Mutex;
+static std::map<std::string, bool> g_supportedEffects;
+static std::mutex g_cacheMutex;
 
 static napi_value EmitAsyncWork(napi_value param, sptr<AsyncCallbackInfo> info)
 {
@@ -502,7 +504,7 @@ static napi_value VibrateEffect(napi_env env, napi_value args[], size_t argc)
             ThrowErr(env, PARAMETER_ERROR, "SetLoopCount fail or parameter invalid");
             return nullptr;
         }
-        asyncCallbackInfo->flag = VIBRATOR_PRESET;
+        asyncCallbackInfo->flag = "preset";
     } else {
         asyncCallbackInfo->error.code = StartVibrate(asyncCallbackInfo->info, identifier);
         if (asyncCallbackInfo->info.vibratorPattern.events != nullptr) {
@@ -679,8 +681,18 @@ static napi_value IsSupportEffect(napi_env env, napi_callback_info info)
     sptr<AsyncCallbackInfo> asyncCallbackInfo = new (std::nothrow) AsyncCallbackInfo(env);
     CHKPP(asyncCallbackInfo);
     asyncCallbackInfo->callbackType = IS_SUPPORT_EFFECT_CALLBACK;
-    asyncCallbackInfo->info.effectId = effectId;
-    asyncCallbackInfo->flag = VIBRATOR_IS_SUPPORT_EFFECT;
+    {
+        std::lock_guard<std::mutex> lock(g_cacheMutex);
+        if (g_supportedEffects.find(effectId) == g_supportedEffects.end()) {
+            bool isEffectSupported = false;
+            int32_t ret = IsHdHapticSupported(effectId.c_str(), &isSupportEffect);
+            if (ret == PERMISSION_DENIED || ret == PARAMETER_ERROR) { 
+                asyncCallbackInfo->error.code = ret;
+            }
+            g_supportedEffects[effectId] = isSupportEffect;
+        }
+        asyncCallbackInfo->isSupportEffect = isSupportEffect;
+    }
     if ((argc > 1) && (IsMatchType(env, args[1], napi_function))) {
         return EmitAsyncWork(args[1], asyncCallbackInfo);
     }
