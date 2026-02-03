@@ -679,7 +679,7 @@ void onVibratorStateChange(callback_view<void(::ohos::vibrator::VibratorStatusEv
     UpdateCallbackInfos(eventType, f, opq);
 }
 
-static int32_t RemoveAllCallback(std::string& eventType)
+static int32_t RemoveAllCallback(const std::string& eventType)
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> onCancelLock(g_Mutex);
@@ -780,7 +780,7 @@ class VibratorPatternBuilderImpl {
 public:
     VibratorPatternBuilderImpl() {}
 
-    int64_t GetVibratorPatternBuilderImpl()
+    int64_t GetVibratorPatternBuilderImpl() const
     {
         return reinterpret_cast<int64_t>(this);
     }
