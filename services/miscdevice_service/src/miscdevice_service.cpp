@@ -1524,6 +1524,7 @@ int32_t MiscdeviceService::GetEffectInfo(const VibratorIdentifierIPC& identifier
 {
     CALL_LOG_ENTER;
     identifier.Dump();
+    std::lock_guard<std::mutex> lockManage(devicesManageMutex_);
     if (devicesManageMap_.empty()) {
         MISC_HILOGI("No vibrator device online");
         return NO_ERROR;
@@ -1591,6 +1592,7 @@ int32_t MiscdeviceService::FastVibratorEffect(const VibrateInfo &info, const Vib
 std::shared_ptr<VibratorThread> MiscdeviceService::GetVibratorThread(const VibratorIdentifierIPC& identifier)
 {
     CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> lockManage(devicesManageMutex_);
     auto deviceIt = devicesManageMap_.find(identifier.deviceId);
     if (deviceIt != devicesManageMap_.end()) {
         auto thread = deviceIt->second.controlInfo.GetVibratorThread(identifier.vibratorId);
@@ -1635,6 +1637,7 @@ int32_t MiscdeviceService::GetAllWaveInfo(const VibratorIdentifierIPC& identifie
     std::vector<HdfWaveInformation>& waveInfo)
 {
     CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> lockManage(devicesManageMutex_);
     if (identifier.deviceId != -1) {
         auto deviceIt = devicesManageMap_.find(identifier.deviceId);
         if (deviceIt != devicesManageMap_.end()) {
@@ -1762,7 +1765,6 @@ int32_t MiscdeviceService::InsertVibratorInfo(int deviceId, const std::string &d
 
 int32_t MiscdeviceService::StartVibrateThreadControl(const VibratorIdentifierIPC& identifier, VibrateInfo& info)
 {
-    std::lock_guard<std::mutex> lockManage(devicesManageMutex_);
     std::string curVibrateTime = GetCurrentTime();
     std::vector<VibratorIdentifierIPC> result = CheckDeviceIdIsValid(identifier);
     if (result.empty()) {
@@ -1835,7 +1837,6 @@ std::vector<VibratorIdentifierIPC> MiscdeviceService::CheckDeviceIdIsValid(const
 {
     CALL_LOG_ENTER;
     std::vector<VibratorIdentifierIPC> result;
-
     auto addToResult = [&](const auto& info) {
         VibratorIdentifierIPC newIdentifier;
         newIdentifier.deviceId = info.deviceId;
@@ -1845,7 +1846,6 @@ std::vector<VibratorIdentifierIPC> MiscdeviceService::CheckDeviceIdIsValid(const
         result.push_back(newIdentifier);
         MISC_HILOGD("Push result in list,:%{public}d,:%{public}d", newIdentifier.deviceId, newIdentifier.vibratorId);
     };
-
     auto processDevice = [&](const auto& device) {
         for (const auto& info : device.second.baseInfo) {
             bool shouldAdd = false;
@@ -1864,7 +1864,7 @@ std::vector<VibratorIdentifierIPC> MiscdeviceService::CheckDeviceIdIsValid(const
             }
         }
     };
-
+    std::lock_guard<std::mutex> lockManage(devicesManageMutex_);
     if (identifier.deviceId != -1) {
         auto deviceIt = devicesManageMap_.find(identifier.deviceId);
         if (deviceIt != devicesManageMap_.end()) {
@@ -1872,7 +1872,6 @@ std::vector<VibratorIdentifierIPC> MiscdeviceService::CheckDeviceIdIsValid(const
         }
         return result;
     }
-
     for (const auto& pair : devicesManageMap_) {
         if (!IsVibratorIdValid(pair.second.baseInfo, identifier.vibratorId)) {
             for (const auto& info : pair.second.baseInfo) {
@@ -1882,7 +1881,6 @@ std::vector<VibratorIdentifierIPC> MiscdeviceService::CheckDeviceIdIsValid(const
             processDevice(pair);
         }
     }
-
     return result;
 }
 
