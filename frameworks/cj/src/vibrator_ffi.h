@@ -50,7 +50,31 @@ extern "C" {
         char* usage;
     };
 
-    FFI_EXPORT void FfiVibratorStartVibration(
+    struct RetVibrateAttributeEnhanced {
+        int32_t id;
+        char* usage;
+        int32_t deviceId;
+    };
+
+    struct RetVibratorInfoParam {
+        int32_t deviceId;
+        int32_t vibratorId;
+    };
+
+    struct RetVibratorInfos {
+        int32_t deviceId;
+        int32_t vibratorId;
+        char* deviceName;
+        bool isSupportHdHaptic;
+        bool isLocalVibrator;
+    };
+
+    struct CArrRetVibratorInfo {
+        RetVibratorInfos* head;
+        int64_t size;
+    };
+
+    FFI_EXPORT void FfiVibratorStartVibrationTime(
         RetVibrateTime effect, RetVibrateAttribute attribute, int32_t &code);
     FFI_EXPORT void FfiVibratorStartVibrationPreset(
         RetVibratePreset effect, RetVibrateAttribute attribute, int32_t &code);

@@ -56,6 +56,19 @@ struct CJVibrateInfo {
     VibratorPattern vibratorPattern;
 };
 
+char* MallocCString(const std::string& origin)
+{
+    if (origin.empty()) {
+        return nullptr;
+    }
+    auto length = origin.length() + 1;
+    char* res =  static_cast<char*>(malloc(sizeof(char) * length));
+    if (res == nullptr) {
+        return nullptr;
+    }
+    return std::char_traits<char>::copy(res, origin.c_str(), length);
+}
+
 bool SetUsage(const std::string &usage, bool systemUsage)
 {
     if (auto iter = g_usageType.find(usage); iter == g_usageType.end()) {
@@ -88,6 +101,44 @@ int32_t StartVibrate(const CJVibrateInfo &info)
         return PlayPattern(info.vibratorPattern);
     }
     return StartVibratorOnce(info.duration);
+}
+
+bool SetUsage(const VibratorIdentifier &identifier, const std::string &usage, bool systemUsage)
+{
+    if (auto iter = g_usageType.find(usage); iter == g_usageType.end()) {
+        MISC_HILOGE("Wrong usage type");
+        return false;
+    }
+    return SetUsageEnhanced(identifier, g_usageType[usage], systemUsage);
+}
+
+int32_t CheckParameters(const CJVibrateInfo &info, const VibratorIdentifier &identifier)
+{
+    CALL_LOG_ENTER;
+    if (!SetUsage(identifier, info.usage, info.systemUsage)) {
+        MISC_HILOGE("SetUsage fail");
+        return DEVICE_OPERATION_FAILED;
+    }
+    if (g_allowedTypes.find(info.type) == g_allowedTypes.end()) {
+        MISC_HILOGE("Invalid vibrate type, type:%{public}s", info.type.c_str());
+        return DEVICE_OPERATION_FAILED;
+    }
+    return ERR_OK;
+}
+
+int32_t StartVibrateEnhanced(const CJVibrateInfo &info, const VibratorIdentifier &identifier)
+{
+    CALL_LOG_ENTER;
+    if (CheckParameters(info, identifier)!= ERR_OK) {
+        MISC_HILOGE("SetUsage fail");
+        return DEVICE_OPERATION_FAILED;
+    }
+    if (info.type == "file") {
+        return PlayVibratorCustomEnhanced(identifier, info.fd, info.offset, info.length);
+    } else if (info.type == "pattern") {
+        return PlayPatternEnhanced(identifier, info.vibratorPattern);
+    }
+    return StartVibratorOnceEnhanced(identifier, info.duration);
 }
 
 extern "C" {
@@ -170,6 +221,148 @@ extern "C" {
     bool FfiVibratorIsHdHapticSupported()
     {
         return IsHdHapticSupported();
+    }
+
+    FFI_EXPORT int32_t FfiVibratorStartVibrationTimeEnhanced(RetVibrateTime effect,
+        RetVibrateAttributeEnhanced attribute)
+    {
+        CJVibrateInfo info;
+        if (effect.timeType == nullptr || attribute.usage == nullptr) {
+            return PARAMETER_ERROR;
+        }
+        std::string strType(effect.timeType);
+        info.type = strType;
+        info.duration = effect.duration;
+        std::string strUsage(attribute.usage);
+        info.usage = strUsage;
+        info.systemUsage = false;
+
+        VibratorIdentifier identifier;
+        identifier.deviceId = attribute.deviceId;
+        identifier.vibratorId = attribute.id;
+
+        if (identifier.vibratorId == 0) {
+            identifier.vibratorId = -1;
+        }
+
+        return StartVibrateEnhanced(info, identifier);
+    }
+
+    FFI_EXPORT int32_t FfiVibratorStartVibrationFileEnhanced(RetVibrateFromFile effect,
+        RetVibrateAttributeEnhanced attribute)
+    {
+        if (effect.fileType == nullptr || attribute.usage == nullptr) {
+            return PARAMETER_ERROR;
+        }
+        CJVibrateInfo info;
+        std::string strType(effect.fileType);
+        info.type = strType;
+        info.fd = effect.hapticFd.fd;
+        info.offset = effect.hapticFd.offSet;
+        info.length = effect.hapticFd.length;
+        std::string strUsage(attribute.usage);
+        info.usage = strUsage;
+        info.systemUsage = false;
+        VibratorIdentifier identifier;
+        identifier.deviceId = attribute.deviceId;
+        identifier.vibratorId = attribute.id;
+
+        if (identifier.vibratorId == 0) {
+            identifier.vibratorId = -1;
+        }
+
+        return StartVibrateEnhanced(info, identifier);
+    };
+
+    FFI_EXPORT int32_t FfiVibratorStartVibrationPresetEnhanced(RetVibratePreset effect,
+        RetVibrateAttributeEnhanced attribute)
+    {
+        if (effect.presetType == nullptr || effect.effectId == nullptr || attribute.usage == nullptr) {
+            return PARAMETER_ERROR;
+        }
+        CJVibrateInfo info;
+        std::string strType(effect.presetType);
+        info.type = strType;
+        std::string strEffectId(effect.effectId);
+        info.effectId = strEffectId;
+        info.count = effect.count;
+        info.intensity = effect.intensity;
+        std::string strUsage(attribute.usage);
+        info.usage = strUsage;
+        info.systemUsage = false;
+        VibratorIdentifier identifier;
+        identifier.deviceId = attribute.deviceId;
+        identifier.vibratorId = attribute.id;
+
+        if (identifier.vibratorId == 0) {
+            identifier.vibratorId = -1;
+        }
+        
+        if (!SetLoopCountEnhanced(identifier, info.count) || CheckParameters(info, identifier) != ERR_OK
+            || info.effectId.empty()) {
+            return DEVICE_OPERATION_FAILED;
+        }
+        return PlayPrimitiveEffect(info.effectId.c_str(), info.intensity);
+    };
+
+    FFI_EXPORT CArrRetVibratorInfo FfiVibratorGetVibratorInfo(RetVibratorInfoParam param, int32_t *code)
+    {
+        CArrRetVibratorInfo arrInfo = {.head = nullptr, .size = 0};
+        VibratorIdentifier identifier;
+        identifier.deviceId = param.deviceId;
+        identifier.vibratorId = param.vibratorId;
+        std::vector<VibratorInfos> vibratorInfo;
+        int32_t ret = GetVibratorList(identifier, vibratorInfo);
+        if (ret != SUCCESS) {
+            *code = ret;
+            return arrInfo;
+        }
+        arrInfo.size = static_cast<int64_t>(vibratorInfo.size());
+        if (arrInfo.size == 0) {
+            return arrInfo;
+        }
+        RetVibratorInfos* retValue = static_cast<RetVibratorInfos*>(
+            malloc(sizeof(RetVibratorInfos) * arrInfo.size));
+        if (retValue == nullptr) {
+            *code = DEVICE_OPERATION_FAILED;
+            return arrInfo;
+        }
+        int32_t flag = 0;
+        bool fail = false;
+        for (std::size_t i = 0; i < arrInfo.size; ++i) {
+            retValue[i].deviceId = vibratorInfo[i].deviceId;
+            retValue[i].vibratorId = vibratorInfo[i].vibratorId;
+            if (vibratorInfo[i].deviceName.empty()) {
+                retValue[i].deviceName = nullptr;
+            } else {
+                retValue[i].deviceName = MallocCString(vibratorInfo[i].deviceName);
+                if (retValue[i].deviceName == nullptr) {
+                    fail = true;
+                    *code = DEVICE_OPERATION_FAILED;
+                    break;
+                }
+            }
+            retValue[i].isSupportHdHaptic = vibratorInfo[i].isSupportHdHaptic;
+            retValue[i].isLocalVibrator = vibratorInfo[i].isLocalVibrator;
+            flag += 1;
+        }
+        if (fail == true) {
+            for (int32_t i = 0; i < flag; ++i) {
+                free(retValue[i].deviceName);
+            }
+            free(retValue);
+            retValue = nullptr;
+        }
+        arrInfo.head = retValue;
+        return arrInfo;
+    }
+
+    FFI_EXPORT int32_t FfiVibratorStopVibrationEnhanced(RetVibratorInfoParam param)
+    {
+        VibratorIdentifier identifier;
+        identifier.deviceId = param.deviceId;
+        identifier.vibratorId = param.vibratorId;
+        return CancelEnhanced(identifier);
     }
 }
 }
