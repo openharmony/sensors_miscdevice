@@ -441,7 +441,6 @@ int32_t MiscdeviceService::StopVibrator(const VibratorIdentifierIPC& identifier)
         MISC_HILOGE("Result:%{public}d", ret);
         return PERMISSION_DENIED;
     }
-    std::lock_guard<std::mutex> lock(devicesManageMutex_);
     return StopVibratorService(identifier);
 }
 
