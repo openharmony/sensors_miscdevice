@@ -362,7 +362,7 @@ int32_t VibratorServiceClient::IsSupportEffect(const VibratorIdentifier &identif
     if (state) {
         auto result = supportedEffectSet_.insert(effect);
         if (!result.second) {
-            MISC_HILOGE("effect insert failed")
+            MISC_HILOGE("effect insert failed");
         }
     }
     return ret;
