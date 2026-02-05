@@ -70,8 +70,6 @@ static std::map<std::string, int32_t> g_usageType = {
 static std::set<std::string> g_allowedTypes = {"time", "preset", "file", "pattern"};
 static std::map<std::string, std::vector<sptr<AsyncCallbackInfo>>> g_onCallbackInfos;
 static std::mutex g_Mutex;
-static std::map<std::string, bool> g_supportedEffects;
-static std::mutex g_cacheMutex;
 
 static napi_value EmitAsyncWork(napi_value param, sptr<AsyncCallbackInfo> info)
 {
@@ -681,18 +679,12 @@ static napi_value IsSupportEffect(napi_env env, napi_callback_info info)
     sptr<AsyncCallbackInfo> asyncCallbackInfo = new (std::nothrow) AsyncCallbackInfo(env);
     CHKPP(asyncCallbackInfo);
     asyncCallbackInfo->callbackType = IS_SUPPORT_EFFECT_CALLBACK;
-    {
-        std::lock_guard<std::mutex> lock(g_cacheMutex);
-        if (g_supportedEffects.find(effectId) == g_supportedEffects.end()) {
-            bool isSupportEffect = false;
-            int32_t ret = IsSupportEffect(effectId.c_str(), &isSupportEffect);
-            if (ret == PERMISSION_DENIED || ret == PARAMETER_ERROR) {
-                asyncCallbackInfo->error.code = ret;
-            }
-            g_supportedEffects[effectId] = isSupportEffect;
-        }
-        asyncCallbackInfo->isSupportEffect = g_supportedEffects[effectId];
+    bool isSupportEffect = false;
+    int32_t ret = IsSupportEffect(effectId.c_str(), &isSupportEffect);
+    if (ret == PERMISSION_DENIED || ret == PARAMETER_ERROR) {
+        asyncCallbackInfo->error.code = ret;
     }
+    asyncCallbackInfo->isSupportEffect = isSupportEffect;
     if ((argc > 1) && (IsMatchType(env, args[1], napi_function))) {
         return EmitAsyncWork(args[1], asyncCallbackInfo);
     }

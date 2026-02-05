@@ -340,6 +340,10 @@ int32_t VibratorServiceClient::IsSupportEffect(const VibratorIdentifier &identif
         return MISC_NATIVE_GET_SERVICE_ERR;
     } // LCOV_EXCL_STOP
     std::lock_guard<std::mutex> clientLock(clientMutex_);
+    if (supportedEffectSet_.find(effect) != supportedEffectSet_.end()) {
+        state = true;
+        return ret;
+    }
     CHKPR(miscdeviceProxy_, ERROR);
 #ifdef HIVIEWDFX_HITRACE_ENABLE
     StartTrace(HITRACE_TAG_SENSORS, "VibrateEffect");
@@ -355,6 +359,12 @@ int32_t VibratorServiceClient::IsSupportEffect(const VibratorIdentifier &identif
     if (ret != ERR_OK) { // LCOV_EXCL_START
         MISC_HILOGE("Query effect support failed, ret:%{public}d, effect:%{public}s", ret, effect.c_str());
     } // LCOV_EXCL_STOP
+    if (state) {
+        auto result = supportedEffectSet_.insert(effect);
+        if (!result.second) {
+            MISC_HILOGE("effect insert failed")
+        }
+    }
     return ret;
 }
 

@@ -21,6 +21,7 @@
 #include <mutex>
 #include <map>
 #include <set>
+#include <unordered_set>
 #include <vector>
 
 #include "iremote_object.h"
@@ -153,6 +154,7 @@ private:
 
     std::mutex vibratorEffectMutex_;
     std::map<VibratorIdentifier, VibratorEffectParameter> vibratorEffectMap_;
+    std::unordered_set<std::string> supportedEffectSet_;
 };
 } // namespace Sensors
 } // namespace OHOS
