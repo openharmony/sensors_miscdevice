@@ -113,7 +113,7 @@ int32_t GetFileName(const int32_t &fd, std::string &fileName)
         return ERROR;
     }
 
-    ret = readlink(buf, filePath, FILE_PATH_MAX);
+    ret = readlink(buf, filePath, FILE_PATH_MAX - 1);
     if (ret < 0 || ret >= FILE_PATH_MAX) {
         MISC_HILOGE("readlink failed with %{public}d", errno);
         return ERROR;
