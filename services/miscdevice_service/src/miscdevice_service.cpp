@@ -613,6 +613,7 @@ int32_t MiscdeviceService::StopVibratorByMode(const VibratorIdentifierIPC& ident
         MISC_HILOGE("CheckVibratePermission failed, ret:%{public}d", ret);
         return PERMISSION_DENIED;
     }
+    std::lock_guard<std::mutex> devicesManageLock(devicesManageMutex_);
     std::vector<VibratorIdentifierIPC> result = CheckDeviceIdIsValid(identifier);
     size_t ignoreVibrateNum = 0;
     if (result.empty()) {
@@ -1524,6 +1525,7 @@ int32_t MiscdeviceService::GetEffectInfo(const VibratorIdentifierIPC& identifier
 {
     CALL_LOG_ENTER;
     identifier.Dump();
+    std::lock_guard<std::mutex> devicesManageLock(devicesManageMutex_);
     if (devicesManageMap_.empty()) {
         MISC_HILOGI("No vibrator device online");
         return NO_ERROR;
