@@ -497,7 +497,7 @@ int32_t VibratorServiceClient::InitPlayPattern(const VibratorIdentifier &identif
         event.index = pattern.events[i].index;
         if ((pattern.events[i].pointNum < CURVE_POINT_NUM_MIN) || (pattern.events[i].pointNum > CURVE_POINT_NUM_MAX)) {
             MISC_HILOGE("The size of curve point is out of bounds, size:%{public}d", pattern.events[i].pointNum);
-            vibratorPattern.events.emplace_back(event);
+            vibratePattern.events.emplace_back(event);
             vibratePattern.patternDuration = pattern.patternDuration;
             continue;
         }
