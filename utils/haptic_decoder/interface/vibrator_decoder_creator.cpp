@@ -38,6 +38,8 @@ IVibratorDecoder *VibratorDecoderCreator::CreateDecoder(const JsonParser &parser
         HEVibratorDecoderFactory factory;
         return factory.CreateDecoder();
     }
+    MISC_HILOGE("Create decoder fail");
+    return nullptr;
 }
 
 bool VibratorDecoderCreator::CheckJsonMetadata(const JsonParser &parser)

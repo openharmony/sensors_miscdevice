@@ -58,7 +58,7 @@ int32_t VibratorClientStub::OnRemoteRequest(uint32_t code, MessageParcel &data, 
             }
             int result = ProcessPlugEvent(eventCode, deviceId, vibratorCnt);
             if (result != NO_ERROR) {
-                MISC_HILOGE("Process plug event failed");
+                MISC_HILOGE("ProcessPlugEvent failed");
             }
             return NO_ERROR;
         }

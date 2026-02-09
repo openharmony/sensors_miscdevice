@@ -109,11 +109,11 @@ bool VibrationPriorityManager::Init()
             MISC_HILOGE("Get feedback failed");
         }
         miscFeedback_ = feedback;
-        MISC_HILOGI("feedback:%{public}d", feedback);
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "SWITCHES_TOGGLE",
             HiSysEvent::EventType::BEHAVIOR, "SWITCH_TYPE", "feedback", "STATUS", feedback);
 #endif // HIVIEWDFX_HISYSEVENT_ENABLE
+        MISC_HILOGI("feedback:%{public}d", feedback);
         int32_t ringerMode = miscAudioRingerMode_;
         if (GetIntValue(SETTING_URI_PROXY, SETTING_RINGER_MODE_KEY, ringerMode, tableType) != ERR_OK) {
             MISC_HILOGE("Get ringerMode failed");
@@ -986,7 +986,7 @@ sptr<MiscDeviceObserver> VibrationPriorityManager::CreateObserver(const MiscDevi
 Uri VibrationPriorityManager::AssembleUri(const std::string &uriProxy, const std::string &key,
     const std::string &tableType)
 {
-    std::string finalUri = uriProxy;;
+    std::string finalUri = uriProxy;
     int32_t currentUserId = g_currentUserId.load();
     if (currentUserId > 0 && tableType == "system") {
         finalUri += std::to_string(currentUserId) + "?Proxy=true";
@@ -1094,8 +1094,8 @@ int32_t VibrationPriorityManager::UnregisterObserver(const sptr<MiscDeviceObserv
     auto uriFeedback = AssembleUri(SETTING_URI_PROXY, SETTING_FEEDBACK_KEY, tableType);
     helper->UnregisterObserver(uriFeedback, observer);
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
-    auto uriCrownnFeedback = AssembleUri(SETTING_URI_PROXY, SETTING_CROWN_FEEDBACK_KEY, tableType);
-    helper->UnregisterObserver(uriCrownnFeedback, observer);
+    auto uriCrownFeedback = AssembleUri(SETTING_URI_PROXY, SETTING_CROWN_FEEDBACK_KEY, tableType);
+    helper->UnregisterObserver(uriCrownFeedback, observer);
     auto uriIntensityContrl = AssembleUri(SETTING_URI_PROXY, SETTING_VIBRATE_INTENSITY_KEY, tableType);
     helper->UnregisterObserver(uriIntensityContrl, observer);
 #endif
