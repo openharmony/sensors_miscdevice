@@ -72,6 +72,7 @@ constexpr int32_t CONVERSION_RATE = 1000;
 constexpr int32_t HOURS_IN_DAY = 24;
 constexpr int32_t MINUTES_IN_HOUR = 60;
 constexpr int32_t SECONDS_IN_MINUTE = 60;
+constexpr uint32_t MAX_SUPPORT_CLIENT_NUM = 1024;
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
 const std::string PHONE_TYPE = "phone";
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_CUSTOM
@@ -1344,6 +1345,10 @@ void MiscdeviceService::SaveClientPid(const sptr<IRemoteObject> &vibratorService
         return;
     }
     std::lock_guard<std::mutex> lock(clientPidMapMutex_);
+    if (clientPidMap_.size() >= MAX_SUPPORT_CLIENT_NUM) {
+        MISC_HILOGE("The maximum number of supported clients has been exceeded");
+        return;
+    }
     clientPidMap_.insert(std::make_pair(vibratorServiceClient, pid));
 }
 
