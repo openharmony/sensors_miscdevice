@@ -99,15 +99,6 @@ struct VibratePackage : public Parcelable {
     static VibratePackage* Unmarshalling(Parcel &data);
 };
 
-struct VibratePackageIPC : public Parcelable {
-    int32_t patternNum = 0;
-    int32_t packageDuration = 0;
-    std::vector<VibratePattern> patterns;
-    void Dump() const;
-    bool Marshalling(Parcel &parcel) const;
-    static VibratePackageIPC* Unmarshalling(Parcel &data);
-};
-
 struct VibratorCapacity : public Parcelable {
     bool isSupportHdHaptic = false;
     bool isSupportPresetMapping = false;
