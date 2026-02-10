@@ -1345,7 +1345,7 @@ void MiscdeviceService::SaveClientPid(const sptr<IRemoteObject> &vibratorService
         return;
     }
     std::lock_guard<std::mutex> lock(clientPidMapMutex_);
-    if (static_cast<uint32_t>(clientPidMap_.size()) >= MAX_SUPPORT_CLIENT_NUM) {
+    if (clientPidMap_.size() >= MAX_SUPPORT_CLIENT_NUM) {
         MISC_HILOGE("The maximum number of supported clients has been exceeded");
         return;
     }
