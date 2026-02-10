@@ -465,6 +465,12 @@ int32_t VibratorServiceClient::GetDelayTime(const VibratorIdentifier &identifier
 int32_t VibratorServiceClient::InitPlayPattern(const VibratorIdentifier &identifier, const VibratorPattern &pattern,
     int32_t usage, bool systemUsage, const VibratorParameter &parameter)
 {
+    MISC_HILOGD("Vibrate begin, usage:%{public}d", usage);
+    int32_t ret = InitServiceClient();
+    if (ret != ERR_OK) {
+        MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
+        return MISC_NATIVE_GET_SERVICE_ERR;
+    }
     VibratePattern vibratePattern = {};
     vibratePattern.startTime = pattern.time;
     if (pattern.eventNum < 0 || pattern.eventNum > MAX_PATTERN_EVENT_NUM) {
@@ -483,6 +489,12 @@ int32_t VibratorServiceClient::InitPlayPattern(const VibratorIdentifier &identif
         event.intensity = pattern.events[i].intensity;
         event.frequency = pattern.events[i].frequency;
         event.index = pattern.events[i].index;
+        if ((pattern.events[i].pointNum < CURVE_POINT_NUM_MIN) || (pattern.events[i].pointNum > CURVE_POINT_NUM_MAX)) {
+            MISC_HILOGE("The size of curve point is out of bounds, size:%{public}d", pattern.events[i].pointNum);
+            vibratePattern.events.emplace_back(event);
+            vibratePattern.patternDuration = pattern.patternDuration;
+            continue;
+        }
         for (int32_t j = 0; j < pattern.events[i].pointNum; ++j) {
             if (pattern.events[i].points == nullptr) {
                 MISC_HILOGE("VibratorEvent's points is null");
@@ -508,7 +520,7 @@ int32_t VibratorServiceClient::InitPlayPattern(const VibratorIdentifier &identif
     vibrateIdentifier.vibratorId = identifier.vibratorId;
     std::lock_guard<std::mutex> clientLock(clientMutex_);
     CHKPR(miscdeviceProxy_, ERROR);
-    int32_t ret = miscdeviceProxy_->PlayPattern(vibrateIdentifier, vibratePattern, customHapticInfoIPC);
+    ret = miscdeviceProxy_->PlayPattern(vibrateIdentifier, vibratePattern, customHapticInfoIPC);
     WriteOtherHiSysIPCEvent(IMiscdeviceServiceIpcCode::COMMAND_PLAY_PATTERN, ret);
     return ret;
 }
@@ -1164,7 +1176,7 @@ int32_t VibratorServiceClient::ModulateVibratorEvent(const VibratorEvent &modula
     return ModulateEventWithCurvePoints(modInterval, patternStartTime, beforeModulationEvent, afterModulationEvent);
 }
 
-int32_t VibratorServiceClient::ModulateEventWithoutCurvePoints(std::vector<VibratorCurveInterval>& modInterval,
+int32_t VibratorServiceClient::ModulateEventWithoutCurvePoints(const std::vector<VibratorCurveInterval>& modInterval,
     int32_t patternStartTime, const VibratorEvent &beforeModEvent, VibratorEvent &afterModEvent)
 {
     afterModEvent = beforeModEvent;
@@ -1216,8 +1228,6 @@ VibratorCurvePoint* VibratorServiceClient::GetCurveListAfterModulation(
     const std::vector<VibratorCurveInterval>& modInterval, const VibratorEvent &beforeModEvent,
     int32_t patternOffset)
 {
-    // There are atmost (modulationCurve.pointNum + beforeModulationEvent.pointNum + 1)
-    // VibratorCurvePoints after modulation
     VibratorCurvePoint* curvePoints = static_cast<VibratorCurvePoint *>(
         calloc(beforeModEvent.pointNum, sizeof(VibratorCurvePoint)));
     if (curvePoints == nullptr) {
@@ -1245,7 +1255,7 @@ void VibratorServiceClient::BinarySearchInterval(
     const std::vector<VibratorCurveInterval>& interval, int32_t val, int32_t& idx)
 {
     if (interval.empty()) {
-        MISC_HILOGD("interval is empty");
+        MISC_HILOGE("interval is empty");
         return;
     }
     if (val < interval.begin()->beginTime || val > interval.rbegin()->endTime) {
@@ -1288,15 +1298,6 @@ void VibratorServiceClient::ConvertVibratorEventsToCurveIntervals(
             break;
         }
     }
-}
-
-void VibratorServiceClient::ModulateSingleCurvePoint(const VibratorCurveInterval &modulationInterval,
-    const VibratorCurveInterval &originalInterval, VibratorCurvePoint& point)
-{
-    static_assert(INTENSITY_UPPER_BOUND != INTENSITY_LOWER_BOUND, "upper bound and lower bound cannot be the same");
-    point.frequency = RestrictFrequencyRange(modulationInterval.frequency + originalInterval.frequency);
-    point.intensity = RestrictIntensityRange(
-        modulationInterval.intensity * originalInterval.intensity / (INTENSITY_UPPER_BOUND - INTENSITY_LOWER_BOUND));
 }
 
 int32_t VibratorServiceClient::RestrictFrequencyRange(int32_t frequency)

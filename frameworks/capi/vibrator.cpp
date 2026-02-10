@@ -50,7 +50,7 @@ int32_t OH_Vibrator_PlayVibrationCustom(Vibrator_FileDescription fileDescription
 {
     if (!OHOS::Sensors::IsSupportVibratorCustom()) {
         MISC_HILOGE("feature is not supported");
-        return UNSUPPORTED;
+        return OHOS::Sensors::IS_NOT_SUPPORTED;
     }
     if ((fileDescription.fd < 0) || (fileDescription.offset < 0) || (fileDescription.length <= 0)) {
         MISC_HILOGE("fileDescription is invalid");

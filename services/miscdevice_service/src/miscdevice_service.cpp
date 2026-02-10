@@ -1485,7 +1485,6 @@ int32_t MiscdeviceService::GetVibratorList(const VibratorIdentifierIPC& identifi
     identifier.Dump();
     GetOnlineVibratorInfo();
     std::lock_guard<std::mutex> lockManage(devicesManageMutex_);
-    int32_t ret;
     if ((identifier.deviceId == -1) && (identifier.vibratorId == -1)) {
         for (auto &value : devicesManageMap_) {
             vibratorInfoIPC.insert(vibratorInfoIPC.end(), value.second.baseInfo.begin(),
@@ -1494,7 +1493,7 @@ int32_t MiscdeviceService::GetVibratorList(const VibratorIdentifierIPC& identifi
     } else if ((identifier.deviceId == -1) && (identifier.vibratorId != -1)) {
         VibratorIdentifierIPC actIdentifier;
         actIdentifier.vibratorId = identifier.vibratorId;
-        ret = GetLocalDeviceId(actIdentifier.deviceId);
+        int32_t ret = GetLocalDeviceId(actIdentifier.deviceId);
         if (ret == NO_ERROR) {
             ret = GetOneVibrator(actIdentifier, vibratorInfoIPC);
             if (ret != NO_ERROR) {
@@ -1510,8 +1509,7 @@ int32_t MiscdeviceService::GetVibratorList(const VibratorIdentifierIPC& identifi
         }
         vibratorInfoIPC = it->second.baseInfo;
     } else { // ((identifier.deviceId != -1) && (identifier.vibratorId != -1))
-        ret = GetOneVibrator(identifier, vibratorInfoIPC);
-        if (ret != NO_ERROR) {
+        if (GetOneVibrator(identifier, vibratorInfoIPC) != NO_ERROR) {
             MISC_HILOGI("DeviceId %{public}d has no vibratorId %{public}d info",
                 identifier.deviceId, identifier.vibratorId);
         }
