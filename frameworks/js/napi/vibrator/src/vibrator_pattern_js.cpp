@@ -165,7 +165,7 @@ bool VibratorPatternBuilder::ParseOptions(const napi_env &env, const napi_value 
     } else {
         event.index = 0;
     }
-    MISC_HILOGE("ParseOptions out");
+    MISC_HILOGI("ParseOptions out");
     return true;
 }
 
