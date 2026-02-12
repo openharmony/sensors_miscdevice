@@ -33,7 +33,6 @@
 namespace {
 using namespace taihe;
 using namespace OHOS::Sensors;
-// using namespace ohos::vibrator;
 using namespace OHOS;
 
 constexpr int32_t INTENSITY_ADJUST_MAX = 100;
