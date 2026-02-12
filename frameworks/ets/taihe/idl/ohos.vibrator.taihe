@@ -173,6 +173,27 @@ struct VibrateAttribute {
     id: Optional<i32>;
 
     /**
+     * Unique identifier for the device that contains one or multiple vibrators.
+     * By default, deviceId represents the local device.
+     *
+     * @type { Optional<i32> }
+     * @syscap SystemCapability.Sensors.MiscDevice
+     * @atomicservice
+     * @since 19
+     */
+    /**
+     * Unique identifier for the device that contains one or multiple vibrators.
+     * By default, deviceId represents the local device.
+     *
+     * @type { Optional<i32> }
+     * @syscap SystemCapability.Sensors.MiscDevice
+     * @crossplatform
+     * @atomicservice
+     * @since 22
+     */
+    deviceId: Optional<i32>;
+
+    /**
      * The use of vibration.
      *
      * @syscap SystemCapability.Sensors.MiscDevice
