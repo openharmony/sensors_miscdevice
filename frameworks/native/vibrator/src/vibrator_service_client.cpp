@@ -477,6 +477,7 @@ int32_t VibratorServiceClient::InitPlayPattern(const VibratorIdentifier &identif
         MISC_HILOGE("InitServiceClient failed, ret:%{public}d", ret);
         return MISC_NATIVE_GET_SERVICE_ERR;
     }
+    StartTrace(HITRACE_TAG_SENSORS, "PlayPattern");
     VibratePattern vibratePattern = {};
     vibratePattern.startTime = pattern.time;
     if (pattern.eventNum < 0 || pattern.eventNum > MAX_PATTERN_EVENT_NUM) {
