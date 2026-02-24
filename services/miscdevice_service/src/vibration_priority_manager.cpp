@@ -57,7 +57,9 @@ const std::string DO_NOT_DISTURB_WHITE_LIST = "intelligent_scene_notification_wh
 const std::string WHITE_LIST_KEY_BUNDLE = "bundle";
 const std::string WHITE_LIST_KEY_UID = "uid";
 constexpr const char *USERID_REPLACE = "##USERID##";
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 const std::string VIBRATE_WHEN_RINGING_KEY = "hw_vibrate_when_ringing";
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 const std::string SETTING_USER_URI_PROXY = "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_";
 const std::string USER_SETTINGS_ENABLE_IME = "settings.inputmethod.enable_ime";
 const std::string INPUT_METHODS_KEY = "inputmethods";
@@ -82,9 +84,11 @@ VibrationPriorityManager::~VibrationPriorityManager()
     if (UnregisterUserObserver() != ERR_OK) {
         MISC_HILOGE("UnregisterUserObserver failed");
     }
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
     if (UnregisterUser100Observer() != ERR_OK) {
         MISC_HILOGE("UnregisterUser100Observer failed");
     }
+#endif OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
     if (UnregisterUserImfObserver() != ERR_OK) {
         MISC_HILOGE("UnregisterUserImfObserver failed");
     }
@@ -195,7 +199,9 @@ void VibrationPriorityManager::ReregisterCurrentUserObserver()
     MISC_HILOGI("ReregisterCurrentUserObserver start");
 #ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
     UnregisterUserObserver();
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
     UnregisterUser100Observer();
+#endif OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 #endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
     UnregisterUserImfObserver();
@@ -204,7 +210,9 @@ void VibrationPriorityManager::ReregisterCurrentUserObserver()
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 #ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
     RegisterUserObserver();
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
     RegisterUser100Observer();
+#endif OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 #endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
 }
 
@@ -227,12 +235,14 @@ void VibrationPriorityManager::UpdateCurrentUserId()
 }
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 void VibrationPriorityManager::InitVibrateWhenRing()
 {
     int32_t vibrateWhenRing = VIBRATE_WHEN_RING_MODE_INVALID;
     std::string tableType = "system";
     if (GetIntValue(SETTING_USER_URI_PROXY, VIBRATE_WHEN_RINGING_KEY, vibrateWhenRing, tableType) != ERR_OK) {
         MISC_HILOGE("Get vibrateWhenRing failed");
+        vibrateWhenRing = VIBRATE_WHEN_RING_MODE_ON; // default status is open
         return;
     }
     HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "SWITCHES_TOGGLE",
@@ -240,6 +250,7 @@ void VibrationPriorityManager::InitVibrateWhenRing()
     MISC_HILOGI("vibrateWhenRing:%{public}d", vibrateWhenRing);
     vibrateWhenRing_.store(vibrateWhenRing);
 }
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 
 int32_t VibrationPriorityManager::RegisterUserObserver()
 {
@@ -311,6 +322,7 @@ int32_t VibrationPriorityManager::UnregisterUserObserver()
     return ERR_OK;
 }
 
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 int32_t VibrationPriorityManager::RegisterUser100Observer()
 {
     MISC_HILOGI("RegisterUser100Observer start");
@@ -346,7 +358,9 @@ int32_t VibrationPriorityManager::RegisterUser100Observer()
     MISC_HILOGI("Succeed to RegisterUser100Observer of uri");
     return ERR_OK;
 }
+#endif OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 int32_t VibrationPriorityManager::UnregisterUser100Observer()
 {
     MISC_HILOGI("UnregisterUser100Observer start");
@@ -375,6 +389,7 @@ int32_t VibrationPriorityManager::UnregisterUser100Observer()
     MISC_HILOGI("Succeed to UnregisterUser100Observer observer");
     return ERR_OK;
 }
+#endif OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 
 std::string VibrationPriorityManager::ReplaceUserIdForUri(std::string uri, int32_t userId)
 {
