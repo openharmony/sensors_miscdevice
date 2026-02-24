@@ -242,7 +242,7 @@ void VibrationPriorityManager::InitVibrateWhenRing()
     std::string tableType = "system";
     if (GetIntValue(SETTING_USER_URI_PROXY, VIBRATE_WHEN_RINGING_KEY, vibrateWhenRing, tableType) != ERR_OK) {
         MISC_HILOGE("Get vibrateWhenRing failed");
-        vibrateWhenRing = VIBRATE_WHEN_RING_MODE_ON; // default status is open
+        vibrateWhenRing_.store(VIBRATE_WHEN_RING_MODE_ON); // default status is open
         return;
     }
     HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "SWITCHES_TOGGLE",
