@@ -199,10 +199,10 @@ void VibrationPriorityManager::ReregisterCurrentUserObserver()
     MISC_HILOGI("ReregisterCurrentUserObserver start");
 #ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
     UnregisterUserObserver();
+#endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
     UnregisterUser100Observer();
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
-#endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
     UnregisterUserImfObserver();
     UpdateCurrentUserId();
@@ -210,10 +210,10 @@ void VibrationPriorityManager::ReregisterCurrentUserObserver()
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 #ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
     RegisterUserObserver();
+#endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
     RegisterUser100Observer();
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
-#endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
 }
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
