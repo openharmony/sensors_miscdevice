@@ -120,6 +120,8 @@ struct VibrateInfo {
     int64_t offset = 0;
     int64_t length = -1;
     int32_t intensity = 0;
+    int32_t deviceId = -1;
+    int32_t vibratorId = -1;
     VibratorPattern vibratorPattern;
 };
 
@@ -386,6 +388,11 @@ bool ParseParameter(::ohos::vibrator::VibrateEffect const& effect, ::ohos::vibra
     }
     vibrateInfo.usage = attribute.usage;
     vibrateInfo.systemUsage = attribute.systemUsage.has_value() ? attribute.systemUsage.value() : false;
+    vibrateInfo.deviceId = attribute.deviceId.has_value() ? attribute.deviceId.value() : -1;
+    vibrateInfo.vibratorId = attribute.id.has_value() ? attribute.id.value() : -1;
+    if (vibrateInfo.vibratorId == 0) {
+        vibrateInfo.vibratorId = -1;
+    }
     return true;
 }
 
@@ -556,8 +563,8 @@ void stopVibrationParam(::taihe::optional_view<::ohos::vibrator::VibratorInfoPar
         ret = Cancel();
     } else {
         VibratorIdentifier info = {
-            .deviceId = param->deviceId.value(),
-            .vibratorId = param->vibratorId.value()
+            .deviceId = param->deviceId.has_value() ? param->deviceId.value() : -1,
+            .vibratorId = param->vibratorId.has_value() ? param->vibratorId.value() : -1
         };
         ret = CancelEnhanced(info);
     }
