@@ -694,9 +694,11 @@ void VibrationPriorityManager::UpdateStatus()
     if (doNotDisturbSwitch_ == DONOTDISTURB_SWITCH_INVALID) {
         InitDoNotDisturbData();
     }
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
     if (vibrateWhenRing_.load() == VIBRATE_WHEN_RING_MODE_INVALID) {
         InitVibrateWhenRing();
     }
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
     if (miscCrownFeedback_ == FEEDBACK_MODE_INVALID) {
         int32_t corwnfeedback = FEEDBACK_MODE_INVALID;
@@ -912,6 +914,7 @@ VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &v
         MISC_HILOGD("Vibration is ignored for ringer mode:%{public}d", static_cast<int32_t>(miscAudioRingerMode_));
         return IGNORE_RINGER_MODE;
     }
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
     int32_t ringerMode = miscAudioRingerMode_.load();
     int32_t vibrateWhenRing = vibrateWhenRing_.load();
     if ((vibrateInfo.usage == USAGE_RING || vibrateInfo.usage == USAGE_COMMUNICATION)
@@ -920,6 +923,7 @@ VibrateStatus VibrationPriorityManager::ShouldIgnoreVibrate(const VibrateInfo &v
                 ringerMode, vibrateWhenRing);
         return IGNORE_RINGER_VIBRATE_WHEN_RING;
     }
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
     if (((vibrateInfo.usage == USAGE_TOUCH || vibrateInfo.usage == USAGE_MEDIA || vibrateInfo.usage == USAGE_UNKNOWN
         || vibrateInfo.usage == USAGE_PHYSICAL_FEEDBACK || vibrateInfo.usage == USAGE_SIMULATE_REALITY)
         && (miscFeedback_ == FEEDBACK_MODE_OFF))
