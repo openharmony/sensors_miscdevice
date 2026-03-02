@@ -329,7 +329,7 @@ extern "C" {
         }
         int32_t flag = 0;
         bool fail = false;
-        for (std::size_t i = 0; i < arrInfo.size; ++i) {
+        for (int64_t i = 0; i < arrInfo.size; ++i) {
             retValue[i].deviceId = vibratorInfo[i].deviceId;
             retValue[i].vibratorId = vibratorInfo[i].vibratorId;
             if (vibratorInfo[i].deviceName.empty()) {
