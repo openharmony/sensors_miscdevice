@@ -131,9 +131,11 @@ private:
     bool ReleaseDataShareHelper(std::shared_ptr<DataShare::DataShareHelper> &helper);
     sptr<MiscDeviceObserver> CreateObserver(const MiscDeviceObserver::UpdateFunc &func);
     void UpdateStatus();
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
     void InitVibrateWhenRing();
     int32_t RegisterUser100Observer();
     int32_t UnregisterUser100Observer();
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
     void PrintDoNotDisturbSwitchStatus(int32_t oldSwitchStatus, int32_t currentSwitchStatus);
     void InitInputMethodData();
     int32_t RegisterUserImfObserver();
@@ -142,14 +144,18 @@ private:
     sptr<MiscDeviceObserver> observer_ { nullptr };
     std::atomic_int32_t miscFeedback_ = FEEDBACK_MODE_INVALID;
     std::atomic_int32_t miscAudioRingerMode_ = RINGER_MODE_INVALID;
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
     std::atomic_int32_t vibrateWhenRing_ = VIBRATE_WHEN_RING_MODE_INVALID;
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
     std::atomic_int32_t doNotDisturbSwitch_ = DONOTDISTURB_SWITCH_INVALID;
     std::vector<WhiteListAppInfo> doNotDisturbWhiteList_;
     sptr<MiscDeviceObserver> currentUserObserver_;
     std::mutex currentUserObserverMutex_;
     std::mutex whiteListMutex_;
+#ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
     std::mutex vibrateWhenRingObserverMutex_;
     sptr<MiscDeviceObserver> vibrateWhenRingObserver_;
+#endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
     std::mutex currentUserImfObserverMutex_;
     sptr<MiscDeviceObserver> currentUserImfObserver_;
     std::vector<std::string> inputMethodBundleNames_;
