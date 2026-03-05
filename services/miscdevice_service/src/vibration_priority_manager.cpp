@@ -202,18 +202,14 @@ void VibrationPriorityManager::ReregisterCurrentUserObserver()
 #endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
     UnregisterUser100Observer();
-#endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
-#ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
     UnregisterUserImfObserver();
     UpdateCurrentUserId();
     RegisterUserImfObserver();
+    RegisterUser100Observer();
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 #ifdef OHOS_BUILD_ENABLE_DO_NOT_DISTURB
     RegisterUserObserver();
 #endif // OHOS_BUILD_ENABLE_DO_NOT_DISTURB
-#ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
-    RegisterUser100Observer();
-#endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 }
 
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
