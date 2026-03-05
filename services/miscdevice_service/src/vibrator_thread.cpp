@@ -32,7 +32,7 @@
 #define gettid getpid
 #endif
 
-#ifdef __gun_linu__
+#ifdef __gun_linux__
 #include <sys/syscall.h>
 #include <sys/types.h>
 #define gettid []() -> int32_t { return static_cast<int32_t(syscall(SYS_gettid)); }
