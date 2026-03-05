@@ -18,13 +18,16 @@
 #include <sys/prctl.h>
 
 #include "custom_vibration_matcher.h"
+#ifdef OHOS_BUILD_ENABLE_QOS
 #include "concurrent_task_client.h"
 #include "qos.h"
+#endif // OHOS_BUILD_ENABLE_QOS
 #include "sensors_errors.h"
 
 #undef LOG_TAG
 #define LOG_TAG "VibratorThread"
 
+#ifdef OHOS_BUILD_ENABLE_QOS
 #ifdef __APPLE__
 #define gettid getpid
 #endif
@@ -33,6 +36,8 @@
 #include <sys/syscall.h>
 #include <sys/types.h>
 #define gettid []() -> int32_t { return static_cast<int32_t(syscall(SYS_gettid)); }
+#endif
+#endif // OHOS_BUILD_ENABLE_QOS
 
 namespace OHOS {
 namespace Sensors {
@@ -51,8 +56,10 @@ bool VibratorThread::Run()
 {
     CALL_LOG_ENTER;
     prctl(PR_SET_NAME, VIBRATE_CONTROL_THREAD_NAME.c_str());
+#ifdef OHOS_BUILD_ENABLE_QOS
     vibrateTid_ = gettid();
     SetQosForOtherThread(vibrateTid_);
+#endif // OHOS_BUILD_ENABLE_QOS
     VibrateInfo info = GetCurrentVibrateInfo();
     VibratorIdentifierIPC identifier = GetCurrentVibrateParams();
     std::vector<HdfWaveInformation> waveInfos = GetCurrentWaveInfo();
@@ -331,6 +338,7 @@ void VibratorThread::ResetVibrateInfo()
     currentVibration_.intensity = 0;
 }
 
+#ifdef OHOS_BUILD_ENABLE_QOS
 void VibratorThread::SetQosForOtherThread(int32_t tid)
 {
     std::unordered_map<std::string, std::string> payload;
@@ -343,5 +351,6 @@ void VibratorThread::SetQosForOtherThread(int32_t tid)
         MISC_HILOGD("Set vibrator thread qos success");
     }
 }
+#endif // OHOS_BUILD_ENABLE_QOS
 }  // namespace Sensors
 }  // namespace OHOS

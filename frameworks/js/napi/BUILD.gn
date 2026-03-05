@@ -48,8 +48,12 @@ ohos_shared_library("vibrator") {
     "c_utils:utils",
     "hilog:libhilog",
     "napi:ace_napi",
-    "qos_manager:qos",
   ]
+  if (miscdevice_feature_phone_lite_qos_enable) {
+    external_deps += [
+      "qos_manager:qos",
+    ]
+  }
   relative_install_dir = "module"
   part_name = "miscdevice"
   subsystem_name = "sensors"

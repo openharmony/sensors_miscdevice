@@ -14,7 +14,8 @@
       "miscdevice_feature_vibrator_custom",
       "miscdevice_feature_vibrator_input_method_enable",
       "miscdevice_feature_crown_vibrator_enable",
-      "miscdevice_feature_do_not_disturb_enable"
+      "miscdevice_feature_do_not_disturb_enable",
+      "miscdevice_feature_phone_lite_qos_enable"
     ],
     "adapted_system_type": [ "standard" ],
     "rom": "1024KB",
