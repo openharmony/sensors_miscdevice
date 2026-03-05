@@ -20,6 +20,7 @@
 #include "securec.h"
 
 #include "miscdevice_log.h"
+#include "qos.h"
 #include "vibrator_napi_error.h"
 
 #undef LOG_TAG
@@ -525,6 +526,12 @@ void ExecuteCallBack(napi_env env, void *data)
     CALL_LOG_ENTER;
     sptr<AsyncCallbackInfo> asyncCallbackInfo(static_cast<AsyncCallbackInfo *>(data));
     if (asyncCallbackInfo->flag == "preset") {
+        auto ret = OHOS::QOS::SetThreadQos(OHOS::QOS::QosLevel::QOS_USER_INTERACTIVE);
+        if (ret != 0) {
+            MISC_HILOGE("SetThreadQos failed, ret:%{public}d", ret);
+        } else {
+            MISC_HILOGD("SetThreadQos success");
+        }
         asyncCallbackInfo->error.code = PlayPrimitiveEffect(asyncCallbackInfo->info.effectId.c_str(),
             asyncCallbackInfo->info.intensity);
     }

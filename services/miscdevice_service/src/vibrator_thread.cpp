@@ -18,10 +18,21 @@
 #include <sys/prctl.h>
 
 #include "custom_vibration_matcher.h"
+#include "concurrent_task_client.h"
+#include "qos.h"
 #include "sensors_errors.h"
 
 #undef LOG_TAG
 #define LOG_TAG "VibratorThread"
+
+#ifdef __APPLE__
+#define gettid getpid
+#endif
+
+#ifdef __gun_linu__
+#include <sys/syscall.h>
+#include <sys/types.h>
+#define gettid []() -> int32_t { return static_cast<int32_t(syscall(SYS_gettid)); }
 
 namespace OHOS {
 namespace Sensors {
@@ -40,6 +51,8 @@ bool VibratorThread::Run()
 {
     CALL_LOG_ENTER;
     prctl(PR_SET_NAME, VIBRATE_CONTROL_THREAD_NAME.c_str());
+    vibrateTid_ = gettid();
+    SetQosForOtherThread(vibrateTid_);
     VibrateInfo info = GetCurrentVibrateInfo();
     VibratorIdentifierIPC identifier = GetCurrentVibrateParams();
     std::vector<HdfWaveInformation> waveInfos = GetCurrentWaveInfo();
@@ -316,6 +329,19 @@ void VibratorThread::ResetVibrateInfo()
     currentVibration_.effect = "";
     currentVibration_.count = 0;
     currentVibration_.intensity = 0;
+}
+
+void VibratorThread::SetQosForOtherThread(int32_t tid)
+{
+    std::unordered_map<std::string, std::string> payload;
+    payload["pid"] = std::to_string(getpid());
+    OHOS::ConcurrentTask::ConcurrentTaskClient::GetInstance().RequestAuth(payload);
+    auto ret = OHOS::QOS::SetQosForOtherThread(OHOS::QOS::QosLevel::QOS_USER_INTERACTIVE, tid);
+    if (ret != 0) {
+        MISC_HILOGE("Set vibrator thread qos failed, ret:%{public}d", ret);
+    } else {
+        MISC_HILOGD("Set vibrator thread qos success");
+    }
 }
 }  // namespace Sensors
 }  // namespace OHOS

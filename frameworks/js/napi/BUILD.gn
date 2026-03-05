@@ -48,6 +48,7 @@ ohos_shared_library("vibrator") {
     "c_utils:utils",
     "hilog:libhilog",
     "napi:ace_napi",
+    "qos_manager:qos",
   ]
   relative_install_dir = "module"
   part_name = "miscdevice"
