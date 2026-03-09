@@ -603,7 +603,6 @@ void MiscdeviceService::StopVibrateThread(std::shared_ptr<VibratorThread> vibrat
 
 int32_t MiscdeviceService::StopVibratorByMode(const VibratorIdentifierIPC& identifier, const std::string &mode)
 {
-    std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
     PermissionUtil &permissionUtil = PermissionUtil::GetInstance();
     int32_t ret = permissionUtil.CheckVibratePermission(this->GetCallingTokenID(), VIBRATE_PERMISSION);
     if (ret != PERMISSION_GRANTED) {
@@ -621,6 +620,7 @@ int32_t MiscdeviceService::StopVibratorByMode(const VibratorIdentifierIPC& ident
         MISC_HILOGD("result is empty, no need to stop");
         return ERROR;
     }
+    std::lock_guard<std::mutex> lock(vibratorThreadMutex_);
     for (const auto& paramIt : result) {
         auto vibratorThread_ = GetVibratorThread(paramIt);
         if ((vibratorThread_ == nullptr) || (!vibratorThread_->IsRunning() &&
