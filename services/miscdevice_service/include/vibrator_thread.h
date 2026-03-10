@@ -49,6 +49,10 @@ private:
     int32_t PlayCompositeEffect(const VibrateInfo &info, const HdfCompositeEffect &hdfCompositeEffect,
         const VibratorIdentifierIPC& identifier);
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
+#ifdef OHOS_BUILD_ENABLE_QOS
+    void SetQosForOtherThread(int32_t tid);
+    int32_t vibrateTid_ { -1 };
+#endif // OHOS_BUILD_ENABLE_QOS
     std::mutex currentVibrationMutex_;
     VibrateInfo currentVibration_;
     std::vector<HdfWaveInformation> waveInfos_;

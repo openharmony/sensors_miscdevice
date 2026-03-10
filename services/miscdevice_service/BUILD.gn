@@ -82,6 +82,13 @@ ohos_shared_library("libmiscdevice_service") {
     "samgr:samgr_proxy",
   ]
 
+  if (miscdevice_feature_phone_lite_qos_enable) {
+    external_deps += [
+      "qos_manager:concurrent_task_client",
+      "qos_manager:qos",
+    ]
+  }
+
   if (miscdevice_feature_vibrator_input_method_enable) {
     external_deps += [
       "os_account:os_account_innerkits",
@@ -197,6 +204,13 @@ ohos_static_library("libmiscdevice_service_static") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
+
+  if (miscdevice_feature_phone_lite_qos_enable) {
+    external_deps += [
+      "qos_manager:concurrent_task_client",
+      "qos_manager:qos",
+    ]
+  }
 
   if (miscdevice_feature_vibrator_input_method_enable) {
     external_deps += [
