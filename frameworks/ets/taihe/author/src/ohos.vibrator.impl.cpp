@@ -618,7 +618,9 @@ static void UpdateCallbackInfos(std::string& vibratorEvent, callbackType callbac
             return (env->Reference_StrictEquals(callbackRef, obj->ref, &isEqual) == ANI_OK) && isEqual;
         });
     if (isSubscribedCallback) {
-        env->GlobalReference_Delete(callbackRef);
+        if (env->GlobalReference_Delete(callbackRef) != ANI_OK) {
+            MISC_HILOGW("Delete global reference failed");
+        }
         MISC_HILOGW("Callback is already subscribed, sensorTypeId:%{public}s", vibratorEvent.c_str());
         return;
     }
@@ -693,7 +695,9 @@ static int32_t RemoveAllCallback(const std::string& eventType)
     for (auto iter = callbackInfos.begin(); iter != callbackInfos.end();) {
         CHKPC(*iter);
         if (auto *env = taihe::get_env()) {
-            env->GlobalReference_Delete((*iter)->ref);
+            if (env->GlobalReference_Delete((*iter)->ref) != ANI_OK) {
+                MISC_HILOGW("Delete global reference failed");
+            }
         }
         iter = callbackInfos.erase(iter);
     }
@@ -722,7 +726,9 @@ static int32_t RemoveCallback(std::string& eventType, uintptr_t opq)
         CHKPC(*iter);
         ani_boolean isEqual = false;
         if ((env->Reference_StrictEquals(callbackRef, (*iter)->ref, &isEqual) == ANI_OK) && isEqual) {
-            env->GlobalReference_Delete((*iter)->ref);
+            if (env->GlobalReference_Delete((*iter)->ref) != ANI_OK) {
+                MISC_HILOGW("Delete global reference failed");
+            }
             iter = callbackInfos.erase(iter);
             MISC_HILOGE("Remove callback success");
             break;
@@ -730,7 +736,9 @@ static int32_t RemoveCallback(std::string& eventType, uintptr_t opq)
             ++iter;
         }
     }
-    env->GlobalReference_Delete(callbackRef);
+    if (env->GlobalReference_Delete(callbackRef) != ANI_OK) {
+        MISC_HILOGW("Delete global reference failed");
+    }
     if (callbackInfos.empty()) {
         MISC_HILOGD("No subscription to change data");
         g_onCallbackInfos.erase(eventType);
