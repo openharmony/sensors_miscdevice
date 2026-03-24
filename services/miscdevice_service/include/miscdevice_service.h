@@ -200,10 +200,10 @@ private:
     sptr<IRemoteObject::DeathRecipient> clientDeathObserver_ = nullptr;
     std::mutex clientDeathObserverMutex_;
     static std::map<sptr<IRemoteObject>, int32_t> clientPidMap_;
-    std::mutex clientPidMapMutex_;
+    static std::mutex clientPidMapMutex_;
     std::mutex miscDeviceIdMapMutex_;
     std::mutex lightInfosMutex_;
-    std::mutex devicesManageMutex_;
+    static std::mutex devicesManageMutex_;
     static std::map<int32_t, VibratorAllInfos> devicesManageMap_;
     int32_t invalidVibratorIdCount_ = 0;
     std::vector<int32_t> disablePids_;
