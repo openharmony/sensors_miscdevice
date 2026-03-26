@@ -93,7 +93,9 @@ std::mutex MiscdeviceService::invalidVibratorInfoMutex_;
 std::mutex MiscdeviceService::stopMutex_;
 bool MiscdeviceService::isVibrationPriorityReady_ = false;
 std::map<int32_t, VibratorAllInfos> MiscdeviceService::devicesManageMap_;
+std::mutex MiscdeviceService::devicesManageMutex_;
 std::map<sptr<IRemoteObject>, int32_t> MiscdeviceService::clientPidMap_;
+std::mutex MiscdeviceService::clientPidMapMutex_;
 std::atomic_bool MiscdeviceService::deviceMute_ = false;
 
 MiscdeviceService::MiscdeviceService()
