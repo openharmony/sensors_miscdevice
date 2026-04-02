@@ -584,7 +584,7 @@ void EmitUvEventLoop(sptr<AsyncCallbackInfo> asyncCallbackInfo)
             return;
         }
     };
-    auto ret = napi_send_event(asyncCallbackInfo->env, task, napi_eprio_immediate);
+    auto ret = napi_send_event(asyncCallbackInfo->env, task, napi_eprio_immediate, "Vibrator EmitUvEventLoop");
     if (ret != napi_ok) {
         MISC_HILOGE("Failed to SendEvent, ret:%{public}d", ret);
         asyncCallbackInfo->DecStrongRef(nullptr);
