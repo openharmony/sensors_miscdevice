@@ -502,6 +502,7 @@ static napi_value VibrateEffect(napi_env env, napi_value args[], size_t argc)
             ThrowErr(env, PARAMETER_ERROR, "SetLoopCount fail or parameter invalid");
             return nullptr;
         }
+        asyncCallbackInfo->identifier = identifier;
         asyncCallbackInfo->flag = "preset";
     } else {
         asyncCallbackInfo->error.code = StartVibrate(asyncCallbackInfo->info, identifier);

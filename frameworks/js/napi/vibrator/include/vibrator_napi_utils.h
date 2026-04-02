@@ -86,6 +86,7 @@ public:
     EffectInfo effectInfo;
     VibratorStatusEvent statusEvent;
     std::string flag;
+    VibratorIdentifier identifier;
     AsyncCallbackInfo(napi_env env) : env(env) {}
     ~AsyncCallbackInfo();
 };

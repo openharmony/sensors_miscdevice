@@ -536,8 +536,8 @@ void ExecuteCallBack(napi_env env, void *data)
             MISC_HILOGD("SetThreadQos success");
         }
 #endif // OHOS_BUILD_ENABLE_QOS
-        asyncCallbackInfo->error.code = PlayPrimitiveEffect(asyncCallbackInfo->info.effectId.c_str(),
-            asyncCallbackInfo->info.intensity);
+        asyncCallbackInfo->error.code = PlayPrimitiveEffectEnhanced(asyncCallbackInfo->identifier,
+            asyncCallbackInfo->info.effectId.c_str(), asyncCallbackInfo->info.intensity);
 #ifdef OHOS_BUILD_ENABLE_QOS
         ret = OHOS::QOS::ResetThreadQos();
         if (ret != 0) {
