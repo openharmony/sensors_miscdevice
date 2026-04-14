@@ -694,6 +694,7 @@ void VibrationPriorityManager::UpdateStatus()
     if (vibrateWhenRing_.load() == VIBRATE_WHEN_RING_MODE_INVALID) {
         InitVibrateWhenRing();
     }
+    UpdateInputMethodBundleNames();
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
     if (miscCrownFeedback_ == FEEDBACK_MODE_INVALID) {
@@ -806,6 +807,7 @@ void VibrationPriorityManager::InitInputMethodData()
         }
         inputMethodBundleNames_.push_back(valBundleName->valuestring);
     }
+    inputMethodBundleNamesInitialized_.store(true);
     cJSON_Delete(jsonValue);
 }
 
@@ -886,6 +888,15 @@ bool VibrationPriorityManager::ShouldIgnoreInputMethod(const VibrateInfo &vibrat
         return true;
     }
     return false;
+}
+
+void VibrationPriorityManager::UpdateInputMethodBundleNames()
+{
+    if (inputMethodBundleNamesInitialized_.load()) {
+        MISC_HILOGD("Input method bundle names has been initialized");
+        return;
+    }
+    InitInputMethodData();
 }
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
 
