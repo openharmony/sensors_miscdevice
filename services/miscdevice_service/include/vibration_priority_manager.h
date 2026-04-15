@@ -104,6 +104,7 @@ private:
     VibrateStatus ShouldIgnoreVibrate(const VibrateInfo &vibrateInfo, VibrateInfo currentVibrateInfo) const;
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
     bool ShouldIgnoreInputMethod(const VibrateInfo &vibrateInfo);
+    void UpdateInputMethodBundleNames();
 #endif // OHOS_BUILD_ENABLE_VIBRATOR_INPUT_METHOD
     static void ExecRegisterCb(const sptr<MiscDeviceObserver> &observer);
     int32_t RegisterObserver(const sptr<MiscDeviceObserver> &observer);
@@ -160,6 +161,7 @@ private:
     sptr<MiscDeviceObserver> currentUserImfObserver_;
     std::vector<std::string> inputMethodBundleNames_;
     std::mutex inputMethodBundleNamesMutex_;
+    std::atomic_bool inputMethodBundleNamesInitialized_ = false;
 #ifdef OHOS_BUILD_ENABLE_VIBRATOR_CROWN
     std::atomic_int32_t miscCrownFeedback_ = FEEDBACK_MODE_INVALID;
     std::atomic_int32_t miscIntensity_ = FEEDBACK_INTENSITY_INVALID;
