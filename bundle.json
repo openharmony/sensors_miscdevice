@@ -64,7 +64,8 @@
         ],
         "service_group": [
           "//base/sensors/miscdevice/services/miscdevice_service:miscdevice_service_target",
-          "//base/sensors/miscdevice/sa_profile:sensors_sa_profiles"
+          "//base/sensors/miscdevice/sa_profile:sensors_sa_profiles",
+          "//base/sensors/miscdevice/tools/ohos-vibratorControl:ohos-vibratorControl"
         ]
       },
       "inner_kits": [
