@@ -579,8 +579,8 @@ void stopVibrationParam(::taihe::optional_view<::ohos::vibrator::VibratorInfoPar
     EffectInfo effectInfo;
     VibratorIdentifier identifierInfo;
     if (param.has_value()) {
-        identifierInfo.deviceId = param->deviceId.has_value() ? param->deviceId.value() : -1;
-        identifierInfo.vibratorId = param->vibratorId.has_value() ? param->vibratorId.value() : -1;
+        identifierInfo.deviceId = param->deviceId.value();
+        identifierInfo.vibratorId = param->vibratorId.value();
     }
     int32_t ret = GetEffectInfo(identifierInfo, std::string(effectId), effectInfo);
     if (ret != OHOS::ERR_OK) {
