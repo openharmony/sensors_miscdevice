@@ -84,6 +84,10 @@ int VibratorClientStub::ProcessPlugEvent(int32_t eventCode, int32_t deviceId, in
 {
     MISC_HILOGD("Begin, eventCode=%{public}d, deviceId:%{public}d, vibratorCnt:%{public}d",
         eventCode, deviceId, vibratorCnt);
+    if (eventCode < -1 || eventCode > 1) {
+        MISC_HILOGE("eventCode invalid");
+        return PARAMETER_ERROR;
+    }
     VibratorStatusEvent statusEvent = {
         .type = static_cast<VibratorPlugState>(eventCode),
         .deviceId = deviceId,

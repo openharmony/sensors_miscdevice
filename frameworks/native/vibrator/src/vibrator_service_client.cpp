@@ -124,6 +124,7 @@ int32_t VibratorServiceClient::InitServiceClient()
 
 int32_t VibratorServiceClient::TransferClientRemoteObject()
 {
+    CHKPR(vibratorClient_, ERROR);
     auto remoteObject = vibratorClient_->AsObject();
     CHKPR(remoteObject, MISC_NATIVE_GET_SERVICE_ERR);
     CHKPR(miscdeviceProxy_, ERROR);
