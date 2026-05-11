@@ -274,6 +274,7 @@ int32_t IsSupportEffect(const char *effectId, bool *state)
 int32_t IsSupportEffectEnhanced(const VibratorIdentifier identifier, const char *effectId, bool *state)
 {
     CHKPR(effectId, PARAMETER_ERROR);
+    CHKPR(state, PARAMETER_ERROR);
     auto &client = VibratorServiceClient::GetInstance();
     int32_t ret = client.IsSupportEffect(identifier, effectId, *state);
     if (ret != ERR_OK) {

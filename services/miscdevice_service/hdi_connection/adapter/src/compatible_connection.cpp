@@ -47,7 +47,7 @@ HdfVibratorMode g_vibrateMode;
 #endif // HDF_DRIVERS_INTERFACE_VIBRATOR
 constexpr int32_t VIBRATE_DELAY_TIME = 10;
 } // namespace
-int32_t CompatibleConnection::duration_ = 0;
+std::atomic_int32_t CompatibleConnection::duration_ = 0;
 std::atomic_bool CompatibleConnection::isStop_ = true;
 
 int32_t CompatibleConnection::ConnectHdi()
@@ -59,7 +59,7 @@ int32_t CompatibleConnection::ConnectHdi()
 int32_t CompatibleConnection::StartOnce(const VibratorIdentifierIPC &identifier, uint32_t duration)
 {
     CALL_LOG_ENTER;
-    duration_ = static_cast<int32_t>(duration);
+    duration_.store(static_cast<int32_t>(duration));
     if (!vibrateThread_.joinable()) {
         std::thread senocdDataThread(CompatibleConnection::VibrateProcess);
         vibrateThread_ = std::move(senocdDataThread);
@@ -78,7 +78,7 @@ int32_t CompatibleConnection::Start(const VibratorIdentifierIPC &identifier, con
         MISC_HILOGE("Do not support effectType:%{public}s", effectType.c_str());
         return VIBRATOR_ON_ERR;
     }
-    duration_ = g_vibratorEffect[effectType];
+    duration_.store(g_vibratorEffect[effectType]);
     if (!vibrateThread_.joinable()) {
         std::thread senocdDataThread(CompatibleConnection::VibrateProcess);
         vibrateThread_ = std::move(senocdDataThread);
@@ -100,13 +100,13 @@ int32_t CompatibleConnection::EnableCompositeEffect(const VibratorIdentifierIPC 
         MISC_HILOGE("compositeEffects is empty");
         return VIBRATOR_ON_ERR;
     }
-    duration_ = 0;
+    duration_.store(0);
     size_t size = hdfCompositeEffect.compositeEffects.size();
     for (size_t i = 0; i < size; ++i) {
         if (hdfCompositeEffect.type == HDF_EFFECT_TYPE_TIME) {
-            duration_ += hdfCompositeEffect.compositeEffects[i].timeEffect.delay;
+            duration_.fetch_add(hdfCompositeEffect.compositeEffects[i].timeEffect.delay);
         } else if (hdfCompositeEffect.type == HDF_EFFECT_TYPE_PRIMITIVE) {
-            duration_ += hdfCompositeEffect.compositeEffects[i].primitiveEffect.delay;
+            duration_.fetch_add(hdfCompositeEffect.compositeEffects[i].primitiveEffect.delay);
         }
     }
     if (!vibrateThread_.joinable()) {
@@ -206,7 +206,7 @@ void CompatibleConnection::VibrateProcess()
     CALL_LOG_ENTER;
     prctl(PR_SET_NAME, VIBRATE_MOCK_THREAD_NAME.c_str());
     clock_t vibrateStartTime = clock();
-    while (clock() - vibrateStartTime < duration_) {
+    while (clock() - vibrateStartTime < duration_.load()) {
         if (isStop_) {
             MISC_HILOGI("Thread should stop");
             break;
@@ -224,7 +224,7 @@ int32_t CompatibleConnection::StartByIntensity(const VibratorIdentifierIPC &iden
         MISC_HILOGE("Do not support effectType:%{public}s", effect.c_str());
         return VIBRATOR_ON_ERR;
     }
-    duration_ = g_vibratorEffect[effect];
+    duration_.store(g_vibratorEffect[effect]);
     if (!vibrateThread_.joinable()) {
         std::thread senocdDataThread(CompatibleConnection::VibrateProcess);
         vibrateThread_ = std::move(senocdDataThread);
