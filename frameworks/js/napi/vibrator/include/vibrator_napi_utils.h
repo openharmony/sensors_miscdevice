@@ -130,6 +130,7 @@ void EmitAsyncCallbackWork(sptr<AsyncCallbackInfo> async_callback_info);
 void EmitPromiseWork(sptr<AsyncCallbackInfo> asyncCallbackInfo);
 void EmitUvEventLoop(sptr<AsyncCallbackInfo> asyncCallbackInfo);
 bool ClearVibratorPattern(VibratorPattern &vibratorPattern);
+void ClearVibratorEvents(VibratorEvent* &events, int32_t eventSize);
 void DeleteWork(uv_work_t *work);
 } // namespace Sensors
 } // namespace OHOS

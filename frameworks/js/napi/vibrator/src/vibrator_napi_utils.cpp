@@ -69,6 +69,23 @@ bool ClearVibratorPattern(VibratorPattern &vibratorPattern)
     return true;
 }
 
+void ClearVibratorEvents(VibratorEvent* &events, int32_t eventSize)
+{
+    CALL_LOG_ENTER;
+    if ((eventSize <= 0) || (events == nullptr)) {
+        MISC_HILOGW("events is not need to free, eventSize:%{public}d", eventSize);
+        return;
+    }
+    for (int32_t j = 0; j < eventSize; ++j) {
+        if (events[j].points != nullptr) {
+            free(events[j].points);
+            events[j].points = nullptr;
+        }
+    }
+    free(events);
+    events = nullptr;
+}
+
 bool CreateInt32Property(napi_env env, napi_value &eventObj, const char* name, int32_t value)
 {
     CALL_LOG_ENTER;
