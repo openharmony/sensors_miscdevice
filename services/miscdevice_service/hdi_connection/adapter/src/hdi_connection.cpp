@@ -340,6 +340,7 @@ int32_t HdiConnection::PlayPackageBySessionId(const VibratorIdentifierIPC &ident
     const VibratePackage &package)
 {
     CALL_LOG_ENTER;
+    CHKPR(vibratorInterface_, ERR_INVALID_VALUE);
     DeviceVibratorInfo deviceVibratorInfo = {
         .deviceId = identifier.deviceId,
         .vibratorId = identifier.vibratorId

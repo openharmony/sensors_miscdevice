@@ -201,6 +201,23 @@ static bool ParseVibrateEvent(::taihe::array<::ohos::vibrator::VibratorEvent> ev
     return true;
 }
 
+static void ClearVibratorEvents(VibratorEvent* &events, int32_t eventSize)
+{
+    CALL_LOG_ENTER;
+    if ((eventSize <= 0) || (events == nullptr)) {
+        MISC_HILOGW("events is not need to free, eventSize:%{public}d", eventSize);
+        return;
+    }
+    for (int32_t j = 0; j < eventSize; ++j) {
+        if (events[j].points != nullptr) {
+            free(events[j].points);
+            events[j].points = nullptr;
+        }
+    }
+    free(events);
+    events = nullptr;
+}
+
 static bool ParseVibratorPattern(::ohos::vibrator::VibratorPattern pattern, VibrateInfo &vibrateInfo)
 {
     CALL_LOG_ENTER;
@@ -220,8 +237,7 @@ static bool ParseVibratorPattern(::ohos::vibrator::VibratorPattern pattern, Vibr
         new (&events[j]) VibratorEvent();
         if (!ParseVibrateEvent(pattern.events, j, events[j])) {
             MISC_HILOGE("ParseVibrateEvent failed");
-            free(events);
-            events = nullptr;
+            ClearVibratorEvents(events, j);
             return false;
         }
     }
