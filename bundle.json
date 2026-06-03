@@ -33,6 +33,7 @@
         "data_share",
         "drivers_interface_light",
         "drivers_interface_vibrator",
+        "ets_frontend",
         "hilog",
         "hisysevent",
         "hitrace",
