@@ -209,6 +209,12 @@ VibratePattern* VibratePattern::Unmarshalling(Parcel &data)
             pattern = nullptr;
             return pattern;
         }
+        if (tag != VibrateTag::EVENT_TAG_CONTINUOUS && tag != VibrateTag::EVENT_TAG_TRANSIENT) {
+            MISC_HILOGE("Invalid tag value");
+            delete pattern;
+            pattern = nullptr;
+            return pattern;
+        }
         event.tag = static_cast<VibrateTag>(tag);
         if (!data.ReadInt32(event.time) || !data.ReadInt32(event.duration) || !data.ReadInt32(event.intensity) ||
             !data.ReadInt32(event.frequency) || !data.ReadInt32(event.index)) {
