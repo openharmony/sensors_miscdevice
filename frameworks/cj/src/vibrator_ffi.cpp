@@ -297,13 +297,39 @@ extern "C" {
         if (identifier.vibratorId == 0) {
             identifier.vibratorId = -1;
         }
-        
+
         if (!SetLoopCountEnhanced(identifier, info.count) || CheckParameters(info, identifier) != ERR_OK
             || info.effectId.empty()) {
             return DEVICE_OPERATION_FAILED;
         }
-        return PlayPrimitiveEffect(info.effectId.c_str(), info.intensity);
+        return PlayPrimitiveEffectEnhanced(identifier, info.effectId.c_str(), info.intensity);
     };
+
+    static bool FillRetVibratorInfo(const VibratorInfos& info, RetVibratorInfos& out)
+    {
+        out.deviceId = info.deviceId;
+        out.vibratorId = info.vibratorId;
+        if (info.deviceName.empty()) {
+            out.deviceName = nullptr;
+        } else {
+            out.deviceName = MallocCString(info.deviceName);
+            if (out.deviceName == nullptr) {
+                return false;
+            }
+        }
+        out.isSupportHdHaptic = info.isSupportHdHaptic;
+        out.isLocalVibrator = info.isLocalVibrator;
+        return true;
+    }
+
+    static void FreeRetVibratorInfos(RetVibratorInfos*& retValue, int64_t flag)
+    {
+        for (int64_t i = 0; i < flag; ++i) {
+            free(retValue[i].deviceName);
+        }
+        free(retValue);
+        retValue = nullptr;
+    }
 
     FFI_EXPORT CArrRetVibratorInfo FfiVibratorGetVibratorInfo(RetVibratorInfoParam param, int32_t *code)
     {
@@ -327,33 +353,22 @@ extern "C" {
             *code = DEVICE_OPERATION_FAILED;
             return arrInfo;
         }
-        int32_t flag = 0;
-        bool fail = false;
+        *code = SUCCESS;
+        int64_t flag = 0;
         for (int64_t i = 0; i < arrInfo.size; ++i) {
-            retValue[i].deviceId = vibratorInfo[i].deviceId;
-            retValue[i].vibratorId = vibratorInfo[i].vibratorId;
-            if (vibratorInfo[i].deviceName.empty()) {
-                retValue[i].deviceName = nullptr;
-            } else {
-                retValue[i].deviceName = MallocCString(vibratorInfo[i].deviceName);
-                if (retValue[i].deviceName == nullptr) {
-                    fail = true;
-                    *code = DEVICE_OPERATION_FAILED;
-                    break;
-                }
+            if (!FillRetVibratorInfo(vibratorInfo[i], retValue[i])) {
+                *code = DEVICE_OPERATION_FAILED;
+                break;
             }
-            retValue[i].isSupportHdHaptic = vibratorInfo[i].isSupportHdHaptic;
-            retValue[i].isLocalVibrator = vibratorInfo[i].isLocalVibrator;
             flag += 1;
         }
-        if (fail == true) {
-            for (int32_t i = 0; i < flag; ++i) {
-                free(retValue[i].deviceName);
-            }
-            free(retValue);
-            retValue = nullptr;
+        if (*code != SUCCESS) {
+            FreeRetVibratorInfos(retValue, flag);
+            arrInfo.head = nullptr;
+            arrInfo.size = 0;
+        } else {
+            arrInfo.head = retValue;
         }
-        arrInfo.head = retValue;
         return arrInfo;
     }
 
