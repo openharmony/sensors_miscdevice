@@ -81,6 +81,7 @@ ohos_source_set("miscdevice_service_proxy") {
 
 ohos_source_set("miscdevice_service_file_h") {
   public_configs = [ ":miscdevice_service_idl_config" ]
+  branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
     cfi_cross_dso = true
