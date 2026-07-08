@@ -47,7 +47,9 @@ ohos_shared_library("vibrator") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
+    "libuv:uv",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
   if (miscdevice_feature_phone_lite_qos_enable) {
     external_deps += [
