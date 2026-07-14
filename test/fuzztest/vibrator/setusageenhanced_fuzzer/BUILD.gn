@@ -39,7 +39,10 @@ ohos_fuzztest("SetUsageEnhancedFuzzTest") {
   deps =
       [ "$SUBSYSTEM_DIR/frameworks/native/vibrator:vibrator_interface_native" ]
 
-  external_deps = [ "c_utils:utils" ]
+  external_deps = [
+    "bounds_checking_function:libsec_shared",
+    "c_utils:utils",
+  ]
 }
 
 group("fuzztest") {
