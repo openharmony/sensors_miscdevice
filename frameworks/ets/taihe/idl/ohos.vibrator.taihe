@@ -775,9 +775,13 @@ struct VibratorInfo {
  * @syscap SystemCapability.Sensors.MiscDevice
  * @since 9
  */
-@gen_async("stopVibration")
-@gen_promise("stopVibration")
+@rename("stopVibration")
+@async
 function stopVibrationByModeSync(stopMode: VibratorStopMode): void;
+
+@rename("stopVibration")
+@promise
+function stopVibrationByModePromise(stopMode: VibratorStopMode): void;
 
 /**
  * Trigger vibrator vibration.
@@ -810,9 +814,13 @@ function stopVibrationByModeSync(stopMode: VibratorStopMode): void;
  * @atomicservice
  * @since 11
  */
-@gen_async("startVibration")
-@gen_promise("startVibration")
+@rename("startVibration")
+@async
 function startVibrationSync(effect: VibrateEffect, attribute: VibrateAttribute): void;
+
+@rename("startVibration")
+@promise
+function startVibrationPromise(effect: VibrateEffect, attribute: VibrateAttribute): void;
 
 /**
  * Whether the high-definition haptic is supported.
@@ -846,9 +854,13 @@ function getVibratorInfoSync(param: Optional<VibratorInfoParam>): Array<Vibrator
  * @atomicservice
  * @since 12
  */
-@gen_async("stopVibration")
-@gen_promise("stopVibration")
+@rename("stopVibration")
+@async
 function stopVibrationAsync(): void;
+
+@rename("stopVibration")
+@promise
+function stopVibrationPromise(): void;
 
 /**
  * Whether the preset vibration effect is supported.
@@ -861,9 +873,13 @@ function stopVibrationAsync(): void;
  * @syscap SystemCapability.Sensors.MiscDevice
  * @since 10
  */
-@gen_async("isSupportEffect")
-@gen_promise("isSupportEffect")
+@rename("isSupportEffect")
+@async
 function isSupportEffectAsync(effectId: String): bool;
+
+@rename("isSupportEffect")
+@promise
+function isSupportEffectPromise(effectId: String): bool;
 
 /**
  * Provide methods for adding long or short vibration events and generate VibratorPattern objects.
@@ -917,7 +933,8 @@ function getVibratorPatternBuilder(): VibratorPatternBuilder;
 function stopVibrationSync(): void;
 function isSupportEffectSync(effectId: String): bool;
 
-@gen_promise("stopVibration")
+@rename("stopVibration")
+@promise
 function stopVibrationParam(param: Optional<VibratorInfoParam>): void;
 
 struct EffectInfo {

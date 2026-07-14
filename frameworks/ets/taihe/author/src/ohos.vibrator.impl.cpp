@@ -1037,11 +1037,15 @@ ohos::vibrator::VibratorPatternBuilder getVibratorPatternBuilder()
 // Since these macros are auto-generate, lint will cause false positive.
 // NOLINTBEGIN
 TH_EXPORT_CPP_API_stopVibrationByModeSync(stopVibrationByModeSync);
+TH_EXPORT_CPP_API_stopVibrationByModePromise(stopVibrationByModeSync);
 TH_EXPORT_CPP_API_startVibrationSync(startVibrationSync);
+TH_EXPORT_CPP_API_startVibrationPromise(startVibrationSync);
 TH_EXPORT_CPP_API_isHdHapticSupported(isHdHapticSupported);
 TH_EXPORT_CPP_API_getVibratorInfoSync(getVibratorInfoSync);
 TH_EXPORT_CPP_API_stopVibrationAsync(stopVibrationAsync);
+TH_EXPORT_CPP_API_stopVibrationPromise(stopVibrationAsync);
 TH_EXPORT_CPP_API_isSupportEffectAsync(isSupportEffectAsync);
+TH_EXPORT_CPP_API_isSupportEffectPromise(isSupportEffectAsync);
 TH_EXPORT_CPP_API_getVibratorPatternBuilder(getVibratorPatternBuilder);
 TH_EXPORT_CPP_API_stopVibrationSync(stopVibrationSync);
 TH_EXPORT_CPP_API_isSupportEffectSync(isSupportEffectSync);
