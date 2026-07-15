@@ -160,7 +160,7 @@ std::optional<HdfEffectInfo> HdiConnection::GetEffectInfo(const VibratorIdentifi
     };
     HdfEffectInfo effectInfo;
     int32_t ret = vibratorInterface_->GetEffectInfo(deviceVibratorInfo, effect, effectInfo);
-    if (ret < 0) {
+    if (ret != ERR_OK) {
 #ifdef HIVIEWDFX_HISYSEVENT_ENABLE
         HiSysEventWrite(HiSysEvent::Domain::MISCDEVICE, "VIBRATOR_HDF_SERVICE_EXCEPTION",
             HiSysEvent::EventType::FAULT, "PKG_NAME", "GetEffectInfo", "ERROR_CODE", ret);
@@ -530,6 +530,7 @@ int32_t HdiConnection::RegisterVibratorPlugCallback(DevicePlugCallback cb)
     CALL_LOG_ENTER;
     CHKPR(cb, ERR_NO_INIT);
     CHKPR(vibratorInterface_, ERR_NO_INIT);
+    CHKPR(g_eventCallback, ERR_NO_INIT);
     devicePlugCb_ = cb;
     int32_t ret = vibratorInterface_->RegVibratorPlugCallback(g_eventCallback);
     if (ret != 0) {

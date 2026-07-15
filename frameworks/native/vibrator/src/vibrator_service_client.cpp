@@ -1054,6 +1054,10 @@ void VibratorServiceClient::ConvertVibratorPattern(const VibratorPattern &vibrat
         MISC_HILOGE("VibratorPattern's eventNum is invalid, eventNum:%{public}d", vibratorPattern.eventNum);
         return;
     }
+    if (vibratorPattern.events == nullptr) {
+        MISC_HILOGE("VibratorPattern's events is nullptr");
+        return;
+    }
     for (int32_t j = 0; j < vibratorPattern.eventNum; ++j) {
         VibrateEvent vibrateEvent = {};
         vibrateEvent.tag = static_cast<VibrateTag>(vibratorPattern.events[j].type);

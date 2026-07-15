@@ -260,7 +260,7 @@ static void PrintVibratorPattern(VibratorPattern &vibratorPattern)
             static_cast<int32_t>(vibratorPattern.events[i].type), vibratorPattern.events[i].time,
             vibratorPattern.events[i].duration, vibratorPattern.events[i].intensity,
             vibratorPattern.events[i].frequency, vibratorPattern.events[i].index, vibratorPattern.events[i].pointNum);
-        if (vibratorPattern.events[i].pointNum > 0) {
+        if (vibratorPattern.events[i].pointNum > 0 && vibratorPattern.events[i].points != nullptr) {
             VibratorCurvePoint *point = vibratorPattern.events[i].points;
             for (int32_t j = 0; j < vibratorPattern.events[i].pointNum; ++j) {
                 MISC_HILOGD("PrintVibratorPattern, time:%{public}d, intensity:%{public}d, frequency:%{public}d",
