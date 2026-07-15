@@ -49,6 +49,7 @@ ohos_fuzztest("HandleVibratorDataFuzzTest") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "cJSON:cjson",
     "hilog:libhilog",

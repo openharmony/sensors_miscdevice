@@ -43,6 +43,7 @@ ohos_fuzztest("FreeVibratorPackageFuzzTest") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken_shared",
     "access_token:libtokensetproc_shared",
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
   ]
 }
