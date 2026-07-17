@@ -316,6 +316,10 @@ static bool CheckVibratorCurvePoint(const VibratorEvent &event)
         MISC_HILOGE("The points size is out of range, pointNum:%{public}d", event.pointNum);
         return false;
     }
+    if (event.points == nullptr) {
+        MISC_HILOGE("points is nullptr");
+        return false;
+    }
     for (int32_t j = 0; j < event.pointNum; ++j) {
         if ((event.points[j].time < 0) || (event.points[j].time > event.duration)) {
             MISC_HILOGE("time in points is out of range, time:%{public}d", event.points[j].time);

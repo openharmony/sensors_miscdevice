@@ -380,6 +380,7 @@ int32_t VibrationPriorityManager::UnregisterUser100Observer()
     }
     auto vibrateWhenRing = AssembleUri(SETTING_USER_URI_PROXY, VIBRATE_WHEN_RINGING_KEY, tableType);
     helper->UnregisterObserver(vibrateWhenRing, vibrateWhenRingObserver_);
+    ReleaseDataShareHelper(helper);
     IPCSkeleton::SetCallingIdentity(callingIdentity);
     vibrateWhenRingObserver_ = nullptr;
     MISC_HILOGI("Succeed to UnregisterUser100Observer observer");
