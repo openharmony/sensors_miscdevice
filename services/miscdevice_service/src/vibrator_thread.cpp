@@ -304,9 +304,10 @@ void VibratorThread::SetExitStatus(bool status)
     exitFlag_.store(status);
 }
 
-void VibratorThread::WakeUp()
+void VibratorThread::NotifyExit()
 {
-    MISC_HILOGD("Notify the vibratorThread");
+    std::lock_guard<std::mutex> lck(vibrateMutex_);
+    exitFlag_.store(true);
     cv_.notify_one();
 }
 
