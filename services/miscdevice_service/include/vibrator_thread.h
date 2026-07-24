@@ -31,7 +31,7 @@ public:
     VibrateInfo GetCurrentVibrateInfo();
     std::vector<HdfWaveInformation> GetCurrentWaveInfo();
     void SetExitStatus(bool status);
-    void WakeUp();
+    void NotifyExit();
     void ResetVibrateInfo();
 protected:
     virtual bool Run();
