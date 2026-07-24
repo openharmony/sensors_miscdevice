@@ -1,0 +1,24 @@
+{
+  "kind": "audio2haptic_style_profile",
+  "id": "default",
+  "version": "0.1.0",
+  "dsp_policy": "default_v1",
+  "parameters": {
+    "tone_frequency": {"neutral": 50, "soft_elastic": 32, "tense": 70, "heavy": 40},
+    "accent_relative_attenuation": 28,
+    "accent_relative_boost": 4,
+    "accent_min_intensity": 10,
+    "accent_max_intensity": 100,
+    "texture_min_intensity": 10,
+    "texture_neutral_intensity": 30,
+    "texture_max_intensity": 55,
+    "texture_curve_error": 5,
+    "texture_smoothing_kernel": [0.25, 0.5, 0.25]
+  },
+  "rationale": {
+    "tone_frequency": "Device execution proxies for semantic tones, not acoustic pitch or physical Hz.",
+    "accent_relative_attenuation": "Keeps admitted weak accents from being promoted by local ranking.",
+    "texture_max_intensity": "Limits continuous-texture intensity.",
+    "texture_smoothing_kernel": "Smooths frame-level texture control before sparse Curve encoding."
+  }
+}
