@@ -29,6 +29,7 @@ namespace OHOS {
 namespace Sensors {
 namespace {
 constexpr int32_t RESULT_LENGTH = 2;
+constexpr napi_qos_t kVibratorAsyncWorkQos = static_cast<napi_qos_t>(5); // napi_qos_user_interactive
 } // namespace
 AsyncCallbackInfo::~AsyncCallbackInfo()
 {
@@ -611,7 +612,7 @@ void EmitAsyncCallbackWork(sptr<AsyncCallbackInfo> asyncCallbackInfo)
         asyncCallbackInfo.GetRefPtr(), &asyncCallbackInfo->asyncWork);
     if (status != napi_ok
         || napi_queue_async_work_with_qos(
-            asyncCallbackInfo->env, asyncCallbackInfo->asyncWork, static_cast<napi_qos_t>(5)) != napi_ok) {
+            asyncCallbackInfo->env, asyncCallbackInfo->asyncWork, kVibratorAsyncWorkQos) != napi_ok) {
         MISC_HILOGE("Create async work fail");
         asyncCallbackInfo->DecStrongRef(nullptr);
     }
@@ -662,7 +663,7 @@ void EmitPromiseWork(sptr<AsyncCallbackInfo> asyncCallbackInfo)
         }, asyncCallbackInfo.GetRefPtr(), &asyncCallbackInfo->asyncWork);
     if (status != napi_ok
         || napi_queue_async_work_with_qos(
-            asyncCallbackInfo->env, asyncCallbackInfo->asyncWork, static_cast<napi_qos_t>(5)) != napi_ok) {
+            asyncCallbackInfo->env, asyncCallbackInfo->asyncWork, kVibratorAsyncWorkQos) != napi_ok) {
         MISC_HILOGE("Create async work fail");
         asyncCallbackInfo->DecStrongRef(nullptr);
     }
