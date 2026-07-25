@@ -20,9 +20,6 @@
 #include "securec.h"
 
 #include "miscdevice_log.h"
-#ifdef OHOS_BUILD_ENABLE_QOS
-#include "qos.h"
-#endif // OHOS_BUILD_ENABLE_QOS
 #include "vibrator_napi_error.h"
 
 #undef LOG_TAG
@@ -545,24 +542,8 @@ void ExecuteCallBack(napi_env env, void *data)
     CALL_LOG_ENTER;
     sptr<AsyncCallbackInfo> asyncCallbackInfo(static_cast<AsyncCallbackInfo *>(data));
     if (asyncCallbackInfo->flag == "preset") {
-#ifdef OHOS_BUILD_ENABLE_QOS
-        auto ret = OHOS::QOS::SetThreadQos(OHOS::QOS::QosLevel::QOS_USER_INTERACTIVE);
-        if (ret != 0) {
-            MISC_HILOGE("SetThreadQos failed, ret:%{public}d", ret);
-        } else {
-            MISC_HILOGD("SetThreadQos success");
-        }
-#endif // OHOS_BUILD_ENABLE_QOS
         asyncCallbackInfo->error.code = PlayPrimitiveEffectEnhanced(asyncCallbackInfo->identifier,
             asyncCallbackInfo->info.effectId.c_str(), asyncCallbackInfo->info.intensity);
-#ifdef OHOS_BUILD_ENABLE_QOS
-        ret = OHOS::QOS::ResetThreadQos();
-        if (ret != 0) {
-            MISC_HILOGE("ResetThreadQos failed, ret:%{public}d", ret);
-        } else {
-            MISC_HILOGD("ResetThreadQos success");
-        }
-#endif // OHOS_BUILD_ENABLE_QOS
     }
 }
 
@@ -630,7 +611,7 @@ void EmitAsyncCallbackWork(sptr<AsyncCallbackInfo> asyncCallbackInfo)
         asyncCallbackInfo.GetRefPtr(), &asyncCallbackInfo->asyncWork);
     if (status != napi_ok
         || napi_queue_async_work_with_qos(
-            asyncCallbackInfo->env, asyncCallbackInfo->asyncWork, napi_qos_user_initiated) != napi_ok) {
+            asyncCallbackInfo->env, asyncCallbackInfo->asyncWork, static_cast<napi_qos_t>(5)) != napi_ok) {
         MISC_HILOGE("Create async work fail");
         asyncCallbackInfo->DecStrongRef(nullptr);
     }
@@ -681,7 +662,7 @@ void EmitPromiseWork(sptr<AsyncCallbackInfo> asyncCallbackInfo)
         }, asyncCallbackInfo.GetRefPtr(), &asyncCallbackInfo->asyncWork);
     if (status != napi_ok
         || napi_queue_async_work_with_qos(
-            asyncCallbackInfo->env, asyncCallbackInfo->asyncWork, napi_qos_default) != napi_ok) {
+            asyncCallbackInfo->env, asyncCallbackInfo->asyncWork, static_cast<napi_qos_t>(5)) != napi_ok) {
         MISC_HILOGE("Create async work fail");
         asyncCallbackInfo->DecStrongRef(nullptr);
     }
