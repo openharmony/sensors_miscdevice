@@ -21,6 +21,7 @@ ohos_shared_library("ohvibrator") {
     "$SUBSYSTEM_DIR/utils/common/include",
   ]
   branch_protector_ret = "pac_ret"
+  branch_protector_frt = "bti"
   sanitize = {
     cfi = true
     cfi_cross_dso = true
