@@ -70,8 +70,14 @@ bool ClearVibratorPattern(VibratorPattern &vibratorPattern)
 void ClearVibratorEvents(VibratorEvent* &events, int32_t eventSize)
 {
     CALL_LOG_ENTER;
-    if ((eventSize <= 0) || (events == nullptr)) {
-        MISC_HILOGW("events is not need to free, eventSize:%{public}d", eventSize);
+    if (events == nullptr) {
+        MISC_HILOGW("events is nullptr, eventSize:%{public}d", eventSize);
+        return;
+    }
+    if (eventSize <= 0) {
+        free(events);
+        events = nullptr;
+        MISC_HILOGW("events is freed, eventSize:%{public}d", eventSize);
         return;
     }
     for (int32_t j = 0; j < eventSize; ++j) {
