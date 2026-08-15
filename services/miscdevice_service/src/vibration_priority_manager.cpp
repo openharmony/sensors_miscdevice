@@ -545,7 +545,7 @@ bool VibrationPriorityManager::IgnoreAppVibrations(const VibrateInfo &vibrateInf
     }
     std::lock_guard<std::mutex> whiteListLock(whiteListMutex_);
     for (const WhiteListAppInfo &whiteListAppInfo : doNotDisturbWhiteList_) {
-        if (vibrateInfo.packageName == whiteListAppInfo.bundle) {
+        if (vibrateInfo.packageName == whiteListAppInfo.bundle && vibrateInfo.uid == whiteListAppInfo.uid) {
             MISC_HILOGD("Not ignore app vibration, the app is on the whitelist, bundleName::%{public}s",
                 vibrateInfo.packageName.c_str());
             return false;
