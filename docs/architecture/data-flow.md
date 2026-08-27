@@ -19,7 +19,7 @@ JS 应用 startVibration()
     → VibrationPriorityManager.ShouldIgnoreVibrate() 优先级判断
     → 若不忽略：
       → VibratorThread.UpdateVibratorEffect()
-      → CustomVibrationMatcher 效果转换
+      → CustomVibrationMatcher 效果转换（抹平算法：底层不支持某特性时抹平为时长振动）
       → VibratorHdiConnection
       → IVibratorInterface (HDI)
       → Vibrator HAL → Kernel Driver → 振动马达
@@ -49,9 +49,18 @@ JS 应用 startVibration()
 - 使用场景（Usage）
 - 系统调用标志（systemUsage）
 
+通过 `data_share` 观察 settings 数据库变化获取上述状态。`miscdevice_common_event_subscriber` 监听公共事件，主要用来确认 data_share 是否可用，从而获取数据库数据。
+
 返回 `VIBRATION`（执行）或 `IGNORE_*`（忽略）。
 
 详见 codewiki core.md §3.1(优先级管理器)、§3.4(组件交互时序)。
+
+## 振动并发与打断
+
+- 多个应用同时请求振动时，**后者打断前者**
+- 相同级别 usage 可以互相打断
+- 不同级别 usage 需根据 usage 优先级判断是否能被打断
+- SessionId 由服务侧分配，传到底层后由底层判断振动生命周期
 
 ## 模块依赖关系
 

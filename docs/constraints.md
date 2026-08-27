@@ -29,8 +29,21 @@
 
 ### 优先级管理
 - `VibrationPriorityManager` 基于勿扰模式、铃声设置等条件决策振动是否执行（来源：core.md §3.1、§3.4）
+- 通过 `data_share` 观察 settings 数据库变化获取勿扰/铃声等状态
+- `miscdevice_common_event_subscriber` 监听公共事件，主要确认 data_share 是否可用
 - 优先级判断结果：`VIBRATION`（执行）或 `IGNORE_*`（忽略）（来源：core.md §3.4）
 - 进程级控制：`DisableVibratorByPid` / `EnableVibratorByPid` 可按 PID 禁用/恢复（来源：core.md §4.3）
+
+### 振动并发与打断
+- 多个应用同时请求振动时，后者打断前者
+- 相同级别 usage 可以互相打断
+- 不同级别 usage 需根据 usage 优先级判断是否能被打断
+- SessionId 由服务侧分配，传到底层后由底层判断振动生命周期
+- `CustomVibrationMatcher` 为抹平算法：底层不支持某特性振动时，将振动效果抹平为对应的时长振动
+
+### C API 接口同步
+- `frameworks/capi/` 封装 `interfaces/kits/c/`，两者是封装关系
+- 新增 C 接口时，`frameworks/capi/` 和 `interfaces/kits/c/` 都需要同步添加
 
 ### HDI 连接
 - HDI 服务死亡时通过 `DeathRecipient` 自动重连（来源：core.md §7.6 §6）
@@ -65,6 +78,13 @@
 
 - `frameworks/` **不可**直接依赖 `services/` 的内部头文件，只通过 IPC 接口通信
 - `frameworks/native/light/` 和 `frameworks/native/vibrator/` **不可**互相依赖
+- `frameworks/capi/` 封装 `interfaces/kits/c/`，新增 C 接口两者都需同步
 - `utils/haptic_decoder/` **不可**依赖 `services/`，是独立解码模块
 - `utils/` **不可**依赖 `frameworks/` 或 `services/`，是最底层基础库
 - `hdi_connection/adapter/`（兼容）和 `interface/`（主路径）**不可**互相依赖
+
+## 特殊工具约束
+
+- `tools/ohos-vibratorControl` 是 CLI 工具，支持应用直接操作振动接口
+- 与 Service 交互直接调用 innerkit 接口，之后走正常 IPC 流程
+- 该工具预置到系统镜像，非调试专用

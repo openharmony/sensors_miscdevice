@@ -51,17 +51,17 @@ miscdevice/
 | JS NAPI Binding | `frameworks/js/napi/` | JS/ArkTS 振动器接口绑定，vibrate/startVibration/stop/查询 | `src/vibrator_js.cpp` |
 | Native Vibrator Client | `frameworks/native/vibrator/` | 振动器客户端 + IPC Proxy + 插拔订阅 + 自定义振动 | `src/vibrator_service_client.cpp` |
 | Native Light Client | `frameworks/native/light/` | 灯光客户端 + NDK 接口 + IPC Proxy | `light_agent.cpp`、`src/light_client.cpp` |
-| C API | `frameworks/capi/` | C API 封装层 | - |
+| C API | `frameworks/capi/` | C API 封装层，封装 `interfaces/kits/c/`，新增 C 接口两者都需同步 | - |
 | Cangjie 绑定 | `frameworks/cj/` | Cangjie 语言振动器 FFI 绑定 | `src/` |
 | Taihe/ETS 绑定 | `frameworks/ets/taihe/` | Taihe 声明式振动器接口 | - |
 | Miscdevice Service | `services/miscdevice_service/` | SA 3602 服务端，振动调度/优先级/灯光控制 | `src/miscdevice_service.cpp` |
-| VibrationPriorityManager | `services/miscdevice_service/` | 基于勿扰模式/铃声等条件决策振动是否执行 | `src/vibration_priority_manager.cpp` |
+| VibrationPriorityManager | `services/miscdevice_service/` | 通过 data_share 观察 settings 数据库，决策振动是否执行 | `src/vibration_priority_manager.cpp` |
 | VibratorThread | `services/miscdevice_service/` | 振动执行线程 | `src/vibrator_thread.cpp` |
 | HDI Connection | `services/miscdevice_service/hdi_connection/` | HDI 驱动连接/重连/容错 | `interface/` |
-| Haptic Matcher | `services/miscdevice_service/haptic_matcher/` | 触觉效果匹配/转换 | - |
+| Haptic Matcher | `services/miscdevice_service/haptic_matcher/` | 抹平算法，底层不支持某特性振动时抹平为时长振动 | - |
 | Common Utils | `utils/common/` | 权限校验/JSON解析/IPC数据结构/日志 | `include/` |
 | Haptic Decoder | `utils/haptic_decoder/` | HE/OH 格式振动效果解码，波形调制 | `interface/` |
-| VibratorControl 工具 | `tools/ohos-vibratorControl/` | 命令行振动控制工具 | `src/` |
+| VibratorControl 工具 | `tools/ohos-vibratorControl/` | CLI 工具，直接调用 innerkit 接口操作振动，预置系统镜像 | `src/` |
 
 ## 模块依赖关系
 

@@ -36,9 +36,11 @@
 | VibrateEvent | 振动事件，tag=CONTINUOUS/TRANSIENT |
 | VibrateCurvePoint | 振动曲线控制点（time/intensity/frequency） |
 | VibratorCapacity | 设备能力（高清触感/预设映射/时延控制） |
-| VibrationPriorityManager | 优先级管理器，决策振动是否执行 |
+| VibrationPriorityManager | 优先级管理器，通过 data_share 观察 settings 数据库决策振动是否执行 |
 | VibratorThread | 振动执行线程 |
-| CustomVibrationMatcher | 触觉匹配器，效果转换 |
+| CustomVibrationMatcher | 抹平算法，底层不支持某特性振动时抹平为时长振动 |
+| SessionId | 服务侧分配的会话标识，传到底层判断振动生命周期 |
+| miscdevice_common_event_subscriber | 监听公共事件，确认 data_share 是否可用 |
 | Haptic Decoder | 振动效果解码器，支持 HE/OH 格式 |
 | HE 格式 | 振动效果 JSON 格式之一（HEVibratorDecoder） |
 | OH 格式 | 振动效果 JSON 格式之一（DefaultVibratorDecoder） |
@@ -47,4 +49,4 @@
 | CompatibleConnection | HDI 兼容模拟实现 |
 | QOS | Quality of Service，预设振动使用 QOS_USER_INTERACTIVE 优化响应 |
 | VibratorPatternBuilder | 振动模式构建器，链式调用构建复杂振动序列 |
-| ohos-vibratorControl | 命令行振动控制工具 |
+| ohos-vibratorControl | CLI 工具，直接调用 innerkit 接口操作振动，预置到系统镜像 |
