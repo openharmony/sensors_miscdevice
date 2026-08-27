@@ -1,4 +1,4 @@
-# 振动器 Native / NDK 接口
+# 振动器 Native / C API
 
 > C/C++ 振动器接口，位于 `frameworks/native/vibrator/` 和 `interfaces/`。
 
@@ -78,7 +78,7 @@
 
 详见 codewiki core.md §4.3(Inner API 接口)、modules.md §3(Native Vibrator Client)。
 
-## NDK 接口（kits/c）
+## C API（kits/c）
 
 头文件：`interfaces/kits/c/vibrator.h`、`vibrator_type.h`
 
@@ -103,7 +103,7 @@ typedef struct Vibrator_FileDescription {
 } Vibrator_FileDescription;
 ```
 
-详见 codewiki core.md §4.2(C API 接口)。
+详见 codewiki core.md §4.2(C API)。
 
 ## 客户端架构
 

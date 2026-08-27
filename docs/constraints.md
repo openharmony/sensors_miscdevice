@@ -41,7 +41,7 @@
 - SessionId 由服务侧分配，传到底层后由底层判断振动生命周期
 - `CustomVibrationMatcher` 为抹平算法：底层不支持某特性振动时，将振动效果抹平为对应的时长振动
 
-### C API 接口同步
+### C API同步
 - `frameworks/capi/` 封装 `interfaces/kits/c/`，两者是封装关系
 - 新增 C 接口时，`frameworks/capi/` 和 `interfaces/kits/c/` 都需要同步添加
 

@@ -1,4 +1,4 @@
-# 代码地图
+# 代码结构
 
 > sensors_miscdevice 仓库目录分层与模块职责。
 
@@ -10,7 +10,7 @@ miscdevice/
 │   ├── js/napi/                    # JS/ArkTS NAPI 绑定层（振动器）
 │   ├── native/
 │   │   ├── vibrator/               # 振动器 Native 客户端 + IPC Proxy
-│   │   └── light/                  # 灯光 Native 客户端 + NDK 接口
+│   │   └── light/                  # 灯光 Native 客户端 + C API
 │   ├── capi/                       # C API 封装层
 │   ├── cj/                         # Cangjie 语言绑定层
 │   └── ets/taihe/                  # Taihe/ETS 绑定层
@@ -33,7 +33,7 @@ miscdevice/
 │   ├── inner_api/
 │   │   ├── vibrator/              # 振动器内部 API（vibrator_agent.h）
 │   │   └── light/                 # 灯光内部 API（light_agent.h）
-│   └── kits/c/                    # NDK 公共 API（vibrator.h）
+│   └── kits/c/                    # C 公共 API（vibrator.h）
 ├── sa_profile/                    # 系统能力配置（SA 3602）
 ├── tools/
 │   └── ohos-vibratorControl/      # 振动器控制命令行工具
@@ -50,7 +50,7 @@ miscdevice/
 |------|------|------|----------|
 | JS NAPI Binding | `frameworks/js/napi/` | JS/ArkTS 振动器接口绑定，vibrate/startVibration/stop/查询 | `src/vibrator_js.cpp` |
 | Native Vibrator Client | `frameworks/native/vibrator/` | 振动器客户端 + IPC Proxy + 插拔订阅 + 自定义振动 | `src/vibrator_service_client.cpp` |
-| Native Light Client | `frameworks/native/light/` | 灯光客户端 + NDK 接口 + IPC Proxy | `light_agent.cpp`、`src/light_client.cpp` |
+| Native Light Client | `frameworks/native/light/` | 灯光客户端 + C API + IPC Proxy | `light_agent.cpp`、`src/light_client.cpp` |
 | C API | `frameworks/capi/` | C API 封装层，封装 `interfaces/kits/c/`，新增 C 接口两者都需同步 | - |
 | Cangjie 绑定 | `frameworks/cj/` | Cangjie 语言振动器 FFI 绑定 | `src/` |
 | Taihe/ETS 绑定 | `frameworks/ets/taihe/` | Taihe 声明式振动器接口 | - |

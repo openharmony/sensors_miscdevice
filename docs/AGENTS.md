@@ -5,7 +5,7 @@
 本仓库对应 OpenHarmony `泛sensor服务/sensors_miscdevice`，管理振动器（Vibrator）和灯光（Light）设备。优先按这些目录定位问题：
 
 - `frameworks/native/vibrator/`：振动器客户端 + IPC Proxy，入口 vibrator_service_client.cpp
-- `frameworks/native/light/`：灯光客户端 + NDK 接口，入口 light_agent.cpp / light_client.cpp
+- `frameworks/native/light/`：灯光客户端 + C API，入口 light_agent.cpp / light_client.cpp
 - `frameworks/js/napi/`：JS/ArkTS NAPI 绑定层，入口 vibrator_js.cpp
 - `services/miscdevice_service/`：Miscdevice Service（SA 3602），入口 miscdevice_service.cpp
 - `services/miscdevice_service/hdi_connection/`：HDI 驱动连接层
@@ -31,7 +31,7 @@ hdc shell "hidumper -s 3602"    # 验证 SA 存活
 |------|------|
 | 目录分层、模块职责 | docs/code-map.md |
 | 振动器 JS API（startVibration/pattern/查询） | docs/api/vibrator-js.md |
-| 振动器 Native/NDK 接口 | docs/api/vibrator-native.md |
+| 振动器 Native/C API | docs/api/vibrator-native.md |
 | 灯光 API（GetLightList/TurnOn/TurnOff） | docs/api/light.md |
 | IPC 接口与 Proxy/Stub | docs/architecture/ipc-design.md |
 | 振动控制数据流（应用→IPC→Service→HDI→马达） | docs/architecture/data-flow.md |

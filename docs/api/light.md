@@ -2,7 +2,7 @@
 
 > 灯光控制接口，位于 `frameworks/native/light/`。
 
-## NDK 接口
+## C API
 
 头文件：`interfaces/inner_api/light/light_agent.h`、`light_agent_type.h`
 
@@ -12,7 +12,7 @@
 | `TurnOn(lightId, color, animation)` | 点亮指定灯光 |
 | `TurnOff(lightId)` | 关闭指定灯光 |
 
-详见 codewiki core.md §4.2(C API 接口)、modules.md §2(Native Light Client)。
+详见 codewiki core.md §4.2(C API)、modules.md §2(Native Light Client)。
 
 ## 数据结构
 
@@ -40,7 +40,7 @@ struct LightAnimation {
 ## 客户端架构
 
 `LightClient` 单例（`frameworks/native/light/`）：
-- 懒加载：首次调用 `GetLightList` 时从服务端获取并缓存
+- 懒加载：第一次调用 `GetLightList` 时从服务端获取并缓存
 - IPC：通过 `IMiscdeviceService` Proxy 调用 SA 3602
 - 死亡监听：注册 `DeathRecipient`，服务死亡时自动重连
 - 参数校验：`IsLightIdValid` 校验 lightId，`IsLightAnimationValid` 校验动画参数

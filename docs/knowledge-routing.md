@@ -10,7 +10,7 @@
 | 编译命令、产物路径、测试 target、Feature flags | docs/build-test.md | hb build、miscdevice_service_target、SA 3602 |
 | 约束、反模式、依赖禁忌 | docs/constraints.md | VIBRATE权限、FreeVibratorPackage、strcpy_s |
 | 振动器 JS API（vibrate/startVibration/stop/查询） | docs/api/vibrator-js.md | startVibration、VibrateOptions、VibratorPatternBuilder |
-| 振动器 Native/NDK 接口 | docs/api/vibrator-native.md | vibrator_agent.h、OH_Vibrator_PlayVibration、VibratorServiceClient |
+| 振动器 Native/C API | docs/api/vibrator-native.md | vibrator_agent.h、OH_Vibrator_PlayVibration、VibratorServiceClient |
 | 灯光 API | docs/api/light.md | LightClient、GetLightList、TurnOn/TurnOff |
 | IPC 接口与 Proxy/Stub | docs/architecture/ipc-design.md | IMiscdeviceService.idl、Proxy-Stub、COMMAND_VIBRATE |
 | 振动控制数据流（应用→IPC→Service→HDI→硬件） | docs/architecture/data-flow.md | VibratorThread、VibrationPriorityManager、CustomVibrationMatcher |
