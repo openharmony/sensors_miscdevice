@@ -33,10 +33,12 @@ JS 应用 startVibration()
 |------|------|
 | VibratorIdentifier | `{deviceId, vibratorId}`，-1 表示默认 |
 | VibrateInfo | 振动参数：mode/packageName/pid/uid/usage/duration/effect/count/intensity/package/sessionId |
-| VibratePackage | 振动包：packageDuration + patterns 列表 |
-| VibratePattern | 模式：startTime + patternDuration + events 列表 |
-| VibrateEvent | 事件：tag(CONTINUOUS/TRANSIENT)/time/duration/intensity/frequency/index/points |
-| VibrateCurvePoint | 曲线点：time/intensity/frequency |
+| VibratePackage | 振动包：packageDuration + patterns 列表，IPC 序列化用 |
+| VibratePattern | 模式：startTime + patternDuration + events 列表，IPC 序列化用 |
+| VibrateEvent | 事件：tag(CONTINUOUS/TRANSIENT)/time/duration/intensity/frequency/index/points，IPC 序列化用 |
+| VibrateCurvePoint | 曲线点：time/intensity/frequency，IPC 序列化用 |
+
+> 命名规则：`Vibrate*` 前缀为 IPC/Native 层结构（VibrateInfo/VibratePackage/VibratePattern/VibrateEvent），`Vibrator*` 前缀为 JS 层类型（VibratorPattern/VibratorPatternBuilder）。JS 层 `VibratorPattern` 经序列化后转为 IPC 层 `VibratePattern` 传递。
 
 数据结构定义详见 core.md §5.2(振动器核心数据结构)。
 

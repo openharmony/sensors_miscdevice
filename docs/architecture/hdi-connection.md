@@ -5,11 +5,13 @@
 ```
 MiscdeviceService (services/miscdevice_service/)
   → VibratorHdiConnection (振动器 HDI 单例)
-    → HdiConnection (真实 HDI 实现)
-    → CompatibleConnection (兼容模拟实现)
+    → HdiConnection (真实 HDI 实现类，位于 hdi_connection/interface/)
+    → CompatibleConnection (兼容模拟实现类，位于 hdi_connection/adapter/)
   → LightHdiConnection (灯光 HDI 单例)
     → ILightInterface (HDI)
 ```
+
+> 注意：`hdi_connection` 既是目录名也是架构层名，`HdiConnection`（首字母大写）是其中的真实 HDI 实现类，需与泛指的"HDI 连接"概念区分。
 
 详见 codewiki core.md §3.1(整体架构)、modules.md §7(HDI Connection Layer)。
 

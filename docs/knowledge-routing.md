@@ -31,14 +31,19 @@
 | IVibratorInterface V2.0 | 振动器 HDI 接口主版本 |
 | ILightInterface V1.0 | 灯光 HDI 接口版本 |
 | VibratorIdentifier | 设备标识符 `{deviceId, vibratorId}`，-1 表示默认 |
-| VibrateInfo | 振动参数信息结构（type/usage/duration/effectId/count/intensity） |
-| VibratePackage | 振动包结构，含 patterns 列表 |
-| VibrateEvent | 振动事件，tag=CONTINUOUS/TRANSIENT |
-| VibrateCurvePoint | 振动曲线控制点（time/intensity/frequency） |
+| VibrateInfo | 振动参数信息结构（mode/packageName/pid/uid/usage/systemUsage/duration/effect/count/intensity/package/sessionId） |
+| VibratePackage | 振动包结构（packageDuration + patterns 列表），IPC 序列化用 |
+| VibratePattern | 振动模式（startTime + patternDuration + events 列表），IPC 序列化用 |
+| VibrateEvent | 振动事件（tag/time/duration/intensity/frequency/index/points），IPC 序列化用 |
+| VibrateCurvePoint | 振动曲线控制点（time/intensity/frequency），IPC 序列化用 |
+| VibratorPattern | JS 层振动模式类型，序列化为 VibratePattern 后通过 IPC 传递 |
+| VibratorPlugEvent | JS 层插拔事件类型（isVibratorOnline/deviceId/timestamp/vibratorCount），对应 Native 层 VibratorStatusEvent |
+| VibratorPlugState | 插拔状态枚举（PLUG_STATE_EVENT_PLUG_OUT=0 / PLUG_STATE_EVENT_PLUG_IN=1） |
+| VibratorStatusEvent | Native 层插拔事件结构，JS 层映射为 VibratorPlugEvent |
 | VibratorCapacity | 设备能力（高清触感/预设映射/时延控制） |
 | VibrationPriorityManager | 优先级管理器，通过 data_share 观察 settings 数据库决策振动是否执行 |
 | VibratorThread | 振动执行线程 |
-| CustomVibrationMatcher | 抹平算法，底层不支持某特性振动时抹平为时长振动 |
+| CustomVibrationMatcher | 抹平算法类（位于 `services/miscdevice_service/haptic_matcher/`），底层不支持某特性振动时抹平为时长振动 |
 | SessionId | 服务侧分配的会话标识，传到底层判断振动生命周期 |
 | miscdevice_common_event_subscriber | 监听公共事件，确认 data_share 是否可用 |
 | Haptic Decoder | 振动效果解码器，支持 HE/OH 格式 |
@@ -46,7 +51,8 @@
 | OH 格式 | 振动效果 JSON 格式之一（DefaultVibratorDecoder） |
 | Usage | 使用场景枚举（alarm/ring/notification/touch/media 等） |
 | systemUsage | 系统调用标志，绕过部分权限检查 |
-| CompatibleConnection | HDI 兼容模拟实现 |
+| CompatibleConnection | HDI 兼容模拟实现类（与 HdiConnection 真实实现并列，均位于 `hdi_connection/`） |
+| HdiConnection | 真实 HDI 实现类（注意：`hdi_connection` 也是目录/层名，引用类时指此类） |
 | QOS | Quality of Service，预设振动使用 QOS_USER_INTERACTIVE 优化响应 |
 | VibratorPatternBuilder | 振动模式构建器，链式调用构建复杂振动序列 |
 | ohos-vibratorControl | CLI 工具，直接调用 innerkit 接口操作振动，预置到系统镜像 |

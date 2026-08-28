@@ -57,8 +57,8 @@ miscdevice/
 | Miscdevice Service | `services/miscdevice_service/` | SA 3602 服务端，振动调度/优先级/灯光控制 | `src/miscdevice_service.cpp` |
 | VibrationPriorityManager | `services/miscdevice_service/` | 通过 data_share 观察 settings 数据库，决策振动是否执行 | `src/vibration_priority_manager.cpp` |
 | VibratorThread | `services/miscdevice_service/` | 振动执行线程 | `src/vibrator_thread.cpp` |
-| HDI Connection | `services/miscdevice_service/hdi_connection/` | HDI 驱动连接/重连/容错 | `interface/` |
-| Haptic Matcher | `services/miscdevice_service/haptic_matcher/` | 抹平算法，底层不支持某特性振动时抹平为时长振动 | - |
+| HDI Connection | `services/miscdevice_service/hdi_connection/` | HDI 驱动连接/重连/容错（含 `HdiConnection` 真实实现类和 `CompatibleConnection` 兼容实现类） | `interface/` |
+| CustomVibrationMatcher | `services/miscdevice_service/haptic_matcher/` | 抹平算法类，底层不支持某特性振动时抹平为时长振动（模块目录名为 `haptic_matcher`） | - |
 | Common Utils | `utils/common/` | 权限校验/JSON解析/IPC数据结构/日志 | `include/` |
 | Haptic Decoder | `utils/haptic_decoder/` | HE/OH 格式振动效果解码，波形调制 | `interface/` |
 | VibratorControl 工具 | `tools/ohos-vibratorControl/` | CLI 工具，直接调用 innerkit 接口操作振动，预置系统镜像 | `src/` |

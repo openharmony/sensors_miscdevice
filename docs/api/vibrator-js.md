@@ -65,6 +65,8 @@ vibrator.off('vibratorStateChange', callback?)
 
 `VibratorPlugEvent`: `isVibratorOnline`、`deviceId`、`timestamp`、`vibratorCount`
 
+> `VibratorPlugEvent` 是 JS 层事件类型，对应 Native 层 `VibratorStatusEvent`；`VibratorPlugState` 是插拔状态枚举（PLUG_OUT=0 / PLUG_IN=1）。
+
 详见 codewiki modules.md §1 §2.1.5(设备状态监听)、§7.3(设备热插拔监听)。
 
 ## 振动模式构建器
