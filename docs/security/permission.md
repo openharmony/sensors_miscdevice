@@ -5,7 +5,7 @@
 | 权限名 | 敏感级别 | 适用接口 |
 |--------|---------|---------|
 | `ohos.permission.VIBRATE` | system_grant | 所有振动相关接口 |
-| `ohos.permission.SYSTEM_LIGHT_CONTROL` | system_grant | 灯光控制接口 |
+| `ohos.permission.SYSTEM_LIGHT_CONTROL` | system_grant | 呼吸灯控制接口 |
 | `ohos.permission.MANAGE_VIBRATOR` | system_grant | 进程级控制接口 |
 
 详见 codewiki core.md §7.1.1(权限清单)。

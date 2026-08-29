@@ -39,6 +39,6 @@ IPC 契约定义在 `IMiscdeviceService.idl`，服务端为 `MiscdeviceServiceSt
 ## 客户端代理
 
 - `VibratorServiceClient`：振动器服务客户端单例，封装 IPC 调用
-- `LightClient`：灯光服务客户端单例，封装 IPC 调用
+- `LightClient`：呼吸灯服务客户端单例，封装 IPC 调用
 
 两者通过 `SystemAbilityManager::GetSystemAbility(3602)` 获取服务代理，注册 `DeathRecipient` 监听服务死亡。

@@ -1,6 +1,6 @@
-# 灯光 API
+# 呼吸灯 API
 
-> 灯光控制接口，位于 `frameworks/native/light/`。
+> 呼吸灯控制接口，位于 `frameworks/native/light/`。
 
 ## C API
 
@@ -8,9 +8,9 @@
 
 | 函数 | 说明 |
 |------|------|
-| `GetLightList(LightInfo **info, int32_t &count)` | 获取灯光设备列表 |
-| `TurnOn(lightId, color, animation)` | 点亮指定灯光 |
-| `TurnOff(lightId)` | 关闭指定灯光 |
+| `GetLightList(LightInfo **info, int32_t &count)` | 获取呼吸灯设备列表 |
+| `TurnOn(lightId, color, animation)` | 点亮指定呼吸灯 |
+| `TurnOff(lightId)` | 关闭指定呼吸灯 |
 
 详见 codewiki core.md §4.2(C API)、modules.md §2(Native Light Client)。
 
@@ -18,10 +18,10 @@
 
 ```cpp
 struct LightInfo {
-    int32_t lightId;           // 灯光设备 ID
-    int32_t lightType;         // 灯光类型
-    int32_t lightNumber;       // 灯光数量
-    char lightName[128];       // 灯光名称
+    int32_t lightId;           // 呼吸灯设备 ID
+    int32_t lightType;         // 呼吸灯类型
+    int32_t lightNumber;       // 呼吸灯数量
+    char lightName[128];       // 呼吸灯名称
 };
 
 struct LightColor {
@@ -35,7 +35,7 @@ struct LightAnimation {
 };
 ```
 
-详见 codewiki core.md §5.3(灯光数据结构)、modules.md §2 §6.1(核心数据结构)。
+详见 codewiki core.md §5.3(呼吸灯数据结构)、modules.md §2 §6.1(核心数据结构)。
 
 ## 客户端架构
 
@@ -44,6 +44,6 @@ struct LightAnimation {
 - IPC：通过 `IMiscdeviceService` Proxy 调用 SA 3602
 - 死亡监听：注册 `DeathRecipient`，服务死亡时自动重连
 - 参数校验：`IsLightIdValid` 校验 lightId，`IsLightAnimationValid` 校验动画参数
-- 内存管理：`malloc` 分配灯光列表，`ClearLightInfos` 释放
+- 内存管理：`malloc` 分配呼吸灯列表，`ClearLightInfos` 释放
 
 详见 codewiki modules.md §2 §7(设备管理)、§8(HDI交互)。

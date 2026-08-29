@@ -7,7 +7,7 @@ MiscdeviceService (services/miscdevice_service/)
   → VibratorHdiConnection (振动器 HDI 单例)
     → HdiConnection (真实 HDI 实现类，位于 hdi_connection/interface/)
     → CompatibleConnection (兼容模拟实现类，位于 hdi_connection/adapter/)
-  → LightHdiConnection (灯光 HDI 单例)
+  → LightHdiConnection (呼吸灯 HDI 单例)
     → ILightInterface (HDI)
 ```
 
@@ -48,6 +48,6 @@ IVibratorHdiConnection 接口（`services/miscdevice_service/hdi_connection/inte
 
 详见 codewiki core.md §3.1(CompatibleConnection)。
 
-## 灯光 HDI
+## 呼吸灯 HDI
 
-`LightHdiConnection` 通过 `ILightInterface` V1.0 与灯光驱动交互，控制灯光开关、颜色和动画。
+`LightHdiConnection` 通过 `ILightInterface` V1.0 与呼吸灯驱动交互，控制呼吸灯开关、颜色和动画。

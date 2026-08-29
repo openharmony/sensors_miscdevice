@@ -4,7 +4,7 @@
 
 ### 权限
 - 振动器接口需 `ohos.permission.VIBRATE`（system_grant），在 Service 端校验（来源：core.md §7.1.1）
-- 灯光控制接口需 `ohos.permission.SYSTEM_LIGHT_CONTROL`（system_grant）（来源：core.md §7.1.1）
+- 呼吸灯控制接口需 `ohos.permission.SYSTEM_LIGHT_CONTROL`（system_grant）（来源：core.md §7.1.1）
 - 进程级控制接口需 `ohos.permission.MANAGE_VIBRATOR`（来源：core.md §7.1.1）
 - `systemUsage=true` 的系统服务调用（TOKEN_NATIVE）可绕过部分权限检查（来源：core.md §7.1.3）
 - 敏感权限调用后通过 `AddPermissionUsedRecord()` 记录
@@ -16,7 +16,7 @@
 - `AsyncCallbackInfo` 继承 `RefBase`，使用引用计数管理生命周期
 
 ### 内存安全
-- 灯光列表使用 `malloc` 分配，`ClearLightInfos()` 通过 `free` 释放，懒加载策略（来源：modules.md §2 §2.2）
+- 呼吸灯列表使用 `malloc` 分配，`ClearLightInfos()` 通过 `free` 释放，懒加载策略（来源：modules.md §2 §2.2）
 - 自定义振动包解码后必须调用 `FreeVibratorPackage` 释放内存（来源：core.md §7.6）
 - 使用 `strcpy_s` 而非 `strcpy`（来源：modules.md §2 `ConvertLightInfos`）
 - IPC 数据结构实现 `Parcelable` 接口，通过 `Marshalling`/`Unmarshalling` 安全序列化（来源：core.md §5.5）
@@ -59,6 +59,10 @@
 - 整数溢出检测（`integer_overflow = true`）
 - UBSan（`ubsan = true`）（来源：core.md §7.3）
 
+### 呼吸灯使用约束
+- 呼吸灯功能需要在支持该硬件的设备上使用，不支持呼吸灯的设备调用相关接口会返回错误
+- 使用呼吸灯前需提供 HDI 适配（`ILightInterface`），确保设备驱动层已实现呼吸灯控制接口
+
 ## 反模式
 
 | 反模式 | 正确做法 |
@@ -70,9 +74,9 @@
 | 使用 `strcpy` 复制字符串 | 使用 `strcpy_s` 安全拷贝 |
 | 高频振动请求不做节流 | 系统会节流高频振动，防止硬件损坏 |
 | 应用退出前不取消插拔事件订阅 | 退出前调用 `UnSubscribeVibratorPlug` 避免野指针 |
-| 灯光列表使用后不释放 | `LightClient` 内部管理，但不要持有外部引用 |
+| 呼吸灯列表使用后不释放 | `LightClient` 内部管理，但不要持有外部引用 |
 | 修改 IPC 数据结构字段顺序而不更新 IDL | `IMiscdeviceService.idl` 是 IPC 契约，必须同步 |
-| 跳过 `IsLightIdValid` 直接控制灯光 | 必须先校验 lightId 在设备列表中 |
+| 跳过 `IsLightIdValid` 直接控制呼吸灯 | 必须先校验 lightId 在设备列表中 |
 
 ## 依赖禁忌
 
@@ -88,3 +92,42 @@
 - `tools/ohos-vibratorControl` 是 CLI 工具，支持应用直接操作振动接口
 - 与 Service 交互直接调用 innerkit 接口，之后走正常 IPC 流程
 - 该工具预置到系统镜像，非调试专用
+
+## 代码修改硬禁令
+
+以下规则在代码逻辑修改时**必须遵守**，违反任何一条即不可合入：
+
+### 1. 接口兼容性 — 禁止非兼容性变更
+- 所有修改必须符合已有接口定义，接口行为不能变动
+- 既有接口的输入输出语义、返回值、错误码含义不可改变
+- 新增参数必须有默认值，不可破坏已有调用方
+
+### 2. 公共 API 签名 — 禁止修改
+- 禁止修改公共 API 函数签名（参数类型/数量/顺序/返回类型）
+- `interfaces/inner_api/` 和 `interfaces/kits/c/` 下的头文件签名不可变
+- 新增接口必须新增函数，不可复用已有函数编号或 IPC command code
+
+### 3. SA profile — 禁止绕过
+- 禁止绕过 `sa_profile/3602.json` 的配置（SA ID、进程名、libpath、run-on-create 等）
+- 服务注册必须通过 `SystemAbilityManager` 标准流程
+- 禁止硬编码 SA ID，必须使用配置文件中的值
+
+### 4. JSON 解析 — 必须检查值存在性和类型
+- 使用 cJSON 解析时必须检查 key 是否存在（`cJSON_GetObjectItem` 返回非 null）
+- 必须检查值类型是否符合预期（`cJSON_IsNumber` / `cJSON_IsString` 等）
+- 禁止直接使用未经校验的 JSON 值
+
+### 5. 线程安全 — 跨线程操作必须加锁且排查死锁
+- 可能跨线程访问的变量必须加锁保护（`std::mutex` / `std::lock_guard`）
+- 加锁后禁止回调外部函数（可能间接获取同一把锁导致死锁）
+- 多锁场景必须保证全局统一的加锁顺序，禁止反向获取
+- 锁内禁止执行 IPC 调用（IPC 可能触发远端回调，间接获取同一把锁）
+
+### 6. 字符串转数字 — 禁止 std::stoi
+- 禁止使用 `std::stoi` 解析系统参数字符串（可能抛异常导致崩溃）
+- 必须使用 `std::from_chars` 并检查 `res.ec`：
+  ```cpp
+  int value = 0;
+  auto res = std::from_chars(str.data(), str.data() + str.size(), value);
+  if (res.ec != std::errc()) { /* 解析失败处理 */ }
+  ```

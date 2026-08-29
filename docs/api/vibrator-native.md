@@ -11,7 +11,7 @@
 | 函数 | 说明 |
 |------|------|
 | `StartVibrator(identifier, effect)` | 预设效果振动 |
-| `StartVibratorOnce(identifier, duration)` | 定时振动 |
+| `StartVibratorOnce(identifier, duration)` | 一次持续时间为 duration 的振动 |
 | `StopVibrator(identifier)` | 停止振动 |
 | `Cancel(identifier)` | 取消振动 |
 
@@ -19,8 +19,8 @@
 
 | 函数 | 说明 |
 |------|------|
-| `StartVibratorOnceEnhanced(identifier, duration)` | 增强版定时振动 |
-| `StartVibratorEnhanced(identifier, effect)` | 增强版预设效果 |
+| `StartVibratorOnceEnhanced(identifier, duration)` | 一次持续时间为 duration 的振动（支持多设备多马达） |
+| `StartVibratorEnhanced(identifier, effect)` | 预设效果振动（支持多设备多马达） |
 | `PlayVibratorCustomEnhanced(identifier, fd, offset, length)` | 自定义振动 |
 | `PlayPatternEnhanced(identifier, pattern)` | 模式振动 |
 | `PlayPrimitiveEffectEnhanced(identifier, effect)` | 预设效果增强 |
