@@ -10,7 +10,7 @@ miscdevice/
 │   ├── js/napi/                    # JS/ArkTS NAPI 绑定层（振动器）
 │   ├── native/
 │   │   ├── vibrator/               # 振动器 Native 客户端 + IPC Proxy
-│   │   └── light/                  # 灯光 Native 客户端 + C API
+│   │   └── light/                  # 呼吸灯 Native 客户端 + C API
 │   ├── capi/                       # C API 封装层
 │   ├── cj/                         # Cangjie 语言绑定层
 │   └── ets/taihe/                  # Taihe/ETS 绑定层
@@ -32,7 +32,7 @@ miscdevice/
 ├── interfaces/
 │   ├── inner_api/
 │   │   ├── vibrator/              # 振动器内部 API（vibrator_agent.h）
-│   │   └── light/                 # 灯光内部 API（light_agent.h）
+│   │   └── light/                 # 呼吸灯内部 API（light_agent.h）
 │   └── kits/c/                    # C 公共 API（vibrator.h）
 ├── sa_profile/                    # 系统能力配置（SA 3602）
 ├── tools/
@@ -50,11 +50,11 @@ miscdevice/
 |------|------|------|----------|
 | JS NAPI Binding | `frameworks/js/napi/` | JS/ArkTS 振动器接口绑定，vibrate/startVibration/stop/查询 | `src/vibrator_js.cpp` |
 | Native Vibrator Client | `frameworks/native/vibrator/` | 振动器客户端 + IPC Proxy + 插拔订阅 + 自定义振动 | `src/vibrator_service_client.cpp` |
-| Native Light Client | `frameworks/native/light/` | 灯光客户端 + C API + IPC Proxy | `light_agent.cpp`、`src/light_client.cpp` |
+| Native Light Client | `frameworks/native/light/` | 呼吸灯客户端 + C API + IPC Proxy | `light_agent.cpp`、`src/light_client.cpp` |
 | C API | `frameworks/capi/` | C API 封装层，封装 `interfaces/kits/c/`，新增 C 接口两者都需同步 | - |
 | Cangjie 绑定 | `frameworks/cj/` | Cangjie 语言振动器 FFI 绑定 | `src/` |
 | Taihe/ETS 绑定 | `frameworks/ets/taihe/` | Taihe 声明式振动器接口 | - |
-| Miscdevice Service | `services/miscdevice_service/` | SA 3602 服务端，振动调度/优先级/灯光控制 | `src/miscdevice_service.cpp` |
+| Miscdevice Service | `services/miscdevice_service/` | SA 3602 服务端，振动调度/优先级/呼吸灯控制 | `src/miscdevice_service.cpp` |
 | VibrationPriorityManager | `services/miscdevice_service/` | 通过 data_share 观察 settings 数据库，决策振动是否执行 | `src/vibration_priority_manager.cpp` |
 | VibratorThread | `services/miscdevice_service/` | 振动执行线程 | `src/vibrator_thread.cpp` |
 | HDI Connection | `services/miscdevice_service/hdi_connection/` | HDI 驱动连接/重连/容错（含 `HdiConnection` 真实实现类和 `CompatibleConnection` 兼容实现类） | `interface/` |

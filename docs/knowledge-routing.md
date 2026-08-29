@@ -11,7 +11,7 @@
 | 约束、反模式、依赖禁忌 | docs/constraints.md | VIBRATE权限、FreeVibratorPackage、strcpy_s |
 | 振动器 JS API（vibrate/startVibration/stop/查询） | docs/api/vibrator-js.md | startVibration、VibrateOptions、VibratorPatternBuilder |
 | 振动器 Native/C API | docs/api/vibrator-native.md | vibrator_agent.h、OH_Vibrator_PlayVibration、VibratorServiceClient |
-| 灯光 API | docs/api/light.md | LightClient、GetLightList、TurnOn/TurnOff |
+| 呼吸灯 API | docs/api/light.md | LightClient、GetLightList、TurnOn/TurnOff |
 | IPC 接口与 Proxy/Stub | docs/architecture/ipc-design.md | IMiscdeviceService.idl、Proxy-Stub、COMMAND_VIBRATE |
 | 振动控制数据流（应用→IPC→Service→HDI→硬件） | docs/architecture/data-flow.md | VibratorThread、VibrationPriorityManager、CustomVibrationMatcher |
 | HDI 连接/重连/容错 | docs/architecture/hdi-connection.md | IVibratorInterface V2.0、ILightInterface、DeathRecipient |
@@ -29,7 +29,7 @@
 | SA 3602 | MiscdeviceService 系统能力 ID，运行在 sensors 进程 |
 | HDI | Hardware Device Interface，硬件驱动接口 |
 | IVibratorInterface V2.0 | 振动器 HDI 接口主版本 |
-| ILightInterface V1.0 | 灯光 HDI 接口版本 |
+| ILightInterface V1.0 | 呼吸灯 HDI 接口版本 |
 | VibratorIdentifier | 设备标识符 `{deviceId, vibratorId}`，-1 表示默认 |
 | VibrateInfo | 振动参数信息结构（mode/packageName/pid/uid/usage/systemUsage/duration/effect/count/intensity/package/sessionId） |
 | VibratePackage | 振动包结构（packageDuration + patterns 列表），IPC 序列化用 |

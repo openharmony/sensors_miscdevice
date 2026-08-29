@@ -49,15 +49,15 @@ hdc shell "ps -ef | grep sensors"
 | 振动器 JS 单元测试 | test/unittest/vibrator/js/ | unittest |
 | 振动器 Native 单元测试 | test/unittest/vibrator/native/ | unittest |
 | 振动器 CAPI 单元测试 | test/unittest/vibrator/capi/ | unittest |
-| 灯光单元测试 | test/unittest/light/ | unittest |
+| 呼吸灯单元测试 | test/unittest/light/ | unittest |
 | 振动器 Fuzz | test/fuzztest/vibrator/ | fuzztest |
-| 灯光 Fuzz | test/fuzztest/light/ | fuzztest |
+| 呼吸灯 Fuzz | test/fuzztest/light/ | fuzztest |
 | 服务层 Fuzz | test/fuzztest/service/ | fuzztest |
 
 ## 调试
 
 ```sh
-# 查看振动器/灯光日志
+# 查看振动器/呼吸灯日志
 hilog -x | grep -i -E "miscdevice|vibrator|light"
 
 # 开启调试日志（需 root）
@@ -76,4 +76,4 @@ hdc shell "hisysevent -l"
 hdc shell "ohos-vibratorControl --help"
 ```
 
-> 涉及真实振动器/灯光硬件的行为，需要补充板侧证据。提交使用 `git commit -s`。
+> 涉及真实振动器/呼吸灯硬件的行为，需要补充板侧证据。提交使用 `git commit -s`。

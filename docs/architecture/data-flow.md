@@ -75,8 +75,8 @@ Level 3: frameworks/js/napi ← frameworks/native/vibrator (接口)
 
 详见 codewiki core.md §3.3(模块依赖关系)。
 
-## 灯光控制
+## 呼吸灯控制
 
-灯光控制通过 `LightClient` 单例 → IPC → `MiscdeviceService` → `LightHdiConnection` → `ILightInterface` → LED 驱动。
+呼吸灯控制通过 `LightClient` 单例 → IPC → `MiscdeviceService` → `LightHdiConnection` → `ILightInterface` → LED 驱动。
 
 详见 codewiki modules.md §2(Native Light Client)。
