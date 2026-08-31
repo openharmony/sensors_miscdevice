@@ -15,6 +15,8 @@
 
 #include "vibration_priority_manager.h"
 
+#include "parse_misc_settings_int64.h"
+
 #include <tokenid_kit.h>
 #include <regex>
 
@@ -68,7 +70,6 @@ const std::string INPUT_METHOD_KEY_BUNDLE_NAME = "bundleName";
 const std::string SETTING_CROWN_FEEDBACK_KEY = "watch_crown_feedback_enabled";
 const std::string SETTING_VIBRATE_INTENSITY_KEY = "vibration_intensity_index";
 #endif
-constexpr int32_t DECEM_BASE = 10;
 }  // namespace
 
 std::atomic_bool VibrationPriorityManager::isVibratorMute_ = false;
@@ -473,7 +474,10 @@ int32_t VibrationPriorityManager::GetDoNotDisturbLongValue(const std::string &ke
         MISC_HILOGE("GetDoNotDisturbStringValue failed, ret:%{public}d", ret);
         return ret;
     }
-    value = static_cast<int64_t>(strtoll(valueStr.c_str(), nullptr, DECEM_BASE));
+    if (!ParseMiscSettingsInt64(valueStr, value)) {
+        MISC_HILOGE("GetDoNotDisturbLongValue failed, value:%{public}s", valueStr.c_str());
+        return ERROR;
+    }
     return ERR_OK;
 }
 
@@ -624,7 +628,10 @@ int32_t VibrationPriorityManager::GetLongValue(const std::string &uri, const std
         MISC_HILOGE("GetStringValue failed, ret:%{public}d", ret);
         return ret;
     }
-    value = static_cast<int64_t>(strtoll(valueStr.c_str(), nullptr, DECEM_BASE));
+    if (!ParseMiscSettingsInt64(valueStr, value)) {
+        MISC_HILOGE("GetLongValue failed, value:%{public}s", valueStr.c_str());
+        return ERROR;
+    }
     return ERR_OK;
 }
 
