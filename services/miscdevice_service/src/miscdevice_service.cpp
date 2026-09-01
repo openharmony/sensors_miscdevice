@@ -595,8 +595,7 @@ void MiscdeviceService::StartVibrateThread(VibrateInfo info, const VibratorIdent
 void MiscdeviceService::StopVibrateThread(std::shared_ptr<VibratorThread> vibratorThread)
 {
     if ((vibratorThread != nullptr) && (vibratorThread->IsRunning())) {
-        vibratorThread->SetExitStatus(true);
-        vibratorThread->WakeUp();
+        vibratorThread->NotifyExit();
         vibratorThread->NotifyExitSync();
         vibratorThread->SetExitStatus(false);
         vibratorThread->ResetVibrateInfo();
