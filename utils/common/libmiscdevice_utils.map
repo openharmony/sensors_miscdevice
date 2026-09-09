@@ -1,0 +1,130 @@
+/*
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+{
+    global:
+        extern "C++" {
+            "OHOS::Sensors::JsonParser::JsonParser(OHOS::Sensors::RawFileDescriptor const&)";
+            "OHOS::Sensors::JsonParser::JsonParser(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
+            "OHOS::Sensors::JsonParser::~JsonParser()";
+            "OHOS::Sensors::GetFileName(int const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&)";
+            "OHOS::Sensors::GetFileSize(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
+            "OHOS::Sensors::GetFileSize(int)";
+            "OHOS::Sensors::CheckFileDir(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
+            "OHOS::Sensors::IsFileExists(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
+            "OHOS::Sensors::LightInfoIPC::SetLightId(int)";
+            "OHOS::Sensors::LightInfoIPC::SetLightName(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
+            "OHOS::Sensors::LightInfoIPC::SetLightType(int)";
+            "OHOS::Sensors::LightInfoIPC::Unmarshalling(OHOS::Parcel&)";
+            "OHOS::Sensors::LightInfoIPC::ReadFromParcel(OHOS::Parcel&)";
+            "OHOS::Sensors::LightInfoIPC::SetLightNumber(int)";
+            "OHOS::Sensors::ReadJsonFile(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
+            "OHOS::Sensors::CheckFileSize(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
+            "OHOS::Sensors::EffectInfoIPC::Unmarshalling(OHOS::Parcel&)";
+            "OHOS::Sensors::GetFileSuffix(int)";
+            "OHOS::Sensors::GetFileExtName(int const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&)";
+            "OHOS::Sensors::PermissionUtil::CheckVibratePermission(unsigned int, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
+            "OHOS::Sensors::VibratePackage::Unmarshalling(OHOS::Parcel&)";
+            "OHOS::Sensors::VibratePattern::Unmarshalling(OHOS::Parcel&)";
+            "OHOS::Sensors::VibratorInfoIPC::Unmarshalling(OHOS::Parcel&)";
+            "OHOS::Sensors::VibrateParameter::Unmarshalling(OHOS::Parcel&)";
+            "OHOS::Sensors::VibratorCapacity::Unmarshalling(OHOS::Parcel&)";
+            "OHOS::Sensors::VibratorCapacity::GetVibrateMode()";
+            "OHOS::Sensors::LightAnimationIPC::SetOffTime(int)";
+            "OHOS::Sensors::LightAnimationIPC::Unmarshalling(OHOS::Parcel&)";
+            "OHOS::Sensors::LightAnimationIPC::ReadFromParcel(OHOS::Parcel&)";
+            "OHOS::Sensors::LightAnimationIPC::SetMode(int)";
+            "OHOS::Sensors::LightAnimationIPC::SetOnTime(int)";
+            "OHOS::Sensors::PrimitiveEffectIPC::Unmarshalling(OHOS::Parcel&)";
+            "OHOS::Sensors::CheckFileExtendName(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
+            "OHOS::Sensors::CustomHapticInfoIPC::Unmarshalling(OHOS::Parcel&)";
+            "OHOS::Sensors::VibratorIdentifierIPC::Unmarshalling(OHOS::Parcel&)";
+            "OHOS::Sensors::ReadFd(OHOS::Sensors::RawFileDescriptor const&)";
+            "OHOS::Sensors::JsonParser::GetIntValue(cJSON*) const";
+            "OHOS::Sensors::JsonParser::GetArrayItem(cJSON*, int) const";
+            "OHOS::Sensors::JsonParser::GetArraySize(cJSON*) const";
+            "OHOS::Sensors::JsonParser::GetObjectItem(cJSON*, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&) const";
+            "OHOS::Sensors::JsonParser::GetObjectItem(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&) const";
+            "OHOS::Sensors::JsonParser::HasObjectItem(cJSON*, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&) const";
+            "OHOS::Sensors::JsonParser::HasObjectItem(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&) const";
+            "OHOS::Sensors::JsonParser::GetDoubleValue(cJSON*) const";
+            "OHOS::Sensors::JsonParser::GetStringValue(cJSON*) const";
+            "OHOS::Sensors::JsonParser::ParseJsonArray(cJSON*, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::vector<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, std::__h::allocator<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>>&) const";
+            "OHOS::Sensors::JsonParser::ParseJsonArray(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::vector<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, std::__h::allocator<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>>&) const";
+            "OHOS::Sensors::JsonParser::IsArray(cJSON*) const";
+            "OHOS::Sensors::LightInfoIPC::GetLightId() const";
+            "OHOS::Sensors::LightInfoIPC::Marshalling(OHOS::Parcel&) const";
+            "OHOS::Sensors::LightInfoIPC::GetLightName() const";
+            "OHOS::Sensors::LightInfoIPC::GetLightType() const";
+            "OHOS::Sensors::LightInfoIPC::GetLightNumber() const";
+            "OHOS::Sensors::EffectInfoIPC::Marshalling(OHOS::Parcel&) const";
+            "OHOS::Sensors::EffectInfoIPC::Dump() const";
+            "OHOS::Sensors::VibratePackage::Marshalling(OHOS::Parcel&) const";
+            "OHOS::Sensors::VibratePackage::Dump() const";
+            "OHOS::Sensors::VibratePattern::Marshalling(OHOS::Parcel&) const";
+            "OHOS::Sensors::VibratePattern::Dump() const";
+            "OHOS::Sensors::VibratorInfoIPC::Marshalling(OHOS::Parcel&) const";
+            "OHOS::Sensors::VibratorInfoIPC::Dump() const";
+            "OHOS::Sensors::VibrateParameter::Marshalling(OHOS::Parcel&) const";
+            "OHOS::Sensors::VibrateParameter::Dump() const";
+            "OHOS::Sensors::VibratorCapacity::Marshalling(OHOS::Parcel&) const";
+            "OHOS::Sensors::VibratorCapacity::Dump() const";
+            "OHOS::Sensors::LightAnimationIPC::GetOffTime() const";
+            "OHOS::Sensors::LightAnimationIPC::Marshalling(OHOS::Parcel&) const";
+            "OHOS::Sensors::LightAnimationIPC::GetMode() const";
+            "OHOS::Sensors::LightAnimationIPC::GetOnTime() const";
+            "OHOS::Sensors::PrimitiveEffectIPC::Marshalling(OHOS::Parcel&) const";
+            "OHOS::Sensors::PrimitiveEffectIPC::Dump() const";
+            "OHOS::Sensors::CustomHapticInfoIPC::Marshalling(OHOS::Parcel&) const";
+            "OHOS::Sensors::CustomHapticInfoIPC::Dump() const";
+            "OHOS::Sensors::VibratorIdentifierIPC::Marshalling(OHOS::Parcel&) const";
+            "OHOS::Sensors::VibratorIdentifierIPC::Dump() const";
+            "construction vtable for OHOS::Parcelable-in-OHOS::Sensors::LightInfoIPC";
+            "construction vtable for OHOS::Parcelable-in-OHOS::Sensors::EffectInfoIPC";
+            "construction vtable for OHOS::Parcelable-in-OHOS::Sensors::VibratePackage";
+            "construction vtable for OHOS::Parcelable-in-OHOS::Sensors::VibratePattern";
+            "construction vtable for OHOS::Parcelable-in-OHOS::Sensors::VibratorInfoIPC";
+            "construction vtable for OHOS::Parcelable-in-OHOS::Sensors::VibrateParameter";
+            "construction vtable for OHOS::Parcelable-in-OHOS::Sensors::VibratorCapacity";
+            "construction vtable for OHOS::Parcelable-in-OHOS::Sensors::LightAnimationIPC";
+            "construction vtable for OHOS::Parcelable-in-OHOS::Sensors::PrimitiveEffectIPC";
+            "construction vtable for OHOS::Parcelable-in-OHOS::Sensors::CustomHapticInfoIPC";
+            "construction vtable for OHOS::Parcelable-in-OHOS::Sensors::VibratorIdentifierIPC";
+            "VTT for OHOS::Sensors::LightInfoIPC";
+            "VTT for OHOS::Sensors::EffectInfoIPC";
+            "VTT for OHOS::Sensors::VibratePackage";
+            "VTT for OHOS::Sensors::VibratePattern";
+            "VTT for OHOS::Sensors::VibratorInfoIPC";
+            "VTT for OHOS::Sensors::VibrateParameter";
+            "VTT for OHOS::Sensors::VibratorCapacity";
+            "VTT for OHOS::Sensors::LightAnimationIPC";
+            "VTT for OHOS::Sensors::PrimitiveEffectIPC";
+            "VTT for OHOS::Sensors::CustomHapticInfoIPC";
+            "VTT for OHOS::Sensors::VibratorIdentifierIPC";
+            "vtable for OHOS::Sensors::LightInfoIPC";
+            "vtable for OHOS::Sensors::EffectInfoIPC";
+            "vtable for OHOS::Sensors::VibratePackage";
+            "vtable for OHOS::Sensors::VibratePattern";
+            "vtable for OHOS::Sensors::VibratorInfoIPC";
+            "vtable for OHOS::Sensors::VibrateParameter";
+            "vtable for OHOS::Sensors::VibratorCapacity";
+            "vtable for OHOS::Sensors::LightAnimationIPC";
+            "vtable for OHOS::Sensors::PrimitiveEffectIPC";
+            "vtable for OHOS::Sensors::CustomHapticInfoIPC";
+            "vtable for OHOS::Sensors::VibratorIdentifierIPC";
+        };
+    local:
+        *;
+};

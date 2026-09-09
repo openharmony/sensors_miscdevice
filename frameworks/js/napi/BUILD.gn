@@ -40,6 +40,8 @@ ohos_shared_library("vibrator") {
     "$SUBSYSTEM_DIR/frameworks/js/napi/vibrator/src/vibrator_pattern_js.cpp",
   ]
 
+  version_script = "libvibrator.map"
+
   deps = [
     "$SUBSYSTEM_DIR/frameworks/native/vibrator:vibrator_interface_native",
     "$SUBSYSTEM_DIR/utils/common:libmiscdevice_utils",

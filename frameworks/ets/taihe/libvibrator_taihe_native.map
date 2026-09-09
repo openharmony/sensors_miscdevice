@@ -1,0 +1,42 @@
+/*
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+{
+    global:
+        ANI_Constructor;
+        extern "C++" {
+            "taihe::from_ani_t<ohos::vibrator::VibrateEffect>::operator()(__ani_env*, __ani_ref*) const::field_0_from_ani_inner";
+            "taihe::from_ani_t<ohos::vibrator::VibrateEffect>::operator()(__ani_env*, __ani_ref*) const::field_1_from_ani_inner";
+            "taihe::from_ani_t<ohos::vibrator::VibrateEffect>::operator()(__ani_env*, __ani_ref*) const::field_2_from_ani_inner";
+            "taihe::from_ani_t<ohos::vibrator::VibrateEffect>::operator()(__ani_env*, __ani_ref*) const::field_3_from_ani_inner";
+            "taihe::from_ani_t<ohos::vibrator::VibratorEvent>::operator()(__ani_env*, __ani_object*) const::field_6_from_ani";
+            "taihe::from_ani_t<ohos::vibrator::ContinuousParam>::operator()(__ani_env*, __ani_object*) const::field_2_from_ani";
+            "taihe::from_ani_t<ohos::vibrator::VibrateFromFile>::operator()(__ani_env*, __ani_object*) const::field_1_from_ani";
+            "taihe::from_ani_t<ohos::vibrator::VibrateFromPattern>::operator()(__ani_env*, __ani_object*) const::field_1_from_ani";
+            "taihe::into_ani_t<ohos::vibrator::VibratorEvent>::operator()(__ani_env*, ohos::vibrator::VibratorEvent const&) const::field_2_into_ani";
+            "taihe::into_ani_t<ohos::vibrator::VibratorEvent>::operator()(__ani_env*, ohos::vibrator::VibratorEvent const&) const::field_3_into_ani";
+            "taihe::into_ani_t<ohos::vibrator::VibratorEvent>::operator()(__ani_env*, ohos::vibrator::VibratorEvent const&) const::field_4_into_ani";
+            "taihe::into_ani_t<ohos::vibrator::VibratorEvent>::operator()(__ani_env*, ohos::vibrator::VibratorEvent const&) const::field_5_into_ani";
+            "taihe::into_ani_t<ohos::vibrator::VibratorCurvePoint>::operator()(__ani_env*, ohos::vibrator::VibratorCurvePoint const&) const::field_1_into_ani";
+            "taihe::into_ani_t<ohos::vibrator::VibratorCurvePoint>::operator()(__ani_env*, ohos::vibrator::VibratorCurvePoint const&) const::field_2_into_ani";
+            "taihe::from_ani_t<ohos::vibrator::VibratorPattern>::operator()(__ani_env*, __ani_object*) const::{lambda(__ani_env*, __ani_array*)#1}::operator()(__ani_env*, __ani_array*) const::item_from_ani_inner";
+            "taihe::into_ani_t<ohos::vibrator::VibratorEvent>::operator()(__ani_env*, ohos::vibrator::VibratorEvent const&) const::{lambda(__ani_env*, taihe::optional_view<taihe::array<ohos::vibrator::VibratorCurvePoint> >)#1}::operator()(__ani_env*, taihe::optional_view<taihe::array<ohos::vibrator::VibratorCurvePoint> >) const::item_into_ani_inner";
+            "taihe::into_ani_t<ohos::vibrator::VibratorPattern>::operator()(__ani_env*, ohos::vibrator::VibratorPattern const&) const::{lambda(__ani_env*, taihe::array_view<ohos::vibrator::VibratorEvent>)#1}::operator()(__ani_env*, taihe::array_view<ohos::vibrator::VibratorEvent>) const::item_into_ani_inner";
+            "taihe::from_ani_t<ohos::vibrator::VibratorEvent>::operator()(__ani_env*, __ani_object*) const::{lambda(__ani_env*, __ani_ref*)#5}::operator()(__ani_env*, __ani_ref*) const::{lambda(__ani_env*, __ani_array*)#1}::operator()(__ani_env*, __ani_array*) const::item_from_ani_inner";
+            "taihe::from_ani_t<ohos::vibrator::ContinuousParam>::operator()(__ani_env*, __ani_object*) const::{lambda(__ani_env*, __ani_ref*)#3}::operator()(__ani_env*, __ani_ref*) const::{lambda(__ani_env*, __ani_array*)#1}::operator()(__ani_env*, __ani_array*) const::item_from_ani_inner";
+        };
+    local:
+        *;
+};

@@ -50,6 +50,8 @@ ohos_shared_library("libvibrator_decoder") {
     "-Oz",
   ]
 
+  version_script = "libvibrator_decoder.map"
+
   deps = [
     "$SUBSYSTEM_DIR/utils/common:libmiscdevice_utils",
     "$SUBSYSTEM_DIR/utils/haptic_decoder/he_json:libhe_vibrator_decoder",

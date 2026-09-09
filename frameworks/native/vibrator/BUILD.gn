@@ -140,6 +140,8 @@ ohos_shared_library("vibrator_interface_native") {
 
   cflags = [ "-Wno-error=inconsistent-missing-override" ]
 
+  version_script = "libvibrator_agent.map"
+
   deps = [
     "$SUBSYSTEM_DIR/frameworks/native/light:light_ndk_header",
     "$SUBSYSTEM_DIR/frameworks/native/vibrator:libvibrator_native",
@@ -177,6 +179,8 @@ ohos_shared_library("libvibrator_native") {
     "$SUBSYSTEM_DIR/interfaces/inner_api/light",
     "$SUBSYSTEM_DIR/utils/common/include",
   ]
+
+  version_script = "libvibrator_native.map"
 
   deps = [
     ":miscdevice_service_interface",

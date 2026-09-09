@@ -64,6 +64,7 @@ taihe_shared_library("vibrator_taihe_native") {
     "author/src/ani_constructor.cpp",
     "author/src/ohos.vibrator.impl.cpp",
   ]
+  version_script = "libvibrator_taihe_native.map"
   deps = [
     ":run_taihe",
     "$SUBSYSTEM_DIR/frameworks/native/vibrator:vibrator_interface_native",

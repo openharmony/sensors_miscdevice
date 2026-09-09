@@ -1,0 +1,121 @@
+/*
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+{
+    global:
+        extern "C++" {
+            "OHOS::Sensors::MiscdeviceServiceProxy::delegator";
+            "OHOS::Singleton<OHOS::Sensors::VibratorServiceClient>::instance";
+            "OHOS::Sensors::IMiscdeviceService::LABEL";
+            "OHOS::Sensors::VibratorClientStub::GetSystemTime()";
+            "OHOS::Sensors::VibratorClientStub::OnRemoteRequest(unsigned int, OHOS::MessageParcel&, OHOS::MessageParcel&, OHOS::MessageOption&)";
+            "OHOS::Sensors::VibratorClientStub::ProcessPlugEvent(int, int, int)";
+            "OHOS::Sensors::VibratorServiceClient::PreProcess(VibratorFileDescription const&, VibratorPackage&)";
+            "OHOS::Sensors::VibratorServiceClient::PlayPattern(VibratorIdentifier const&, VibratorPattern const&, int, bool, VibratorParameter const&)";
+            "OHOS::Sensors::VibratorServiceClient::GetDelayTime(VibratorIdentifier const&, int&)";
+            "OHOS::Sensors::VibratorServiceClient::SetLoopCount(VibratorIdentifier const&, int)";
+            "OHOS::Sensors::VibratorServiceClient::StopVibrator(VibratorIdentifier const&)";
+            "OHOS::Sensors::VibratorServiceClient::StopVibrator(VibratorIdentifier const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
+            "OHOS::Sensors::VibratorServiceClient::GetEffectInfo(VibratorIdentifier const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, EffectInfo&)";
+            "OHOS::Sensors::VibratorServiceClient::SetParameters(VibratorIdentifier const&, VibratorParameter const&)";
+            "OHOS::Sensors::VibratorServiceClient::GetVibratorList(VibratorIdentifier const&, std::__h::vector<VibratorInfos, std::__h::allocator<VibratorInfos>>&)";
+            "OHOS::Sensors::VibratorServiceClient::InitPlayPattern(VibratorIdentifier const&, VibratorPattern const&, int, bool, VibratorParameter const&)";
+            "OHOS::Sensors::VibratorServiceClient::IsSupportEffect(VibratorIdentifier const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, bool&)";
+            "OHOS::Sensors::VibratorServiceClient::ModulatePackage(VibratorEvent const&, VibratorPackage const&, VibratorPackage&)";
+            "OHOS::Sensors::VibratorServiceClient::InitServiceClient()";
+            "OHOS::Sensors::VibratorServiceClient::SeekTimeOnPackage(int, VibratorPackage const&, VibratorPackage&)";
+            "OHOS::Sensors::VibratorServiceClient::HandleVibratorData(VibratorStatusEvent)";
+            "OHOS::Sensors::VibratorServiceClient::LoadDecoderLibrary(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
+            "OHOS::Sensors::VibratorServiceClient::PlayVibratorCustom(VibratorIdentifier const&, OHOS::Sensors::RawFileDescriptor const&, int, bool, VibratorParameter const&)";
+            "OHOS::Sensors::VibratorServiceClient::EnableVibratorByPid(int)";
+            "OHOS::Sensors::VibratorServiceClient::FreeVibratorPackage(VibratorPackage&)";
+            "OHOS::Sensors::VibratorServiceClient::GetVibratorCapacity(VibratorIdentifier const&, OHOS::Sensors::VibratorCapacity&)";
+            "OHOS::Sensors::VibratorServiceClient::IsHdHapticSupported(VibratorIdentifier const&)";
+            "OHOS::Sensors::VibratorServiceClient::PlayPrimitiveEffect(VibratorIdentifier const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, OHOS::Sensors::PrimitiveEffect const&)";
+            "OHOS::Sensors::VibratorServiceClient::BinarySearchInterval(std::__h::vector<OHOS::Sensors::VibratorCurveInterval, std::__h::allocator<OHOS::Sensors::VibratorCurveInterval>> const&, int, int&)";
+            "OHOS::Sensors::VibratorServiceClient::DisableVibratorByPid(int)";
+            "OHOS::Sensors::VibratorServiceClient::ProcessDeathObserver(OHOS::wptr<OHOS::IRemoteObject> const&)";
+            "OHOS::Sensors::VibratorServiceClient::ModulateVibratorEvent(VibratorEvent const&, int, VibratorEvent const&, VibratorEvent&)";
+            "OHOS::Sensors::VibratorServiceClient::ConvertVibratorPackage(VibratorPackage const&, OHOS::Sensors::VibratePackage&)";
+            "OHOS::Sensors::VibratorServiceClient::ConvertVibratorPackage(OHOS::Sensors::VibratePackage const&, VibratorPackage&)";
+            "OHOS::Sensors::VibratorServiceClient::ConvertVibratorPattern(VibratorPattern const&, OHOS::Sensors::VibratePattern&)";
+            "OHOS::Sensors::VibratorServiceClient::PlayPackageBySessionId(VibratorIdentifier const&, OHOS::Sensors::VibratorEffectParameter const&, VibratorPackage const&)";
+            "OHOS::Sensors::VibratorServiceClient::RestrictFrequencyRange(int)";
+            "OHOS::Sensors::VibratorServiceClient::RestrictIntensityRange(int)";
+            "OHOS::Sensors::VibratorServiceClient::StopVibrateBySessionId(VibratorIdentifier const&, unsigned int)";
+            "OHOS::Sensors::VibratorServiceClient::IsSupportVibratorCustom(VibratorIdentifier const&)";
+            "OHOS::Sensors::VibratorServiceClient::ModulateVibratorPattern(VibratorEvent const&, VibratorPattern const&, VibratorPattern&)";
+            "OHOS::Sensors::VibratorServiceClient::WriteOtherHiSysIPCEvent(OHOS::Sensors::IMiscdeviceServiceIpcCode, int)";
+            "OHOS::Sensors::VibratorServiceClient::GetSubscribeUserCallback(int)";
+            "OHOS::Sensors::VibratorServiceClient::SubscribeVibratorPlugInfo(VibratorUser const*)";
+            "OHOS::Sensors::VibratorServiceClient::ConvertSeekVibratorPackage(VibratorPackage const&, OHOS::Sensors::VibratePackage&, int)";
+            "OHOS::Sensors::VibratorServiceClient::GetVibratorEffectParameter(VibratorIdentifier const&)";
+            "OHOS::Sensors::VibratorServiceClient::TransferClientRemoteObject()";
+            "OHOS::Sensors::VibratorServiceClient::WriteVibratorHiSysIPCEvent(OHOS::Sensors::IMiscdeviceServiceIpcCode, int)";
+            "OHOS::Sensors::VibratorServiceClient::GetCurveListAfterModulation(std::__h::vector<OHOS::Sensors::VibratorCurveInterval, std::__h::allocator<OHOS::Sensors::VibratorCurveInterval>> const&, VibratorEvent const&, int)";
+            "OHOS::Sensors::VibratorServiceClient::UnsubscribeVibratorPlugInfo(VibratorUser const*)";
+            "OHOS::Sensors::VibratorServiceClient::ModulateEventWithCurvePoints(std::__h::vector<OHOS::Sensors::VibratorCurveInterval, std::__h::allocator<OHOS::Sensors::VibratorCurveInterval>>&, int, VibratorEvent const&, VibratorEvent&)";
+            "OHOS::Sensors::VibratorServiceClient::ModulateEventWithoutCurvePoints(std::__h::vector<OHOS::Sensors::VibratorCurveInterval, std::__h::allocator<OHOS::Sensors::VibratorCurveInterval>> const&, int, VibratorEvent const&, VibratorEvent&)";
+            "OHOS::Sensors::VibratorServiceClient::SkipEventAndConvertVibratorEvent(VibratorEvent const&, OHOS::Sensors::VibratePattern&, int, OHOS::Sensors::VibrateEvent&)";
+            "OHOS::Sensors::VibratorServiceClient::FreePartiallyAllocatedVibratorEvents(VibratorEvent**, int)";
+            "OHOS::Sensors::VibratorServiceClient::ConvertVibratorEventsToCurveIntervals(VibratorEvent const&, int, std::__h::vector<OHOS::Sensors::VibratorCurveInterval, std::__h::allocator<OHOS::Sensors::VibratorCurveInterval>>&)";
+            "OHOS::Sensors::VibratorServiceClient::FreePartiallyAllocatedVibratorPatterns(VibratorPattern**, int)";
+            "OHOS::Sensors::VibratorServiceClient::Vibrate(VibratorIdentifier const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int, int, bool)";
+            "OHOS::Sensors::VibratorServiceClient::Vibrate(VibratorIdentifier const&, int, int, bool)";
+            "OHOS::Sensors::VibratorServiceClient::SetUsage(VibratorIdentifier const&, int, bool)";
+            "OHOS::Sensors::VibratorServiceClient::~VibratorServiceClient()";
+            "OHOS::Sensors::MiscdeviceServiceProxy::PlayPattern(OHOS::Sensors::VibratorIdentifierIPC const&, OHOS::Sensors::VibratePattern const&, OHOS::Sensors::CustomHapticInfoIPC const&)";
+            "OHOS::Sensors::MiscdeviceServiceProxy::GetDelayTime(OHOS::Sensors::VibratorIdentifierIPC const&, int&)";
+            "OHOS::Sensors::MiscdeviceServiceProxy::GetLightList(std::__h::vector<OHOS::Sensors::LightInfoIPC, std::__h::allocator<OHOS::Sensors::LightInfoIPC>>&)";
+            "OHOS::Sensors::MiscdeviceServiceProxy::StopVibrator(OHOS::Sensors::VibratorIdentifierIPC const&)";
+            "OHOS::Sensors::MiscdeviceServiceProxy::GetEffectInfo(OHOS::Sensors::VibratorIdentifierIPC const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, OHOS::Sensors::EffectInfoIPC&)";
+            "OHOS::Sensors::MiscdeviceServiceProxy::GetVibratorList(OHOS::Sensors::VibratorIdentifierIPC const&, std::__h::vector<OHOS::Sensors::VibratorInfoIPC, std::__h::allocator<OHOS::Sensors::VibratorInfoIPC>>&)";
+            "OHOS::Sensors::MiscdeviceServiceProxy::IsSupportEffect(OHOS::Sensors::VibratorIdentifierIPC const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, bool&)";
+            "OHOS::Sensors::MiscdeviceServiceProxy::PlayVibratorCustom(OHOS::Sensors::VibratorIdentifierIPC const&, OHOS::Sensors::VibratePackage const&, OHOS::Sensors::CustomHapticInfoIPC const&)";
+            "OHOS::Sensors::MiscdeviceServiceProxy::PlayVibratorEffect(OHOS::Sensors::VibratorIdentifierIPC const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int, int, bool)";
+            "OHOS::Sensors::MiscdeviceServiceProxy::StopVibratorByMode(OHOS::Sensors::VibratorIdentifierIPC const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
+            "OHOS::Sensors::MiscdeviceServiceProxy::EnableVibratorByPid(int)";
+            "OHOS::Sensors::MiscdeviceServiceProxy::GetVibratorCapacity(OHOS::Sensors::VibratorIdentifierIPC const&, OHOS::Sensors::VibratorCapacity&)";
+            "OHOS::Sensors::MiscdeviceServiceProxy::PlayPrimitiveEffect(OHOS::Sensors::VibratorIdentifierIPC const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, OHOS::Sensors::PrimitiveEffectIPC const&)";
+            "OHOS::Sensors::MiscdeviceServiceProxy::DisableVibratorByPid(int)";
+            "OHOS::Sensors::MiscdeviceServiceProxy::PlayPackageBySessionId(OHOS::Sensors::VibratorIdentifierIPC const&, OHOS::Sensors::VibratePackage const&, OHOS::Sensors::CustomHapticInfoIPC const&)";
+            "OHOS::Sensors::MiscdeviceServiceProxy::StopVibrateBySessionId(OHOS::Sensors::VibratorIdentifierIPC const&, unsigned int)";
+            "OHOS::Sensors::MiscdeviceServiceProxy::SubscribeVibratorPlugInfo(OHOS::sptr<OHOS::IRemoteObject> const&)";
+            "OHOS::Sensors::MiscdeviceServiceProxy::TransferClientRemoteObject(OHOS::sptr<OHOS::IRemoteObject> const&)";
+            "OHOS::Sensors::MiscdeviceServiceProxy::TurnOn(int, int, OHOS::Sensors::LightAnimationIPC const&)";
+            "OHOS::Sensors::MiscdeviceServiceProxy::TurnOff(int)";
+            "OHOS::Sensors::MiscdeviceServiceProxy::Vibrate(OHOS::Sensors::VibratorIdentifierIPC const&, int, int, bool)";
+            "OHOS::HiviewDFX::HiSysEvent::Domain::MISCDEVICE";
+            "Construction vtable for OHOS::IRemoteStub<OHOS::Sensors::IVibratorClient>-in-OHOS::Sensors::VibratorClientStub";
+            "Construction vtable for OHOS::IPCObjectStub-in-OHOS::Sensors::VibratorClientStub";
+            "Construction vtable for OHOS::IRemoteObject-in-OHOS::Sensors::VibratorClientStub";
+            "Construction vtable for OHOS::Sensors::IVibratorClient-in-OHOS::Sensors::VibratorClientStub";
+            "Construction vtable for OHOS::IRemoteBroker-in-OHOS::Sensors::VibratorClientStub";
+            "Construction vtable for OHOS::Parcelable-in-OHOS::Sensors::VibratorClientStub";
+            "Construction vtable for OHOS::Sensors::IMiscdeviceService-in-OHOS::Sensors::MiscdeviceServiceProxy";
+            "Construction vtable for OHOS::IRemoteProxy<OHOS::Sensors::IMiscdeviceService>-in-OHOS::Sensors::MiscdeviceServiceProxy";
+            "Construction vtable for OHOS::IRemoteBroker-in-OHOS::Sensors::MiscdeviceServiceProxy";
+            "VTT for OHOS::Sensors::VibratorClientStub";
+            "VTT for OHOS::Sensors::MiscdeviceServiceProxy";
+            "vtable for OHOS::Sensors::VibratorClientStub";
+            "vtable for OHOS::Sensors::VibratorServiceClient";
+            "vtable for OHOS::Sensors::MiscdeviceServiceProxy";
+            "non-virtual thunk to OHOS::Sensors::VibratorClientStub::ProcessPlugEvent(int, int, int)";
+            "OHOS::Sensors::InnerFunctionTracer::InnerFunctionTracer(char const*, char const*)::hilogFmt114";
+            "OHOS::Sensors::InnerFunctionTracer::~InnerFunctionTracer()::hilogFmt122";
+        };
+    local:
+        *;
+};
