@@ -45,6 +45,8 @@ ohos_shared_library("libmiscdevice_utils") {
 
   include_dirs = [ "include" ]
 
+  version_script = "libmiscdevice_utils.map"
+
   deps = []
 
   external_deps = [

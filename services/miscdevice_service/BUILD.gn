@@ -64,6 +64,8 @@ ohos_shared_library("libmiscdevice_service") {
     debug = false
   }
 
+  version_script = "libmiscdevice_service.map"
+
   deps = [
     "$SUBSYSTEM_DIR/frameworks/native/vibrator:miscdevice_service_stub",
     "$SUBSYSTEM_DIR/utils/common:libmiscdevice_utils",

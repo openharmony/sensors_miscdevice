@@ -51,6 +51,8 @@ ohos_shared_library("light_interface_native") {
 
   cflags = [ "-Wno-error=inconsistent-missing-override" ]
 
+  version_script = "liblight_agent.map"
+
   deps = [
     "$SUBSYSTEM_DIR/frameworks/native/light:liblight_native",
     "$SUBSYSTEM_DIR/frameworks/native/light:liblight_ndk",
@@ -87,6 +89,8 @@ ohos_shared_library("liblight_native") {
   }
 
   cflags = [ "-fstack-protector-all" ]
+
+  version_script = "liblight_native.map"
 
   deps = [
     "$SUBSYSTEM_DIR/frameworks/native/light:light_ndk_header",

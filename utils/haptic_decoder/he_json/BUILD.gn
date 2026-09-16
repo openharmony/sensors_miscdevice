@@ -48,6 +48,8 @@ ohos_shared_library("libhe_vibrator_decoder") {
     "$SUBSYSTEM_DIR/utils/haptic_decoder/interface",
   ]
 
+  version_script = "libhe_vibrator_decoder.map"
+
   deps = [ "$SUBSYSTEM_DIR/utils/common:libmiscdevice_utils" ]
 
   external_deps = [

@@ -31,6 +31,8 @@ ohos_shared_library("ohvibrator") {
 
   defines = [ "API_EXPORT=__attribute__((visibility (\"default\")))" ]
 
+  version_script = "libohvibrator.map"
+
   deps =
       [ "$SUBSYSTEM_DIR/frameworks/native/vibrator:vibrator_interface_native" ]
 
