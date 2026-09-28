@@ -57,8 +57,10 @@
         SubscribeVibratorPlug;
         UnSubscribeVibratorPlug;
         extern "C++" {
-            "OHOS::Sensors::MiscdeviceServiceProxy::delegator";
-            "OHOS::Singleton<OHOS::Sensors::VibratorServiceClient>::instance";
+            "guard variable for OHOS::Sensors::MiscdeviceServiceProxy::delegator_";
+            "guard variable for OHOS::Singleton<OHOS::Sensors::VibratorServiceClient>::instance_";
+            "OHOS::Sensors::MiscdeviceServiceProxy::delegator_";
+            "OHOS::Singleton<OHOS::Sensors::VibratorServiceClient>::instance_";
             "OHOS::Sensors::InnerFunctionTracer::InnerFunctionTracer(char const*, char const*)::hilogFmt114";
             "OHOS::Sensors::InnerFunctionTracer::~InnerFunctionTracer()::hilogFmt122";
         };

@@ -16,8 +16,10 @@
 {
     global:
         extern "C++" {
-            "OHOS::Sensors::MiscdeviceServiceProxy::delegator";
-            "OHOS::Singleton<OHOS::Sensors::VibratorServiceClient>::instance";
+            "guard variable for OHOS::Sensors::MiscdeviceServiceProxy::delegator_";
+            "guard variable for OHOS::Singleton<OHOS::Sensors::VibratorServiceClient>::instance_";
+            "OHOS::Sensors::MiscdeviceServiceProxy::delegator_";
+            "OHOS::Singleton<OHOS::Sensors::VibratorServiceClient>::instance_";
             "OHOS::Sensors::IMiscdeviceService::LABEL";
             "OHOS::Sensors::VibratorClientStub::GetSystemTime()";
             "OHOS::Sensors::VibratorClientStub::OnRemoteRequest(unsigned int, OHOS::MessageParcel&, OHOS::MessageParcel&, OHOS::MessageOption&)";
